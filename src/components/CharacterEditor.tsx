@@ -71,7 +71,7 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onSave }) => {
     <span style={{ color: '#000', fontWeight: 400 }}>
       <b><i style={{ color: '#116372' }}>Psychosomatic Harmony.</i></b> You are <b>[resistant]</b> to <b><u style={{ color: '#a929ff', display: 'inline-flex', alignItems: 'center' }}>
         Neural
-        <img src="/neural.png" alt="Neural" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+        <img src="/Neural.png" alt="Neural" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
       </u></b> and can <b><i style={{ color: '#351c75' }}>Strike</i></b> <b>[1]</b> extra time per turn.
     </span>
   );
@@ -331,7 +331,7 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onSave }) => {
     : subspeciesOptionsMap[species] || [];
 
   return (
-    <div className="character-editor">
+    <div className="character-editor" style={{ position: 'relative' }}>
       <h2>{sheet ? "Edit Character" : "New Character"}</h2>
       <section className="header-info">
         <h3 style={{ fontWeight: 'bold', textDecoration: 'underline' }}>Identity</h3>
@@ -419,6 +419,25 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onSave }) => {
     </select>
   </label><br />
   <label style={{ fontWeight: 'bold' }}>Background: <input value={background} onChange={e => setBackground(e.target.value)} /></label><br />
+      </section>
+
+      {/* Move Features section here */}
+      <section className="features">
+        <h3 style={{ color: '#0b5394', fontWeight: 'bold', textDecoration: 'underline' }}>Features</h3>
+        <label style={{ color: '#0b5394', fontWeight: 'bold' }}>Class Feature: {
+          charClass === "Chemist"
+            ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{chemistFeatureJSX}</span>
+            : charClass === "Coder"
+              ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{coderFeatureJSX}</span>
+              : charClass === "Commander"
+                ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{commanderFeatureJSX}</span>
+                : charClass === "Contemplative"
+                  ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{contemplativeFeatureJSX}</span>
+                  : <input value={classFeature} onChange={e => setClassFeature(e.target.value)} />
+        }</label><br />
+        <label style={{ color: '#0b5394', fontWeight: 'bold' }}>Subclass Feature: <input value={subclassFeature} onChange={e => setSubclassFeature(e.target.value)} /></label><br />
+        <label style={{ color: '#0b5394', fontWeight: 'bold' }}>Species Feature: <input value={speciesFeature} onChange={e => setSpeciesFeature(e.target.value)} /></label><br />
+        <label style={{ color: '#0b5394', fontWeight: 'bold' }}>Subspecies Feature: <input value={subspeciesFeature} onChange={e => setSubspeciesFeature(e.target.value)} /></label><br />
       </section>
 
       {/* Hit Points Section */}
@@ -516,24 +535,6 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onSave }) => {
         <label style={{ color: '#351c75', fontWeight: 'bold' }}>Strike Effects: <input value={strikeEffects} onChange={e => setStrikeEffects(e.target.value)} /></label><br />
       </section>
 
-        <section className="features">
-          <h3 style={{ color: '#0b5394', fontWeight: 'bold', textDecoration: 'underline' }}>Features</h3>
-          <label style={{ color: '#0b5394', fontWeight: 'bold' }}>Class Feature: {
-            charClass === "Chemist"
-              ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{chemistFeatureJSX}</span>
-              : charClass === "Coder"
-                ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{coderFeatureJSX}</span>
-                : charClass === "Commander"
-                  ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{commanderFeatureJSX}</span>
-                  : charClass === "Contemplative"
-                    ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{contemplativeFeatureJSX}</span>
-                    : <input value={classFeature} onChange={e => setClassFeature(e.target.value)} />
-          }</label><br />
-          <label style={{ color: '#0b5394', fontWeight: 'bold' }}>Subclass Feature: <input value={subclassFeature} onChange={e => setSubclassFeature(e.target.value)} /></label><br />
-          <label style={{ color: '#0b5394', fontWeight: 'bold' }}>Species Feature: <input value={speciesFeature} onChange={e => setSpeciesFeature(e.target.value)} /></label><br />
-          <label style={{ color: '#0b5394', fontWeight: 'bold' }}>Subspecies Feature: <input value={subspeciesFeature} onChange={e => setSubspeciesFeature(e.target.value)} /></label><br />
-        </section>
-
       {/* Damage Interactions Section */}
       <section className="damage-interactions">
         <h3 style={{ fontWeight: 'bold', textDecoration: 'underline' }}>Damage Interactions</h3>
@@ -618,9 +619,55 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onSave }) => {
         </div>
       </section>
 
-      <div style={{ display: 'flex', gap: 12, marginTop: 24 }}>
-        <button onClick={handleSave}>Save</button>
-        <button onClick={onSave} style={{ background: '#eee', color: '#222', border: '1px solid #888', borderRadius: 4, padding: '6px 18px', fontWeight: 'bold', cursor: 'pointer' }}>
+      {/* Fixed button group */}
+      <div
+        style={{
+          position: 'fixed',
+          top: '10%',
+          right: 0,
+          transform: 'translateY(-50%)',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 12,
+          zIndex: 1000,
+          background: 'rgba(255,255,255,0.95)',
+          borderLeft: '2px solid #bbb',
+          boxShadow: '-2px 0 8px rgba(0,0,0,0.08)',
+          padding: '18px 12px 18px 18px',
+          borderTopLeftRadius: 12,
+          borderBottomLeftRadius: 12,
+        }}
+      >
+        <button
+          onClick={handleSave}
+          style={{
+            background: '#1976d2',
+            color: '#fff',
+            border: 'none',
+            borderRadius: 4,
+            padding: '1px 18px',
+            fontWeight: 'bold',
+            fontSize: '1.1em',
+            cursor: 'pointer',
+            boxShadow: '0 2px 6px rgba(0,0,0,0.07)',
+          }}
+        >
+          Save
+        </button>
+        <button
+          onClick={onSave}
+          style={{
+            background: '#eee',
+            color: '#222',
+            border: '1px solid #888',
+            borderRadius: 4,
+            padding: '1px 1px',
+            fontWeight: 'bold',
+            fontSize: '1.1em',
+            cursor: 'pointer',
+            boxShadow: '0 2px 6px rgba(0,0,0,0.07)',
+          }}
+        >
           Return
         </button>
       </div>
