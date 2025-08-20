@@ -1,0 +1,42 @@
+.character-sheet {
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  font-family: sans-serif;
+}
+
+section {
+  border: 1px solid #ccc;
+  padding: 1rem;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+}
+
+h2 {
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+  color: #333;
+}
+
+input {
+  padding: 0.5rem;
+  font-size: 1rem;
+  width: 200px;
+  margin-right: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.skills-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 0.5rem;
+}
+.skills label {
+  display: flex;
+  flex-direction: column;
+  font-weight: bold;
+}
+.skills input {
+  margin-top: 0.25rem;
+}
