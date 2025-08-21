@@ -1,0 +1,84 @@
+.addButton {
+  background-color: #4CAF50 !important;
+  color: white !important;
+  border: none;
+  border-radius: 3px;
+  font-size: 0.9em;
+  padding: 2px 7px;
+  cursor: pointer;
+  margin-bottom: 2px;
+}
+
+.subtractButton {
+  background-color: #d32f2f !important;
+  color: white !important;
+  border: none;
+  border-radius: 3px;
+  font-size: 0.9em;
+  padding: 2px 7px;
+  cursor: pointer;
+  margin-top: 2px;
+}
+
+.saveButton {
+  background-color: #1976d2 !important;
+  color: white !important;
+  border: none;
+  border-radius: 4px;
+  padding: 1px 18px;
+  font-weight: bold;
+  font-size: 1.1em;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.07);
+}
+
+.saveButton:disabled {
+  background-color: #64b5f6 !important;
+  cursor: default;
+}
+
+.coloredSelect {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  background: white url("data:image/svg+xml;charset=utf-8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' fill='black'><polygon points='0,0 100,0 50,50'/></svg>") no-repeat right .7em top 50% !important;
+  background-size: .65em auto !important;
+  padding-right: 1.7em !important;
+}
+
+.coloredSelect::-ms-expand {
+  display: none;
+}
+
+.selectWrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.colorSelect {
+  font-weight: bold;
+  padding: 2px 4px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  background: transparent;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  padding-right: 20px;
+}
+
+.colorSelect option {
+  background-color: white;
+  font-weight: bold;
+}
+
+/* Add a custom dropdown arrow */
+.selectWrapper::after {
+  content: '▼';
+  font-size: 0.7em;
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+}

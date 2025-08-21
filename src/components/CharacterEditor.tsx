@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import styles from './CharacterEditor.module.css';
 
 import type { CharacterSheet } from "../types/CharacterSheet";
 import { saveCharacterSheet } from "../utils/storage";
@@ -9,6 +10,8 @@ type Props = {
 };
 
 const CharacterEditor: React.FC<Props> = ({ sheet, onSave }) => {
+  const [isSaved, setIsSaved] = useState(false);
+
   // Identity fields
   const [playerName, setPlayerName] = useState(sheet?.playerName || "");
   const [name, setName] = useState(sheet?.name || "");
@@ -17,6 +20,7 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onSave }) => {
   const [species, setSpecies] = useState(sheet?.species || "");
   const [subspecies, setSubspecies] = useState(sheet?.subspecies || "");
   const [background, setBackground] = useState(sheet?.background || "");
+  const [backgroundDescription, setBackgroundDescription] = useState(sheet?.backgroundDescription || "");
 
   // Stats fields
   const [resistances, setResistances] = useState(sheet?.resistances || "");
@@ -82,9 +86,51 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onSave }) => {
   );  
   const elementalistFeatureJSX = (
     <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#231172' }}>Elemental Excitement.</i></b> When another creature within <b>[3]</b>hx of you takes Damage associated with your subclass blah blah blah
+      <b><i style={{ color: '#231172' }}>Elemental Excitement.</i></b> When another creature within <b>[3]</b>hx of you takes Damage associated with your subclass, you may remove a <i>Cooldown Token</i> from any of your <b><i><span style={{ color: '#990000' }}>Attacks</span></i></b> or <b><i><span style={{ color: '#bf9000' }}>Techniques</span></i></b>.<br/>
+      <b style={{ color: '#0ee2df' }}>Air:</b> <b><u style={{ color: '#516fff', display: 'inline-flex', alignItems: 'center' }}>
+        Force
+        <img src="/Force.png" alt="Force" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+      </u></b><br/>
+      <b style={{ color: '#e2b90e' }}>Earth:</b> <b><u style={{ color: '#915927', display: 'inline-flex', alignItems: 'center' }}>
+        Bludgeoning
+        <img src="/Bludgeoning.png" alt="Bludgeoning" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+      </u></b><br/>
+      <b style={{ color: '#e20e0e' }}>Fire:</b> <b><u style={{ color: '#f90102', display: 'inline-flex', alignItems: 'center' }}>
+        Fire
+        <img src="/Fire.png" alt="Fire" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+      </u></b><br/>
+      <b style={{ color: '#0e42e2' }}>Water:</b> <b><u style={{ color: '#3ebbff', display: 'inline-flex', alignItems: 'center' }}>
+        Cold
+        <img src="/Cold.png" alt="Cold" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+      </u></b>
     </span>
   );  
+  const exospecialistFeatureJSX = (
+    <span style={{ color: '#000', fontWeight: 400 }}>
+      <b><i style={{ color: '#117233' }}>Exosuit.</i></b> You <i>Resist</i> <b><u style={{ color: '#915927', display: 'inline-flex', alignItems: 'center' }}>
+        Bludgeoning
+        <img src="/Bludgeoning.png" alt="Bludgeoning" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+      </u></b>, <b><u style={{ color: '#a6965f', display: 'inline-flex', alignItems: 'center' }}>
+        Piercing
+        <img src="/Piercing.png" alt="Piercing" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+      </u></b> and <b><u style={{ color: '#808080', display: 'inline-flex', alignItems: 'center' }}>
+        Slashing
+        <img src="/Slashing.png" alt="Slashing" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+      </u></b> Damage and have an additional 20 <b><i style={{ color: '#990000' }}>Hit Points</i></b>.
+    </span>
+  );
+
+  const gunslingerFeatureJSX = (
+    <span style={{ color: '#000', fontWeight: 400 }}>
+      <b><i style={{ color: '#4e7211' }}>Sharpshooter.</i></b> You gain a +<b>[2]</b> to Crit rolls on all <b><i><span style={{ color: '#990000' }}>Attacks</span></i></b>.
+    </span>
+  );  
+
+  const technicianFeatureJSX = (
+    <span style={{ color: '#000', fontWeight: 400 }}>
+      <b><i style={{ color: '#724811' }}>Master Mechanic.</i></b> Friendly <i>Drones</i>, <i style={{ color: '#2b3b5f' }}>Cognizants</i>, and <i style={{ color: '#117233' }}>Exospecialists</i> that start their turn within <b>[3]</b>hx of you gain <b>[1]</b>d6 <b><i style={{ color: '#990000' }}>Hit Points</i></b>.
+    </span>
+  );
 
   // Auto-fill classFeature when class changes, unless user has typed something custom
   React.useEffect(() => {
@@ -155,6 +201,7 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onSave }) => {
       species,
       subspecies,
       background,
+      backgroundDescription,
       classFeature,
       subclassFeature,
       speciesFeature,
@@ -174,6 +221,8 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onSave }) => {
       skillDots,
     };
     saveCharacterSheet(updatedSheet);
+    setIsSaved(true);
+    setTimeout(() => setIsSaved(false), 1500); // Reset after 1.5 seconds
   };
 
   const classOptions = [
@@ -266,8 +315,8 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onSave }) => {
     Avenoch: [
       { label: "Corvid", value: "Corvid", color: "#75904e", species: "Avenoch" },
       { label: "Falcador", value: "Falcador", color: "#6d7156", species: "Avenoch" },
-      { label: "Nocturne", value: "Nocturne", color: "#334592", species: "Avenoch" },
-      { label: "Vulturine", value: "Vulturine", color: "#a96d8c", species: "Avenoch" },
+      { label: "Nocturne", value: "Nocturne", color: "#334592" },
+      { label: "Vulturine", value: "Vulturine", color: "#a96d8c" },
     ],
     Cerebronych: [],
     Chloroptid: [
@@ -340,95 +389,237 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onSave }) => {
     ? hostOptions
     : subspeciesOptionsMap[species] || [];
 
+  const backgroundOptions = [
+    { label: "Adherent of the Pollen Collective", value: "Adherent of the Pollen Collective", color: "#666666" },
+    { label: "Anti-Deft Secessionist", value: "Anti-Deft Secessionist", color: "#666666" },
+    { label: "Awakened Machine", value: "Awakened Machine", color: "#666666" },
+    { label: "Belt Miner", value: "Belt Miner", color: "#666666" },
+    { label: "Black Market Executive", value: "Black Market Executive", color: "#666666" },
+    { label: "Combat Medic", value: "Combat Medic", color: "#666666" },
+    { label: "Covert Operative", value: "Covert Operative", color: "#666666" },
+    { label: "DAGR Officer", value: "DAGR Officer", color: "#666666" },
+    { label: "Exobiologist", value: "Exobiologist", color: "#666666" },
+    { label: "Feathered One", value: "Feathered One", color: "#666666" },
+    { label: "Galactapol Netizen", value: "Galactapol Netizen", color: "#666666" },
+    { label: "Interstellar Refugee", value: "Interstellar Refugee", color: "#666666" },
+    { label: "Intragalactic Nobility", value: "Intragalactic Nobility", color: "#666666" },
+    { label: "Kenos Assassin", value: "Kenos Assassin", color: "#666666" },
+    { label: "Knight of the Chromatic Blade", value: "Knight of the Chromatic Blade", color: "#666666" },
+    { label: "Military Officer", value: "Military Officer", color: "#666666" },
+    { label: "Oikomonastic Disciple", value: "Oikomonastic Disciple", color: "#666666" },
+    { label: "Physios Universal Contestant", value: "Physios Universal Contestant", color: "#666666" },
+    { label: "Scoundrel", value: "Scoundrel", color: "#666666" },
+    { label: "Signals Intelligence Collector", value: "Signals Intelligence Collector", color: "#666666" },
+    { label: "Silver Swarm Scion", value: "Silver Swarm Scion", color: "#666666" },
+    { label: "Student of Lux Academy (Ruby)", value: "Student of Lux Academy (Ruby)", color: "#666666" },
+    { label: "Student of Lux Academy (Emerald)", value: "Student of Lux Academy (Emerald)", color: "#666666" },
+    { label: "Student of Lux Academy (Sapphire)", value: "Student of Lux Academy (Sapphire)", color: "#666666" },
+    { label: "Traveling Performer", value: "Traveling Performer", color: "#666666" },
+    { label: "Wandering Yogi", value: "Wandering Yogi", color: "#666666" },
+  ];
+
+  // Add this after the other feature JSX constants
+  const anatomistFeatureJSX = (
+    <span style={{ color: '#000', fontWeight: 400 }}>
+      <b><i style={{ color: '#66cf00' }}>Anatomical Precision.</i></b> You and all allies within <b>[3]</b>hx of you ignore any Damage <i>Resistances</i> and/or <i>Immunities</i>.
+    </span>
+  );
+
+  // Add after anatomistFeatureJSX
+  const grenadierFeatureJSX = (
+    <span style={{ color: '#000', fontWeight: 400 }}>
+      <b><i style={{ color: '#cf0000' }}>Blaster Master.</i></b> You <i>Resist</i> all Damage from <i>AoE</i> <b><i><span style={{ color: '#990000' }}>Attacks</span></i></b>. In addition, your <b><i><span style={{ color: '#000' }}>Primary</span> <span style={{ color: '#990000' }}>Attack</span></i></b> Target becomes an <i>AoE</i> 1hx-Radius, and other <i>AoE</i> <b><i><span style={{ color: '#990000' }}>Attacks</span></i></b> you make increase in size by <b>[1]</b>hx.
+    </span>
+  );
+
   return (
-    <div className="character-editor" style={{ position: 'relative' }}>
+    <div className="character-editor" style={{ 
+      position: 'relative',
+      backgroundColor: '#ffffff',
+      color: '#000000',
+      colorScheme: 'light',
+      // Force all children to inherit light mode
+      WebkitForcedColorAdjust: 'none',
+      forcedColorAdjust: 'none'
+    }}>
       <h2>{sheet ? "Edit Character" : "New Character"}</h2>
       <section className="header-info">
         <h3 style={{ fontWeight: 'bold', textDecoration: 'underline' }}>Identity</h3>
   <label style={{ fontWeight: 'bold' }}>Player Name: <input value={playerName} onChange={e => setPlayerName(e.target.value)} /></label><br />
   <label style={{ fontWeight: 'bold' }}>Character Name: <input value={name} onChange={e => setName(e.target.value)} /></label><br />
   <label style={{ fontWeight: 'bold' }}>Class: 
-  <select value={charClass} onChange={e => {
-    setCharClass(e.target.value);
-    setSubclass(""); // Reset subclass when class changes
-  }} style={{ fontWeight: 'bold', color: classOptions.find(opt => opt.value === charClass)?.color || '#000' }}>
-    <option value="">Select Class</option>
-    {classOptions.map(opt => (
-      <option key={opt.value} value={opt.value} style={{ color: opt.color }}>
-        {opt.label}
-      </option>
-    ))}
-  </select>
-</label><br />
-  <label style={{ fontWeight: 'bold' }}>Subclass: 
-  <select value={subclass} onChange={e => {
-    const val = e.target.value;
-    setSubclass(val);
-    if (!charClass && val) {
-      // If no class selected, auto-select the class for the chosen subclass
-      const found = allSubclassOptions.find(opt => opt.value === val);
-      if (found) setCharClass(found.class);
-    }
-  }}
-    style={{ fontWeight: 'bold', color: (subclassOptions.find(opt => opt.value === subclass) || allSubclassOptions.find(opt => opt.value === subclass))?.color || '#000' }}
-  >
-    <option value="">Select Subclass</option>
-    {(charClass
-      ? subclassOptions
-      : allSubclassOptions
-    ).map(opt => (
-      <option key={opt.value} value={opt.value} style={{ color: opt.color }}>
-        {opt.label}
-      </option>
-    ))}
-  </select>
-</label><br />
-  <label style={{ fontWeight: 'bold' }}>Species: 
-  <select value={species} onChange={e => {
-    setSpecies(e.target.value);
-    setSubspecies(""); // Reset subspecies when species changes
-  }} style={{ fontWeight: 'bold', color: speciesOptions.find(opt => opt.value === species)?.color || '#000' }}>
-    <option value="">Select Species</option>
-    {speciesOptions.map(opt => (
-      <option key={opt.value} value={opt.value} style={{ color: opt.color }}>
-        {opt.label}
-      </option>
-    ))}
-  </select>
-</label><br />
-  <label style={{ fontWeight: 'bold' }}>Subspecies: 
-    <select value={subspecies} onChange={e => {
-      const val = e.target.value;
-      setSubspecies(val);
-      if (!species && val) {
-        // If no species selected, auto-select the species for the chosen subspecies
-        const found = allSubspeciesOptions.find(opt => opt.value === val);
-        if (found) setSpecies(found.species);
-      }
+  <select 
+    value={charClass} 
+    onChange={e => {
+      setCharClass(e.target.value);
+      setSubclass(""); 
+    }} 
+    style={{ 
+      fontWeight: 'bold',
+      padding: '4px 8px',
+      borderRadius: '4px',
+      border: '1px solid #ccc',
+      color: classOptions.find(opt => opt.value === charClass)?.color || '#000',
+      minWidth: '200px',
+      background: 'white'
     }}
-      style={{ fontWeight: 'bold', color: (subspeciesOptions.find(opt => opt.value === subspecies) || allSubspeciesOptions.find(opt => opt.value === subspecies))?.color || '#000' }}
+  >
+    <option value="" style={{ color: 'black', backgroundColor: 'white' }}>Select Class</option>
+    {classOptions.map(opt => (
+      <option 
+        key={opt.value} 
+        value={opt.value} 
+        style={{ 
+          color: opt.color,
+          backgroundColor: 'white',
+          fontWeight: 'bold'
+        }}
+      >
+        {opt.label}
+      </option>
+    ))}
+  </select>
+  </label><br />
+  <label style={{ fontWeight: 'bold' }}>Subclass: 
+    <select 
+      value={subclass} 
+      onChange={e => {
+        const val = e.target.value;
+        setSubclass(val);
+        if (!charClass && val) {
+          const found = allSubclassOptions.find(opt => opt.value === val);
+          if (found) setCharClass(found.class);
+        }
+      }}
+      style={{ 
+        fontWeight: 'bold',
+        padding: '4px 8px',
+        borderRadius: '4px',
+        border: '1px solid #ccc',
+        color: (subclassOptions.find(opt => opt.value === subclass) || allSubclassOptions.find(opt => opt.value === subclass))?.color || '#000',
+        minWidth: '200px',
+        background: 'white'
+      }}
     >
-      <option value="">Select Subspecies</option>
-      {(species === "Cerebronych"
-        ? hostOptions.map(opt => (
-            <option key={opt.value} value={opt.value}>
-              <span style={{ color: opt.color }}>{opt.label.split(' ')[0]}</span>{' '}
-              <span style={{ color: opt.hostColor }}>{opt.label.split(' ')[1]}</span>{' '}
-              <span style={{ color: '#000' }}>Host</span>
-            </option>
-          ))
-        : (species
-            ? subspeciesOptions
-            : allSubspeciesOptions
-          ).map(opt => (
-            <option key={opt.value} value={opt.value} style={{ color: opt.color }}>
-              {opt.label}
-            </option>
-          ))
-      )}
+      <option value="" style={{ color: 'black', backgroundColor: 'white' }}>Select Subclass</option>
+      {(charClass ? subclassOptions : allSubclassOptions).map(opt => (
+        <option 
+          key={opt.value} 
+          value={opt.value} 
+          style={{ 
+            color: opt.color,
+            backgroundColor: 'white',
+            fontWeight: 'bold'
+          }}
+        >
+          {opt.label}
+        </option>
+      ))}
     </select>
   </label><br />
-  <label style={{ fontWeight: 'bold' }}>Background: <input value={background} onChange={e => setBackground(e.target.value)} /></label><br />
+  <label style={{ fontWeight: 'bold' }}>Species: 
+    <select 
+      value={species} 
+      onChange={e => {
+        setSpecies(e.target.value);
+        setSubspecies("");
+      }}
+      style={{ 
+        fontWeight: 'bold',
+        padding: '4px 8px',
+        borderRadius: '4px',
+        border: '1px solid #ccc',
+        color: speciesOptions.find(opt => opt.value === species)?.color || '#000',
+        minWidth: '200px',
+        background: 'white'
+      }}
+    >
+      <option value="" style={{ color: 'black', backgroundColor: 'white' }}>Select Species</option>
+      {speciesOptions.map(opt => (
+        <option 
+          key={opt.value} 
+          value={opt.value} 
+          style={{ 
+            color: opt.color,
+            backgroundColor: 'white',
+            fontWeight: 'bold'
+          }}
+        >
+          {opt.label}
+        </option>
+      ))}
+    </select>
+  </label><br />
+  <label style={{ fontWeight: 'bold' }}>Subspecies: 
+    <select 
+      value={subspecies} 
+      onChange={e => {
+        const val = e.target.value;
+        setSubspecies(val);
+        if (!species && val) {
+          const found = allSubspeciesOptions.find(opt => opt.value === val);
+          if (found) setSpecies(found.species);
+        }
+      }}
+      style={{ 
+        fontWeight: 'bold',
+        padding: '4px 8px',
+        borderRadius: '4px',
+        border: '1px solid #ccc',
+        color: (subspeciesOptions.find(opt => opt.value === subspecies) || allSubspeciesOptions.find(opt => opt.value === subspecies))?.color || '#000',
+        minWidth: '200px',
+        background: 'white'
+      }}
+    >
+      <option value="" style={{ color: 'black', backgroundColor: 'white' }}>Select Subspecies</option>
+      {(species === "Cerebronych"
+        ? hostOptions
+        : (species ? subspeciesOptions : allSubspeciesOptions)
+      ).map(opt => (
+        <option 
+          key={opt.value} 
+          value={opt.value} 
+          style={{ 
+            color: opt.color,
+            backgroundColor: 'white',
+            fontWeight: 'bold'
+          }}
+        >
+          {opt.label}
+        </option>
+      ))}
+    </select>
+  </label><br />
+  <label style={{ fontWeight: 'bold' }}>Background: 
+    <select 
+      value={background} 
+      onChange={e => setBackground(e.target.value)} 
+      style={{ 
+        fontWeight: 'bold',
+        padding: '4px 8px',
+        borderRadius: '4px',
+        border: '1px solid #ccc',
+        color: backgroundOptions.find(opt => opt.value === background)?.color || '#000',
+        minWidth: '200px',
+        background: 'white'
+      }}
+    >
+      <option value="" style={{ color: 'black', backgroundColor: 'white' }}>Select Background</option>
+      {backgroundOptions.map(opt => (
+        <option 
+          key={opt.value} 
+          value={opt.value} 
+          style={{ 
+            color: opt.color,
+            backgroundColor: 'white',
+            fontWeight: 'bold'
+          }}
+        >
+          {opt.label}
+        </option>
+      ))}
+    </select>
+  </label><br />
       </section>
 
       {/* Move Features section here */}
@@ -447,9 +638,21 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onSave }) => {
                     ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{devoutFeatureJSX}</span>
                     : charClass === "Elementalist"
                       ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{elementalistFeatureJSX}</span>
+                    : charClass === "Exospecialist"
+                      ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{exospecialistFeatureJSX}</span>
+                    : charClass === "Gunslinger"
+                      ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{gunslingerFeatureJSX}</span>
+                    : charClass === "Technician"
+                      ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{technicianFeatureJSX}</span>
                     : <input value={classFeature} onChange={e => setClassFeature(e.target.value)} />            
         }</label><br />
-        <label style={{ color: '#0b5394', fontWeight: 'bold' }}>Subclass Feature: <input value={subclassFeature} onChange={e => setSubclassFeature(e.target.value)} /></label><br />
+        <label style={{ color: '#0b5394', fontWeight: 'bold' }}>Subclass Feature: {
+          subclass === "Anatomist" 
+            ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{anatomistFeatureJSX}</span>
+            : subclass === "Grenadier"
+              ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{grenadierFeatureJSX}</span>
+              : <input value={subclassFeature} onChange={e => setSubclassFeature(e.target.value)} />
+        }</label><br />
         <label style={{ color: '#0b5394', fontWeight: 'bold' }}>Species Feature: <input value={speciesFeature} onChange={e => setSpeciesFeature(e.target.value)} /></label><br />
         <label style={{ color: '#0b5394', fontWeight: 'bold' }}>Subspecies Feature: <input value={subspeciesFeature} onChange={e => setSubspeciesFeature(e.target.value)} /></label><br />
       </section>
@@ -468,13 +671,13 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onSave }) => {
               <input type="number" value={currentHitPoints} onChange={e => setCurrentHitPoints(+e.target.value)} style={{ width: 50, marginRight: 8, color: '#990000', border: '1.5px solid #990000', fontWeight: 'bold' }} />
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
                 <button
-                  style={{ background: '#4CAF50', color: '#fff', border: 'none', borderRadius: 3, fontSize: '0.9em', padding: '2px 7px', cursor: 'pointer', marginBottom: 2 }}
+                  className={styles.addButton}
                   onClick={() => setCurrentHitPoints(hp => hp + hpDelta)}
                   title="Add to current hit points"
                 >Add</button>
                 <input type="number" value={hpDelta} onChange={e => setHpDelta(+e.target.value)} style={{ width: 40, fontSize: '0.9em', textAlign: 'center', margin: '2px 0' }} />
                 <button
-                  style={{ background: '#d32f2f', color: '#fff', border: 'none', borderRadius: 3, fontSize: '0.9em', padding: '2px 7px', cursor: 'pointer', marginTop: 2 }}
+                  className={styles.subtractButton}
                   onClick={() => setCurrentHitPoints(hp => hp - hpDelta)}
                   title="Subtract from current hit points"
                 >Subtract</button>
@@ -654,19 +857,10 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onSave }) => {
       >
         <button
           onClick={handleSave}
-          style={{
-            background: '#1976d2',
-            color: '#fff',
-            border: 'none',
-            borderRadius: 4,
-            padding: '1px 18px',
-            fontWeight: 'bold',
-            fontSize: '1.1em',
-            cursor: 'pointer',
-            boxShadow: '0 2px 6px rgba(0,0,0,0.07)',
-          }}
+          className={styles.saveButton}
+          disabled={isSaved}
         >
-          Save
+          {isSaved ? "Saved!" : "Save"}
         </button>
         <button
           onClick={onSave}
@@ -682,7 +876,7 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onSave }) => {
             boxShadow: '0 2px 6px rgba(0,0,0,0.07)',
           }}
         >
-          Return
+          Home
         </button>
       </div>
     </div>
