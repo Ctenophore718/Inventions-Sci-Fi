@@ -34,7 +34,7 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onSave }) => {
     Coder: "Subtle Magic.",
     Commander: "Stay Sharp.",
     Contemplative: "Psychosomatic Harmony.",
-    Devout: "test 5",
+    Devout: "Blood Trade.",
     Elementalist: "test 6",
     Exospecialist: "test 7",
     Gunslinger: "test 8",
@@ -51,7 +51,7 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onSave }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [charClass]);
 
-  // Rich JSX for Chemist, Coder, Commander, and Contemplative
+  // Rich JSX for Chemist, Coder, Commander, Contemplative, Devout
   const chemistFeatureJSX = (
     <span style={{ color: '#000', fontWeight: 400 }}>
       <b><i style={{ color: '#721131' }}>Chemical Reaction.</i></b> At the start of each round, you gain 1 <i>Chem Token</i>, up to a maximum of <b>[3]</b> <i>Chem Token</i>s. While you have at least 1 <i>Chem Token</i>, your <b><i><span style={{ color: '#000' }}>Primary</span> <span style={{ color: '#990000' }}>Attack</span></i></b> gains a +<b>[0]</b> Crit and deals +1 Damage die.
@@ -75,6 +75,16 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onSave }) => {
       </u></b> and can <b><i style={{ color: '#351c75' }}>Strike</i></b> <b>[1]</b> extra time per turn.
     </span>
   );
+  const devoutFeatureJSX = (
+    <span style={{ color: '#000', fontWeight: 400 }}>
+      <b><i style={{ color: '#6b1172' }}>Blood Trade.</i></b> Whenever you take Damage, you gain +<b>[1]</b>d6 Damage on your next <b><i><span style={{ color: '#351c75' }}>Strike</span></i></b> or <b><i><span style={{ color: '#990000' }}>Attack</span></i></b>. The Damage type matches your next <b><i><span style={{ color: '#351c75' }}>Strike</span></i></b>  or <b><i><span style={{ color:'#990000' }}>Attack</span></i></b> and doesn’t stack if you are Damaged multiple times.   
+    </span>
+  );  
+  const elementalistFeatureJSX = (
+    <span style={{ color: '#000', fontWeight: 400 }}>
+      <b><i style={{ color: '#231172' }}>Elemental Excitement.</i></b> When another creature within <b>[3]</b>hx of you takes Damage associated with your subclass blah blah blah
+    </span>
+  );  
 
   // Auto-fill classFeature when class changes, unless user has typed something custom
   React.useEffect(() => {
@@ -433,7 +443,11 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onSave }) => {
                 ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{commanderFeatureJSX}</span>
                 : charClass === "Contemplative"
                   ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{contemplativeFeatureJSX}</span>
-                  : <input value={classFeature} onChange={e => setClassFeature(e.target.value)} />
+                  : charClass === "Devout"
+                    ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{devoutFeatureJSX}</span>
+                    : charClass === "Elementalist"
+                      ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{elementalistFeatureJSX}</span>
+                    : <input value={classFeature} onChange={e => setClassFeature(e.target.value)} />            
         }</label><br />
         <label style={{ color: '#0b5394', fontWeight: 'bold' }}>Subclass Feature: <input value={subclassFeature} onChange={e => setSubclassFeature(e.target.value)} /></label><br />
         <label style={{ color: '#0b5394', fontWeight: 'bold' }}>Species Feature: <input value={speciesFeature} onChange={e => setSpeciesFeature(e.target.value)} /></label><br />
