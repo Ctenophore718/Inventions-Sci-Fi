@@ -68,7 +68,7 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onSave }) => {
   );
   const commanderFeatureJSX = (
     <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#717211' }}>Stay Sharp.</i></b> At the beginning of the round, you and allies within <b>[3]</b>hx of you can remove an additional <i>Cooldown Token</i> from one inactive <b><i><span style={{ color: '#bf9000' }}>Technique</span></i></b> of their choice.
+      <b><i style={{ color: '#717211' }}>Stay Sharp.</i></b> At the beginning of the round, you and allies within <b>[3]</b>hx of you can remove an additional <i>Cooldown Token</i> from one <i>inactive</i> <b><i><span style={{ color: '#bf9000' }}>Technique</span></i></b> of their choice.
     </span>
   );
   const contemplativeFeatureJSX = (
@@ -86,23 +86,19 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onSave }) => {
   );  
   const elementalistFeatureJSX = (
     <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#231172' }}>Elemental Excitement.</i></b> When another creature within <b>[3]</b>hx of you takes Damage associated with your subclass, you may remove a <i>Cooldown Token</i> from any of your <b><i><span style={{ color: '#990000' }}>Attacks</span></i></b> or <b><i><span style={{ color: '#bf9000' }}>Techniques</span></i></b>.<br/>
-      <b style={{ color: '#0ee2df' }}>Air:</b> <b><u style={{ color: '#516fff', display: 'inline-flex', alignItems: 'center' }}>
-        Force
-        <img src="/Force.png" alt="Force" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
-      </u></b><br/>
-      <b style={{ color: '#e2b90e' }}>Earth:</b> <b><u style={{ color: '#915927', display: 'inline-flex', alignItems: 'center' }}>
-        Bludgeoning
-        <img src="/Bludgeoning.png" alt="Bludgeoning" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
-      </u></b><br/>
-      <b style={{ color: '#e20e0e' }}>Fire:</b> <b><u style={{ color: '#f90102', display: 'inline-flex', alignItems: 'center' }}>
-        Fire
-        <img src="/Fire.png" alt="Fire" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
-      </u></b><br/>
-      <b style={{ color: '#0e42e2' }}>Water:</b> <b><u style={{ color: '#3ebbff', display: 'inline-flex', alignItems: 'center' }}>
-        Cold
-        <img src="/Cold.png" alt="Cold" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
-      </u></b>
+      <b><i style={{ color: '#231172' }}>Elemental Excitement.</i></b> When another creature within <b>[3]</b>hx of you takes {
+        subclass === "Air" ? (
+          <><b><u style={{ color: '#516fff', display: 'inline-flex', alignItems: 'center' }}>Force<img src="/Force.png" alt="Force" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> Damage</>
+        ) : subclass === "Earth" ? (
+          <><b><u style={{ color: '#915927', display: 'inline-flex', alignItems: 'center' }}>Bludgeoning<img src="/Bludgeoning.png" alt="Bludgeoning" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> Damage</>
+        ) : subclass === "Fire" ? (
+          <><b><u style={{ color: '#f90102', display: 'inline-flex', alignItems: 'center' }}>Fire<img src="/Fire.png" alt="Fire" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> Damage</>
+        ) : subclass === "Water" ? (
+          <><b><u style={{ color: '#3ebbff', display: 'inline-flex', alignItems: 'center' }}>Cold<img src="/Cold.png" alt="Cold" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> Damage</>
+        ) : (
+          "Damage associated with your subclass"
+        )
+      }, you may remove a <i>Cooldown Token</i> from any of your <b><i><span style={{ color: '#990000' }}>Attacks</span></i></b> or <b><i><span style={{ color: '#bf9000' }}>Techniques</span></i></b>.
     </span>
   );  
   const exospecialistFeatureJSX = (
@@ -432,6 +428,368 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onSave }) => {
     </span>
   );
 
+  // Add after grenadierFeatureJSX
+  const necroFeatureJSX = (
+    <span style={{ color: '#000', fontWeight: 400 }}>
+      <b><i style={{ color: '#0033cf' }}>Bodysnatcher.</i></b> Whenever a creature dies within <b>[5]</b>hx of you, you gain a <i>Chem Token</i>. Additionally, when you take Damage, you can spend a <i>Chem Token</i> to reduce that Damage by half.
+    </span>
+  );
+
+  // Add after necroFeatureJSX
+  const poisonerFeatureJSX = (
+    <span style={{ color: '#000', fontWeight: 400 }}>
+      <b><i style={{ color: '#cf7600' }}>Backstabber.</i></b> You <i>Resist</i> <b><u style={{ color: '#de7204', display: 'inline-flex', alignItems: 'center' }}>
+        Chemical
+        <img src="/Chemical.png" alt="Chemical" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+      </u></b> and <b><u style={{ color: '#02b900', display: 'inline-flex', alignItems: 'center' }}>
+        Toxic
+        <img src="/Toxic.png" alt="Toxic" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+      </u></b>. Additionally, when you <b><i style={{ color: '#351c75' }}>Strike</i></b> against a target's <i>Rear Arc</i>, you gain +1d6 Damage for each <i>Chem Token</i> you have.
+    </span>
+  );
+
+  // Add after poisonerFeatureJSX
+  const coerciveFeatureJSX = (
+    <span style={{ color: '#000', fontWeight: 400 }}>
+      <b><i style={{ color: '#43c9ff' }}>Field of Coercion.</i></b> You and allies within <b>[5]</b>hx are <i>Immune</i> to <b><i>Confuse</i></b> and <b><i>Mesmerize</i></b>. Additionally, enemies within <b>[5]</b>hx cannot benefit from <b><i>Confuse</i></b> or <b><i>Mesmerize</i></b> <i>Immunity</i>.
+    </span>
+  );
+
+  // Add after coerciveFeatureJSX
+  const divinistFeatureJSX = (
+    <span style={{ color: '#000', fontWeight: 400 }}>
+      <b><i style={{ color: '#ff4343' }}>Aura of Luck.</i></b> You and allies within <b>[3]</b>hx of you can roll an additional +<b>[1]</b> Crit die and drop the lowest roll when making <b><i><span style={{ color: '#990000' }}>Attacks</span></i></b>.
+    </span>
+  );
+
+  // Add after divinistFeatureJSX
+  const naturalistFeatureJSX = (
+    <span style={{ color: '#000', fontWeight: 400 }}>
+      <b><i style={{ color: '#66cf00' }}>Boughbender.</i></b> You and allies within <b>[5]</b>hx may ignore <i>Obstacles</i> and <i>Rough Terrain</i> when <b><i style={{ color: '#38761d' }}>Moving</i></b>. Additionally, enemies treat <i>Terrain</i> within <b>[5]</b>hx of you as <i>Rough Terrain</i>.
+    </span>
+  );
+
+  // Add after naturalistFeatureJSX
+  const technologistFeatureJSX = (
+    <span style={{ color: '#000', fontWeight: 400 }}>
+      <b><i style={{ color: '#8c43ff' }}>Tech Manipulation.</i></b> Enemies within <b>[5]</b>hx of you cannot Crit on <b><i><span style={{ color: '#990000' }}>Attacks</span></i></b>. In addition, when you or an ally within <b>[5]</b>hx of you removes a <i>Cooldown Token</i> from an <i>Item</i>, they can remove one additional <i>Cooldown Token</i>.
+    </span>
+  );
+
+  // Add after technologistFeatureJSX
+  const beguilerFeatureJSX = (
+    <span style={{ color: '#000', fontWeight: 400 }}>
+      <b><i style={{ color: '#1f21ce' }}>Loyal Servants.</i></b> You control allies within <b>[3]</b>hx of you when they suffer the <b><i>Confuse</i></b> or <b><i>Mesmerize</i></b> condition. Additionally, whenever you're targeted by an <b><i><span style={{ color: '#990000' }}>Attack</span></i></b>, an ally of your choice within <b>[3]</b>hx of you is targeted instead and suffers the <b><i>Confuse</i></b> condition.
+    </span>
+  );
+
+  // Add after beguilerFeatureJSX
+  const galvanicFeatureJSX = (
+    <span style={{ color: '#000', fontWeight: 400 }}>
+      <b><i style={{ color: '#6fce1f' }}>Inspiring Presence.</i></b> Allies within <b>[3]</b>hx of you at the beginning of the round gain +<b>[1]</b>d6 <b><i style={{ color: '#990000' }}>Hit Points</i></b>.
+    </span>
+  );
+
+  // Add after galvanicFeatureJSX
+  const tacticianFeatureJSX = (
+    <span style={{ color: '#000', fontWeight: 400 }}>
+      <b><i style={{ color: '#cec31f' }}>Tactical Offensive.</i></b> At the beginning of the round, you and allies within <b>[3]</b>hx of you ignore <i>Rough Terrain</i>, gain +<b>[1]</b> to Crit rolls and +<b>[1]</b> <b><i style={{ color: '#38761d' }}>Speed</i></b> until the end of their turn.
+    </span>
+  );
+
+  // Add after tacticianFeatureJSX
+  const tyrantFeatureJSX = (
+    <span style={{ color: '#000', fontWeight: 400 }}>
+      <b><i style={{ color: '#ce1f1f' }}>Fearless.</i></b> You are <i>Immune</i> to the <b><i>Demoralize</i></b> condition, and so are any allies while they are within <b>[3]</b>hx of you.
+    </span>
+  );
+
+  // Add after tyrantFeatureJSX
+  const inertialFeatureJSX = (
+    <span style={{ color: '#000', fontWeight: 400 }}>
+      <b><i style={{ color: '#1c945e' }}>Telekinetic Shield.</i></b> You <i>Resist</i> all Damage while you are not suffering the <b><i>Sleep</i></b> condition.
+    </span>
+  );
+
+  // Add after inertialFeatureJSX
+  const kineticFeatureJSX = (
+    <span style={{ color: '#000', fontWeight: 400 }}>
+      <b><i style={{ color: '#7b941c' }}>Final Fists.</i></b> Whenever you reach 0 <b><i style={{ color: '#990000' }}>Hit Points</i></b> in a battle, you can immediately <b><i style={{ color: '#38761d' }}>Move</i></b> up to your <b><i style={{ color: '#38761d' }}>Speed</i></b> and <b><i style={{ color: '#351c75' }}>Strike</i></b> up to your <b><i style={{ color: '#351c75' }}>Strike</i></b> amount before falling unconscious.
+    </span>
+  );
+
+  // Add after kineticFeatureJSX
+  const mercurialFeatureJSX = (
+    <span style={{ color: '#000', fontWeight: 400 }}>
+      <b><i style={{ color: '#941c6c' }}>Bladeshield.</i></b> You gain 50% Cover against all <b><i style={{ color: '#351c75' }}>Strikes</i></b>.
+    </span>
+  );
+
+  // Add after mercurialFeatureJSX
+  const vectorialFeatureJSX = (
+    <span style={{ color: '#000', fontWeight: 400 }}>
+      <b><i style={{ color: '#531c94' }}>Unreasonable Accuracy.</i></b> You treat 100% Cover as 50% Cover when making <b><i><span style={{ color: '#990000' }}>Attacks</span></i></b>. Additionally, all your <b><i><span style={{ color: '#990000' }}>Attacks</span></i></b> have a +<b>[6]</b>hx Range.
+    </span>
+  );
+
+  // Add after vectorialFeatureJSX
+  const astralFeatureJSX = (
+    <span style={{ color: '#000', fontWeight: 400 }}>
+      <b><i style={{ color: '#5bb1af' }}>Martyr.</i></b> Whenever you take Damage, <b>[1]</b> ally within <b>[5]</b>hx gains <b>[2]</b>d6 <b><i style={{ color: '#990000' }}>Hit Points</i></b>.
+    </span>
+  );
+
+  // Add after astralFeatureJSX
+  const chaosFeatureJSX = (
+    <span style={{ color: '#000', fontWeight: 400 }}>
+      <b><i style={{ color: '#b15b6c' }}>Aggression.</i></b> Whenever you take Damage, you can immediately <b><i style={{ color: '#38761d' }}>Move</i></b> <b>[2]</b>hx.
+    </span>
+  );
+
+  // Add after chaosFeatureJSX
+  const orderFeatureJSX = (
+    <span style={{ color: '#000', fontWeight: 400 }}>
+      <b><i style={{ color: '#aeb15b' }}>Armored Guard.</i></b> Whenever an ally within <b>[3]</b>hx of you takes Damage, you can immediately <b><i style={{ color: '#38761d' }}>Move</i></b> to a hx adjacent to the ally and take the Damage instead.
+    </span>
+  );
+
+  // Add after orderFeatureJSX
+  const voidFeatureJSX = (
+    <span style={{ color: '#000', fontWeight: 400 }}>
+      <b><i style={{ color: '#5b73b1' }}>Fatigue.</i></b> Whenever you take Damage, you inflict the <b><i>Demoralize</i></b> condition to one creature within <b>[8]</b>hx.
+    </span>
+  );
+
+  // Add after voidFeatureJSX
+  const airFeatureJSX = (
+    <span style={{ color: '#000', fontWeight: 400 }}>
+      <b><i style={{ color: '#0ee2df' }}>Air Armor.</i></b> You <i>Resist</i> <b><u style={{ color: '#516fff', display: 'inline-flex', alignItems: 'center' }}>
+        Force
+        <img src="/Force.png" alt="Force" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+      </u></b> Damage
+    </span>
+  );
+
+  // Add after airFeatureJSX
+  const earthFeatureJSX = (
+    <span style={{ color: '#000', fontWeight: 400 }}>
+      <b><i style={{ color: '#e2b90e' }}>Earth Armor.</i></b> You <i>Resist</i> <b><u style={{ color: '#915927', display: 'inline-flex', alignItems: 'center' }}>
+        Bludgeoning
+        <img src="/Bludgeoning.png" alt="Bludgeoning" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+      </u></b> Damage
+    </span>
+  );
+
+  // Add after earthFeatureJSX
+  const fireFeatureJSX = (
+    <span style={{ color: '#000', fontWeight: 400 }}>
+      <b><i style={{ color: '#e20e0e' }}>Fire Armor.</i></b> You <i>Resist</i> <b><u style={{ color: '#f90102', display: 'inline-flex', alignItems: 'center' }}>
+        Fire
+        <img src="/Fire.png" alt="Fire" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+      </u></b> Damage
+    </span>
+  );
+
+  const waterFeatureJSX = (
+    <span style={{ color: '#000', fontWeight: 400 }}>
+      <b><i style={{ color: '#0e42e2' }}>Water Armor.</i></b> You <i>Resist</i> <b><u style={{ color: '#3ebbff', display: 'inline-flex', alignItems: 'center' }}>
+        Cold
+        <img src="/Cold.png" alt="Cold" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+      </u></b> Damage
+    </span>
+  );
+
+  const aeronautFeatureJSX = (
+    <span style={{ color: '#000', fontWeight: 400 }}>
+      <b><i style={{ color: '#3da1d8' }}>Steel Wings.</i></b> You have a <b><i style={{ color: '#38761d' }}>Flight Speed</i></b> and an additional +<b>[2]</b> <b><i style={{ color: '#38761d' }}>Speed</i></b>.
+    </span>
+  );
+
+  const brawlerFeatureJSX = (
+    <span style={{ color: '#000', fontWeight: 400 }}>
+      <b><i style={{ color: '#d8a53d' }}>Fightin' Dirty.</i></b> When you <b><i style={{ color: '#351c75' }}>Strike</i></b> an enemy, you inflict <b>[1]</b> of the following conditions: <b><i>Blind</i></b>, <b><i>Spike</i></b> (<b><u style={{ color: '#915927', display: 'inline-flex', alignItems: 'center' }}>Bludgeoning<img src="/Bludgeoning.png" alt="Bludgeoning" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>), or <b><i>Restrain</i></b>.
+    </span>
+  );
+
+  const dreadnaughtFeatureJSX = (
+    <span style={{ color: '#000', fontWeight: 400 }}>
+      <b><i style={{ color: '#d83da0' }}>Towering Defense.</i></b> When resolving <b><i><span style={{ color: '#990000' }}>Attacks</span></i></b>, other creatures treat you as 100% Cover. Additionally, while wearing your <i>Exosuit</i>, your size is 3hx.
+    </span>
+  );
+
+  const spectreFeatureJSX = (
+    <span style={{ color: '#000', fontWeight: 400 }}>
+      <b><i style={{ color: '#6a3dd8' }}>Holo-Field.</i></b> You roll <b>[1]</b> additional Cover die when a creature <b><i><span style={{ color: '#990000' }}>Attacks</span></i></b> you, and discard the lowest roll. Additionally, you can use the <i>Stealth</i> skill once per turn without using an <i>Action</i>.
+    </span>
+  );
+
+  const ammoCoderFeatureJSX = (
+    <span style={{ color: '#000', fontWeight: 400 }}>
+      <b><i style={{ color: '#0a3991' }}>Bullet Code.</i></b> Whenever you make an <b><i><span style={{ color: '#990000' }}>Attack</span></i></b>, you can change the Damage type of your <b><i><span style={{ color: '#990000' }}>Attack</span></i></b> to any of the following:<br/>
+      <b><u style={{ color: '#de7204', display: 'inline-flex', alignItems: 'center' }}>Chemical<img src="/Chemical.png" alt="Chemical" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>,&nbsp;
+      <b><u style={{ color: '#3ebbff', display: 'inline-flex', alignItems: 'center' }}>Cold<img src="/Cold.png" alt="Cold" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>,&nbsp;
+      <b><u style={{ color: '#ffe700', display: 'inline-flex', alignItems: 'center' }}>Electric<img src="/Electric.png" alt="Electric" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>,&nbsp;
+      <b><u style={{ color: '#f90102', display: 'inline-flex', alignItems: 'center' }}>Fire<img src="/Fire.png" alt="Fire" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>,&nbsp;
+      <b><u style={{ color: '#516fff', display: 'inline-flex', alignItems: 'center' }}>Force<img src="/Force.png" alt="Force" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>,&nbsp;
+      <b><u style={{ color: '#a929ff', display: 'inline-flex', alignItems: 'center' }}>Neural<img src="/Neural.png" alt="Neural" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>,&nbsp;
+      <b><u style={{ color: '#02b900', display: 'inline-flex', alignItems: 'center' }}>Toxic<img src="/Toxic.png" alt="Toxic" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>
+    </span>
+  );
+
+  const ordnancerFeatureJSX = (
+    <span style={{ color: '#000', fontWeight: 400 }}>
+      <b><i style={{ color: '#910a0a' }}>Excessive Display.</i></b> You and all allies within <b>[3]</b>hx deal +1d6 Damage to all <b><i><span style={{ color: '#990000' }}>Attacks</span></i></b>. The Damage type is the same as the <b><i><span style={{ color: '#990000' }}>Attack</span></i></b> used.
+    </span>
+  );
+
+  const pistoleerFeatureJSX = (
+    <span style={{ color: '#000', fontWeight: 400 }}>
+      <b><i style={{ color: '#5a910a' }}>Harry.</i></b> When you deal Damage to an enemy, you can immediately <b><i style={{ color: '#38761d' }}>Move</i></b> <b>[1]</b>hx.
+    </span>
+  );
+
+  const sniperFeatureJSX = (
+    <span style={{ color: '#000', fontWeight: 400 }}>
+      <b><i style={{ color: '#0a6f91' }}>Targeteer.</i></b> When you Crit, in addition to rolling extra Damage dice and dealing an effect, you can choose to inflict <b>[1]</b> of the following conditions: <b><i>Blind</i></b>, <b><i>Demoralized</i></b>, <b><i>Spike</i></b> (weapon Damage type), or <b><i>Restrained</i></b>.
+    </span>
+  );
+
+  const hackerFeatureJSX = (
+    <span style={{ color: '#000', fontWeight: 400 }}>
+      <b><i style={{ color: '#5c57b8' }}>Mobile Gate.</i></b> Your allies can use you and your <i>Drone</i> as a pair of <i style={{ color: '#38761d' }}>Teleportation Gates</i>.
+    </span>
+  );
+
+  const junkerFeatureJSX = (
+    <span style={{ color: '#000', fontWeight: 400 }}>
+      <b><i style={{ color: '#6db857' }}>Salvage.</i></b> Your <i>Drone</i> gains the Crit effect of a <b>[1]</b> ally's <b><i><span style={{ color: '#000' }}>Primary</span> <span style={{ color: '#990000' }}>Attack</span></i></b> within <b>[3]</b>hx of it.
+    </span>
+  );
+
+  const nanoboticistFeatureJSX = (
+    <span style={{ color: '#000', fontWeight: 400 }}>
+      <b><i style={{ color: '#57b8b0' }}>Protective Swarm.</i></b> While your <i>Drone</i> is <b>[1]</b>hx away from you, any <b><i><span style={{ color: '#990000' }}>Attack</span></i></b> that targets you automatically targets your <i>Drone</i> instead.
+    </span>
+  );
+
+  const tankerFeatureJSX = (
+    <span style={{ color: '#000', fontWeight: 400 }}>
+      <b><i style={{ color: '#b8578b' }}>Ironclad.</i></b> Your <i>Drone</i> has the <i>Mount</i> keyword. While <i>Mounting</i> the <i>Drone</i>, the <i>Rider</i> cannot be directly targeted by <b><i><span style={{ color: '#990000' }}>Attacks</span></i></b> or <b><i style={{ color: '#351c75' }}>Strikes</i></b>.
+    </span>
+  );
+
+  const avenochFeatureJSX = (
+    <span style={{ color: '#000', fontWeight: 400 }}>
+      <b><i style={{ color: '#2b5f59' }}>First in Flight.</i></b> You have a <b><i style={{ color: '#38761d' }}>Flight Speed</i></b>. Additionally, you can <b><i style={{ color: '#38761d' }}>Move</i></b> <b>[2]</b>hx whenever you Crit on an <b><i><span style={{ color: '#990000' }}>Attack</span></i></b>.
+    </span>
+  );
+
+  const cerebronychFeatureJSX = (
+    <span style={{ color: '#000', fontWeight: 400 }}>
+      <b><i style={{ color: '#5f5e2b' }}>Parasitic Composure.</i></b> You are <i>Immune</i> to the <b><i>Confuse</i></b> condition and have <b><u style={{ color: '#de7204', display: 'inline-flex', alignItems: 'center' }}>Chemical<img src="/Chemical.png" alt="Chemical" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> and <b><u style={{ color: '#02b900', display: 'inline-flex', alignItems: 'center' }}>
+        Toxic
+        <img src="/Toxic.png" alt="Toxic" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+      </u></b> <i>Resistance</i>.
+    </span>
+  );
+
+  const chloroptidFeatureJSX = (
+    <span style={{ color: '#000', fontWeight: 400 }}>
+      <b><i style={{ color: '#315f2b' }}>Rapid Regeneration.</i></b> You gain 1d4 <b><i style={{ color: '#990000' }}>Hit Points</i></b> at the start of your turn. Additionally, your size is 1hx, 2hx, or 3hx, which is chosen at character creation.
+    </span>
+  );
+
+  const cognizantFeatureJSX = (
+    <span style={{ color: '#000', fontWeight: 400 }}>
+      <b><i style={{ color: '#2b3b5f' }}>Gears & Cogs.</i></b> You <i>Resist</i> <b><u style={{ color: '#02b900', display: 'inline-flex', alignItems: 'center' }}>Toxic<img src="/Toxic.png" alt="Toxic" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> damage and are <i>Immune</i> to the <b><i>Drain</i></b> condition and can naturally survive in the vacuum of space.
+    </span>
+  );
+
+  const emberfolkFeatureJSX = (
+    <span style={{ color: '#000', fontWeight: 400 }}>
+      <b><i style={{ color: '#5f2b2b' }}>Born of Fire.</i></b> You <i>Resist</i> <b><u style={{ color: '#f90102', display: 'inline-flex', alignItems: 'center' }}>Fire<img src="/Fire.png" alt="Fire" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> damage and are <i>Immune</i> to the <b><i>Spike</i></b> condition.
+    </span>
+  );
+
+  const entomosFeatureJSX = (
+    <span style={{ color: '#000', fontWeight: 400 }}>
+      <b><i style={{ color: '#5f422b' }}>Insectoid Resistance.</i></b> You are <i>Immune</i> to the <b><i>Confuse</i></b> condition and fall damage.
+    </span>
+  );
+
+  const humanFeatureJSX = (
+    <span style={{ color: '#000', fontWeight: 400 }}>
+      <b><i style={{ color: '#2b315f' }}>Adaptable Physique.</i></b> You <i>Resist</i> <b>[2]</b> of the following damage types:<br/>
+    <b><u style={{ color: '#de7204', display: 'inline-flex', alignItems: 'center' }}>Chemical<img src="/Chemical.png" alt="Chemical" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>,&nbsp;
+    <b><u style={{ color: '#3ebbff', display: 'inline-flex', alignItems: 'center' }}>Cold<img src="/Cold.png" alt="Cold" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>,&nbsp;
+    <b><u style={{ color: '#ffe700', display: 'inline-flex', alignItems: 'center' }}>Electric<img src="/Electric.png" alt="Electric" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>,&nbsp;
+    <b><u style={{ color: '#f90102', display: 'inline-flex', alignItems: 'center' }}>Fire<img src="/Fire.png" alt="Fire" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>,&nbsp;
+    <b><u style={{ color: '#516fff', display: 'inline-flex', alignItems: 'center' }}>Force<img src="/Force.png" alt="Force" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>,&nbsp;
+    <b><u style={{ color: '#a929ff', display: 'inline-flex', alignItems: 'center' }}>Neural<img src="/Neural.png" alt="Neural" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>,&nbsp;
+    <b><u style={{ color: '#02b900', display: 'inline-flex', alignItems: 'center' }}>Toxic<img src="/Toxic.png" alt="Toxic" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>
+    </span>
+  );
+
+  const lumenarenFeatureJSX = (
+    <span style={{ color: '#000', fontWeight: 400 }}>
+      <b><i style={{ color: '#515f2b' }}>Immutable Energy Reserves.</i></b> You are <i>Immune</i> to the <b><i>Sleep</i></b> condition, <i>Resist</i> <b><u style={{ color: '#ffe700', display: 'inline-flex', alignItems: 'center' }}>Electric<img src="/Electric.png" alt="Electric" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> and <b><u style={{ color: '#516fff', display: 'inline-flex', alignItems: 'center' }}>Force<img src="/Force.png" alt="Force" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> and can naturally survive in the vacuum of space.
+    </span>
+  );
+
+  const praedariFeatureJSX = (
+    <span style={{ color: '#000', fontWeight: 400 }}>
+      <b><i style={{ color: '#5f2b5c' }}>Predator.</i></b> Whenever you <b><i><span style={{ color: '#990000' }}>Attack</span></i></b> or <b><i style={{ color: '#351c75' }}>Strike</i></b> a creature who is not at full <b><i style={{ color: '#990000' }}>Hit Points</i></b>, you gain +<b>[2]</b> Crit and +<b>[1]</b>d6 Damage, the Damage type is the same as the <b><i><span style={{ color: '#990000' }}>Attack</span></i></b> or <b><i style={{ color: '#351c75' }}>Strike</i></b> Damage type.
+    </span>
+  );
+
+  const corvidFeatureJSX = (
+    <span style={{ color: '#000', fontWeight: 400 }}>
+      <b><i style={{ color: '#75904e' }}>Crow's Cunning.</i></b> You are <i>Immune</i> to the <b><i>Confuse</i></b> and <b><i>Mesmerize</i></b> conditions.
+    </span>
+  );
+
+  const falcadorFeatureJSX = (
+    <span style={{ color: '#000', fontWeight: 400 }}>
+      <b><i style={{ color: '#6d7156' }}>Rending Talons.</i></b> When you roll for <b><i>Spike</i></b> damage on <b><i style={{ color: '#351c75' }}>Strikes</i></b>, the <b><i>Spike</i></b> effect triggers on a roll of <b>[5]</b>+.
+    </span>
+  );
+
+  const nocturneFeatureJSX = (
+    <span style={{ color: '#000', fontWeight: 400 }}>
+      <b><i style={{ color: '#334592' }}>Eyes of the Night.</i></b> You are <i>Immune</i> to the <b><i>Blind</i></b> condition and don't have a <i>Rear Arc</i>. Additionally, whenever you Crit on an <b><i><span style={{ color: '#990000' }}>Attack</span></i></b>, you inflict the <b><i>Mesmerize</i></b> condition.
+    </span>
+  );
+
+  const vulturineFeatureJSX = (
+    <span style={{ color: '#000', fontWeight: 400 }}>
+      <b><i style={{ color: '#a96d8c' }}>Carrion Gorge.</i></b> When you destroy an enemy using a <b><i style={{ color: '#351c75' }}>Strike</i></b>, you immediately gain <b>[2]</b>d6 <b><i style={{ color: '#990000' }}>Hit Points</i></b>.
+    </span>
+  );
+
+  const barkskinFeatureJSX = (
+    <span style={{ color: '#000', fontWeight: 400 }}>
+      <b><i style={{ color: '#5f2d2b' }}>Deep Roots.</i></b> You are <i>Immune</i> to the <b><i>Slam</i></b> and <b><i>Bounce</i></b> conditions.
+    </span>
+  );
+
+  const carnivorousFeatureJSX = (
+    <span style={{ color: '#000', fontWeight: 400 }}>
+      <b><i style={{ color: '#2b2d5f' }}>Sap Sucker.</i></b> Whenever you heal as a result of the <b><i>Drain</i></b> condition, you heal all of the amount of Damage done instead of half.
+    </span>
+  );
+
+  const driftingFeatureJSX = (
+    <span style={{ color: '#000', fontWeight: 400 }}>
+      <b><i style={{ color: '#5f8a5f' }}>Leaf on the Wind.</i></b> You have a <b><i style={{ color: '#38761d' }}>Flight Speed</i></b>. Additionally, you can <b><i style={{ color: '#38761d' }}>Move</i></b> <b>[1]</b>hx after you take any Damage.
+    </span>
+  );
+
+  const vinyFeatureJSX = (
+    <span style={{ color: '#000', fontWeight: 400 }}>
+      <b><i style={{ color: '#5f5f2b' }}>Climbing Creeper.</i></b> You gain a <b><i style={{ color: '#38761d' }}>Climb Speed</i></b> and <i>Resist</i> <b><u style={{ color: '#a6965f', display: 'inline-flex', alignItems: 'center' }}>Piercing<img src="/Piercing.png" alt="Piercing" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>.
+    </span>
+  );
+
   return (
     <div className="character-editor" style={{ 
       position: 'relative',
@@ -447,7 +805,7 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onSave }) => {
         <h3 style={{ fontWeight: 'bold', textDecoration: 'underline' }}>Identity</h3>
   <label style={{ fontWeight: 'bold' }}>Player Name: <input value={playerName} onChange={e => setPlayerName(e.target.value)} /></label><br />
   <label style={{ fontWeight: 'bold' }}>Character Name: <input value={name} onChange={e => setName(e.target.value)} /></label><br />
-  <label style={{ fontWeight: 'bold' }}>Class: 
+  <label style={{ fontWeight: 'bold' }}>Class:
   <select 
     value={charClass} 
     onChange={e => {
@@ -649,12 +1007,106 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onSave }) => {
         <label style={{ color: '#0b5394', fontWeight: 'bold' }}>Subclass Feature: {
           subclass === "Anatomist" 
             ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{anatomistFeatureJSX}</span>
-            : subclass === "Grenadier"
-              ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{grenadierFeatureJSX}</span>
-              : <input value={subclassFeature} onChange={e => setSubclassFeature(e.target.value)} />
+            : subclass === "Beguiler"
+              ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{beguilerFeatureJSX}</span>
+              : subclass === "Coercive"
+                ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{coerciveFeatureJSX}</span>
+                : subclass === "Divinist"
+                  ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{divinistFeatureJSX}</span>
+                  : subclass === "Galvanic"
+                    ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{galvanicFeatureJSX}</span>
+                    : subclass === "Grenadier"
+                      ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{grenadierFeatureJSX}</span>
+                      : subclass === "Naturalist"
+                        ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{naturalistFeatureJSX}</span>
+                        : subclass === "Necro"
+                          ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{necroFeatureJSX}</span>
+                          : subclass === "Poisoner"
+                            ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{poisonerFeatureJSX}</span>
+                            : subclass === "Technologist"
+                              ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{technologistFeatureJSX}</span>
+                              : subclass === "Tactician"
+                                ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{tacticianFeatureJSX}</span>
+                                : subclass === "Tyrant"
+                                  ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{tyrantFeatureJSX}</span>
+                                  : subclass === "Vectorial"
+                                    ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{vectorialFeatureJSX}</span>
+                                    : subclass === "Void"
+                                      ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{voidFeatureJSX}</span>
+                                      : subclass === "Air"
+                                        ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{airFeatureJSX}</span>
+                                        : subclass === "Earth"
+                                          ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{earthFeatureJSX}</span>
+                                          : subclass === "Fire"
+                                            ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{fireFeatureJSX}</span>
+                                            : subclass === "Water"
+                                              ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{waterFeatureJSX}</span>
+                                              : subclass === "Aeronaut"
+                                                ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{aeronautFeatureJSX}</span>
+                                                : subclass === "Brawler"
+                                                  ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{brawlerFeatureJSX}</span>
+                                                  : subclass === "Dreadnaught"
+                                                    ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{dreadnaughtFeatureJSX}</span>
+                                                    : subclass === "Spectre"
+                                                      ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{spectreFeatureJSX}</span>
+                                                      : subclass === "Ammo Coder"
+                                                        ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{ammoCoderFeatureJSX}</span>
+                                                        : subclass === "Ordnancer"
+                                                          ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{ordnancerFeatureJSX}</span>
+                                                          : subclass === "Pistoleer"
+                                                            ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{pistoleerFeatureJSX}</span>
+                                                            : subclass === "Sniper"
+                                                              ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{sniperFeatureJSX}</span>
+                                                              : subclass === "Hacker"
+                                                                ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{hackerFeatureJSX}</span>
+                                                                : subclass === "Junker"
+                                                                  ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{junkerFeatureJSX}</span>
+                                                                  : subclass === "Nanoboticist"
+                                                                    ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{nanoboticistFeatureJSX}</span>
+                                                                    : subclass === "Tanker"
+                                                                      ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{tankerFeatureJSX}</span>
+                                                                      : <input value={subclassFeature} onChange={e => setSubclassFeature(e.target.value)} />
         }</label><br />
-        <label style={{ color: '#0b5394', fontWeight: 'bold' }}>Species Feature: <input value={speciesFeature} onChange={e => setSpeciesFeature(e.target.value)} /></label><br />
-        <label style={{ color: '#0b5394', fontWeight: 'bold' }}>Subspecies Feature: <input value={subspeciesFeature} onChange={e => setSubspeciesFeature(e.target.value)} /></label><br />
+        <label style={{ color: '#0b5394', fontWeight: 'bold' }}>Species Feature: {
+          species === "Avenoch" 
+            ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{avenochFeatureJSX}</span>
+            : species === "Cerebronych"
+              ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{cerebronychFeatureJSX}</span> 
+              : species === "Chloroptid"
+                ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{chloroptidFeatureJSX}</span>
+                : species === "Cognizant"
+                  ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{cognizantFeatureJSX}</span>
+                  : species === "Emberfolk"
+                    ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{emberfolkFeatureJSX}</span>
+                    : species === "Entomos"
+                      ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{entomosFeatureJSX}</span>
+                      : species === "Human"
+                        ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{humanFeatureJSX}</span>
+                        : species === "Lumenaren"
+                          ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{lumenarenFeatureJSX}</span>
+                          : species === "Praedari"
+                            ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{praedariFeatureJSX}</span>
+                            : <input value={speciesFeature} onChange={e => setSpeciesFeature(e.target.value)} />
+        }</label><br />
+        <label style={{ color: '#0b5394', fontWeight: 'bold' }}>Subspecies Feature: {
+          subspecies === "Corvid" 
+            ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{corvidFeatureJSX}</span>
+            : subspecies === "Falcador"
+              ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{falcadorFeatureJSX}</span>
+            : subspecies === "Nocturne"
+              ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{nocturneFeatureJSX}</span>
+            : subspecies === "Vulturine"
+              ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{vulturineFeatureJSX}</span>
+            : subspecies === "Barkskin"
+              ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{barkskinFeatureJSX}</span>
+            : subspecies === "Carnivorous"
+              ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{carnivorousFeatureJSX}</span>
+            : subspecies === "Drifting"
+              ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{driftingFeatureJSX}</span>
+            : subspecies === "Viny"
+              ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{vinyFeatureJSX}</span>
+            : <input value={subspeciesFeature} onChange={e => setSubspeciesFeature(e.target.value)} />
+        }</label><br />
       </section>
 
       {/* Hit Points Section */}
@@ -668,7 +1120,7 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onSave }) => {
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginLeft: 12 }}>
               <label style={{ color: '#990000', fontWeight: 'bold', marginRight: 4 }}>Current Hit Points:</label>
-              <input type="number" value={currentHitPoints} onChange={e => setCurrentHitPoints(+e.target.value)} style={{ width: 50, marginRight: 8, color: '#990000', border: '1.5px solid #990000', fontWeight: 'bold' }} />
+                           <input type="number" value={currentHitPoints} onChange={e => setCurrentHitPoints(+e.target.value)} style={{ width: 50, marginRight: 8, color: '#990000', border: '1.5px solid #990000', fontWeight: 'bold' }} />
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
                 <button
                   className={styles.addButton}
@@ -777,7 +1229,7 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onSave }) => {
             <thead>
               <tr>
                 <th style={{ textAlign: 'left', fontWeight: 'bold', padding: '4px 8px' }}></th>
-                {[20, 18, 16, 14, 12, 10, 8, 6, 4, 2].map((val) => (
+                {[20, 18, 16, 14, 12, 10, 8, 6, 4,  2].map((val) => (
                   <th key={val} style={{ textAlign: 'center', fontWeight: 'bold', padding: '4px 8px' }}>{val}+</th>
                 ))}
               </tr>
@@ -851,6 +1303,7 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onSave }) => {
           borderLeft: '2px solid #bbb',
           boxShadow: '-2px 0 8px rgba(0,0,0,0.08)',
           padding: '18px 12px 18px 18px',
+
           borderTopLeftRadius: 12,
           borderBottomLeftRadius: 12,
         }}
