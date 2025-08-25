@@ -5,6 +5,7 @@ import CharacterEditor from "./components/CharacterEditor";
 import LevelUp from "./components/LevelUp";
 import Cards from "./components/Cards";
 import type { CharacterSheet } from "./types/CharacterSheet";
+import { loadSheetById, saveCharacterSheet } from "./utils/storage";
 
 
 const App = () => {
@@ -16,6 +17,43 @@ const App = () => {
   const [subclass, setSubclass] = useState<string>(currentSheet?.subclass || "");
   const [species, setSpecies] = useState<string>(currentSheet?.species || "");
   const [subspecies, setSubspecies] = useState<string>(currentSheet?.subspecies || "");
+
+  // Cross-window synchronization
+  React.useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === "rpg-character-sheets" && currentSheet?.id) {
+        // Reload the current character from storage
+        const updatedSheet = loadSheetById(currentSheet.id);
+        if (updatedSheet) {
+          setCurrentSheet(updatedSheet);
+          setCharClass(updatedSheet.charClass || "");
+          setSubclass(updatedSheet.subclass || "");
+          setSpecies(updatedSheet.species || "");
+          setSubspecies(updatedSheet.subspecies || "");
+        }
+      }
+    };
+
+    const handleCharacterUpdate = (e: CustomEvent<{ sheet: CharacterSheet }>) => {
+      if (currentSheet?.id && e.detail.sheet.id === currentSheet.id) {
+        setCurrentSheet(e.detail.sheet);
+        setCharClass(e.detail.sheet.charClass || "");
+        setSubclass(e.detail.sheet.subclass || "");
+        setSpecies(e.detail.sheet.species || "");
+        setSubspecies(e.detail.sheet.subspecies || "");
+      }
+    };
+
+    // Listen for storage changes from other windows
+    window.addEventListener('storage', handleStorageChange);
+    // Listen for character updates from current window
+    window.addEventListener('character-updated', handleCharacterUpdate as EventListener);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('character-updated', handleCharacterUpdate as EventListener);
+    };
+  }, [currentSheet?.id]);
 
   // Keep state in sync with currentSheet changes
   // (If a new sheet is loaded, update all shared state)
@@ -47,13 +85,15 @@ const App = () => {
   // Save and go home (for CharacterEditor)
   const handleSave = () => {
     if (currentSheet) {
-      setCurrentSheet({ 
+      const updatedSheet = { 
         ...currentSheet, 
         charClass, 
         subclass, 
         species, 
         subspecies 
-      });
+      };
+      setCurrentSheet(updatedSheet);
+      saveCharacterSheet(updatedSheet);
     }
     setView("manager");
   };
@@ -61,16 +101,47 @@ const App = () => {
   // Save only, do not navigate (for LevelUp and Cards)
   const handleSaveOnly = () => {
     if (currentSheet) {
-      setCurrentSheet({ 
+      const updatedSheet = { 
         ...currentSheet, 
         charClass, 
         subclass, 
         species, 
         subspecies 
-      });
+      };
+      setCurrentSheet(updatedSheet);
+      saveCharacterSheet(updatedSheet);
     }
     // No navigation
   };
+
+  // Auto-save when shared state changes (debounced to prevent excessive saves)
+  React.useEffect(() => {
+    if (!currentSheet) return;
+    
+    const hasChanges = (
+      currentSheet.charClass !== charClass ||
+      currentSheet.subclass !== subclass ||
+      currentSheet.species !== species ||
+      currentSheet.subspecies !== subspecies
+    );
+
+    if (hasChanges) {
+      // Debounce the save to prevent rapid-fire saves
+      const timeoutId = setTimeout(() => {
+        const updatedSheet = {
+          ...currentSheet,
+          charClass,
+          subclass,
+          species,
+          subspecies
+        };
+        setCurrentSheet(updatedSheet);
+        saveCharacterSheet(updatedSheet);
+      }, 100); // 100ms debounce
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [charClass, subclass, species, subspecies, currentSheet]);
 
   const handleLevelUp = () => {
     setView("levelup");

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import styles from './CharacterEditor.module.css';
 
 import type { CharacterSheet } from "../types/CharacterSheet";
-import { saveCharacterSheet } from "../utils/storage";
+import { saveCharacterSheet, loadSheetById } from "../utils/storage";
 
 
 type Props = {
@@ -69,9 +69,16 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onSave, onLevelUp, onCards, c
   }, [charClass]);
 
   // Rich JSX for Chemist, Coder, Commander, Contemplative, Devout
+  // Dynamically show Crit bonus as [2] if '+2 Crit' dot is selected in classCardDots
+  const chemCritBonus = sheet?.classCardDots?.[1]?.[0] ? 2 : 0;
+  // Dynamically show Chem Token max as [4] or [5] if '+1 Chem Token max' dots are selected
+  const chemTokenDots = sheet?.classCardDots?.[0] || [];
+  let chemTokenMax = 3;
+  if (chemTokenDots[0]) chemTokenMax = 4;
+  if (chemTokenDots[0] && chemTokenDots[1]) chemTokenMax = 5;
   const chemistFeatureJSX = (
     <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#721131' }}>Chemical Reaction.</i></b> At the start of each round, you gain 1 <i>Chem Token</i>, up to a maximum of <b>[3]</b> <i>Chem Token</i>s. While you have at least 1 <i>Chem Token</i>, your <b><i><span style={{ color: '#000' }}>Primary</span> <span style={{ color: '#990000' }}>Attack</span></i></b> gains a +<b>[0]</b> Crit and deals +1 Damage die.
+      <b><i style={{ color: '#721131' }}>Chemical Reaction.</i></b> At the start of each round, you gain 1 <i>Chem Token</i>, up to a maximum of <b>[{chemTokenMax}]</b> <i>Chem Token</i>s. While you have at least 1 <i>Chem Token</i>, your <b><i><span style={{ color: '#000' }}>Primary</span> <span style={{ color: '#990000' }}>Attack</span></i></b> gains a +<b>[{chemCritBonus}]</b> Crit and deals +1 Damage die.
     </span>
   );
   const coderFeatureJSX = (
@@ -199,6 +206,126 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onSave, onLevelUp, onCards, c
       return () => clearTimeout(timeout);
     }
   }, [spNotice]);
+
+  // Cross-window synchronization for this character
+  React.useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === "rpg-character-sheets" && sheet?.id) {
+        // Reload the current character from storage
+        const updatedSheet = loadSheetById(sheet.id);
+        if (updatedSheet) {
+        // Update all local state to match the stored character (only if changed)
+        if (updatedSheet.playerName !== playerName) setPlayerName(updatedSheet.playerName || "");
+        if (updatedSheet.name !== name) setName(updatedSheet.name || "");
+        if (updatedSheet.background !== background) setBackground(updatedSheet.background || "");
+        if (updatedSheet.resistances !== resistances) setResistances(updatedSheet.resistances || "");
+        if (updatedSheet.immunities !== immunities) setImmunities(updatedSheet.immunities || "");
+        if (updatedSheet.absorptions !== absorptions) setAbsorptions(updatedSheet.absorptions || "");
+        if (updatedSheet.movement !== movement) setMovement(updatedSheet.movement || "");
+        if (updatedSheet.strike !== strike) setStrike(updatedSheet.strike || "");
+        if (updatedSheet.xpTotal !== xpTotal) setXpTotal(updatedSheet.xpTotal || 0);
+        if (updatedSheet.spTotal !== spTotal) setSpTotal(updatedSheet.spTotal || 0);
+        if (updatedSheet.classFeature !== classFeature) setClassFeature(updatedSheet.classFeature || "");
+        if (updatedSheet.portrait !== portraitUrl) setPortraitUrl(updatedSheet.portrait || null);
+        if (updatedSheet.spSpent !== spSpent) setSpSpent(updatedSheet.spSpent ?? 0);
+        if (JSON.stringify(updatedSheet.deathDots) !== JSON.stringify(deathDots)) setDeathDots(updatedSheet.deathDots || Array(10).fill(false));
+        if (updatedSheet.multiStrike !== multiStrike) setMultiStrike(updatedSheet.multiStrike || 0);
+        if (updatedSheet.strikeEffects !== strikeEffects) setStrikeEffects(updatedSheet.strikeEffects || "");          // Update character details if they've changed
+          if (updatedSheet.charClass !== charClass) setCharClass(updatedSheet.charClass || "");
+          if (updatedSheet.subclass !== subclass) setSubclass(updatedSheet.subclass || "");
+          if (updatedSheet.species !== species) setSpecies(updatedSheet.species || "");
+          if (updatedSheet.subspecies !== subspecies) setSubspecies(updatedSheet.subspecies || "");
+        }
+      }
+    };
+
+    const handleCharacterUpdate = (e: CustomEvent<{ sheet: CharacterSheet }>) => {
+      if (sheet?.id && e.detail.sheet.id === sheet.id) {
+        const updatedSheet = e.detail.sheet;
+        // Update all local state to match the updated character (only if changed)
+        if (updatedSheet.playerName !== playerName) setPlayerName(updatedSheet.playerName || "");
+        if (updatedSheet.name !== name) setName(updatedSheet.name || "");
+        if (updatedSheet.background !== background) setBackground(updatedSheet.background || "");
+        if (updatedSheet.resistances !== resistances) setResistances(updatedSheet.resistances || "");
+        if (updatedSheet.immunities !== immunities) setImmunities(updatedSheet.immunities || "");
+        if (updatedSheet.absorptions !== absorptions) setAbsorptions(updatedSheet.absorptions || "");
+        if (updatedSheet.movement !== movement) setMovement(updatedSheet.movement || "");
+        if (updatedSheet.strike !== strike) setStrike(updatedSheet.strike || "");
+        if (updatedSheet.xpTotal !== xpTotal) setXpTotal(updatedSheet.xpTotal || 0);
+        if (updatedSheet.spTotal !== spTotal) setSpTotal(updatedSheet.spTotal || 0);
+        if (updatedSheet.classFeature !== classFeature) setClassFeature(updatedSheet.classFeature || "");
+        if (updatedSheet.portrait !== portraitUrl) setPortraitUrl(updatedSheet.portrait || null);
+        if (updatedSheet.spSpent !== spSpent) setSpSpent(updatedSheet.spSpent ?? 0);
+        if (JSON.stringify(updatedSheet.deathDots) !== JSON.stringify(deathDots)) setDeathDots(updatedSheet.deathDots || Array(10).fill(false));
+        if (updatedSheet.multiStrike !== multiStrike) setMultiStrike(updatedSheet.multiStrike || 0);
+        if (updatedSheet.strikeEffects !== strikeEffects) setStrikeEffects(updatedSheet.strikeEffects || "");
+        
+        // Update character details if they've changed
+        if (updatedSheet.charClass !== charClass) setCharClass(updatedSheet.charClass || "");
+        if (updatedSheet.subclass !== subclass) setSubclass(updatedSheet.subclass || "");
+        if (updatedSheet.species !== species) setSpecies(updatedSheet.species || "");
+        if (updatedSheet.subspecies !== subspecies) setSubspecies(updatedSheet.subspecies || "");
+      }
+    };
+
+    // Listen for storage changes from other windows
+    window.addEventListener('storage', handleStorageChange);
+    // Listen for character updates from current window
+    window.addEventListener('character-updated', handleCharacterUpdate as EventListener);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('character-updated', handleCharacterUpdate as EventListener);
+    };
+  }, [sheet?.id, charClass, subclass, species, subspecies]);
+
+  // Auto-save when critical fields change (debounced for performance)
+  React.useEffect(() => {
+    if (!sheet || !sheet.id) return;
+    
+    const hasChanges = (
+      sheet.playerName !== playerName ||
+      sheet.name !== name ||
+      sheet.background !== background ||
+      sheet.classFeature !== classFeature ||
+      sheet.resistances !== resistances ||
+      sheet.immunities !== immunities ||
+      sheet.absorptions !== absorptions ||
+      sheet.movement !== movement ||
+      sheet.strike !== strike ||
+      sheet.xpTotal !== xpTotal ||
+      sheet.spTotal !== spTotal ||
+      sheet.portrait !== portraitUrl
+    );
+
+    if (hasChanges) {
+      // Debounce saves to prevent excessive storage writes
+      const timeoutId = setTimeout(() => {
+        const updatedSheet: CharacterSheet = {
+          ...sheet,
+          playerName,
+          name,
+          background,
+          classFeature,
+          resistances,
+          immunities,
+          absorptions,
+          movement,
+          strike,
+          xpTotal,
+          spTotal,
+          portrait: portraitUrl || undefined,
+          xpRemaining: xpTotal - (sheet.xpSpent ?? 0),
+          spRemaining: spTotal - spSpent,
+          spSpent,
+        };
+        saveCharacterSheet(updatedSheet);
+      }, 300); // 300ms debounce for text fields
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [playerName, name, background, classFeature, resistances, immunities, absorptions, movement, strike, xpTotal, spTotal, portraitUrl, sheet, spSpent]);
+
   // SP cost per column in the skills grid
   const skillSpCosts = [1,1,2,2,3,4,5,6,8,10];
 
@@ -1735,7 +1862,24 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onSave, onLevelUp, onCards, c
       <div className={styles.strikeCard}>
         <h3>Strike</h3>
         <div className={styles.cardContent}>
-          <div className={styles.horizontalLabel} style={{ color: '#351c75', fontWeight: 'bold' }}>Strike Damage: {strikeDamage}</div>
+          <div className={styles.horizontalLabel} style={{ color: '#351c75', fontWeight: 'bold', display: 'flex', alignItems: 'center' }}>
+            <span style={{ fontWeight: 'bold', fontFamily: 'inherit', color: '#351c75', marginRight: 4 }}>Strike Damage:</span>
+            {charClass === 'Chemist' ? (
+              (() => {
+                const damageDots = sheet?.classCardDots?.[8] || [];
+                const numDice = 1 + damageDots.filter(Boolean).length;
+                return (
+                  <span style={{ fontWeight: 'bold', fontFamily: 'inherit', color: '#000', marginLeft: 4, display: 'flex', alignItems: 'center' }}>
+                    {numDice}d6&nbsp;
+                    <span style={{ color: '#de7204', textDecoration: 'underline', fontWeight: 'bold', fontFamily: 'inherit', display: 'inline-flex', alignItems: 'center' }}>
+                      Chemical
+                      <img src="/Chemical.png" alt="Chemical" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+                    </span>
+                  </span>
+                );
+              })()
+            ) : <span style={{ fontWeight: 'bold', fontFamily: 'inherit', color: '#000', marginLeft: 4 }}>{strikeDamage}</span>}
+          </div>
           <div className={styles.horizontalLabel} style={{ color: '#351c75', fontWeight: 'bold' }}>Multi Strike</div>
           <div className={styles.horizontalLabel} style={{ color: '#351c75', fontWeight: 'bold' }}>Strike Effects: {strikeEffects}</div>
         </div>
@@ -1916,7 +2060,14 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onSave, onLevelUp, onCards, c
   <h3 style={{ marginTop: 0, textDecoration: 'underline' }}>Languages & Perks</h3>
         <div className={styles.cardContent}>
           <div style={{ fontWeight: 'bold', marginBottom: 6 }}>Languages</div>
-          <div style={{ fontWeight: 'bold', marginBottom: 2 }}>Perk 1</div>
+          <div style={{ fontWeight: 'bold', marginBottom: 2 }}>
+            Perk 1
+            {sheet?.classCardDots?.[9]?.[0] && (
+              <span style={{ color: '#721131', fontWeight: 'bold', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '0.90em', marginLeft: 8 }}>
+                <b><i>Chemical Concoctions.</i></b> You can create myriad concoctions. When doing so, choose a skill. Upon drinking a concoction, the imbiber gains an advantage on the next sill roll of your choice. You can create up to 3 concoctions per day which each last until the end of the day.
+              </span>
+            )}
+          </div>
           <div style={{ fontWeight: 'bold', marginBottom: 2 }}>Perk 2</div>
           <div style={{ fontWeight: 'bold', marginBottom: 2 }}>Perk 3</div>
           <div style={{ fontWeight: 'bold', marginBottom: 2 }}>Perk 4</div>

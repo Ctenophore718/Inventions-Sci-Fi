@@ -57,4 +57,7 @@ export type CharacterSheet = {
   // UI state fields
   skillDots?: { [key: string]: boolean[] };
   currentHitPoints?: number;
+
+  // Persistent state for Level Up Class Card dots (rows of booleans)
+  classCardDots?: boolean[][];
 };

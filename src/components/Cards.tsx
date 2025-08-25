@@ -1,5 +1,6 @@
 import React from "react";
 import type { CharacterSheet } from "../types/CharacterSheet";
+import { loadSheetById } from "../utils/storage";
 
 type CardsProps = {
   sheet: CharacterSheet | null;
@@ -10,6 +11,41 @@ type CardsProps = {
 };
 
 const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onSave, onHome }) => {
+  const [localSheet, setLocalSheet] = React.useState<CharacterSheet | null>(sheet);
+
+  // Update local sheet when prop changes
+  React.useEffect(() => {
+    setLocalSheet(sheet);
+  }, [sheet]);
+
+  // Cross-window synchronization for character display (optimized)
+  React.useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === "rpg-character-sheets" && sheet?.id) {
+        const updatedSheet = loadSheetById(sheet.id);
+        if (updatedSheet && JSON.stringify(updatedSheet) !== JSON.stringify(localSheet)) {
+          setLocalSheet(updatedSheet);
+        }
+      }
+    };
+
+    const handleCharacterUpdate = (e: CustomEvent<{ sheet: CharacterSheet }>) => {
+      if (sheet?.id && e.detail.sheet.id === sheet.id) {
+        // Only update if the sheet has actually changed
+        if (JSON.stringify(e.detail.sheet) !== JSON.stringify(localSheet)) {
+          setLocalSheet(e.detail.sheet);
+        }
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('character-updated', handleCharacterUpdate as EventListener);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('character-updated', handleCharacterUpdate as EventListener);
+    };
+  }, [sheet?.id, localSheet]);
   return (
     <div style={{ padding: "1rem" }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
@@ -90,17 +126,17 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onSave, onHome 
         textAlign: 'center'
       }}>
         <h3>Character Card Management System</h3>
-        <p>Card management for <strong>{sheet?.name || 'Unnamed Character'}</strong> is coming soon!</p>
+        <p>Card management for <strong>{localSheet?.name || 'Unnamed Character'}</strong> is coming soon!</p>
         
         <div style={{ marginTop: '2rem', display: 'grid', gap: '1rem', maxWidth: '600px', margin: '2rem auto 0' }}>
           <div style={{ background: 'white', padding: '1rem', borderRadius: 6, border: '1px solid #ccc' }}>
             <h4 style={{ margin: '0 0 0.5rem 0', color: '#0b5394' }}>Current Character</h4>
             <p style={{ margin: 0 }}>
-              <strong>Name:</strong> {sheet?.name || 'Unnamed'}<br />
-              <strong>Class:</strong> {sheet?.charClass || 'None'}<br />
-              <strong>Subclass:</strong> {sheet?.subclass || 'None'}<br />
-              <strong>Species:</strong> {sheet?.species || 'None'}<br />
-              <strong>Background:</strong> {sheet?.background || 'None'}
+              <strong>Name:</strong> {localSheet?.name || 'Unnamed'}<br />
+              <strong>Class:</strong> {localSheet?.charClass || 'None'}<br />
+              <strong>Subclass:</strong> {localSheet?.subclass || 'None'}<br />
+              <strong>Species:</strong> {localSheet?.species || 'None'}<br />
+              <strong>Background:</strong> {localSheet?.background || 'None'}
             </p>
           </div>
           
