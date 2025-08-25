@@ -29,6 +29,8 @@ export type CharacterSheet = {
   spSpent: number;
   spRemaining: number;
 
+  // Portrait
+  portrait?: string;
   // Combat
   speed: string;
   strikeDamage: string;

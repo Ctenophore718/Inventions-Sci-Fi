@@ -1,3 +1,224 @@
+/* Header row for Character Sheet title and buttons */
+.headerRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1em;
+  gap: 0.5em;
+}
+
+.headerTitle {
+  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  font-size: 2em;
+  flex-shrink: 0;
+}
+
+.headerButtons {
+  display: flex;
+  gap: 0.5em;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 600px) {
+  .headerRow {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5em;
+  }
+  .headerTitle {
+    text-align: center;
+    margin-bottom: 0.5em;
+  }
+  .headerButtons {
+    justify-content: center;
+    width: 100%;
+  }
+}
+/* iPad landscape specific layout for Level Up page */
+@media (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
+  .characterSheetGrid[style*="repeat(4, 1fr)"] {
+    grid-template-columns: repeat(2, 1fr) !important;
+    grid-template-rows: repeat(2, 1fr) !important;
+    gap: 16px !important;
+  }
+}
+
+/* Desktop/laptop responsive layout - switch to 2x2 when width gets narrow */
+@media (min-width: 601px) and (max-width: 900px) {
+  .characterSheetGrid[style*="repeat(4, 1fr)"] {
+    grid-template-columns: repeat(2, 1fr) !important;
+    grid-template-rows: repeat(2, 1fr) !important;
+    gap: 16px !important;
+  }
+}
+
+@media (min-width: 1101px) and (max-width: 1366px) {
+  body {
+    overflow-x: hidden !important;
+  }
+  .characterSheetGrid {
+    grid-template-columns: 1fr 1fr 1fr 1fr !important;
+    gap: 8px !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+    box-sizing: border-box !important;
+    overflow-x: hidden !important;
+    padding: 8px !important;
+  }
+  .identityCard {
+    grid-column: 1 / -1 !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+    min-width: 0 !important;
+    display: block !important;
+  }
+  .featuresCard {
+    grid-column: 1 !important;
+    grid-row: 2 !important;
+  }
+  .movementStrikeCard {
+    grid-column: 2 !important;
+    grid-row: 2 !important;
+  }
+  .strikeCard {
+    grid-column: 3 !important;
+    grid-row: 2 !important;
+  }
+  .hitPointsCard {
+    grid-column: 4 !important;
+    grid-row: 2 !important;
+  }
+  .skillsCard {
+    grid-column: 1 / span 2 !important;
+    grid-row: 3 / span 2 !important;
+  }
+  .perksCard {
+    grid-column: 3 !important;
+    grid-row: 3 !important;
+  }
+  .portraitCard {
+    grid-column: 4 !important;
+    grid-row: 3 / span 2 !important;
+  }
+  .damageInteractionsCard {
+    grid-column: 3 !important;
+    grid-row: 3 !important;
+  }
+  .experienceCard {
+    grid-column: 3 !important;
+    grid-row: 4 !important;
+  }
+}
+/* Portrait Card */
+.portraitCard {
+  grid-column: 5;
+  grid-row: 3;
+  border: 2px solid #000;
+  padding: 16px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(180,143,6,0.08);
+  min-height: 120px;
+}
+/* SP Notice Bubble for Skills grid */
+.spNoticeBubble {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+  background: #fff3e0;
+  color: #b45f06;
+  border: 2px solid #b45f06;
+  border-radius: 16px;
+  padding: 18px 36px;
+  font-size: 1.2em;
+  font-weight: bold;
+  box-shadow: 0 4px 24px rgba(180,95,6,0.18);
+  pointer-events: none;
+  text-align: center;
+  white-space: pre-line;
+  animation: spNoticePopCenter 0.2s cubic-bezier(.4,2,.6,1) 1;
+}
+
+@keyframes spNoticePopCenter {
+  0% { transform: translate(-50%, -50%) scale(0.7); opacity: 0; }
+  80% { transform: translate(-50%, -50%) scale(1.08); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+@media (max-width: 600px) {
+  .characterSheetGrid {
+    grid-template-columns: 1fr !important;
+    grid-template-rows: none !important;
+    gap: 12px !important;
+    padding: 0 8px !important;
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+  }
+  .identityCard,
+  .featuresCard,
+  .movementStrikeCard,
+  .strikeCard,
+  .hitPointsCard,
+  .skillsCard,
+  .damageInteractionsCard,
+  .perksCard,
+  .portraitCard,
+  .experienceCard,
+  .saveButtonContainer {
+    display: block !important;
+    grid-column: 1 !important;
+    grid-row: auto !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    margin: 0 !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    height: auto !important;
+    position: static !important;
+    overflow-x: hidden !important;
+    order: unset !important;
+  }
+  /* Fix skill circle overlap on mobile */
+  .skillsCard .skillCircle {
+    margin-bottom: 8px !important;
+    margin-right: 8px !important;
+    z-index: 1;
+    display: inline-block !important;
+  .featuresCard {
+    background: #fff !important;
+    z-index: 10 !important;
+    box-shadow: 0 2px 8px rgba(11,83,148,0.08) !important;
+    position: relative !important;
+  }
+  }
+}
+@media (max-width: 600px) {
+  .identityCard .cardContent {
+    grid-template-columns: 1fr !important;
+  }
+}
+.identityCard .cardContent label.playerName input,
+.identityCard .cardContent label.characterName input {
+  max-width: 160px;
+  margin-left: auto;
+  margin-right: auto;
+}
+/* Horizontal label for Movement and Strike sections */
+.horizontalLabel {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  font-family: Arial, Helvetica, sans-serif !important;
+  font-weight: bold;
+  margin-bottom: 4px;
+}
 .addButton {
   background-color: #4CAF50 !important;
   color: white !important;
@@ -25,9 +246,9 @@
   color: white !important;
   border: none;
   border-radius: 4px;
-  padding: 1px 18px;
+  padding: 8px 16px;
   font-weight: bold;
-  font-size: 1.1em;
+  font-size: 1em;
   cursor: pointer;
   box-shadow: 0 2px 6px rgba(0,0,0,0.07);
 }
@@ -64,8 +285,19 @@
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
-  padding-right: 20px;
+  padding-right: 16px; /* Only enough for text */
+  min-width: 180px;
+  width: 100%;
+  max-width: 260px;
+  box-sizing: border-box;
 }
+
+/* Hide the default arrow in Edge/IE */
+.colorSelect::-ms-expand {
+  display: none;
+}
+
+/* Hide the default arrow in Chrome/Safari/Opera */
 
 .colorSelect option {
   background-color: white;
@@ -75,10 +307,620 @@
 /* Add a custom dropdown arrow */
 .selectWrapper::after {
   content: '▼';
-  font-size: 0.7em;
+  font-size: 0.9em;
   position: absolute;
-  right: 6px;
+  right: -18px;
   top: 50%;
   transform: translateY(-50%);
   pointer-events: none;
+  background: transparent;
+  padding-left: 0;
+}
+
+/* CSS Grid Layout for Character Sheet */
+/* Add a fifth column for new cards */
+.characterSheetGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+  grid-template-rows: auto auto auto auto auto;
+  gap: 16px;
+  padding: 16px 0;
+  width: 100%;
+  max-width: 100vw;
+  margin: 0;
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+
+/* Ensure the parent container doesn't cause horizontal overflow */
+.characterSheetGrid > * {
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Perks Card */
+.perksCard {
+  grid-column: 4;
+  grid-row: 3;
+  border: 2px solid #888;
+  padding: 16px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+  min-height: 120px;
+}
+
+/* Identity Card - spans full width at top, horizontal layout */
+/* Span all 5 columns for full width */
+.identityCard {
+  grid-column: 1 / span 5;
+  grid-row: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: flex-start;
+  border: 2px solid #333;
+  padding: 12px 16px;
+  background: #f8f8f8;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  min-height: 80px;
+}
+
+.identityCard h3 {
+  width: 100%;
+  margin: 0 0 8px 0;
+  color: #333;
+  font-weight: bold;
+  text-decoration: underline;
+  font-size: 1.1em;
+}
+
+
+
+.identityCard .cardContent {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 6px;
+  width: 100%;
+  align-items: start;
+}
+
+
+.identityCard .cardContent label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  width: 100%;
+  max-width: 220px;
+  text-align: center;
+  font-weight: bold;
+  background: none;
+  box-sizing: border-box;
+}
+
+
+@media (max-width: 900px) {
+  .identityCard .cardContent {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+}
+
+.selectedClassColor {
+  color: var(--selected-class-color) !important;
+}
+
+.selectedSubclassColor {
+  color: var(--selected-subclass-color) !important;
+}
+
+.selectedSpeciesColor {
+  color: var(--selected-species-color) !important;
+}
+
+.selectedSubspeciesColor {
+  color: var(--selected-subspecies-color) !important;
+}
+
+/* Features Card - first in second row */
+.featuresCard {
+  grid-column: 1 / span 2;
+  grid-row: 2;
+  border: 2px solid #0b5394;
+  padding: 16px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.featuresCard h3 {
+  margin: 0 0 12px 0;
+  color: #0b5394;
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+/* Movement Card - second in second row */
+.movementStrikeCard {
+  grid-column: 3;
+  grid-row: 2;
+  border: 2px solid #38761d;
+  padding: 16px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.movementStrikeCard h3 {
+  margin: 0 0 12px 0;
+  color: #38761d;
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+/* Strike Card - third in second row */
+.strikeCard {
+  grid-column: 4;
+  grid-row: 2;
+  border: 2px solid #351c75;
+  padding: 16px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.strikeCard h3 {
+  margin: 0 0 12px 0;
+  color: #351c75;
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+/* Hit Points Card - fourth in second row */
+.hitPointsCard {
+  grid-column: 5;
+  grid-row: 2;
+  border: 2px solid #990000;
+  padding: 16px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.hitPointsCard h3 {
+  margin: 0 0 12px 0;
+  color: #990000;
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+/* Skills Card - first in third row, spans 2 columns */
+.skillsCard {
+  grid-column: 1 / span 2;
+  grid-row: 3 / span 2;
+  border: 2px solid #351c75;
+  padding: 12px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  font-size: 0.92em;
+}
+
+.skillsCard h3 {
+  margin: 0 0 10px 0;
+  color: #351c75;
+  font-weight: bold;
+  text-decoration: underline;
+  font-size: 1.2em;
+}
+/* Reduce font and dot size in Skills table for better fit */
+.skillsCard table,
+  .skillsCard th,
+  .skillsCard td {
+    font-size: 0.92em;
+    padding-left: 2px !important;
+    padding-right: 2px !important;
+    padding-top: 2px !important;
+    padding-bottom: 2px !important;
+  }
+  .skillsCard td {
+    padding-left: 1px !important;
+    padding-right: 1px !important;
+    padding-top: 1px !important;
+    padding-bottom: 1px !important;
+  }
+  .skillsCard .skillCircle,
+  .skillsCard span[style*='border-radius: 50%'] {
+    width: 14px !important;
+    height: 14px !important;
+    min-width: 14px !important;
+    min-height: 14px !important;
+    font-size: 0.9em !important;
+  }
+@media (max-width: 900px) {
+  .skillsCard {
+    font-size: 0.85em;
+    padding: 8px;
+  }
+  .skillsCard h3 {
+    font-size: 1.2em;
+  }
+  .skillsCard table,
+  .skillsCard th,
+  .skillsCard td {
+    font-size: 0.85em;
+  }
+  .skillsCard .skillCircle,
+  .skillsCard span[style*='border-radius: 50%'] {
+    width: 12px !important;
+    height: 12px !important;
+    min-width: 12px !important;
+    min-height: 12px !important;
+    font-size: 0.8em !important;
+  }
+}
+
+/* Damage Interactions Card - third in third row */
+.damageInteractionsCard {
+  grid-column: 3;
+  grid-row: 3;
+  border: 2px solid #666;
+  padding: 16px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.damageInteractionsCard h3 {
+  margin: 0 0 12px 0;
+  color: #666;
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+/* Experience Card - fourth in third row */
+.experienceCard {
+  grid-column: 3;
+  grid-row: 4;
+  border: 2px solid #b45f06;
+  padding: 16px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.experienceCard h3 {
+  margin: 0 0 12px 0;
+  color: #b45f06;
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+/* Remove old resistances card - no longer needed */
+.resistancesCard {
+  display: none;
+}
+
+/* Save Button Container - spans full width */
+.saveButtonContainer {
+  grid-column: 1 / span 4;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+}
+
+/* Form styling within cards */
+.cardContent {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cardContent label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-weight: bold;
+}
+
+.cardContent input,
+.cardContent select,
+.cardContent textarea {
+  padding: 6px 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+/* Ensure number input spinners are visible on mobile */
+.cardContent input[type="number"] {
+  -webkit-appearance: none;
+  -moz-appearance: textfield;
+  appearance: none;
+}
+
+.cardContent input[type="number"]::-webkit-outer-spin-button,
+.cardContent input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: auto;
+  opacity: 1;
+}
+
+/* Custom number input with spinner buttons */
+
+.numberInputContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  overflow: hidden;
+  min-width: 98px;
+  max-width: 126px;
+  width: 100%;
+}
+
+.numberSpinnerButton {
+  flex-shrink: 0;
+}
+
+.numberInputWithSpinner {
+  max-width: 32px;
+  width: 32px;
+  flex-shrink: 0;
+  margin: 0 2px;
+}
+
+
+.numberSpinnerButton {
+  background: #f5f5f5;
+  border: 2px solid transparent;
+  width: 34px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+  transition: background-color 0.2s, border-color 0.2s;
+  box-sizing: border-box;
+  padding: 0;
+}
+
+.numberSpinnerButton.minus {
+  border-color: #d32f2f !important;
+  color: #d32f2f !important;
+}
+.numberSpinnerButton.plus {
+  border-color: #4CAF50 !important;
+  color: #4CAF50 !important;
+}
+
+.numberSpinnerButton:hover {
+  background: #e0e0e0;
+}
+
+.numberSpinnerButton:active {
+  background: #d0d0d0;
+}
+
+.numberInputWithSpinner {
+  border: none !important;
+  outline: none;
+  text-align: center;
+  height: 32px;
+  padding: 0 4px;
+}
+
+/* Hide native spinners since we have custom ones */
+.numberInputWithSpinner::-webkit-outer-spin-button,
+.numberInputWithSpinner::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.numberInputWithSpinner {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+@media (max-width: 768px) {
+  .numberSpinnerButton {
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+  }
+  
+  .numberInputWithSpinner {
+    height: 40px;
+    font-size: 16px;
+  }
+  
+  .numberInputContainer {
+    border-width: 2px;
+  }
+}
+
+@media (max-width: 768px) {
+  .numberInputWithSpinner {
+    -webkit-appearance: auto !important;
+    -moz-appearance: auto !important;
+    appearance: auto !important;
+    font-size: 16px !important; /* Prevents zoom on iOS */
+  }
+  
+  .numberInputWithSpinner::-webkit-outer-spin-button,
+  .numberInputWithSpinner::-webkit-inner-spin-button {
+    -webkit-appearance: auto !important;
+    opacity: 1 !important;
+    height: 40px !important;
+    width: 20px !important;
+    display: block !important;
+    margin: 0 !important;
+  }
+  
+  .cardContent input[type="number"] {
+    -webkit-appearance: auto !important;
+    -moz-appearance: auto !important;
+    appearance: auto !important;
+  }
+  
+  .cardContent input[type="number"]::-webkit-outer-spin-button,
+  .cardContent input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: auto !important;
+    opacity: 1 !important;
+    height: 30px !important;
+  }
+}
+
+/* Responsive design */
+/* Medium-narrow screens: 2-column grid layout */
+@media (max-width: 1100px) and (min-width: 601px) {
+  .characterSheetGrid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 16px;
+  }
+  
+  .identityCard {
+    grid-column: 1 / span 2;
+  }
+  
+  .featuresCard {
+    grid-column: 1 / span 2;
+    grid-row: 2;
+  }
+  
+  .movementStrikeCard {
+    grid-column: 1;
+    grid-row: 3;
+  }
+  
+  .strikeCard {
+    grid-column: 2;
+    grid-row: 3;
+  }
+  
+  .hitPointsCard {
+    grid-column: 1;
+    grid-row: 4;
+  }
+  
+  .skillsCard {
+    grid-column: 2;
+    grid-row: 4 / span 2;
+  }
+  
+  .damageInteractionsCard {
+    grid-column: 1;
+    grid-row: 5;
+  }
+  
+  .perksCard {
+    grid-column: 2;
+    grid-row: 6;
+  }
+  
+  .portraitCard {
+    grid-column: 1;
+    grid-row: 6;
+  }
+  
+  .experienceCard {
+    grid-column: 1;
+    grid-row: 7;
+  }
+  
+  .saveButtonContainer {
+    grid-column: 1 / span 2;
+  }
+}
+
+@media (max-width: 1200px) and (min-width: 1101px) {
+  .characterSheetGrid {
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+  }
+  
+  .identityCard {
+    grid-column: 1 / span 3;
+  }
+  
+  .featuresCard {
+    grid-column: 1;
+  }
+  
+  .movementStrikeCard {
+    grid-column: 2;
+  }
+  
+  .strikeCard {
+    grid-column: 3;
+  }
+  
+  .hitPointsCard {
+    grid-column: 1;
+    grid-row: 3;
+  }
+  
+  .skillsCard {
+    grid-column: 2 / span 2;
+    grid-row: 3;
+  }
+  
+  .damageInteractionsCard {
+    grid-column: 1;
+    grid-row: 4;
+  }
+  
+  .experienceCard {
+    grid-column: 2;
+    grid-row: 4;
+  }
+  
+  .saveButtonContainer {
+    grid-column: 1 / span 3;
+  }
+}
+
+@media (max-width: 600px) {
+  .characterSheetGrid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 12px;
+  }
+  
+  .identityCard {
+    grid-column: 1 / -1 !important;
+    width: 100% !important;
+  }
+  .featuresCard,
+  .hitPointsCard,
+  .movementStrikeCard,
+  .strikeCard,
+  .skillsCard,
+  .damageInteractionsCard,
+  .experienceCard,
+  .saveButtonContainer {
+    grid-column: 1;
+  }
+  
+  .identityCard .cardContent {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 6px;
+  width: 100%;
+  align-items: start;
+}
+  
+  .identityCard .cardContent label {
+    min-width: auto;
+    flex: 1;
+    max-width: 220px;
+  }
 }

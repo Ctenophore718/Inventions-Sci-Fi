@@ -4,21 +4,33 @@ import styles from './CharacterEditor.module.css';
 import type { CharacterSheet } from "../types/CharacterSheet";
 import { saveCharacterSheet } from "../utils/storage";
 
+
 type Props = {
   sheet: CharacterSheet | null;
   onSave: () => void;
+  onLevelUp: () => void;
+  onCards: () => void;
+  charClass: string;
+  setCharClass: (c: string) => void;
+  subclass: string;
+  setSubclass: (s: string) => void;
+  species: string;
+  setSpecies: (sp: string) => void;
+  subspecies: string;
+  setSubspecies: (ss: string) => void;
 };
 
-const CharacterEditor: React.FC<Props> = ({ sheet, onSave }) => {
+
+const CharacterEditor: React.FC<Props> = ({ sheet, onSave, onLevelUp, onCards, charClass, setCharClass, subclass, setSubclass, species, setSpecies, subspecies, setSubspecies }) => {
+  // Portrait upload state and ref
+  const [portraitUrl, setPortraitUrl] = useState<string | null>(sheet?.portrait || null);
+  const portraitInputRef = React.useRef<HTMLInputElement>(null);
   const [isSaved, setIsSaved] = useState(false);
 
   // Identity fields
   const [playerName, setPlayerName] = useState(sheet?.playerName || "");
   const [name, setName] = useState(sheet?.name || "");
-  const [charClass, setCharClass] = useState(sheet?.charClass || "");
-  const [subclass, setSubclass] = useState(sheet?.subclass || "");
-  const [species, setSpecies] = useState(sheet?.species || "");
-  const [subspecies, setSubspecies] = useState(sheet?.subspecies || "");
+  // charClass, subclass, species, subspecies are now props
   const [background, setBackground] = useState(sheet?.background || "");
   const [backgroundDescription, setBackgroundDescription] = useState(sheet?.backgroundDescription || "");
 
@@ -29,6 +41,7 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onSave }) => {
   const [movement, setMovement] = useState(sheet?.movement || "");
   const [strike, setStrike] = useState(sheet?.strike || "");
   const [xpTotal, setXpTotal] = useState(sheet?.xpTotal || 0);
+  const [spTotal, setSpTotal] = useState(sheet?.spTotal || 0);
 
   // Features fields
   const [classFeature, setClassFeature] = useState(sheet?.classFeature || "");
@@ -175,6 +188,19 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onSave }) => {
   const [skillDots, setSkillDots] = useState<{ [key: string]: boolean[] }>(
     (sheet?.skillDots) || Object.fromEntries(skillList.map(skill => [skill, Array(10).fill(false)]))
   );
+  // Track SP spent for skills
+  const [spSpent, setSpSpent] = useState(sheet?.spSpent ?? 0);
+  const [spNotice, setSpNotice] = useState("");
+
+  // Auto-dismiss SP notice bubble after 2.5 seconds
+  useEffect(() => {
+    if (spNotice) {
+      const timeout = setTimeout(() => setSpNotice("") , 2500);
+      return () => clearTimeout(timeout);
+    }
+  }, [spNotice]);
+  // SP cost per column in the skills grid
+  const skillSpCosts = [1,1,2,2,3,4,5,6,8,10];
 
 
   // Hit Points UI state
@@ -207,14 +233,20 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onSave }) => {
       absorptions,
       movement,
       strike,
-      xpTotal,
+  xpTotal,
+  xpRemaining: xpTotal - (sheet?.xpSpent ?? 0),
+  xpSpent: sheet?.xpSpent ?? 0,
+  spTotal,
+  spRemaining: spTotal - spSpent,
+  spSpent,
       speed,
       strikeDamage,
       maxHitPoints,
       deathDots,
       multiStrike,
       strikeEffects,
-      skillDots,
+  skillDots,
+  portrait: portraitUrl,
     };
     saveCharacterSheet(updatedSheet);
     setIsSaved(true);
@@ -789,6 +821,12 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onSave }) => {
     </span>
   );
 
+  const hostMimicFeatureJSX = (
+    <span style={{ color: '#000', fontWeight: 400 }}>
+      <b><i style={{ color: '#5f5e2b' }}>Host Mimic.</i></b> Choose a starting <b><i style={{ color: '#0b5394' }}>Feature</i></b> available to any other <i>Species</i> or <i>Subspecies</i> by selecting a <i>Host</i> from the <i>Subspecies</i> dropdown. You cannot upgrade this <b><i style={{ color: '#0b5394' }}>Feature</i></b>.
+    </span>
+  );
+
   const barkskinFeatureJSX = (
     <span style={{ color: '#000', fontWeight: 400 }}>
       <b><i style={{ color: '#5f2d2b' }}>Deep Roots.</i></b> You are <i>Immune</i> to the <b><i>Slam</i></b> and <b><i>Bounce</i></b> conditions.
@@ -813,9 +851,111 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onSave }) => {
     </span>
   );
 
-  const hostMimicFeatureJSX = (
+  const androidFeatureJSX = (
     <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#5f5e2b' }}>Host Mimic.</i></b> Choose a starting <b><i style={{ color: '#0b5394' }}>Feature</i></b> available to any other <i>Species</i> or <i>Subspecies</i> by selecting a <i>Host</i> from the <i>Subspecies</i> dropdown. You cannot upgrade this <b><i style={{ color: '#0b5394' }}>Feature</i></b>.
+      <b><i style={{ color: '#581fbd' }}>Encrypted Cerebral Cortex.</i></b> You are <i>Immune</i> to the <b><i>Confuse</i></b> condition.
+    </span>
+  );
+
+  const utilityDroidFeatureJSX = (
+    <span style={{ color: '#000', fontWeight: 400 }}>
+      <b><i style={{ color: '#bd891f' }}>Variant Utility.</i></b> Your size is 1hx, 2hx, or 3hx, chosen at character creation, and you gain a <b><i style={{ color: '#38761d' }}>Climb Speed</i></b>.
+    </span>
+  );
+
+  const petranFeatureJSX = (
+    <span style={{ color: '#000', fontWeight: 400 }}>
+      <b><i style={{ color: '#735311' }}>Mountain's Endurance.</i></b> You <i>Resist</i> <b><u style={{ color: '#915927', display: 'inline-flex', alignItems: 'center' }}>Bludgeoning<img src="/Bludgeoning.png" alt="Bludgeoning" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> and are <i>Immune</i> to the <b><i>Demoralize</i></b> condition.
+    </span>
+  );
+
+  const pyranFeatureJSX = (
+    <span style={{ color: '#000', fontWeight: 400 }}>
+      <b><i style={{ color: '#b31111' }}>Ignition.</i></b> You can choose to have your <b><i><span style={{ color: '#990000' }}>Attacks</span></i></b> and/or <b><i style={{ color: '#351c75' }}>Strikes</i></b> deal <b><u style={{ color: '#f90102', display: 'inline-flex', alignItems: 'center' }}>Fire<img src="/Fire.png" alt="Fire" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> Damage at-will.
+    </span>
+  );
+
+  const apocritanFeatureJSX = (
+    <span style={{ color: '#000', fontWeight: 400 }}>
+      <b><i style={{ color: '#6d7156' }}>Swarm Tactics.</i></b> When you are <b>[1]</b>hx away from an enemy, allies who <b><i style={{ color: '#351c75' }}>Strike</i></b> that enemy can choose to inflict the <b><i>Spike</i></b>, <b><i>Confuse</i></b> or <b><i>Restrain</i></b> condition on it. The <b><i>Spike</i></b> damage is the same as the ally's <b><i style={{ color: '#351c75' }}>Strike</i></b> damage.
+    </span>
+  );
+
+  const dynastesFeatureJSX = (
+    <span style={{ color: '#000', fontWeight: 400 }}>
+      <b><i style={{ color: '#334592' }}>Herculean.</i></b> Your size is 3hx. You are also <i>Immune</i> to the <b><i>Slam</i></b> and <b><i>Bounce</i></b> conditions. Additionally, when you inflict the <b><i>Slam</i></b> or <b><i>Bounce</i></b> condition, increase the forced <b><i style={{ color: '#38761d' }}>Movement</i></b> by <b>[2]</b>hx.
+    </span>
+  );
+
+  const mantidFeatureJSX = (
+    <span style={{ color: '#000', fontWeight: 400 }}>
+      <b><i style={{ color: '#75904e' }}>Raptorial Claws.</i></b> You can <b><i style={{ color: '#351c75' }}>Strike</i></b> enemies in an adjacent hx during your <b><i style={{ color: '#38761d' }}>Move</i></b> instead of having to <b><i style={{ color: '#38761d' }}>Move</i></b> through them.
+    </span>
+  );
+
+  const diminutiveEvolutionFeatureJSX = (
+    <span style={{ color: '#000', fontWeight: 400 }}>
+      <b><i style={{ color: '#c3735f' }}>Out of Sight.</i></b> When you are <b><i><span style={{ color: '#990000' }}>Attacked</span></i></b> and have any Cover, you roll <b>[1]</b> additional Cover die and discard the lowest roll.
+    </span>
+  );
+
+  const litheEvolutionFeatureJSX = (
+    <span style={{ color: '#000', fontWeight: 400 }}>
+      <b><i style={{ color: '#2b5f5f' }}>Fleet of Foot.</i></b> You ignore <i>Rough Terrain</i> and <i>Dangerous Terrain</i> and you gain a <b><i style={{ color: '#38761d' }}>Climb Speed</i></b>.
+    </span>
+  );
+
+  const massiveEvolutionFeatureJSX = (
+    <span style={{ color: '#000', fontWeight: 400 }}>
+      <b><i style={{ color: '#2b175f' }}>I'LL SEE YOU IN HELL!</i></b> Whenever you reach 0 <b><i style={{ color: '#990000' }}>Hit Points</i></b> in a battle, you can immediately make a <b><i><span style={{ color: '#000' }}>Primary</span> <span style={{ color: '#990000' }}>Attack</span></i></b>. Additionally, your size is 3hx.
+    </span>
+  );
+
+  const stoutEvolutionFeatureJSX = (
+    <span style={{ color: '#000', fontWeight: 400 }}>
+      <b><i style={{ color: '#5f2b2b' }}>Die Hard.</i></b> The first time you reach 0 <b><i style={{ color: '#990000' }}>Hit Points</i></b> in a battle, you immediately gain 1 <b><i style={{ color: '#990000' }}>Hit Point</i></b> and are not dying.
+    </span>
+  );
+
+  const infraredFeatureJSX = (
+    <span style={{ color: '#000', fontWeight: 400 }}>
+      <b><i style={{ color: '#b17fbe' }}>Infrared Tracking.</i></b> All <b><i><span style={{ color: '#990000' }}>Attacks</span></i></b> you make automatically have the Arcing keyword.
+    </span>
+  );
+
+  const radiofrequentFeatureJSX = (
+    <span style={{ color: '#000', fontWeight: 400 }}>
+      <b><i style={{ color: '#bea97f' }}>Misleading Signals.</i></b> Enemies <b><i><span style={{ color: '#990000' }}>Attacking</span></i></b> you roll an additional Crit die and discard the highest rolled.
+    </span>
+  );
+
+  const xRayFeatureJSX = (
+    <span style={{ color: '#000', fontWeight: 400 }}>
+      <b><i style={{ color: '#7f8abe' }}>Irradiate.</i></b> Enemies starting their turn within <b>[3]</b>hx of you suffer <b>[2]</b> instances of the <b><i>Spike</i></b> (<b><u style={{ color: '#de7204', display: 'inline-flex', alignItems: 'center' }}>Chemical<img src="/Chemical.png" alt="Chemical" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>) condition.
+    </span>
+  );
+
+  const canidFeatureJSX = (
+    <span style={{ color: '#000', fontWeight: 400 }}>
+      <b><i style={{ color: '#2f8da6' }}>Inspired Hunter.</i></b> When you reduce a creature to 0 <b><i style={{ color: '#990000' }}>Hit Points</i></b>, you immediately gain 1 <i>Action</i>. You can only benefit from this once per turn.
+    </span>
+  );
+
+  const felidFeatureJSX = (
+    <span style={{ color: '#000', fontWeight: 400 }}>
+      <b><i style={{ color: '#b16326' }}>Cat’s Grace.</i></b> You gain a <b><i style={{ color: '#38761d' }}>Climb Speed</i></b> and cannot take damage from falling as long as you are conscious. Additionally, you can use the <i>Acrobatics</i> skill once per turn without using an <i>Action</i>.
+    </span>
+  );
+  
+  const mustelidFeatureJSX = (
+    <span style={{ color: '#000', fontWeight: 400 }}>
+      <b><i style={{ color: '#699239' }}>Weasel.</i></b> You gain a <b><i style={{ color: '#38761d' }}>Burrow Speed</i></b> and are <i>Immune</i> to the <b><i>Restrain</i></b> condition. Additionally you can use the <i>Thievery</i> skill once per turn without using an <i>Action</i>.
+    </span>
+  );
+  
+  const ursidFeatureJSX = (
+    <span style={{ color: '#000', fontWeight: 400 }}>
+      <b><i style={{ color: '#9026b1' }}>Natural Insulation.</i></b> You <i>Resist</i> <b><u style={{ color: '#3ebbff', display: 'inline-flex', alignItems: 'center' }}>Cold<img src="/Cold.png" alt="Cold" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> and <b><u style={{ color: '#915927', display: 'inline-flex', alignItems: 'center' }}>Bludgeoning<img src="/Bludgeoning.png" alt="Bludgeoning" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> and are <i>Immune</i> to the <b><i>Restrain</i></b> condition. Your size is 3hx.
     </span>
   );
 
@@ -828,258 +968,355 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onSave }) => {
       // Force all children to inherit light mode
       forcedColorAdjust: 'none'
     }}>
-      <h2>{sheet ? "Edit Character" : "New Character"}</h2>
-      <section className="header-info">
-        <h3 style={{ fontWeight: 'bold', textDecoration: 'underline' }}>Identity</h3>
-  <label style={{ fontWeight: 'bold' }}>Player Name: <input value={playerName} onChange={e => setPlayerName(e.target.value)} /></label><br />
-  <label style={{ fontWeight: 'bold' }}>Character Name: <input value={name} onChange={e => setName(e.target.value)} /></label><br />
-  <label style={{ fontWeight: 'bold' }}>Class:
-  <select 
-    value={charClass} 
-    onChange={e => {
-      setCharClass(e.target.value);
-      setSubclass(""); 
-    }} 
-    style={{ 
-      fontWeight: 'bold',
-      padding: '4px 8px',
-      borderRadius: '4px',
-      border: '1px solid #ccc',
-      color: classOptions.find(opt => opt.value === charClass)?.color || '#000',
-      minWidth: '200px',
-      background: 'white'
-    }}
-  >
-    <option value="" style={{ color: 'black', backgroundColor: 'white' }}>Select Class</option>
-    {classOptions.map(opt => (
-      <option 
-        key={opt.value} 
-        value={opt.value} 
-        style={{ 
-          color: opt.color,
-          backgroundColor: 'white',
-          fontWeight: 'bold'
-        }}
-      >
-        {opt.label}
-      </option>
-    ))}
-  </select>
-  </label><br />
-  <label style={{ fontWeight: 'bold' }}>Subclass: 
-    <select 
-      value={subclass} 
-      onChange={e => {
-        const val = e.target.value;
-        setSubclass(val);
-        if (!charClass && val) {
-          const found = allSubclassOptions.find(opt => opt.value === val);
-          if (found) setCharClass(found.class);
-        }
-      }}
-      style={{ 
-        fontWeight: 'bold',
-        padding: '4px 8px',
-        borderRadius: '4px',
-        border: '1px solid #ccc',
-        color: (subclassOptions.find(opt => opt.value === subclass) || allSubclassOptions.find(opt => opt.value === subclass))?.color || '#000',
-        minWidth: '200px',
-        background: 'white'
-      }}
-    >
-      <option value="" style={{ color: 'black', backgroundColor: 'white' }}>Select Subclass</option>
-      {(charClass ? subclassOptions : allSubclassOptions).map(opt => (
-        <option 
-          key={opt.value} 
-          value={opt.value} 
- 
-          style={{ 
-            color: opt.color,
-            backgroundColor: 'white',
-            fontWeight: 'bold'
-          }}
-        >
-          {opt.label}
-        </option>
-      ))}
-    </select>
-  </label><br />
-  <label style={{ fontWeight: 'bold' }}>Species: 
-    <select 
-      value={species} 
-      onChange={e => {
-        setSpecies(e.target.value);
-        setSubspecies("");
-      }}
-      style={{ 
-        fontWeight: 'bold',
-        padding: '4px 8px',
-        borderRadius: '4px',
-        border: '1px solid #ccc',
-        color: speciesOptions.find(opt => opt.value === species)?.color || '#000',
-        minWidth: '200px',
-        background: 'white'
-      }}
-    >
-      <option value="" style={{ color: 'black', backgroundColor: 'white' }}>Select Species</option>
-      {speciesOptions.map(opt => (
-        <option 
-          key={opt.value} 
-          value={opt.value} 
-          style={{ 
-            color: opt.color,
-            backgroundColor: 'white',
-            fontWeight: 'bold'
-          }}
-        >
-          {opt.label}
-        </option>
-      ))}
-    </select>
-  </label><br />
-  <label style={{ fontWeight: 'bold' }}>Subspecies: 
-    <select 
-      value={subspecies} 
-      onChange={e => {
-        const val = e.target.value;
-        setSubspecies(val);
-        if (!species && val) {
-          const found = allSubspeciesOptions.find(opt => opt.value === val);
-          if (found) setSpecies(found.species);
-        }
-      }}
-      style={{ 
-        fontWeight: 'bold',
-        padding: '4px 8px',
-        borderRadius: '4px',
-        border: '1px solid #ccc',
-        color: (subspeciesOptions.find(opt => opt.value === subspecies) || allSubspeciesOptions.find(opt => opt.value === subspecies))?.color || '#000',
-        minWidth: '200px',
-        background: 'white'
-      }}
-    >
-      <option value="" style={{ color: 'black', backgroundColor: 'white' }}>
-        {species === "Cerebronych" ? "Select Host" : "Select Subspecies"}
-      </option>
-      {(species === "Cerebronych"
-        ? hostOptions
-        : (species ? subspeciesOptions : allSubspeciesOptions)
-      ).map(opt => (
-        <option 
-          key={opt.value} 
-          value={opt.value} 
-          style={{ 
-            color: opt.color,
-            backgroundColor: 'white',
-            fontWeight: 'bold'
-          }}
-        >
-          {opt.label}
-        </option>
-      ))}
-    </select>
-  </label><br />
-  <label style={{ fontWeight: 'bold' }}>Background: 
-    <select 
-      value={background} 
-      onChange={e => setBackground(e.target.value)} 
-      style={{ 
-        fontWeight: 'bold',
-        padding: '4px 8px',
-        borderRadius: '4px',
-        border: '1px solid #ccc',
-        color: backgroundOptions.find(opt => opt.value === background)?.color || '#000',
-        minWidth: '200px',
-        background: 'white'
-      }}
-    >
-      <option value="" style={{ color: 'black', backgroundColor: 'white' }}>Select Background</option>
-      {backgroundOptions.map(opt => (
-        <option 
-          key={opt.value} 
-          value={opt.value} 
-          style={{ 
-            color: opt.color,
-            backgroundColor: 'white',
-            fontWeight: 'bold'
-          }}
-        >
-          {opt.label}
-        </option>
-      ))}
-    </select>
-  </label><br />
-      </section>
+      <div className={styles.headerRow}>
+        <h2 className={styles.headerTitle}>Character Sheet</h2>
+        <div className={styles.headerButtons}>
+          <button
+            onClick={handleSave}
+            className={styles.saveButton}
+            disabled={isSaved}
+          >
+            {isSaved ? "Saved!" : "Save"}
+          </button>
+          <button
+            onClick={onCards}
+            style={{
+              background: '#1976d2',
+              color: 'white',
+              border: '1px solid #115293',
+              borderRadius: 4,
+              padding: '1px 18px',
+              fontWeight: 'bold',
+              fontSize: '1.1em',
+              cursor: 'pointer',
+              boxShadow: '0 2px 6px rgba(0,0,0,0.07)',
+            }}
+          >
+            Cards
+          </button>
+          <button
+            onClick={onLevelUp}
+            style={{
+              background: '#4CAF50',
+              color: 'white',
+              border: '1px solid #388e3c',
+              borderRadius: 4,
+              padding: '1px 18px',
+              fontWeight: 'bold',
+              fontSize: '1.1em',
+              cursor: 'pointer',
+              boxShadow: '0 2px 6px rgba(0,0,0,0.07)',
+            }}
+          >
+            Level Up
+          </button>
+          <button
+            onClick={() => window.location.href = '/'}
+            style={{
+              background: '#eee',
+              color: '#222',
+              border: '1px solid #888',
+              borderRadius: 4,
+              padding: '1px 18px',
+              fontWeight: 'bold',
+              fontSize: '1.1em',
+              cursor: 'pointer',
+              boxShadow: '0 2px 6px rgba(0,0,0,0.07)',
+            }}
+          >
+            Home
+          </button>
+        </div>
+      </div>
+      <div className={styles.characterSheetGrid}>
+      <div className={styles.identityCard}>
+        <h3>Identity</h3>
+        <div className={styles.cardContent}>
+          <label>
+            <span>Player Name</span>
+            <input value={playerName} onChange={e => setPlayerName(e.target.value)} style={{ textAlign: 'center' }} />
+          </label>
+          <label>
+            <span>Character Name</span>
+            <input value={name} onChange={e => setName(e.target.value)} style={{ textAlign: 'center' }} />
+          </label>
+          <label>
+            <span>Class</span>
+            <div className={styles.selectWrapper}>
+              <select 
+                value={charClass}
+                onChange={e => {
+                  setCharClass(e.target.value);
+                  setSubclass(""); 
+                }} 
+                className={styles.colorSelect + ' ' + styles.selectedClassColor}
+                style={{ 
+                  '--selected-class-color': classOptions.find(opt => opt.value === charClass)?.color || '#000',
+                  fontWeight: 'bold',
+                  padding: '4px 8px',
+                  borderRadius: '4px',
+                  border: '1px solid #ccc',
+                  textAlign: 'center',
+                  color: `${classOptions.find(opt => opt.value === charClass)?.color || '#000'} !important`,
+                  minWidth: '120px',
+                  background: 'white'
+                } as React.CSSProperties}
+              >
+                <option value="" style={{ color: 'black', backgroundColor: 'white' }}>Select Class</option>
+                {classOptions.map(opt => (
+                  <option 
+                    key={opt.value} 
+                    value={opt.value} 
+                    style={{ 
+                      color: opt.color,
+                      backgroundColor: 'white',
+                      fontWeight: 'bold'
+                    }}
+                  >
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </label>
+          <label>
+            <span>Subclass</span>
+            <div className={styles.selectWrapper}>
+              <select 
+                value={subclass} 
+                onChange={e => {
+                  const val = e.target.value;
+                  setSubclass(val);
+                  if (!charClass && val) {
+                    const found = allSubclassOptions.find(opt => opt.value === val);
+                    if (found) setCharClass(found.class);
+                  }
+                }}
+                className={styles.colorSelect + ' ' + styles.selectedSubclassColor}
+                style={{ 
+                  '--selected-subclass-color': subclassOptions.find(opt => opt.value === subclass)?.color || '#000',
+                  fontWeight: 'bold',
+                  padding: '4px 8px',
+                  borderRadius: '4px',
+                  border: '1px solid #ccc',
+                  textAlign: 'center',
+                  color: `${(subclassOptions.find(opt => opt.value === subclass) || allSubclassOptions.find(opt => opt.value === subclass))?.color || '#000'} !important`,
+                  minWidth: '120px',
+                  background: 'white'
+                } as React.CSSProperties}
+              >
+                <option value="" style={{ color: 'black', backgroundColor: 'white' }}>Select Subclass</option>
+                {(charClass ? subclassOptions : allSubclassOptions).map(opt => (
+                  <option 
+                    key={opt.value} 
+                    value={opt.value} 
+                    style={{ 
+                      color: opt.color,
+                      backgroundColor: 'white',
+                      fontWeight: 'bold'
+                    }}
+                  >
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </label>
+          <label>
+            <span>Species</span>
+            <div className={styles.selectWrapper}>
+              <select 
+                value={species} 
+                onChange={e => {
+                  setSpecies(e.target.value);
+                  setSubspecies("");
+                }}
+                className={styles.colorSelect + ' ' + styles.selectedSpeciesColor}
+                style={{ 
+                  '--selected-species-color': speciesOptions.find(opt => opt.value === species)?.color || '#000',
+                  fontWeight: 'bold',
+                  padding: '4px 8px',
+                  borderRadius: '4px',
+                  border: '1px solid #ccc',
+                  textAlign: 'center',
+                  color: `${(speciesOptions.find(opt => opt.value === species)) || allSubspeciesOptions.find(opt => opt.value === species)?.color || '#000'} !important`,
+                  minWidth: '120px',
+                  background: 'white'
+                } as React.CSSProperties}
+              >
+                <option value="" style={{ color: 'black', backgroundColor: 'white' }}>Select Species</option>
+                {speciesOptions.map(opt => (
+                  <option 
+                    key={opt.value} 
+                    value={opt.value} 
+                    style={{ 
+                      color: opt.color,
+                      backgroundColor: 'white',
+                      fontWeight: 'bold'
+                    }}
+                  >
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </label>
+          <label>
+            <span>Subspecies</span>
+            <div className={styles.selectWrapper}>
+              <select 
+                value={subspecies} 
+                onChange={e => {
+                  const val = e.target.value;
+                  setSubspecies(val);
+                  if (!species && val) {
+                    const found = allSubspeciesOptions.find(opt => opt.value === val);
+                    if (found) setSpecies(found.species);
+                  }
+                }}
+                className={styles.colorSelect + ' ' + styles.selectedSubspeciesColor}
+                style={{ 
+                  '--selected-subspecies-color': (subspeciesOptions.find(opt => opt.value === subspecies) || allSubspeciesOptions.find(opt => opt.value === subspecies))?.color || '#000',
+                  fontWeight: 'bold',
+                  padding: '4px 8px',
+                  borderRadius: '4px',
+                  border: '1px solid #ccc',
+                  textAlign: 'center',
+                  color: `${(subspeciesOptions.find(opt => opt.value === subspecies) || allSubspeciesOptions.find(opt => opt.value === subspecies))?.color || '#000'} !important`,
+                  minWidth: '120px',
+                  background: 'white'
+                } as React.CSSProperties}
+              >
+                <option value="" style={{ color: 'black', backgroundColor: 'white' }}>
+                  {species === "Cerebronych" ? "Select Host" : "Select Subspecies"}
+                </option>
+                {(species === "Cerebronych"
+                  ? hostOptions
+                  : (species ? subspeciesOptions : allSubspeciesOptions)
+                ).map(opt => (
+                  <option 
+                    key={opt.value} 
+                    value={opt.value} 
+                    style={{ 
+                      color: opt.color,
+                      backgroundColor: 'white',
+                      fontWeight: 'bold'
+                    }}
+                  >
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </label>
+          <label>
+            <span>Background</span>
+            <div className={styles.selectWrapper}>
+              <select 
+                value={background} 
+                onChange={e => setBackground(e.target.value)} 
+                className={styles.colorSelect}
+                style={{ 
+                  fontWeight: 'bold',
+                  padding: '4px 8px',
+                  borderRadius: '4px',
+                  border: '1px solid #ccc',
+                  color: backgroundOptions.find(opt => opt.value === background)?.color || '#000',
+                  textAlign: 'center',
+                  minWidth: '120px',
+                  background: 'white'
+                }}
+              >
+                <option value="" style={{ color: 'black', backgroundColor: 'white' }}>Select Background</option>
+                {backgroundOptions.map(opt => (
+                  <option 
+                    key={opt.value} 
+                    value={opt.value} 
+                    style={{ 
+                      color: opt.color,
+                      backgroundColor: 'white',
+                      fontWeight: 'bold'
+                    }}
+                  >
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </label>
+        </div>
+      </div>
 
       {/* Move Features section here */}
-      <section className="features">
-        <h3 style={{ color: '#0b5394', fontWeight: 'bold', textDecoration: 'underline' }}>Features</h3>
-        <label style={{ color: '#0b5394', fontWeight: 'bold' }}>Class Feature: {
-          charClass === "Chemist"
-            ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{chemistFeatureJSX}</span>
-            : charClass === "Coder"
-              ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{coderFeatureJSX}</span>
-              : charClass === "Commander"
-                ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{commanderFeatureJSX}</span>
-                : charClass === "Contemplative"
-                  ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{contemplativeFeatureJSX}</span>
-                  : charClass === "Devout"
-                    ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{devoutFeatureJSX}</span>
-                    : charClass === "Elementalist"
-                      ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{elementalistFeatureJSX}</span>
-                    : charClass === "Exospecialist"
-                      ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{exospecialistFeatureJSX}</span>
-                    : charClass === "Gunslinger"
-                      ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{gunslingerFeatureJSX}</span>
-                    : charClass === "Technician"
-                      ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{technicianFeatureJSX}</span>
-                    : <input value={classFeature} onChange={e => setClassFeature(e.target.value)} />            
-        }</label><br />
-        <label style={{ color: '#0b5394', fontWeight: 'bold' }}>Subclass Feature: {
-          subclass === "Anatomist" 
-            ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{anatomistFeatureJSX}</span>
-            : subclass === "Beguiler"
-              ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{beguilerFeatureJSX}</span>
-              : subclass === "Coercive"
-                ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{coerciveFeatureJSX}</span>
-                : subclass === "Divinist"
-                  ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{divinistFeatureJSX}</span>
-                  : subclass === "Galvanic"
-                    ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{galvanicFeatureJSX}</span>
-                    : subclass === "Grenadier"
-                      ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{grenadierFeatureJSX}</span>
-                      : subclass === "Naturalist"
-                        ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{naturalistFeatureJSX}</span>
-                        : subclass === "Necro"
-                          ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{necroFeatureJSX}</span>
-                          : subclass === "Poisoner"
-                            ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{poisonerFeatureJSX}</span>
-                            : subclass === "Technologist"
-                              ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{technologistFeatureJSX}</span>
-                              : subclass === "Tactician"
-                                ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{tacticianFeatureJSX}</span>
-                                : subclass === "Tyrant"
-                                  ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{tyrantFeatureJSX}</span>
-                                  : subclass === "Inertial"
-                                    ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{inertialFeatureJSX}</span>
-                                    : subclass === "Kinetic"
-                                      ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{kineticFeatureJSX}</span>
-                                      : subclass === "Mercurial"
-                                        ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{mercurialFeatureJSX}</span>
-                                        : subclass === "Vectorial"
-                                          ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{vectorialFeatureJSX}</span>
-                                          : subclass === "Astral"
-                                            ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{astralFeatureJSX}</span>
-                                            : subclass === "Chaos"
-                                              ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{chaosFeatureJSX}</span>
-                                              : subclass === "Order"
-                                                ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{orderFeatureJSX}</span>
-                                                : subclass === "Void"
-                                                  ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{voidFeatureJSX}</span>
-                                                  : subclass === "Air"
-                                                    ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{airFeatureJSX}</span>
-                                                    : subclass === "Earth"
-                                                      ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{earthFeatureJSX}</span>
+      <div className={styles.featuresCard}>
+        <h3>Features</h3>
+        <div className={styles.cardContent}>
+          <label style={{ color: '#0b5394', fontWeight: 'bold', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '0.90em' }}>{
+            charClass === "Chemist"
+              ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32, fontFamily: 'Arial, Helvetica, sans-serif' }}>{chemistFeatureJSX}</span>
+              : charClass === "Coder"
+                ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32, fontFamily: 'Arial, Helvetica, sans-serif' }}>{coderFeatureJSX}</span>
+                : charClass === "Commander"
+                  ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32, fontFamily: 'Arial, Helvetica, sans-serif' }}>{commanderFeatureJSX}</span>
+                  : charClass === "Contemplative"
+                    ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32, fontFamily: 'Arial, Helvetica, sans-serif' }}>{contemplativeFeatureJSX}</span>
+                    : charClass === "Devout"
+                      ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32, fontFamily: 'Arial, Helvetica, sans-serif' }}>{devoutFeatureJSX}</span>
+                      : charClass === "Elementalist"
+                        ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32, fontFamily: 'Arial, Helvetica, sans-serif' }}>{elementalistFeatureJSX}</span>
+                        : charClass === "Exospecialist"
+                          ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32, fontFamily: 'Arial, Helvetica, sans-serif' }}>{exospecialistFeatureJSX}</span>
+                          : charClass === "Gunslinger"
+                            ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32, fontFamily: 'Arial, Helvetica, sans-serif' }}>{gunslingerFeatureJSX}</span>
+                            : charClass === "Technician"
+                              ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32, fontFamily: 'Arial, Helvetica, sans-serif' }}>{technicianFeatureJSX}</span>
+                              : null
+          }</label>
+          <label style={{ color: '#0b5394', fontWeight: 'bold', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '0.90em' }}>{
+            subclass === "Anatomist" 
+              ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{anatomistFeatureJSX}</span>
+              : subclass === "Beguiler"
+                ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{beguilerFeatureJSX}</span>
+                : subclass === "Coercive"
+                  ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{coerciveFeatureJSX}</span>
+                  : subclass === "Divinist"
+                    ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{divinistFeatureJSX}</span>
+                    : subclass === "Galvanic"
+                      ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{galvanicFeatureJSX}</span>
+                      : subclass === "Grenadier"
+                        ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{grenadierFeatureJSX}</span>
+                        : subclass === "Naturalist"
+                          ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{naturalistFeatureJSX}</span>
+                          : subclass === "Necro"
+                            ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{necroFeatureJSX}</span>
+                            : subclass === "Poisoner"
+                              ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{poisonerFeatureJSX}</span>
+                              : subclass === "Technologist"
+                                ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{technologistFeatureJSX}</span>
+                                : subclass === "Tactician"
+                                  ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{tacticianFeatureJSX}</span>
+                                  : subclass === "Tyrant"
+                                    ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{tyrantFeatureJSX}</span>
+                                    : subclass === "Inertial"
+                                      ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{inertialFeatureJSX}</span>
+                                      : subclass === "Kinetic"
+                                        ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{kineticFeatureJSX}</span>
+                                        : subclass === "Mercurial"
+                                          ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{mercurialFeatureJSX}</span>
+                                          : subclass === "Vectorial"
+                                            ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{vectorialFeatureJSX}</span>
+                                            : subclass === "Astral"
+                                              ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{astralFeatureJSX}</span>
+                                              : subclass === "Chaos"
+                                                ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{chaosFeatureJSX}</span>
+                                                : subclass === "Order"
+                                                  ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{orderFeatureJSX}</span>
+                                                  : subclass === "Void"
+                                                    ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{voidFeatureJSX}</span>
+                                                    : subclass === "Air"
+                                                      ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{airFeatureJSX}</span>
+                                                      : subclass === "Earth"
+                                                        ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{earthFeatureJSX}</span>
                                                         : subclass === "Fire"
                                                           ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{fireFeatureJSX}</span>
                                                           : subclass === "Water"
@@ -1107,31 +1344,31 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onSave }) => {
                                                                                 : subclass === "Nanoboticist"
                                                                                   ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{nanoboticistFeatureJSX}</span>
                                                                                   : subclass === "Tanker"
-                                                                                  ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{tankerFeatureJSX}</span>
-                                                                                  : <input value={subclassFeature} onChange={e => setSubclassFeature(e.target.value)} />
-        }</label><br />
-        <label style={{ color: '#0b5394', fontWeight: 'bold' }}>Species Feature: {
-          species === "Avenoch" 
-            ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{avenochFeatureJSX}</span>
-            : species === "Cerebronych"
-              ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{cerebronychFeatureJSX}</span> 
-              : species === "Chloroptid"
-                ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{chloroptidFeatureJSX}</span>
-                : species === "Cognizant"
-                  ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{cognizantFeatureJSX}</span>
-                  : species === "Emberfolk"
-                    ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{emberfolkFeatureJSX}</span>
-                    : species === "Entomos"
-                      ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{entomosFeatureJSX}</span>
-                      : species === "Human"
-                        ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{humanFeatureJSX}</span>
-                        : species === "Lumenaren"
-                          ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{lumenarenFeatureJSX}</span>
-                          : species === "Praedari"
-                            ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{praedariFeatureJSX}</span>
-                            : <input value={speciesFeature} onChange={e => setSpeciesFeature(e.target.value)} />
-        }</label><br />
-        <label style={{ color: '#0b5394', fontWeight: 'bold' }}>Subspecies Feature: {
+                                                                                    ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{tankerFeatureJSX}</span>
+                                                                                    : null
+          }</label>
+          <label style={{ color: '#0b5394', fontWeight: 'bold', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '0.90em' }}>{
+            species === "Avenoch" 
+              ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{avenochFeatureJSX}</span>
+              : species === "Cerebronych"
+                ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{cerebronychFeatureJSX}</span> 
+                : species === "Chloroptid"
+                  ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{chloroptidFeatureJSX}</span>
+                  : species === "Cognizant"
+                    ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{cognizantFeatureJSX}</span>
+                    : species === "Emberfolk"
+                      ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{emberfolkFeatureJSX}</span>
+                      : species === "Entomos"
+                        ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{entomosFeatureJSX}</span>
+                        : species === "Human"
+                          ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{humanFeatureJSX}</span>
+                          : species === "Lumenaren"
+                            ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{lumenarenFeatureJSX}</span>
+                            : species === "Praedari"
+                              ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{praedariFeatureJSX}</span>
+                              : null
+          }</label>
+          <label style={{ color: '#0b5394', fontWeight: 'bold', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '0.90em' }}>{
           species === "Cerebronych"
             ? <>
                 <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{hostMimicFeatureJSX}</span>
@@ -1212,7 +1449,7 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onSave }) => {
                 )}   
                 {subspecies === "Pyran Emberfolk Host" && (
                   <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32, marginTop: 8, color: '#000', fontWeight: 400 }}>
-                    <b><i style={{ color: '#b31111' }}>Ignition.</i></b> You can choose to have your <b><i><span style={{ color: '#990000' }}>Attacks</span></i></b> and/or <b><i style={{ color: '#351c75' }}>Strikes</i></b> deal <b><u style={{ color: '#f90102', display: 'inline-flex', alignItems: 'center' }}>Fire<img src="/Fire.png" alt="Fire" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> damage at-will.
+                    <b><i style={{ color: '#b31111' }}>Ignition.</i></b> You can choose to have your <b><i><span style={{ color: '#990000' }}>Attacks</span></i></b> and/or <b><i style={{ color: '#351c75' }}>Strikes</i></b> deal <b><u style={{ color: '#f90102', display: 'inline-flex', alignItems: 'center' }}>Fire<img src="/Fire.png" alt="Fire" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> Damage at-will.
                   </span>
                 )}     
                 {subspecies === "Entomos Host" && (
@@ -1259,7 +1496,7 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onSave }) => {
                 )}     
                 {subspecies === "Massive Human Host" && (
                     <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32, marginTop: 8, color: '#000', fontWeight: 400 }}>
-                      <b><i style={{ color: '#2b175f' }}>I'LL SEE YOU IN HELL!</i></b> Whenever you reach 0 <b><i style={{ color: '#990000' }}>Hit Points</i></b> in a battle, you can immediately make a <b><i style={{ color: '#38761d' }}>Move</i></b> up to your <b><i style={{ color: '#38761d' }}>Speed</i></b> and <b><i style={{ color: '#351c75' }}>Strike</i></b> up to your <b><i style={{ color: '#351c75' }}>Strike</i></b> amount before falling unconscious.
+                      <b><i style={{ color: '#2b175f' }}>I'LL SEE YOU IN HELL!</i></b> Whenever you reach 0 <b><i style={{ color: '#990000' }}>Hit Points</i></b> in a battle, you can immediately make a <b><i><span style={{ color: '#000' }}>Primary</span> <span style={{ color: '#990000' }}>Attack</span></i></b>. Additionally, your size is 3hx.
                     </span>
                 )}     
                 {subspecies === "Stout Human Host" && (
@@ -1274,17 +1511,42 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onSave }) => {
                 )}
                 {subspecies === "Infrared Lumenaren Host" && (
                     <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32, marginTop: 8, color: '#000', fontWeight: 400 }}>
-                      <b><i style={{ color: '#5f2b2b' }}>Die Hard.</i></b> The first time you reach 0 <b><i style={{ color: '#990000' }}>Hit Points</i></b> in a battle, you immediately gain 1 <b><i style={{ color: '#990000' }}>Hit Point</i></b> and are not dying.
+                      <b><i style={{ color: '#b17fbe' }}>Infrared Tracking.</i></b> All <b><i><span style={{ color: '#990000' }}>Attacks</span></i></b> you make automatically have the Arcing keyword.
                     </span>
                 )}
                 {subspecies === "Radiofrequent Lumenaren Host" && (
                     <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32, marginTop: 8, color: '#000', fontWeight: 400 }}>
-                      <b><i style={{ color: '#5f2b2b' }}>Die Hard.</i></b> The first time you reach 0 <b><i style={{ color: '#990000' }}>Hit Points</i></b> in a battle, you immediately gain 1 <b><i style={{ color: '#990000' }}>Hit Point</i></b> and are not dying.
+                      <b><i style={{ color: '#bea97f' }}>Misleading Signals.</i></b> Enemies <b><i><span style={{ color: '#990000' }}>Attacking</span></i></b> you roll an additional Crit die and discard the highest rolled.
                     </span>
                 )}
                 {subspecies === "X-Ray Lumenaren Host" && (
                     <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32, marginTop: 8, color: '#000', fontWeight: 400 }}>
-                      <b><i style={{ color: '#5f2b2b' }}>Die Hard.</i></b> The first time you reach 0 <b><i style={{ color: '#990000' }}>Hit Points</i></b> in a battle, you immediately gain 1 <b><i style={{ color: '#990000' }}>Hit Point</i></b> and are not dying.
+                      <b><i style={{ color: '#7f8abe' }}>Irradiate.</i></b> Enemies starting their turn within 3hx of you suffer 2 instances of the <b><i>Spike</i></b> (<b><u style={{ color: '#de7204', display: 'inline-flex', alignItems: 'center' }}>Chemical<img src="/Chemical.png" alt="Chemical" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>) condition.
+                    </span>
+                )}
+                {subspecies === "Praedari Host" && (
+                    <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32, marginTop: 8, color: '#000', fontWeight: 400 }}>
+                      <b><i style={{ color: '#5f2b5c' }}>Predator.</i></b> Whenever you <b><i><span style={{ color: '#990000' }}>Attack</span></i></b> or <b><i style={{ color: '#351c75' }}>Strike</i></b> a creature who is not at full <b><i style={{ color: '#990000' }}>Hit Points</i></b>, you gain +2 Crit and +1d6 Damage, the Damage type is the same as the <b><i><span style={{ color: '#990000' }}>Attack</span></i></b> or <b><i style={{ color: '#351c75' }}>Strike</i></b> Damage type.
+                    </span>
+                )}
+                {subspecies === "Canid Praedari Host" && (
+                    <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32, marginTop: 8, color: '#000', fontWeight: 400 }}>
+                      <b><i style={{ color: '#2f8da6' }}>Inspired Hunter.</i></b> When you reduce a creature to 0 <b><i style={{ color: '#990000' }}>Hit Points</i></b>, you immediately gain 1 <i>Action</i>. You can only benefit from this once per turn.
+                    </span>
+                )}
+                {subspecies === "Felid Praedari Host" && (
+                    <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32, marginTop: 8, color: '#000', fontWeight: 400 }}>
+                      <b><i style={{ color: '#b16326' }}>Cat’s Grace.</i></b> You gain a <b><i style={{ color: '#38761d' }}>Climb Speed</i></b> and cannot take damage from falling as long as you are conscious. Additionally, you can use the <i>Acrobatics</i> skill once per turn without using an <i>Action</i>.
+                    </span>
+                )}
+                {subspecies === "Mustelid Praedari Host" && (
+                    <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32, marginTop: 8, color: '#000', fontWeight: 400 }}>
+                      <b><i style={{ color: '#699239' }}>Weasel.</i></b> You gain a <b><i style={{ color: '#38761d' }}>Burrow Speed</i></b> and are <i>Immune</i> to the <b><i>Restrain</i></b> condition. Additionally you can use the <i>Thievery</i> skill once per turn without using an <i>Action</i>.
+                    </span>
+                )}
+                {subspecies === "Ursid Praedari Host" && (
+                    <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32, marginTop: 8, color: '#000', fontWeight: 400 }}>
+                      <b><i style={{ color: '#9026b1' }}>Natural Insulation.</i></b> You <i>Resist</i> <b><u style={{ color: '#3ebbff', display: 'inline-flex', alignItems: 'center' }}>Cold<img src="/Cold.png" alt="Cold" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> and <b><u style={{ color: '#915927', display: 'inline-flex', alignItems: 'center' }}>Bludgeoning<img src="/Bludgeoning.png" alt="Bludgeoning" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> and are <i>Immune</i> to the <b><i>Restrain</i></b> condition. Your size is 3hx.
                     </span>
                 )}
               </>
@@ -1304,29 +1566,92 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onSave }) => {
                           ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{driftingFeatureJSX}</span>
                           : subspecies === "Viny"
                             ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{vinyFeatureJSX}</span>
-                            : <input value={subspeciesFeature} onChange={e => setSubspeciesFeature(e.target.value)} />
-        }</label><br />
-      </section>
+                            : subspecies === "Android"
+                              ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{androidFeatureJSX}</span>
+                              : subspecies === "Utility Droid"
+                                ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{utilityDroidFeatureJSX}</span>
+                                : subspecies === "Petran"
+                                  ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{petranFeatureJSX}</span>
+                                  : subspecies === "Pyran"
+                                    ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{pyranFeatureJSX}</span>
+                                    : subspecies === "Apocritan"
+                                      ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{apocritanFeatureJSX}</span>
+                                      : subspecies === "Dynastes"
+                                        ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{dynastesFeatureJSX}</span>
+                                        : subspecies === "Mantid"
+                                          ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{mantidFeatureJSX}</span>
+                                          : subspecies === "Diminutive Evolution"
+                                            ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{diminutiveEvolutionFeatureJSX}</span>
+                                            : subspecies === "Lithe Evolution"
+                                              ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{litheEvolutionFeatureJSX}</span>
+                                              : subspecies === "Massive Evolution"
+                                                ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{massiveEvolutionFeatureJSX}</span>
+                                                : subspecies === "Stout Evolution"
+                                                  ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{stoutEvolutionFeatureJSX}</span>
+                                                  : subspecies === "Infrared"
+                                                    ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{infraredFeatureJSX}</span>
+                                                    : subspecies === "Radiofrequent"
+                                                      ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{radiofrequentFeatureJSX}</span>
+                                                      : subspecies === "X-Ray"
+                                                        ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{xRayFeatureJSX}</span>
+                                                        : subspecies === "Canid"
+                                                          ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{canidFeatureJSX}</span>
+                                                          : subspecies === "Felid"
+                                                            ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{felidFeatureJSX}</span>
+                                                            : subspecies === "Mustelid"
+                                                              ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{mustelidFeatureJSX}</span>
+                                                              : subspecies === "Ursid"
+                                                                ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{ursidFeatureJSX}</span>
+                                                                : null
+          }</label>
+        </div>
+      </div>
 
       {/* Hit Points Section */}
-      <section className="hit-points-section" style={{ margin: '1.5em 0' }}>
-        <h3 style={{ color: '#990000', marginBottom: 0, fontWeight: 'bold', textDecoration: 'underline' }}>Hit Points</h3>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '0.5em', marginTop: 0 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+      <div className={styles.hitPointsCard}>
+        <h3>Hit Points</h3>
+        <div className={styles.cardContent}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
             <div>
-              <label style={{ color: '#990000', fontWeight: 'bold' }}>Max Hit Points: </label>
-              <input type="number" value={maxHitPoints} onChange={e => setMaxHitPoints(+e.target.value)} style={{ width: 60, color: '#990000', border: '1.5px solid #990000', fontWeight: 'bold' }} />
+              <label style={{ color: '#990000', fontWeight: 'bold' }}>Max Hit Points</label>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginLeft: 12 }}>
-              <label style={{ color: '#990000', fontWeight: 'bold', marginRight: 4 }}>Current Hit Points:</label>
-                           <input type="number" value={currentHitPoints} onChange={e => setCurrentHitPoints(+e.target.value)} style={{ width: 50, marginRight: 8, color: '#990000', border: '1.5px solid #990000', fontWeight: 'bold' }} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <label style={{ color: '#990000', fontWeight: 'bold', marginBottom: 2, alignSelf: 'flex-start' }}>Current Hit Points:</label>
+                <input type="number" value={currentHitPoints} onChange={e => setCurrentHitPoints(+e.target.value)} style={{ width: 35, marginRight: 8, color: '#990000', border: '1.5px solid #990000', fontWeight: 'bold' }} />
+              </div>
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
                 <button
                   className={styles.addButton}
                   onClick={() => setCurrentHitPoints(hp => hp + hpDelta)}
                   title="Add to current hit points"
                 >Add</button>
-                <input type="number" value={hpDelta} onChange={e => setHpDelta(+e.target.value)} style={{ width: 40, fontSize: '0.9em', textAlign: 'center', margin: '2px 0' }} />
+                <div className={styles.numberInputContainer}>
+                  <button
+                    className={`${styles.numberSpinnerButton} ${styles.minus}`}
+                    onClick={() => setHpDelta(Math.max(0, hpDelta - 1))}
+                    type="button"
+                  >
+                    −
+                  </button>
+                  <input
+                    className={styles.numberInputWithSpinner}
+                    type="number"
+                    min={0}
+                    step={1}
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    value={hpDelta}
+                    onChange={e => setHpDelta(Math.max(0, +e.target.value))}
+                  />
+                  <button
+                    className={`${styles.numberSpinnerButton} ${styles.plus}`}
+                    onClick={() => setHpDelta(hpDelta + 1)}
+                    type="button"
+                  >
+                    +
+                  </button>
+                </div>
                 <button
                   className={styles.subtractButton}
                   onClick={() => setCurrentHitPoints(hp => hp - hpDelta)}
@@ -1335,202 +1660,313 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onSave }) => {
               </div>
             </div>
           </div>
-          <div style={{ margin: '0 0 2px 0' }}>
-            <label style={{ color: '#fff', background: '#000', padding: '2px 8px', borderRadius: 4, fontWeight: 'bold', display: 'inline-block', marginBottom: 4 }}>Death Count: </label>
-            <input type="number" value={deathDots.filter(Boolean).length} readOnly style={{ width: 40, marginLeft: 4, background: '#000', color: '#fff', fontWeight: 'bold', border: '1px solid #333', borderRadius: 4, textAlign: 'center' }} />
-          </div>
-          <div style={{ display: 'flex', alignItems: 'flex-end', marginTop: 0, gap: 8, width: '100%' }}>
-            {deathDots.map((checked, i) => {
-              // Only allow clicking if all previous are checked (for checking)
-              // Only allow unchecking the rightmost checked dot (for unchecking)
-              const canCheck = i === 0 || deathDots.slice(0, i).every(Boolean);
-              const rightmostChecked = deathDots.lastIndexOf(true);
-              const canUncheck = checked && i === rightmostChecked;
-              return (
-                <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                  <span style={{ fontSize: '0.7em', marginBottom: 2 }}>{i + 1}+</span>
-                  <span
-                    onClick={() => {
-                      setDeathDots(prev => {
-                        if (!prev[i] && canCheck) {
-                          // Fill all up to i
-                          return prev.map((v, idx) => idx <= i ? true : v);
-                        }
-                        if (prev[i] && canUncheck) {
-                          // Uncheck this and all after
-                          return prev.map((v, idx) => idx < i ? v : false);
-                        }
-                        return prev;
-                      });
-                    }}
-                    style={{
-                      display: 'inline-block',
-                      width: 18,
-                      height: 18,
-                      borderRadius: '50%',
-                      border: '2px solid #000',
-                      background: checked ? '#000' : '#fff',
-                      cursor: (canCheck && !checked) || canUncheck ? 'pointer' : 'not-allowed',
-                      marginTop: 2,
-                      opacity: (canCheck && !checked) || canUncheck ? 1 : 0.4,
-                    }}
-                    title={
-                      (!checked && canCheck)
-                        ? `Toggle ${i + 1}+`
-                        : (canUncheck ? `Uncheck rightmost first` : `Must uncheck rightmost first`)
-                    }
-                  />
-                </div>
-              );
-            })}
+          <div style={{
+            background: '#000',
+            borderRadius: 8,
+            padding: '6px 0 6px 0',
+            margin: '8px 0 0 0',
+            textAlign: 'center',
+            display: 'inline-block',
+            width: '100%'
+          }}>
+            <label style={{ color: '#fff', background: 'transparent', padding: '2px 8px', borderRadius: 4, fontWeight: 'bold', display: 'inline-block', marginBottom: 0 }}>Death Count</label>
+            <div style={{ display: 'flex', alignItems: 'flex-end', marginTop: 0, gap: 8, width: '100%', flexWrap: 'wrap', justifyContent: 'center' }}>
+              {deathDots.map((checked, i) => {
+                // Only allow clicking if all previous are checked (for checking)
+                // Only allow unchecking the rightmost checked dot (for unchecking)
+                const canCheck = i === 0 || deathDots.slice(0, i).every(Boolean);
+                const rightmostChecked = deathDots.lastIndexOf(true);
+                const canUncheck = checked && i === rightmostChecked;
+                return (
+                  <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    <span style={{ fontSize: '0.7em', marginBottom: 1, color: '#fff', fontWeight: 'bold' }}>{i + 1}+</span>
+                    <span
+                      onClick={() => {
+                        setDeathDots(prev => {
+                          if (!prev[i] && canCheck) {
+                            // Fill all up to i
+                            return prev.map((v, idx) => idx <= i ? true : v);
+                          }
+                          if (prev[i] && canUncheck) {
+                            // Uncheck this and all after
+                            return prev.map((v, idx) => idx < i ? v : false);
+                          }
+                          return prev;
+                        });
+                      }}
+                      style={{
+                        display: 'inline-block',
+                        width: 8,
+                        height: 8,
+                        borderRadius: '50%',
+                        border: '2px solid #fff',
+                        background: checked ? '#000' : '#fff',
+                        cursor: (canCheck && !checked) || canUncheck ? 'pointer' : 'not-allowed',
+                        marginTop: 0,
+                        opacity: (canCheck && !checked) || canUncheck ? 1 : 1,
+                        background: (!checked && !((canCheck && !checked) || canUncheck)) ? '#fff' : (checked ? '#000' : '#fff'),
+                      }}
+                      title={
+                        (!checked && canCheck)
+                          ? `Toggle ${i + 1}+`
+                          : (canUncheck ? `Uncheck rightmost first` : `Must uncheck rightmost first`)
+                      }
+                    />
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </div>
-      </section>
+      </div>
 
-      <section className="movement">
-        <h3 style={{ color: '#38761d', fontWeight: 'bold', textDecoration: 'underline' }}>Movement</h3>
-  <label style={{ color: '#38761d', fontWeight: 'bold' }}>Speed: <input value={speed} onChange={e => setSpeed(e.target.value)} /></label><br />
-  <label style={{ color: '#38761d', fontWeight: 'bold' }}>Speed Types: <input value={movement} onChange={e => setMovement(e.target.value)} /></label><br />
-  <label style={{ color: '#38761d', fontWeight: 'bold' }}>Jump Speed: <input value={strike} onChange={e => setStrike(e.target.value)} /></label><br />
-  <label style={{ color: '#38761d', fontWeight: 'bold' }}>Jump Amount: <input type="number" value={xpTotal} onChange={e => setXpTotal(+e.target.value)} /></label><br />
-  <label style={{ color: '#38761d', fontWeight: 'bold' }}>Speed Effects: <input value={resistances} onChange={e => setResistances(e.target.value)} /></label><br />
-      </section>
 
-      <section className="strike">
-        <h3 style={{ color: '#351c75', fontWeight: 'bold', textDecoration: 'underline' }}>Strike</h3>
-        <label style={{ color: '#351c75', fontWeight: 'bold' }}>Strike Damage: <input value={strikeDamage} onChange={e => setStrikeDamage(e.target.value)} /></label><br />
-        <label style={{ color: '#351c75', fontWeight: 'bold' }}>Multi Strike: <input type="number" value={multiStrike} onChange={e => setMultiStrike(+e.target.value)} /></label><br />
-        <label style={{ color: '#351c75', fontWeight: 'bold' }}>Strike Effects: <input value={strikeEffects} onChange={e => setStrikeEffects(e.target.value)} /></label><br />
-      </section>
+      <div className={styles.movementStrikeCard}>
+        <h3>Movement</h3>
+        <div className={styles.cardContent}>
+          <div className={styles.horizontalLabel} style={{ color: '#38761d', fontWeight: 'bold' }}>Speed: {speed}</div>
+          <div className={styles.horizontalLabel} style={{ color: '#38761d', fontWeight: 'bold' }}>Speed Types: {movement}</div>
+          <div className={styles.horizontalLabel} style={{ color: '#38761d', fontWeight: 'bold' }}>Jump Speed: {strike}</div>
+          <div className={styles.horizontalLabel} style={{ color: '#38761d', fontWeight: 'bold' }}>Jump Amount</div>
+          <div className={styles.horizontalLabel} style={{ color: '#38761d', fontWeight: 'bold' }}>Speed Effects: {resistances}</div>
+        </div>
+      </div>
+
+      <div className={styles.strikeCard}>
+        <h3>Strike</h3>
+        <div className={styles.cardContent}>
+          <div className={styles.horizontalLabel} style={{ color: '#351c75', fontWeight: 'bold' }}>Strike Damage: {strikeDamage}</div>
+          <div className={styles.horizontalLabel} style={{ color: '#351c75', fontWeight: 'bold' }}>Multi Strike</div>
+          <div className={styles.horizontalLabel} style={{ color: '#351c75', fontWeight: 'bold' }}>Strike Effects: {strikeEffects}</div>
+        </div>
+      </div>
 
       {/* Damage Interactions Section */}
-      <section className="damage-interactions">
-        <h3 style={{ fontWeight: 'bold', textDecoration: 'underline' }}>Damage Interactions</h3>
-        <label style={{ fontWeight: 'bold' }}>Resistances: <input value={resistances} onChange={e => setResistances(e.target.value)} /></label><br />
-        <label style={{ fontWeight: 'bold' }}>Immunities: <input value={immunities} onChange={e => setImmunities(e.target.value)} /></label><br />
-        <label style={{ fontWeight: 'bold' }}>Absorptions: <input value={absorptions} onChange={e => setAbsorptions(e.target.value)} /></label><br />
-      </section>
-
-      <section className="xp-sp">
-        <h3 style={{ fontWeight: 'bold', textDecoration: 'underline' }}>Experience & Skill Points</h3>
-  <label style={{ fontWeight: 'bold' }}>xp Total: <input type="number" value={xpTotal} onChange={e => setXpTotal(+e.target.value)} /></label><br />
-  <label style={{ fontWeight: 'bold' }}>xp Spent: <input type="number" value={sheet?.xpSpent ?? 0} readOnly /></label><br />
-  <label style={{ fontWeight: 'bold' }}>Remaining xp: <input type="number" value={sheet?.xpRemaining ?? 0} readOnly /></label><br />
-  <label style={{ fontWeight: 'bold' }}>sp Total: <input type="number" value={sheet?.spTotal ?? 0} readOnly /></label><br />
-  <label style={{ fontWeight: 'bold' }}>sp Spent: <input type="number" value={sheet?.spSpent ?? 0} readOnly /></label><br />
-  <label style={{ fontWeight: 'bold' }}>Remaining sp: <input type="number" value={sheet?.spRemaining ?? 0} readOnly /></label><br />
-      </section>
-
-      <section className="skills">
-        <h3 style={{ fontWeight: 'bold', textDecoration: 'underline' }}>Skills</h3>
-        <div style={{ overflowX: 'auto' }}>
-          <table style={{ borderCollapse: 'collapse', width: '100%' }}>
-            <thead>
-              <tr>
-                <th style={{ textAlign: 'left', fontWeight: 'bold', padding: '4px 8px' }}></th>
-                {[20, 18, 16, 14, 12, 10, 8, 6, 4,  2].map((val) => (
-                  <th key={val} style={{ textAlign: 'center', fontWeight: 'bold', padding: '4px 8px' }}>{val}+</th>
-                ))}
-              </tr>
-              <tr>
-                <th></th>
-                {[1,1,2,2,3,4,5,6,8,10].map((sp, idx) => (
-                  <th key={idx} style={{ textAlign: 'center', fontSize: '0.9em', color: '#888', padding: '2px 8px' }}>{sp}sp</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {skillList.map(skill => (
-                <tr key={skill}>
-                  <td style={{ fontWeight: 'bold', padding: '4px 8px', whiteSpace: 'nowrap' }}>{skill}</td>
-                  {skillDots[skill].map((checked, i) => {
-                    const canCheck = i === 0 || skillDots[skill].slice(0, i).every(Boolean);
-                    const rightmostChecked = skillDots[skill].lastIndexOf(true);
-                    const canUncheck = checked && i === rightmostChecked;
-                    return (
-                      <td key={i} style={{ textAlign: 'center', padding: '2px 4px' }}>
-                        <span
-                          onClick={() => {
-                            setSkillDots(prev => {
-                              const arr = prev[skill].slice();
-                              if (!arr[i] && canCheck) {
-                                for (let j = 0; j <= i; ++j) arr[j] = true;
-                              } else if (arr[i] && canUncheck) {
-                                for (let j = i; j < arr.length; ++j) arr[j] = false;
-                              }
-                              return { ...prev, [skill]: arr };
-                            });
-                          }}
-                          style={{
-                            display: 'inline-block',
-                            width: 18,
-                            height: 18,
-                            borderRadius: '50%',
-                            border: '2px solid #000',
-                            background: checked ? '#000' : '#fff',
-                            cursor: (canCheck && !checked) || canUncheck ? 'pointer' : 'not-allowed',
-                            opacity: (canCheck && !checked) || canUncheck ? 1 : 0.4,
-                          }}
-                          title={
-                            (!checked && canCheck)
-                              ? `Toggle`
-                              : (canUncheck ? `Uncheck rightmost first` : `Must uncheck rightmost first`)
-                          }
-                        />
-                      </td>
-                    );
-                  })}
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      <div className={styles.damageInteractionsCard}>
+        <h3>Damage Interactions</h3>
+        <div className={styles.cardContent}>
+          <div style={{ fontWeight: 'bold', marginBottom: 6 }}>Resistances</div>
+          <div style={{ fontWeight: 'bold', marginBottom: 2 }}>Immunities</div>
+          <div style={{ fontWeight: 'bold', marginBottom: 2 }}>Absorptions</div>
         </div>
-      </section>
-
-      {/* Fixed button group */}
-      <div
-        style={{
-          position: 'fixed',
-          top: '10%',
-          right: 0,
-          transform: 'translateY(-50%)',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 12,
-          zIndex: 1000,
-          background: 'rgba(255,255,255,0.95)',
-          borderLeft: '2px solid #bbb',
-          boxShadow: '-2px 0 8px rgba(0,0,0,0.08)',
-          padding: '18px 12px 18px 18px',
-
-          borderTopLeftRadius: 12,
-          borderBottomLeftRadius: 12,
-        }}
-      >
-        <button
-          onClick={handleSave}
-          className={styles.saveButton}
-          disabled={isSaved}
-        >
-          {isSaved ? "Saved!" : "Save"}
-        </button>
-        <button
-          onClick={onSave}
-          style={{
-            background: '#eee',
-            color: '#222',
-            border: '1px solid #888',
-            borderRadius: 4,
-            padding: '1px 1px',
-            fontWeight: 'bold',
-            fontSize: '1.1em',
-            cursor: 'pointer',
-            boxShadow: '0 2px 6px rgba(0,0,0,0.07)',
-          }}
-        >
-          Home
-        </button>
       </div>
+
+      <div className={styles.experienceCard}>
+        <h3 style={{ margin: 0 }}>Experience & Skill Points</h3>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, minWidth: 180, marginTop: 8 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span style={{ fontWeight: 'bold' }}>xp Total</span>
+            <div className={styles.numberInputContainer}>
+              <button 
+                className={`${styles.numberSpinnerButton} ${styles.minus}`}
+                onClick={() => setXpTotal(Math.max(0, xpTotal - 1))}
+                type="button"
+              >
+                −
+              </button>
+              <input
+                className={styles.numberInputWithSpinner}
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                value={xpTotal}
+                onChange={e => setXpTotal(Math.max(0, +e.target.value.replace(/[^0-9]/g, "")))}
+                style={{ width: 80, fontWeight: 'bold' }}
+              />
+              <button 
+                className={`${styles.numberSpinnerButton} ${styles.plus}`}
+                onClick={() => setXpTotal(xpTotal + 1)}
+                type="button"
+              >
+                +
+              </button>
+            </div>
+          </div>
+          <div style={{ fontWeight: 'bold' }}>xp Spent: <span>{sheet?.xpSpent ?? 0}</span></div>
+          <div style={{ fontWeight: 'bold' }}>Remaining xp: <span>{xpTotal - (sheet?.xpSpent ?? 0)}</span></div>
+          {/* SP fields moved underneath Remaining xp */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 12 }}>
+            <span style={{ fontWeight: 'bold' }}>sp Total</span>
+            <div className={styles.numberInputContainer}>
+              <button 
+                className={`${styles.numberSpinnerButton} ${styles.minus}`}
+                onClick={() => setSpTotal(Math.max(0, spTotal - 1))}
+                type="button"
+              >
+                −
+              </button>
+              <input
+                className={styles.numberInputWithSpinner}
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                value={spTotal}
+                onChange={e => setSpTotal(Math.max(0, +e.target.value.replace(/[^0-9]/g, "")))}
+                style={{ fontWeight: 'bold' }}
+              />
+              <button 
+                className={`${styles.numberSpinnerButton} ${styles.plus}`}
+                onClick={() => setSpTotal(spTotal + 1)}
+                type="button"
+              >
+                +
+              </button>
+            </div>
+          </div>
+          <div style={{ fontWeight: 'bold' }}>sp Spent: <span>{spSpent}</span></div>
+          <div style={{ fontWeight: 'bold' }}>Remaining sp: <span>{spTotal - spSpent}</span></div>
+          {/* Removed inline spNotice here; only show floating bubble above Skills grid */}
+        </div>
+      </div>
+
+      <div className={styles.skillsCard} style={{ position: 'relative' }}>
+        <h3>Skills</h3>
+        <div className={styles.cardContent}>
+          {/* SP Notice Bubble */}
+          {spNotice && (
+            <div className={styles.spNoticeBubble}>
+              {spNotice}
+            </div>
+          )}
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ borderCollapse: 'collapse', width: '100%' }}>
+              <thead>
+                <tr>
+                  <th style={{ textAlign: 'left', fontWeight: 'bold', padding: '4px 8px' }}></th>
+                  {[20, 18, 16, 14, 12, 10, 8, 6, 4,  2].map((val) => (
+                    <th key={val} style={{ textAlign: 'center', fontWeight: 'bold', padding: '4px 8px' }}>{val}+</th>
+                  ))}
+                </tr>
+                <tr>
+                  <th></th>
+                  {[1,1,2,2,3,4,5,6,8,10].map((sp, idx) => (
+                    <th key={idx} style={{ textAlign: 'center', fontSize: '0.9em', color: '#888', padding: '2px 8px' }}>{sp}sp</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {skillList.map(skill => (
+                  <tr key={skill}>
+                    <td style={{ fontWeight: 'bold', padding: '4px 8px', whiteSpace: 'nowrap' }}>{skill}</td>
+                    {skillDots[skill].map((checked, i) => {
+                      const canCheck = i === 0 || skillDots[skill].slice(0, i).every(Boolean);
+                      const rightmostChecked = skillDots[skill].lastIndexOf(true);
+                      const canUncheck = checked && i === rightmostChecked;
+                      return (
+                        <td key={i} style={{ textAlign: 'center', padding: '2px 4px' }}>
+                          <span
+                            onClick={() => {
+                              setSkillDots(prev => {
+                                setSpNotice("");
+                                const arr = prev[skill].slice();
+                                let tempArr = arr.slice();
+                                if (!arr[i] && canCheck) {
+                                  for (let j = 0; j <= i; ++j) tempArr[j] = true;
+                                } else if (arr[i] && canUncheck) {
+                                  for (let j = i; j < arr.length; ++j) tempArr[j] = false;
+                                } else {
+                                  return prev;
+                                }
+                                // Calculate what the new total would be
+                                let total = 0;
+                                const newSkillDots = { ...prev, [skill]: tempArr };
+                                Object.values(newSkillDots).forEach(dotsArr => {
+                                  dotsArr.forEach((dot, idx) => {
+                                    if (dot) total += skillSpCosts[idx];
+                                  });
+                                });
+                                if (total > spTotal) {
+                                  setSpNotice("The sp cost of your selection is too high! You cannot spend more sp than your sp Total.");
+                                  return prev;
+                                }
+                                setSpSpent(total);
+                                return newSkillDots;
+                              });
+                            }}
+                            style={{
+                              display: 'inline-block',
+                              width: 18,
+                              height: 18,
+                              borderRadius: '50%',
+                              border: '2px solid #000',
+                              background: checked ? '#000' : '#fff',
+                              cursor: (canCheck && !checked) || canUncheck ? 'pointer' : 'not-allowed',
+                              opacity: (canCheck && !checked) || canUncheck ? 1 : 0.4,
+                            }}
+                            title={
+                              (!checked && canCheck)
+                                ? `Toggle`
+                                : (canUncheck ? `Uncheck rightmost first` : `Must uncheck rightmost first`)
+                            }
+                          />
+                        </td>
+                      );
+                    })}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      
+
+      {/* Perks card */}
+      <div className={styles.perksCard}>
+  <h3 style={{ marginTop: 0, textDecoration: 'underline' }}>Languages & Perks</h3>
+        <div className={styles.cardContent}>
+          <div style={{ fontWeight: 'bold', marginBottom: 6 }}>Languages</div>
+          <div style={{ fontWeight: 'bold', marginBottom: 2 }}>Perk 1</div>
+          <div style={{ fontWeight: 'bold', marginBottom: 2 }}>Perk 2</div>
+          <div style={{ fontWeight: 'bold', marginBottom: 2 }}>Perk 3</div>
+          <div style={{ fontWeight: 'bold', marginBottom: 2 }}>Perk 4</div>
+          <div style={{ fontWeight: 'bold', marginBottom: 2 }}>Perk 5</div>
+        </div>
+      </div>
+
+      {/* Portrait card */}
+      <div className={styles.portraitCard}>
+        <h3 style={{ marginTop: 0, textDecoration: 'underline' }}>Portrait</h3>
+        <div className={styles.cardContent} style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', minHeight: 100 }}>
+          {portraitUrl ? (
+            <img src={portraitUrl} alt="Character Portrait" style={{ width: '95%', height: 'auto', margin: '0 auto 12px auto', display: 'block', borderRadius: 8, border: '1px solid #ccc' }} />
+          ) : null}
+          <input
+            type="file"
+            accept="image/*"
+            style={{ display: 'none' }}
+            ref={portraitInputRef}
+            onChange={e => {
+              const file = e.target.files && e.target.files[0];
+              if (file) {
+                const reader = new FileReader();
+                reader.onload = ev => {
+                  setPortraitUrl(ev.target?.result as string);
+                };
+                reader.readAsDataURL(file);
+              }
+            }}
+          />
+          <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
+            <button
+              style={{ padding: '10px 20px', fontSize: '1em', borderRadius: 6, border: '1px solid #888', background: '#f0f0f0', cursor: 'pointer' }}
+              onClick={() => portraitInputRef.current && portraitInputRef.current.click()}
+            >
+              {portraitUrl ? 'Change' : 'Add Character Portrait'}
+            </button>
+            {portraitUrl && (
+              <button
+                style={{ padding: '10px 20px', fontSize: '1em', borderRadius: 6, border: '1px solid #c00', background: '#fff0f0', color: '#c00', cursor: 'pointer' }}
+                onClick={() => setPortraitUrl(null)}
+              >
+                Remove
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+      </div> {/* End characterSheetGrid */}
+
     </div>
   );
 };
