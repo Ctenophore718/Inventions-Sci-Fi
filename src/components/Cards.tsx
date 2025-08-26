@@ -1,7 +1,6 @@
 import React from "react";
 import type { CharacterSheet } from "../types/CharacterSheet";
 import { loadSheetById } from "../utils/storage";
-import styles from "./CharacterEditor.module.css";
 
 type CardsProps = {
   sheet: CharacterSheet | null;
@@ -119,89 +118,239 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onSave, onHome 
         </div>
       </div>
       
-      {/* 4-column, 2-row CSS grid, matching Level Up page layout */}
-      <div className={styles.characterSheetGrid} style={{ marginTop: '2rem', marginBottom: '2rem', gridTemplateColumns: 'repeat(4, 1fr)', gridTemplateRows: 'repeat(2, auto)' }}>
-        {/* First Row - Technique Cards */}
-        <div style={{ background: '#fff', border: '2px solid #333', borderRadius: 8, boxShadow: '0 2px 4px rgba(0,0,0,0.1)', minHeight: 120, padding: '1.2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-          <div style={{ fontWeight: 'bold', color: 'black', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1.1em', textAlign: 'center' }}>Class Technique</div>
-        </div>
-        
-        <div style={{ background: '#fff', border: '2px solid #333', borderRadius: 8, boxShadow: '0 2px 4px rgba(0,0,0,0.1)', minHeight: 120, padding: '1.2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+      {/* Responsive card grid with fixed card sizes (240px × 336px) */}
+      <div style={{ 
+        marginTop: '2rem', 
+        marginBottom: '2rem',
+        display: 'flex',
+        flexWrap: 'wrap',
+        justifyContent: 'center',
+        gap: '1rem',
+        padding: '0 1rem'
+      }}>
+        {/* Technique Cards */}
+        <div style={{ 
+          width: '240px', 
+          height: '336px', 
+          background: '#fff', 
+          border: '5px solid #bf9000', 
+          borderRadius: 8, 
+          boxShadow: '0 2px 4px rgba(0,0,0,0.1)', 
+          padding: '1.2rem', 
+          display: 'flex', 
+          flexDirection: 'column', 
+          alignItems: 'center', 
+          justifyContent: 'center',
+          flexShrink: 0,
+          position: 'relative',
+          overflow: 'hidden'
+        }}>
+            <div style={{ position: 'absolute', top: 10, left: 0, width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', padding: '0 16px', boxSizing: 'border-box' }}>
+              <span style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontWeight: 'bold', fontSize: '1.25em', color: 'black' }}>Card Name</span>
+              <span style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontStyle: 'italic', fontSize: '0.95em', color: 'black' }}>Class</span>
+            </div>
+            {/* Neural image between Card Name and Technique */}
+            <img 
+              src="/Neural.png"
+              alt="Neural"
+              style={{
+                position: 'absolute',
+                top: 36,
+                left: 10,
+                right: 10,
+                width: 'calc(100% - 20px)',
+                height: 'calc(50% - 55px)',
+                objectFit: 'cover',
+                zIndex: 1,
+                borderRadius: 8
+              }}
+            />
+            {/* Technique and Cooldown - absolutely positioned and locked */}
+            <div style={{
+              position: 'absolute',
+              top: 'calc(50% - 15px)',
+              left: 0,
+              width: '100%',
+              display: 'flex',
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              paddingLeft: 10,
+              paddingRight: 10,
+              zIndex: 3
+            }}>
+              <span style={{ color: '#bf9000', fontFamily: 'Arial, Helvetica, sans-serif', fontWeight: 'bold', fontSize: '1.1em', textAlign: 'left' }}>Technique</span>
+              <span style={{ color: '#bf9000', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '0.875em', fontStyle: 'italic', marginRight: 22, whiteSpace: 'nowrap', maxWidth: 'calc(100% - 120px)', overflow: 'hidden', textOverflow: 'ellipsis', textAlign: 'right' }}>
+                Cooldown <span style={{ fontWeight: 'bold', fontStyle: 'normal' }}>[#]</span>
+              </span>
+            </div>
+            
+            {/* Card stats - positioned with 10px gaps and better responsive sizing */}
+            <div style={{
+              position: 'absolute',
+              top: 'calc(50% + 10px)',
+              left: 10,
+              right: 10,
+              bottom: 45,
+              color: '#000',
+              fontFamily: 'Arial, Helvetica, sans-serif',
+              fontWeight: 400,
+              overflow: 'auto',
+              wordWrap: 'break-word',
+              display: 'flex',
+              alignItems: 'flex-start',
+              zIndex: 2,
+              lineHeight: 1.2
+            }}>
+              <div style={{
+                fontSize: 'min(0.875em, max(0.6em, calc((100vh - 400px) / 25)))',
+                width: '100%',
+                height: 'fit-content',
+                maxHeight: '100%',
+                overflow: 'hidden'
+              }}>Card stats.</div>
+            </div>
+            {/* Flavor text - absolutely positioned and locked */}
+            <div style={{
+              position: 'absolute',
+              top: 330,
+              bottom: 5,
+              left: 10,
+              right: 10,
+              color: '#000',
+              fontFamily: 'Arial, Helvetica, sans-serif',
+              fontStyle: 'italic',
+              fontSize: '0.70em',
+              fontWeight: 400,
+              zIndex: 3,
+              textAlign: 'left'
+            }}>
+              Flavor text.
+            </div>
+            </div>
+            
+        <div style={{ 
+          width: '240px', 
+          height: '336px', 
+          background: '#fff', 
+          border: '5px solid #bf9000', 
+          borderRadius: 8, 
+          boxShadow: '0 2px 4px rgba(0,0,0,0.1)', 
+          padding: '1.2rem', 
+          display: 'flex', 
+          flexDirection: 'column', 
+          alignItems: 'center', 
+          justifyContent: 'center',
+          flexShrink: 0
+        }}>
           <div style={{ fontWeight: 'bold', color: 'black', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1.1em', textAlign: 'center' }}>Subclass Technique</div>
         </div>
         
-        <div style={{ background: '#fff', border: '2px solid #333', borderRadius: 8, boxShadow: '0 2px 4px rgba(0,0,0,0.1)', minHeight: 120, padding: '1.2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ 
+          width: '240px', 
+          height: '336px', 
+          background: '#fff', 
+          border: '5px solid #bf9000', 
+          borderRadius: 8, 
+          boxShadow: '0 2px 4px rgba(0,0,0,0.1)', 
+          padding: '1.2rem', 
+          display: 'flex', 
+          flexDirection: 'column', 
+          alignItems: 'center', 
+          justifyContent: 'center',
+          flexShrink: 0
+        }}>
           <div style={{ fontWeight: 'bold', color: 'black', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1.1em', textAlign: 'center' }}>Species Technique</div>
         </div>
         
-        <div style={{ background: '#fff', border: '2px solid #333', borderRadius: 8, boxShadow: '0 2px 4px rgba(0,0,0,0.1)', minHeight: 120, padding: '1.2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ 
+          width: '240px', 
+          height: '336px', 
+          background: '#fff', 
+          border: '5px solid #bf9000', 
+          borderRadius: 8, 
+          boxShadow: '0 2px 4px rgba(0,0,0,0.1)', 
+          padding: '1.2rem', 
+          display: 'flex', 
+          flexDirection: 'column', 
+          alignItems: 'center', 
+          justifyContent: 'center',
+          flexShrink: 0
+        }}>
           <div style={{ fontWeight: 'bold', color: 'black', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1.1em', textAlign: 'center' }}>Subspecies Technique</div>
         </div>
         
-        {/* Second Row - Attack Cards */}
-        <div style={{ background: '#fff', border: '2px solid #333', borderRadius: 8, boxShadow: '0 2px 4px rgba(0,0,0,0.1)', minHeight: 120, padding: '1.2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+        {/* Attack Cards */}
+        <div style={{ 
+          width: '240px', 
+          height: '336px', 
+          background: '#fff', 
+          border: '5px solid #990000', 
+          borderRadius: 8, 
+          boxShadow: '0 2px 4px rgba(0,0,0,0.1)', 
+          padding: '1.2rem', 
+          display: 'flex', 
+          flexDirection: 'column', 
+          alignItems: 'center', 
+          justifyContent: 'center',
+          flexShrink: 0
+        }}>
           <div style={{ fontWeight: 'bold', color: 'black', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1.1em', textAlign: 'center' }}>Primary Attack</div>
         </div>
         
-        <div style={{ background: '#fff', border: '2px solid #333', borderRadius: 8, boxShadow: '0 2px 4px rgba(0,0,0,0.1)', minHeight: 120, padding: '1.2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ 
+          width: '240px', 
+          height: '336px', 
+          background: '#fff', 
+          border: '5px solid #990000', 
+          borderRadius: 8, 
+          boxShadow: '0 2px 4px rgba(0,0,0,0.1)', 
+          padding: '1.2rem', 
+          display: 'flex', 
+          flexDirection: 'column', 
+          alignItems: 'center', 
+          justifyContent: 'center',
+          flexShrink: 0
+        }}>
           <div style={{ fontWeight: 'bold', color: 'black', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1.1em', textAlign: 'center' }}>Primary Attack</div>
         </div>
         
-        <div style={{ background: '#fff', border: '2px solid #333', borderRadius: 8, boxShadow: '0 2px 4px rgba(0,0,0,0.1)', minHeight: 120, padding: '1.2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ 
+          width: '240px', 
+          height: '336px', 
+          background: '#fff', 
+          border: '5px solid #990000', 
+          borderRadius: 8, 
+          boxShadow: '0 2px 4px rgba(0,0,0,0.1)', 
+          padding: '1.2rem', 
+          display: 'flex', 
+          flexDirection: 'column', 
+          alignItems: 'center', 
+          justifyContent: 'center',
+          flexShrink: 0
+        }}>
           <div style={{ fontWeight: 'bold', color: 'black', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1.1em', textAlign: 'center' }}>Secondary Attack</div>
         </div>
         
-        <div style={{ background: '#fff', border: '2px solid #333', borderRadius: 8, boxShadow: '0 2px 4px rgba(0,0,0,0.1)', minHeight: 120, padding: '1.2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ 
+          width: '240px', 
+          height: '336px', 
+          background: '#fff', 
+          border: '5px solid #990000', 
+          borderRadius: 8, 
+          boxShadow: '0 2px 4px rgba(0,0,0,0.1)', 
+          padding: '1.2rem', 
+          display: 'flex', 
+          flexDirection: 'column', 
+          alignItems: 'center', 
+          justifyContent: 'center',
+          flexShrink: 0
+        }}>
           <div style={{ fontWeight: 'bold', color: 'black', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1.1em', textAlign: 'center' }}>Secondary Attack</div>
         </div>
       </div>
       
-      <div style={{ 
-        background: '#f8f9fa', 
-        border: '1px solid #ddd', 
-        borderRadius: 8, 
-        padding: '2rem',
-        textAlign: 'center'
-      }}>
-        <h3>Character Card Management System</h3>
-        <p>Card management for <strong>{localSheet?.name || 'Unnamed Character'}</strong> is coming soon!</p>
-        
-        <div style={{ marginTop: '2rem', display: 'grid', gap: '1rem', maxWidth: '600px', margin: '2rem auto 0' }}>
-          <div style={{ background: 'white', padding: '1rem', borderRadius: 6, border: '1px solid #ccc' }}>
-            <h4 style={{ margin: '0 0 0.5rem 0', color: '#0b5394' }}>Current Character</h4>
-            <p style={{ margin: 0 }}>
-              <strong>Name:</strong> {localSheet?.name || 'Unnamed'}<br />
-              <strong>Class:</strong> {localSheet?.charClass || 'None'}<br />
-              <strong>Subclass:</strong> {localSheet?.subclass || 'None'}<br />
-              <strong>Species:</strong> {localSheet?.species || 'None'}<br />
-              <strong>Background:</strong> {localSheet?.background || 'None'}
-            </p>
-          </div>
-          
-          <div style={{ background: 'white', padding: '1rem', borderRadius: 6, border: '1px solid #ccc' }}>
-            <h4 style={{ margin: '0 0 0.5rem 0', color: '#38761d' }}>Card Types</h4>
-            <ul style={{ textAlign: 'left', margin: '0.5rem 0', paddingLeft: '1.5rem' }}>
-              <li>Equipment Cards</li>
-              <li>Ability Cards</li>
-              <li>Spell Cards</li>
-              <li>Item Cards</li>
-              <li>Status Effect Cards</li>
-            </ul>
-          </div>
-          
-          <div style={{ background: 'white', padding: '1rem', borderRadius: 6, border: '1px solid #ccc' }}>
-            <h4 style={{ margin: '0 0 0.5rem 0', color: '#990000' }}>Future Features</h4>
-            <ul style={{ textAlign: 'left', margin: '0.5rem 0', paddingLeft: '1.5rem' }}>
-              <li>View and organize character cards</li>
-              <li>Add new cards to inventory</li>
-              <li>Manage equipped items</li>
-              <li>Track card effects and bonuses</li>
-              <li>Search and filter cards</li>
-              <li>Import/export card collections</li>
-            </ul>
-          </div>
-        </div>
-      </div>
+  {/* Character Card Management System section removed as requested */}
     </div>
   );
 };
