@@ -332,6 +332,31 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onSave, onHom
   const [isSaved, setIsSaved] = useState(false);
 
   const handleSave = () => {
+    // Save all local state to the character sheet
+    if (sheet) {
+      const updatedSheet = { 
+        ...sheet, 
+        charClass, 
+        subclass, 
+        species, 
+        subspecies,
+        xpTotal,
+        spTotal,
+        xpSpent,
+        spSpent,
+        classCardDots,
+        xpRemaining: xpTotal - xpSpent,
+        spRemaining: spTotal - spSpent
+      };
+      saveCharacterSheet(updatedSheet);
+      
+      // Dispatch custom event to notify other components
+      window.dispatchEvent(new CustomEvent('character-updated', { 
+        detail: { sheet: updatedSheet } 
+      }));
+    }
+    
+    // Also call the parent's onSave for any additional logic
     onSave();
     setIsSaved(true);
     setTimeout(() => setIsSaved(false), 2000);

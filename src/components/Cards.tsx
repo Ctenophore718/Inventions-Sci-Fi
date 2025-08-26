@@ -1,6 +1,7 @@
 import React from "react";
 import type { CharacterSheet } from "../types/CharacterSheet";
 import { loadSheetById } from "../utils/storage";
+import styles from "./CharacterEditor.module.css";
 
 type CardsProps = {
   sheet: CharacterSheet | null;
@@ -115,6 +116,43 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onSave, onHome 
           >
             Home
           </button>
+        </div>
+      </div>
+      
+      {/* 4-column, 2-row CSS grid, matching Level Up page layout */}
+      <div className={styles.characterSheetGrid} style={{ marginTop: '2rem', marginBottom: '2rem', gridTemplateColumns: 'repeat(4, 1fr)', gridTemplateRows: 'repeat(2, auto)' }}>
+        {/* First Row - Technique Cards */}
+        <div style={{ background: '#fff', border: '2px solid #333', borderRadius: 8, boxShadow: '0 2px 4px rgba(0,0,0,0.1)', minHeight: 120, padding: '1.2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ fontWeight: 'bold', color: 'black', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1.1em', textAlign: 'center' }}>Class Technique</div>
+        </div>
+        
+        <div style={{ background: '#fff', border: '2px solid #333', borderRadius: 8, boxShadow: '0 2px 4px rgba(0,0,0,0.1)', minHeight: 120, padding: '1.2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ fontWeight: 'bold', color: 'black', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1.1em', textAlign: 'center' }}>Subclass Technique</div>
+        </div>
+        
+        <div style={{ background: '#fff', border: '2px solid #333', borderRadius: 8, boxShadow: '0 2px 4px rgba(0,0,0,0.1)', minHeight: 120, padding: '1.2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ fontWeight: 'bold', color: 'black', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1.1em', textAlign: 'center' }}>Species Technique</div>
+        </div>
+        
+        <div style={{ background: '#fff', border: '2px solid #333', borderRadius: 8, boxShadow: '0 2px 4px rgba(0,0,0,0.1)', minHeight: 120, padding: '1.2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ fontWeight: 'bold', color: 'black', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1.1em', textAlign: 'center' }}>Subspecies Technique</div>
+        </div>
+        
+        {/* Second Row - Attack Cards */}
+        <div style={{ background: '#fff', border: '2px solid #333', borderRadius: 8, boxShadow: '0 2px 4px rgba(0,0,0,0.1)', minHeight: 120, padding: '1.2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ fontWeight: 'bold', color: 'black', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1.1em', textAlign: 'center' }}>Primary Attack</div>
+        </div>
+        
+        <div style={{ background: '#fff', border: '2px solid #333', borderRadius: 8, boxShadow: '0 2px 4px rgba(0,0,0,0.1)', minHeight: 120, padding: '1.2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ fontWeight: 'bold', color: 'black', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1.1em', textAlign: 'center' }}>Primary Attack</div>
+        </div>
+        
+        <div style={{ background: '#fff', border: '2px solid #333', borderRadius: 8, boxShadow: '0 2px 4px rgba(0,0,0,0.1)', minHeight: 120, padding: '1.2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ fontWeight: 'bold', color: 'black', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1.1em', textAlign: 'center' }}>Secondary Attack</div>
+        </div>
+        
+        <div style={{ background: '#fff', border: '2px solid #333', borderRadius: 8, boxShadow: '0 2px 4px rgba(0,0,0,0.1)', minHeight: 120, padding: '1.2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ fontWeight: 'bold', color: 'black', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1.1em', textAlign: 'center' }}>Secondary Attack</div>
         </div>
       </div>
       

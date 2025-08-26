@@ -101,15 +101,31 @@ const App = () => {
   // Save only, do not navigate (for LevelUp and Cards)
   const handleSaveOnly = () => {
     if (currentSheet) {
-      const updatedSheet = { 
-        ...currentSheet, 
-        charClass, 
-        subclass, 
-        species, 
-        subspecies 
-      };
-      setCurrentSheet(updatedSheet);
-      saveCharacterSheet(updatedSheet);
+      // Reload the current sheet from storage to get any updates made by components
+      const latestSheet = loadSheetById(currentSheet.id);
+      if (latestSheet) {
+        // Update with the shared state and save
+        const updatedSheet = { 
+          ...latestSheet, 
+          charClass, 
+          subclass, 
+          species, 
+          subspecies 
+        };
+        setCurrentSheet(updatedSheet);
+        saveCharacterSheet(updatedSheet);
+      } else {
+        // Fallback if sheet not found in storage
+        const updatedSheet = { 
+          ...currentSheet, 
+          charClass, 
+          subclass, 
+          species, 
+          subspecies 
+        };
+        setCurrentSheet(updatedSheet);
+        saveCharacterSheet(updatedSheet);
+      }
     }
     // No navigation
   };

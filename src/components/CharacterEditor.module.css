@@ -38,7 +38,7 @@
 /* iPad landscape specific layout for Level Up page */
 @media (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
   .characterSheetGrid[style*="repeat(4, 1fr)"] {
-    grid-template-columns: repeat(2, 1fr) !important;
+    grid-template-columns: repeat(3, 1fr) !important;
     grid-template-rows: repeat(2, 1fr) !important;
     gap: 16px !important;
   }
