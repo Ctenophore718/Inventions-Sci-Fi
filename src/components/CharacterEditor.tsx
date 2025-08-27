@@ -7,7 +7,6 @@ import { saveCharacterSheet, loadSheetById } from "../utils/storage";
 
 type Props = {
   sheet: CharacterSheet | null;
-  onSave: () => void;
   onLevelUp: () => void;
   onCards: () => void;
   onHome: () => void;
@@ -23,7 +22,7 @@ type Props = {
 };
 
 
-const CharacterEditor: React.FC<Props> = ({ sheet, onSave, onLevelUp, onCards, onHome, onAutoSave, charClass, setCharClass, subclass, setSubclass, species, setSpecies, subspecies, setSubspecies }) => {
+const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, onAutoSave, charClass, setCharClass, subclass, setSubclass, species, setSpecies, subspecies, setSubspecies }) => {
   
   console.log('CharacterEditor render started, sheet:', sheet ? `ID: ${sheet.id}` : 'NULL');
   
@@ -35,7 +34,6 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onSave, onLevelUp, onCards, o
   // Portrait upload state and ref
   const [portraitUrl, setPortraitUrl] = useState<string | null>(sheet?.portrait || null);
   const portraitInputRef = React.useRef<HTMLInputElement>(null);
-  const [isSaved, setIsSaved] = useState(false);
   const [isNavExpanded, setIsNavExpanded] = useState(false);
   const menuRef = React.useRef<HTMLDivElement>(null);
   const waffleRef = React.useRef<HTMLButtonElement>(null);
@@ -391,47 +389,6 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onSave, onLevelUp, onCards, o
   // Current Hit Points state (local only)
   const [currentHitPoints, setCurrentHitPoints] = useState<number>(sheet?.currentHitPoints ?? sheet?.maxHitPoints ?? 0);
   const [hpDelta, setHpDelta] = useState<number>(0);
-
-  const handleSave = () => {
-    const updatedSheet: any = {
-      id: sheet?.id || Date.now().toString(),
-      playerName,
-      name,
-      charClass,
-      subclass,
-      species,
-      subspecies,
-      background,
-      backgroundDescription,
-      classFeature,
-      subclassFeature,
-      speciesFeature,
-      subspeciesFeature,
-      resistances,
-      immunities,
-      absorptions,
-      movement,
-      strike,
-      xpTotal,
-      xpRemaining: xpTotal - (sheet?.xpSpent ?? 0),
-      xpSpent: sheet?.xpSpent ?? 0,
-      spTotal,
-      spRemaining: spTotal - spSpent,
-      spSpent,
-      speed,
-      strikeDamage,
-      maxHitPoints,
-      currentHitPoints,
-      deathDots,
-      multiStrike,
-      strikeEffects,
-      skillDots,
-      portrait: portraitUrl,
-    };
-    saveCharacterSheet(updatedSheet);
-    setIsSaved(true);
-    setTimeout(() => setIsSaved(false), 1500); // Reset after 1.5 seconds
-  };
 
   const classOptions = [
     { label: "Chemist", value: "Chemist", color: "#721131" },
@@ -1150,63 +1107,6 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onSave, onLevelUp, onCards, o
     }}>
       <div className={styles.headerRow}>
         <h2 className={styles.headerTitle}>Character Sheet</h2>
-        <div className={styles.headerButtons}>
-          <button
-            onClick={handleSave}
-            className={styles.saveButton}
-            disabled={isSaved}
-          >
-            {isSaved ? "Saved!" : "Save"}
-          </button>
-          <button
-            onClick={onCards}
-            style={{
-              background: '#1976d2',
-              color: 'white',
-              border: '1px solid #115293',
-              borderRadius: 4,
-              padding: '1px 18px',
-              fontWeight: 'bold',
-              fontSize: '1.1em',
-              cursor: 'pointer',
-              boxShadow: '0 2px 6px rgba(0,0,0,0.07)',
-            }}
-          >
-            Cards
-          </button>
-          <button
-            onClick={onLevelUp}
-            style={{
-              background: '#4CAF50',
-              color: 'white',
-              border: '1px solid #388e3c',
-              borderRadius: 4,
-              padding: '1px 18px',
-              fontWeight: 'bold',
-              fontSize: '1.1em',
-              cursor: 'pointer',
-              boxShadow: '0 2px 6px rgba(0,0,0,0.07)',
-            }}
-          >
-            Level Up
-          </button>
-          <button
-            onClick={() => window.location.href = '/'}
-            style={{
-              background: '#eee',
-              color: '#222',
-              border: '1px solid #888',
-              borderRadius: 4,
-              padding: '1px 18px',
-              fontWeight: 'bold',
-              fontSize: '1.1em',
-              cursor: 'pointer',
-              boxShadow: '0 2px 6px rgba(0,0,0,0.07)',
-            }}
-          >
-            Home
-          </button>
-        </div>
       </div>
       <div className={styles.characterSheetGrid}>
       <div className={styles.identityCard}>
@@ -2355,12 +2255,14 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onSave, onLevelUp, onCards, o
         {/* Main Waffle Button */}
         <button
           ref={waffleRef}
+          className={styles.blueWaffleButton}
           onClick={() => setIsNavExpanded((open) => !open)}
           style={{
             width: '51px',
             height: '51px',
             borderRadius: '50%',
-            background: '#000000',
+            backgroundColor: '#1976d2',
+            background: '#1976d2',
             color: 'white',
             border: 'none',
             cursor: 'pointer',
@@ -2376,16 +2278,20 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onSave, onLevelUp, onCards, o
             if (!isNavExpanded) {
               e.currentTarget.style.transform = 'scale(1.1)';
               e.currentTarget.style.boxShadow = '0 6px 16px rgba(0,0,0,0.2)';
+              e.currentTarget.style.backgroundColor = '#1976d2';
+              e.currentTarget.style.background = '#1976d2';
             }
           }}
           onMouseLeave={(e) => {
             if (!isNavExpanded) {
               e.currentTarget.style.transform = 'scale(1)';
               e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+              e.currentTarget.style.backgroundColor = '#1976d2';
+              e.currentTarget.style.background = '#1976d2';
             }
           }}
         >
-          {isNavExpanded ? '✕' : '⊞'}
+          <span style={{ color: 'white', fontSize: '1.3em', lineHeight: 1 }}>{isNavExpanded ? '✕' : '⊞'}</span>
         </button>
       </div>
 

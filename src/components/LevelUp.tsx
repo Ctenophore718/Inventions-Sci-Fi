@@ -9,7 +9,6 @@ type LevelUpProps = {
   sheet: CharacterSheet | null;
   onBack: () => void;
   onCards: () => void;
-  onSave: () => void;
   onHome: () => void;
   onAutoSave: (updates: Partial<CharacterSheet>) => void;
   charClass: string;
@@ -23,7 +22,7 @@ type LevelUpProps = {
 };
 
 
-const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onSave, onHome, onAutoSave, charClass, setCharClass, subclass, setSubclass, species, setSpecies, subspecies, setSubspecies }) => {
+const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAutoSave, charClass, setCharClass, subclass, setSubclass, species, setSpecies, subspecies, setSubspecies }) => {
   
   // Auto-save helper function
   const handleAutoSave = (fieldUpdates: Partial<CharacterSheet>) => {
@@ -38,8 +37,11 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onSave, onHom
   const [xpSpent, setXpSpent] = useState(sheet?.xpSpent ?? 0);
   const [notice, setNotice] = useState("");
   const [isNavExpanded, setIsNavExpanded] = useState(false);
+  const [isXpSpMenuExpanded, setIsXpSpMenuExpanded] = useState(false);
   const menuRef = React.useRef<HTMLDivElement>(null);
   const waffleRef = React.useRef<HTMLButtonElement>(null);
+  const xpSpMenuRef = React.useRef<HTMLDivElement>(null);
+  const xpSpButtonRef = React.useRef<HTMLButtonElement>(null);
   React.useEffect(() => {
     if (!isNavExpanded) return;
     function handleClick(e: MouseEvent) {
@@ -53,6 +55,20 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onSave, onHom
     document.addEventListener('mousedown', handleClick);
     return () => document.removeEventListener('mousedown', handleClick);
   }, [isNavExpanded]);
+
+  React.useEffect(() => {
+    if (!isXpSpMenuExpanded) return;
+    function handleClick(e: MouseEvent) {
+      if (
+        xpSpMenuRef.current && !xpSpMenuRef.current.contains(e.target as Node) &&
+        xpSpButtonRef.current && !xpSpButtonRef.current.contains(e.target as Node)
+      ) {
+        setIsXpSpMenuExpanded(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [isXpSpMenuExpanded]);
   React.useEffect(() => {
     setXpTotal(sheet?.xpTotal ?? 0);
     setSpTotal(sheet?.spTotal ?? 0);
@@ -154,6 +170,14 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onSave, onHom
       ? sheet.classCardDots.map(row => [...row])
       : defaultChemistDots.map(row => [...row])
   );
+
+  // Helper function to safely access classCardDots array
+  const safeGetDotsArray = (index: number): boolean[] => {
+    if (!classCardDots || !Array.isArray(classCardDots) || index >= classCardDots.length) {
+      return defaultChemistDots[index] || [];
+    }
+    return classCardDots[index] || [];
+  };
 
   // Save to sheet and localStorage
   const persistClassCardDots = (newDots: boolean[][], spSpentDelta: number = 0, xpSpentDelta: number = 0) => {
@@ -352,40 +376,6 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onSave, onHom
     ? hostOptions
     : subspeciesOptionsMap[species] || [];
 
-
-  const [isSaved, setIsSaved] = useState(false);
-
-  const handleSave = () => {
-    // Save all local state to the character sheet
-    if (sheet) {
-      const updatedSheet = { 
-        ...sheet, 
-        charClass, 
-        subclass, 
-        species, 
-        subspecies,
-        xpTotal,
-        spTotal,
-        xpSpent,
-        spSpent,
-        classCardDots,
-        xpRemaining: xpTotal - xpSpent,
-        spRemaining: spTotal - spSpent
-      };
-      saveCharacterSheet(updatedSheet);
-      
-      // Dispatch custom event to notify other components
-      window.dispatchEvent(new CustomEvent('character-updated', { 
-        detail: { sheet: updatedSheet } 
-      }));
-    }
-    
-    // Also call the parent's onSave for any additional logic
-    onSave();
-    setIsSaved(true);
-    setTimeout(() => setIsSaved(false), 2000);
-  };
-
   return (
     <div style={{ padding: "1rem" }}>
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
@@ -499,63 +489,6 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onSave, onHom
             </div>
           </div>
         </div>
-        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'flex-start' }}>
-          <button
-            onClick={handleSave}
-            className={styles.saveButton}
-            disabled={isSaved}
-          >
-            {isSaved ? "Saved!" : "Save"}
-          </button>
-          <button
-            onClick={onCards}
-            style={{
-              background: '#1976d2',
-              color: 'white',
-              border: '1px solid #115293',
-              borderRadius: 4,
-              padding: '8px 16px',
-              fontWeight: 'bold',
-              fontSize: '1em',
-              cursor: 'pointer',
-              boxShadow: '0 2px 6px rgba(0,0,0,0.07)',
-            }}
-          >
-            Cards
-          </button>
-          <button
-            onClick={onBack}
-            style={{
-              background: '#6c757d',
-              color: 'white',
-              border: '1px solid #545b62',
-              borderRadius: 4,
-              padding: '8px 16px',
-              fontWeight: 'bold',
-              fontSize: '1em',
-              cursor: 'pointer',
-              boxShadow: '0 2px 6px rgba(0,0,0,0.07)',
-            }}
-          >
-            Character Sheet
-          </button>
-          <button
-            onClick={onHome}
-            style={{
-              background: '#dc3545',
-              color: 'white',
-              border: '1px solid #bd2130',
-              borderRadius: 4,
-              padding: '8px 16px',
-              fontWeight: 'bold',
-              fontSize: '1em',
-              cursor: 'pointer',
-              boxShadow: '0 2px 6px rgba(0,0,0,0.07)',
-            }}
-          >
-            Home
-          </button>
-        </div>
       </div>
       
       {/* 4-column, 2-row CSS grid, outer grey box removed */}
@@ -635,7 +568,22 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onSave, onHom
                     {/* Row 2: +1 Chem Token max dots (interactive) */}
                     <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>+1 <i>Chem Token</i> max</span>
                     {[0,1].map(idx => {
-                      const arr = classCardDots[0];
+                        const arr = safeGetDotsArray(0);
+                      // Add null check to prevent crashes
+                      if (!arr || !Array.isArray(arr) || arr.length === 0) {
+                        return (
+                          <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
+                            <span style={{
+                              width: 16,
+                              height: 16,
+                              borderRadius: '50%',
+                              border: '2px solid #ddd',
+                              background: '#fff',
+                              cursor: 'not-allowed'
+                            }}></span>
+                          </span>
+                        );
+                      }
                       const canCheck = idx === 0 || arr.slice(0, idx).every(Boolean);
                       const rightmostChecked = arr.lastIndexOf(true);
                       const canUncheck = arr[idx] && idx === rightmostChecked;
@@ -683,7 +631,19 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onSave, onHom
                     <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>+2 Crit</span>
                     <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
                       {(() => {
-                        const arr = classCardDots[1];
+                        const arr = safeGetDotsArray(1);
+                        if (arr.length === 0) {
+                          return (
+                            <span style={{
+                              width: 16,
+                              height: 16,
+                              borderRadius: '50%',
+                              border: '2px solid #ddd',
+                              background: '#fff',
+                              cursor: 'not-allowed'
+                            }}></span>
+                          );
+                        }
                         const idx = 0;
                         const canCheck = idx === 0 || arr.slice(0, idx).every(Boolean);
                         const rightmostChecked = arr.lastIndexOf(true);
@@ -753,7 +713,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onSave, onHom
                       {/* Row 2: +1hx dots (interactive) */}
                       <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>+1hx</span>
                       {[0,1,2].map(idx => {
-                        const arr = classCardDots[2];
+                        const arr = safeGetDotsArray(2);
                         const canCheck = idx === 0 || arr.slice(0, idx).every(Boolean);
                         const rightmostChecked = arr.lastIndexOf(true);
                         const canUncheck = arr[idx] && idx === rightmostChecked;
@@ -809,7 +769,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onSave, onHom
                       </span>
                       <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
                         {(() => {
-                          const arr = classCardDots[3];
+                          const arr = safeGetDotsArray(3);
                           const idx = 0;
                           const canCheck = idx === 0 || arr.slice(0, idx).every(Boolean);
                           const rightmostChecked = arr.lastIndexOf(true);
@@ -860,7 +820,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onSave, onHom
                       </span>
                       <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
                         {(() => {
-                          const arr = classCardDots[4];
+                          const arr = safeGetDotsArray(4);
                           const idx = 0;
                           const canCheck = idx === 0 || arr.slice(0, idx).every(Boolean);
                           const rightmostChecked = arr.lastIndexOf(true);
@@ -910,7 +870,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onSave, onHom
                         -1 <i>Cooldown</i>
                       </span>
                       {[0,1].map(idx => {
-                        const arr = classCardDots[5];
+                        const arr = safeGetDotsArray(5);
                         const canCheck = idx === 0 || arr.slice(0, idx).every(Boolean);
                         const rightmostChecked = arr.lastIndexOf(true);
                         const canUncheck = arr[idx] && idx === rightmostChecked;
@@ -979,7 +939,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onSave, onHom
                       {/* Row 2: Increase die size dots (interactive) */}
                       <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>Increase die size</span>
                       {[0,1,2].map(idx => {
-                        const arr = classCardDots[6];
+                        const arr = safeGetDotsArray(6);
                         const canCheck = idx === 0 || arr.slice(0, idx).every(Boolean);
                         const rightmostChecked = arr.lastIndexOf(true);
                         const canUncheck = arr[idx] && idx === rightmostChecked;
@@ -1027,7 +987,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onSave, onHom
                       {/* Row 4: +1 Crit dots (interactive) */}
                       <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>+1 Crit</span>
                       {[0,1,2].map(idx => {
-                        const arr = classCardDots[7];
+                        const arr = safeGetDotsArray(7);
                         const canCheck = idx === 0 || arr.slice(0, idx).every(Boolean);
                         const rightmostChecked = arr.lastIndexOf(true);
                         const canUncheck = arr[idx] && idx === rightmostChecked;
@@ -1099,7 +1059,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onSave, onHom
                       {/* Row 2: +1 Damage die dots (interactive, with xpSpent) */}
                       <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>+1 Damage die</span>
                       {[0,1,2].map(idx => {
-                        const arr = classCardDots[8];
+                        const arr = safeGetDotsArray(8);
                         const canCheck = idx === 0 || arr.slice(0, idx).every(Boolean);
                         const rightmostChecked = arr.lastIndexOf(true);
                         const canUncheck = arr[idx] && idx === rightmostChecked;
@@ -1167,7 +1127,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onSave, onHom
                         {/* Row 2: dot (interactive) */}
                         <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px', width: '100%' }}>
                           {(() => {
-                            const arr = classCardDots[9];
+                            const arr = safeGetDotsArray(9);
                             const idx = 0;
                             const canCheck = idx === 0 || arr.slice(0, idx).every(Boolean);
                             const rightmostChecked = arr.lastIndexOf(true);
@@ -1499,12 +1459,14 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onSave, onHom
       {/* Main Waffle Button */}
       <button
         ref={waffleRef}
+        className={styles.blueWaffleButton}
         onClick={() => setIsNavExpanded((open) => !open)}
         style={{
           width: '51px',
           height: '51px',
           borderRadius: '50%',
-          background: '#000000',
+          backgroundColor: '#1976d2',
+          background: '#1976d2',
           color: 'white',
           border: 'none',
           cursor: 'pointer',
@@ -1520,16 +1482,187 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onSave, onHom
           if (!isNavExpanded) {
             e.currentTarget.style.transform = 'scale(1.1)';
             e.currentTarget.style.boxShadow = '0 6px 16px rgba(0,0,0,0.2)';
+            e.currentTarget.style.backgroundColor = '#1976d2';
+            e.currentTarget.style.background = '#1976d2';
           }
         }}
         onMouseLeave={(e) => {
           if (!isNavExpanded) {
             e.currentTarget.style.transform = 'scale(1)';
             e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+            e.currentTarget.style.backgroundColor = '#1976d2';
+            e.currentTarget.style.background = '#1976d2';
           }
         }}
       >
-        {isNavExpanded ? '✕' : '⊞'}
+  <span style={{ color: 'white', fontSize: '1.3em', lineHeight: 1 }}>{isNavExpanded ? '✕' : '⊞'}</span>
+      </button>
+    </div>
+
+    {/* XP/SP Summary Button */}
+    <div style={{
+      position: 'fixed',
+      bottom: '20px',
+      left: '50%',
+      transform: 'translateX(-50%)',
+      zIndex: 999
+    }}>
+      {/* XP/SP Menu (expanded state) */}
+      {isXpSpMenuExpanded && (
+        <div ref={xpSpMenuRef} style={{
+          position: 'absolute',
+          bottom: '70px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          background: 'white',
+          border: '2px solid #ccc',
+          borderRadius: '12px',
+          padding: '16px',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+          minWidth: '280px',
+          animation: 'fadeIn 0.2s ease-out'
+        }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {/* XP Section */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ fontWeight: 'bold', minWidth: '80px' }}>xp Total:</span>
+              <button
+                onClick={() => {
+                  const newValue = Math.max(0, xpTotal - 1);
+                  setXpTotal(newValue);
+                  handleAutoSave({ xpTotal: newValue });
+                }}
+                style={{
+                  width: '30px',
+                  height: '30px',
+                  border: '1px solid #ccc',
+                  borderRadius: '4px',
+                  background: '#f8f8f8',
+                  cursor: 'pointer',
+                  fontSize: '16px'
+                }}
+              >
+                −
+              </button>
+              <span style={{ minWidth: '40px', textAlign: 'center', fontWeight: 'bold' }}>{xpTotal}</span>
+              <button
+                onClick={() => {
+                  const newValue = xpTotal + 1;
+                  setXpTotal(newValue);
+                  handleAutoSave({ xpTotal: newValue });
+                }}
+                style={{
+                  width: '30px',
+                  height: '30px',
+                  border: '1px solid #ccc',
+                  borderRadius: '4px',
+                  background: '#f8f8f8',
+                  cursor: 'pointer',
+                  fontSize: '16px'
+                }}
+              >
+                +
+              </button>
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ fontWeight: 'bold', minWidth: '80px' }}>xp Spent:</span>
+              <span style={{ minWidth: '40px', textAlign: 'center' }}>{xpSpent}</span>
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ fontWeight: 'bold', minWidth: '80px' }}>Remaining xp:</span>
+              <span style={{ minWidth: '40px', textAlign: 'center', color: xpTotal - xpSpent < 0 ? '#d32f2f' : '#000' }}>{xpTotal - xpSpent}</span>
+            </div>
+
+            <hr style={{ margin: '8px 0', border: '1px solid #eee' }} />
+
+            {/* SP Section */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ fontWeight: 'bold', minWidth: '80px' }}>sp Total:</span>
+              <button
+                onClick={() => {
+                  const newValue = Math.max(0, spTotal - 1);
+                  setSpTotal(newValue);
+                  handleAutoSave({ spTotal: newValue });
+                }}
+                style={{
+                  width: '30px',
+                  height: '30px',
+                  border: '1px solid #ccc',
+                  borderRadius: '4px',
+                  background: '#f8f8f8',
+                  cursor: 'pointer',
+                  fontSize: '16px'
+                }}
+              >
+                −
+              </button>
+              <span style={{ minWidth: '40px', textAlign: 'center', fontWeight: 'bold' }}>{spTotal}</span>
+              <button
+                onClick={() => {
+                  const newValue = spTotal + 1;
+                  setSpTotal(newValue);
+                  handleAutoSave({ spTotal: newValue });
+                }}
+                style={{
+                  width: '30px',
+                  height: '30px',
+                  border: '1px solid #ccc',
+                  borderRadius: '4px',
+                  background: '#f8f8f8',
+                  cursor: 'pointer',
+                  fontSize: '16px'
+                }}
+              >
+                +
+              </button>
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ fontWeight: 'bold', minWidth: '80px' }}>sp Spent:</span>
+              <span style={{ minWidth: '40px', textAlign: 'center' }}>{spSpent}</span>
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ fontWeight: 'bold', minWidth: '80px' }}>Remaining sp:</span>
+              <span style={{ minWidth: '40px', textAlign: 'center', color: spTotal - spSpent < 0 ? '#d32f2f' : '#000' }}>{spTotal - spSpent}</span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Main XP/SP Button */}
+      <button
+        ref={xpSpButtonRef}
+        onClick={() => setIsXpSpMenuExpanded((open) => !open)}
+        style={{
+          padding: '8px 16px',
+          borderRadius: '20px',
+          background: '#1976d2',
+          color: 'white',
+          border: 'none',
+          cursor: 'pointer',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+          fontSize: '14px',
+          fontWeight: 'bold',
+          transition: 'all 0.3s ease',
+          transform: isXpSpMenuExpanded ? 'scale(1.05)' : 'scale(1)'
+        }}
+        onMouseEnter={(e) => {
+          if (!isXpSpMenuExpanded) {
+            e.currentTarget.style.transform = 'scale(1.05)';
+            e.currentTarget.style.boxShadow = '0 6px 16px rgba(0,0,0,0.2)';
+          }
+        }}
+        onMouseLeave={(e) => {
+          if (!isXpSpMenuExpanded) {
+            e.currentTarget.style.transform = 'scale(1)';
+            e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+          }
+        }}
+      >
+        xp: {xpTotal - xpSpent}/{xpTotal} | sp: {spTotal - spSpent}/{spTotal}
       </button>
     </div>
 

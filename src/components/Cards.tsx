@@ -7,15 +7,12 @@ type CardsProps = {
   sheet: CharacterSheet | null;
   onBack: () => void;
   onLevelUp: () => void;
-  onSave: () => void;
   onHome: () => void;
-  onAutoSave: (updates: Partial<CharacterSheet>) => void;
   charClass: string;
 };
 
-const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onSave, onHome, onAutoSave, charClass }) => {
+const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charClass }) => {
   const [localSheet, setLocalSheet] = React.useState<CharacterSheet | null>(sheet);
-  const [isSaved, setIsSaved] = React.useState(false);
   const [isNavExpanded, setIsNavExpanded] = React.useState(false);
   const menuRef = React.useRef<HTMLDivElement>(null);
   const waffleRef = React.useRef<HTMLButtonElement>(null);
@@ -66,12 +63,6 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onSave, onHome,
       window.removeEventListener('character-updated', handleCharacterUpdate as EventListener);
     };
   }, [sheet?.id, localSheet]);
-  // Save handler for Cards page (blue button, feedback)
-  const handleSaveClick = () => {
-    onSave();
-    setIsSaved(true);
-    setTimeout(() => setIsSaved(false), 1500);
-  };
 
   return (
     <>
@@ -92,63 +83,6 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onSave, onHome,
       <div style={{ padding: "1rem" }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
         <h2 style={{ fontFamily: 'Arial, Helvetica, sans-serif', margin: 0, fontSize: '2em', flexShrink: 0 }}>Cards</h2>
-        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-          <button
-            onClick={handleSaveClick}
-            disabled={isSaved}
-            className={styles.saveButton}
-          >
-            {isSaved ? 'Saved!' : 'Save'}
-          </button>
-          <button
-            onClick={onLevelUp}
-            style={{
-              background: '#fd7e14',
-              color: 'white',
-              border: '1px solid #e8590c',
-              borderRadius: 4,
-              padding: '8px 16px',
-              fontWeight: 'bold',
-              fontSize: '1em',
-              cursor: 'pointer',
-              boxShadow: '0 2px 6px rgba(0,0,0,0.07)',
-            }}
-          >
-            Level Up
-          </button>
-          <button
-            onClick={onBack}
-            style={{
-              background: '#6c757d',
-              color: 'white',
-              border: '1px solid #545b62',
-              borderRadius: 4,
-              padding: '8px 16px',
-              fontWeight: 'bold',
-              fontSize: '1em',
-              cursor: 'pointer',
-              boxShadow: '0 2px 6px rgba(0,0,0,0.07)',
-            }}
-          >
-            Character Sheet
-          </button>
-          <button
-            onClick={onHome}
-            style={{
-              background: '#dc3545',
-              color: 'white',
-              border: '1px solid #bd2130',
-              borderRadius: 4,
-              padding: '8px 16px',
-              fontWeight: 'bold',
-              fontSize: '1em',
-              cursor: 'pointer',
-              boxShadow: '0 2px 6px rgba(0,0,0,0.07)',
-            }}
-          >
-            Home
-          </button>
-        </div>
       </div>
       
       {/* Responsive card grid with fixed card sizes (240px × 336px) - optimized for 3 cards on iPad */}
@@ -641,10 +575,10 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onSave, onHome,
               <span style={{
                 fontFamily: 'Arial, Helvetica, sans-serif',
                 fontWeight: 'bold',
-                fontSize: 'clamp(0.8em, 4vw, 1.25em)',
+                fontSize: 'clamp(0.8em, 4vw, 1.08em)',
                 color: 'black',
                 lineHeight: 1,
-                textAlign: 'left',
+                textAlign: 'left', 
                 whiteSpace: 'nowrap',
                 maxWidth: 'calc(100% - 87px)',
                 minWidth: 0,
@@ -665,7 +599,7 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onSave, onHome,
                 maxWidth: '72px',
                 display: 'inline-block',
                 textAlign: 'right'
-              }}>Sub species</span>
+              }}>Subspecies</span>
             </div>
             <img 
               src="/Blank Card.png"
@@ -801,7 +735,7 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onSave, onHome,
                 maxWidth: '72px',
                 display: 'inline-block',
                 textAlign: 'right'
-              }}>Primary Attack</span>
+              }}>Class / Subclass</span>
             </div>
             <img 
               src="/Blank Card.png"
@@ -936,7 +870,7 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onSave, onHome,
                 maxWidth: '72px',
                 display: 'inline-block',
                 textAlign: 'right'
-              }}>Primary Attack</span>
+              }}>Class / Subclass</span>
             </div>
             <img 
               src="/Blank Card.png"
@@ -1047,7 +981,7 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onSave, onHome,
               <span style={{
                 fontFamily: 'Arial, Helvetica, sans-serif',
                 fontWeight: 'bold',
-                fontSize: 'clamp(0.8em, 4vw, 1.25em)',
+                fontSize: 'clamp(0.8em, 4vw, 1.05em)',
                 color: 'black',
                 lineHeight: 1,
                 textAlign: 'left',
@@ -1071,7 +1005,7 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onSave, onHome,
                 maxWidth: '77px',
                 display: 'inline-block',
                 textAlign: 'right'
-              }}>Secondary Attack</span>
+              }}>Class / Subclass</span>
             </div>
             <img 
               src="/Blank Card.png"
@@ -1182,7 +1116,7 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onSave, onHome,
               <span style={{
                 fontFamily: 'Arial, Helvetica, sans-serif',
                 fontWeight: 'bold',
-                fontSize: 'clamp(0.8em, 4vw, 1.25em)',
+                fontSize: 'clamp(0.8em, 4vw, 1.05em)',
                 color: 'black',
                 lineHeight: 1,
                 textAlign: 'left',
@@ -1206,7 +1140,7 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onSave, onHome,
                 maxWidth: '72px',
                 display: 'inline-block',
                 textAlign: 'right'
-              }}>Secondary Attack</span>
+              }}>Class / Subclass</span>
             </div>
             <img 
               src="/Blank Card.png"
@@ -1410,12 +1344,14 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onSave, onHome,
         {/* Main Waffle Button */}
         <button
           ref={waffleRef}
+          className={styles.blueWaffleButton}
           onClick={() => setIsNavExpanded((open) => !open)}
           style={{
             width: '51px',
             height: '51px',
             borderRadius: '50%',
-            background: '#000000',
+            backgroundColor: '#1976d2',
+            background: '#1976d2',
             color: 'white',
             border: 'none',
             cursor: 'pointer',
@@ -1431,16 +1367,20 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onSave, onHome,
             if (!isNavExpanded) {
               e.currentTarget.style.transform = 'scale(1.1)';
               e.currentTarget.style.boxShadow = '0 6px 16px rgba(0,0,0,0.2)';
+              e.currentTarget.style.backgroundColor = '#1976d2';
+              e.currentTarget.style.background = '#1976d2';
             }
           }}
           onMouseLeave={(e) => {
             if (!isNavExpanded) {
               e.currentTarget.style.transform = 'scale(1)';
               e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+              e.currentTarget.style.backgroundColor = '#1976d2';
+              e.currentTarget.style.background = '#1976d2';
             }
           }}
         >
-          {isNavExpanded ? '✕' : '⊞'}
+          <span style={{ color: 'white', fontSize: '1.3em', lineHeight: 1 }}>{isNavExpanded ? '✕' : '⊞'}</span>
         </button>
       </div>
 

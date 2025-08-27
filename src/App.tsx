@@ -224,54 +224,6 @@ const App = () => {
     setView("editor");
   };
 
-  // Save and go home (for CharacterEditor)
-  const handleSave = () => {
-    if (currentSheet) {
-      const updatedSheet = { 
-        ...currentSheet, 
-        charClass, 
-        subclass, 
-        species, 
-        subspecies 
-      };
-      setCurrentSheet(updatedSheet);
-      saveCharacterSheet(updatedSheet);
-    }
-    setView("manager");
-  };
-
-  // Save only, do not navigate (for LevelUp and Cards)
-  const handleSaveOnly = () => {
-    if (currentSheet) {
-      // Reload the current sheet from storage to get any updates made by components
-      const latestSheet = loadSheetById(currentSheet.id);
-      if (latestSheet) {
-        // Update with the shared state and save
-        const updatedSheet = { 
-          ...latestSheet, 
-          charClass, 
-          subclass, 
-          species, 
-          subspecies 
-        };
-        setCurrentSheet(updatedSheet);
-        saveCharacterSheet(updatedSheet);
-      } else {
-        // Fallback if sheet not found in storage
-        const updatedSheet = { 
-          ...currentSheet, 
-          charClass, 
-          subclass, 
-          species, 
-          subspecies 
-        };
-        setCurrentSheet(updatedSheet);
-        saveCharacterSheet(updatedSheet);
-      }
-    }
-    // No navigation
-  };
-
   // Auto-save when shared state changes (debounced to prevent excessive saves)
   React.useEffect(() => {
     if (!currentSheet) return;
@@ -404,12 +356,8 @@ const App = () => {
 
       {view === "editor" && (
         <div>
-          <div style={{ background: '#f0f0f0', padding: '10px', marginBottom: '20px', fontSize: '12px' }}>
-            DEBUG: currentSheet = {currentSheet ? `ID: ${currentSheet.id}, Name: "${currentSheet.name}"` : 'NULL'}
-          </div>
           <CharacterEditor 
             sheet={currentSheet} 
-            onSave={handleSave}
             onLevelUp={handleLevelUp}
             onCards={handleCards}
             onHome={handleBackToHome}
@@ -431,7 +379,6 @@ const App = () => {
           sheet={currentSheet} 
           onBack={handleBackToEditor}
           onCards={handleCards}
-          onSave={handleSaveOnly}
           onHome={handleBackToHome}
           onAutoSave={updateCurrentSheet}
           charClass={charClass}
@@ -450,9 +397,7 @@ const App = () => {
           sheet={currentSheet} 
           onBack={handleBackToEditor}
           onLevelUp={handleLevelUp}
-          onSave={handleSaveOnly}
           onHome={handleBackToHome}
-          onAutoSave={updateCurrentSheet}
           charClass={charClass}
         />
       )}

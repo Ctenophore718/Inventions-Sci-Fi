@@ -924,3 +924,9 @@
     max-width: 220px;
   }
 }
+
+/* Blue waffle button override */
+.blueWaffleButton {
+  background-color: #1976d2 !important;
+  background: #1976d2 !important;
+}
