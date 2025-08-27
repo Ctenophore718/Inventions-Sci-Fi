@@ -25,6 +25,8 @@ type Props = {
 
 const CharacterEditor: React.FC<Props> = ({ sheet, onSave, onLevelUp, onCards, onHome, onAutoSave, charClass, setCharClass, subclass, setSubclass, species, setSpecies, subspecies, setSubspecies }) => {
   
+  console.log('CharacterEditor render started, sheet:', sheet ? `ID: ${sheet.id}` : 'NULL');
+  
   // Auto-save helper function
   const handleAutoSave = (fieldUpdates: Partial<CharacterSheet>) => {
     onAutoSave(fieldUpdates);
@@ -57,6 +59,29 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onSave, onLevelUp, onCards, o
   // charClass, subclass, species, subspecies are now props
   const [background, setBackground] = useState(sheet?.background || "");
   const [backgroundDescription, setBackgroundDescription] = useState(sheet?.backgroundDescription || "");
+
+  // Sync local state when sheet prop changes
+  React.useEffect(() => {
+    if (sheet) {
+      setPlayerName(sheet.playerName || "");
+      setName(sheet.name || "");
+      setBackground(sheet.background || "");
+      setBackgroundDescription(sheet.backgroundDescription || "");
+      setResistances(sheet.resistances || "");
+      setImmunities(sheet.immunities || "");
+      setAbsorptions(sheet.absorptions || "");
+      setMovement(sheet.movement || "");
+      setStrike(sheet.strike || "");
+      setXpTotal(sheet.xpTotal || 0);
+      setSpTotal(sheet.spTotal || 0);
+      setPortraitUrl(sheet.portrait || null);
+      setCurrentHitPoints(sheet.currentHitPoints || 0);
+      setClassFeature(sheet.classFeature || "");
+      setSubclassFeature(sheet.subclassFeature || "");
+      setSpeciesFeature(sheet.speciesFeature || "");
+      setSubspeciesFeature(sheet.subspeciesFeature || "");
+    }
+  }, [sheet]);
 
   // Stats fields
   const [resistances, setResistances] = useState(sheet?.resistances || "");
@@ -216,6 +241,9 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onSave, onLevelUp, onCards, o
     "Thievery",
     "Xenomagic"
   ];
+  
+  console.log('CharacterEditor skillList defined:', skillList);
+  
   const [skillDots, setSkillDots] = useState<{ [key: string]: boolean[] }>(
     (sheet?.skillDots) || Object.fromEntries(skillList.map(skill => [skill, Array(10).fill(false)]))
   );
@@ -2074,12 +2102,13 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onSave, onLevelUp, onCards, o
                 </tr>
               </thead>
               <tbody>
-                {skillList.map(skill => (
+                {skillList && skillList.map(skill => (
                   <tr key={skill}>
                     <td style={{ fontWeight: 'bold', padding: '4px 8px', whiteSpace: 'nowrap' }}>{skill}</td>
-                    {skillDots[skill].map((checked, i) => {
-                      const canCheck = i === 0 || skillDots[skill].slice(0, i).every(Boolean);
-                      const rightmostChecked = skillDots[skill].lastIndexOf(true);
+                    {(skillDots[skill] || Array(10).fill(false)).map((checked, i) => {
+                      const skillDotsForSkill = skillDots[skill] || Array(10).fill(false);
+                      const canCheck = i === 0 || skillDotsForSkill.slice(0, i).every(Boolean);
+                      const rightmostChecked = skillDotsForSkill.lastIndexOf(true);
                       const canUncheck = checked && i === rightmostChecked;
                       return (
                         <td key={i} style={{ textAlign: 'center', padding: '2px 4px' }}>

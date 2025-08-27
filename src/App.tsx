@@ -11,6 +11,7 @@ import { loadSheetById, saveCharacterSheet } from "./utils/storage";
 const App = () => {
   const [currentSheet, setCurrentSheet] = useState<CharacterSheet | null>(null);
   const [view, setView] = useState<"manager" | "editor" | "levelup" | "cards">("manager");
+  const [newCharacterCreated, setNewCharacterCreated] = useState(false); // Track if we've created a new character
 
   // Shared state for syncing between CharacterEditor and LevelUp
   const [charClass, setCharClass] = useState<string>(currentSheet?.charClass || "");
@@ -23,22 +24,36 @@ const App = () => {
 
   // Enhanced auto-save function that handles any character changes
   const performAutoSave = React.useCallback((updatedSheet: CharacterSheet) => {
+    console.log('performAutoSave called with:', updatedSheet);
+    console.log('performAutoSave - setting currentSheet to:', updatedSheet.id);
+    // Immediately update the current sheet state for navigation
+    setCurrentSheet(updatedSheet);
+    
+    // Debounce the localStorage save
     if (autoSaveTimeoutRef.current) {
       clearTimeout(autoSaveTimeoutRef.current);
     }
     
     autoSaveTimeoutRef.current = setTimeout(() => {
-      setCurrentSheet(updatedSheet);
+      console.log('Actually saving to localStorage:', updatedSheet);
       saveCharacterSheet(updatedSheet);
       console.log('Auto-saved character:', updatedSheet.name || 'Unnamed');
     }, 300); // 300ms debounce for better UX
   }, []);
 
+  // Add effect to track currentSheet changes
+  React.useEffect(() => {
+    console.log('currentSheet changed to:', currentSheet ? `ID: ${currentSheet.id}, Name: "${currentSheet.name || 'Unnamed'}"` : 'NULL');
+  }, [currentSheet]);
+
   // Function to update current sheet with any changes
   // Helper function to create a new character sheet with default values
   const createNewCharacterSheet = (initialUpdates: Partial<CharacterSheet> = {}): CharacterSheet => {
+    // Use a more stable ID generation to prevent duplicates
+    const id = `sheet-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    
     return {
-      id: Date.now().toString(),
+      id,
       // Identity
       playerName: "",
       name: "",
@@ -103,18 +118,43 @@ const App = () => {
   };
 
   const updateCurrentSheet = React.useCallback((updates: Partial<CharacterSheet>) => {
-    if (!currentSheet) {
+    console.log('updateCurrentSheet called with:', updates);
+    console.log('current currentSheet:', currentSheet);
+    console.log('newCharacterCreated flag:', newCharacterCreated);
+    
+    if (!currentSheet && !newCharacterCreated) {
       // Create a new character sheet for the first save
       console.log('Creating new character sheet with updates:', updates);
       const newSheet = createNewCharacterSheet(updates);
+      console.log('Created new sheet:', newSheet);
       setCurrentSheet(newSheet);
+      setNewCharacterCreated(true); // Mark that we've created a character
+      
+      // Immediately sync the App-level state with the new sheet
+      setCharClass(newSheet.charClass || "");
+      setSubclass(newSheet.subclass || "");
+      setSpecies(newSheet.species || "");
+      setSubspecies(newSheet.subspecies || "");
+      
       performAutoSave(newSheet);
       return;
     }
     
-    const updatedSheet = { ...currentSheet, ...updates };
-    performAutoSave(updatedSheet);
-  }, [currentSheet, performAutoSave, charClass, subclass, species, subspecies]);
+    if (currentSheet) {
+      const updatedSheet = { ...currentSheet, ...updates };
+      console.log('Updating existing sheet:', updatedSheet);
+      
+      // Update App-level state if these fields changed
+      if (updates.charClass !== undefined) setCharClass(updates.charClass);
+      if (updates.subclass !== undefined) setSubclass(updates.subclass);
+      if (updates.species !== undefined) setSpecies(updates.species);
+      if (updates.subspecies !== undefined) setSubspecies(updates.subspecies);
+      
+      performAutoSave(updatedSheet);
+    } else {
+      console.log('Ignoring update - no current sheet and already created character this session');
+    }
+  }, [currentSheet, performAutoSave, newCharacterCreated, charClass, subclass, species, subspecies]);
 
   // Cross-window synchronization
   React.useEffect(() => {
@@ -163,11 +203,14 @@ const App = () => {
   }, [currentSheet]);
 
   const handleEdit = (sheet: CharacterSheet) => {
+    console.log('handleEdit called with sheet:', sheet ? `ID: ${sheet.id}, Name: ${sheet.name}` : 'NULL');
     setCurrentSheet(sheet);
     setCharClass(sheet.charClass || "");
     setSubclass(sheet.subclass || "");
     setSpecies(sheet.species || "");
     setSubspecies(sheet.subspecies || "");
+    setNewCharacterCreated(false); // Reset the flag when loading existing character
+    console.log('handleEdit - setting view to editor');
     setView("editor");
   };
 
@@ -177,6 +220,7 @@ const App = () => {
     setSubclass("");
     setSpecies("");
     setSubspecies("");
+    setNewCharacterCreated(false); // Reset the flag when starting new character
     setView("editor");
   };
 
@@ -258,6 +302,7 @@ const App = () => {
   }, [charClass, subclass, species, subspecies, currentSheet]);
 
   const handleLevelUp = () => {
+    console.log('handleLevelUp called, currentSheet before:', currentSheet ? `ID: ${currentSheet.id}` : 'NULL');
     // Auto-save before navigation
     if (currentSheet) {
       const updatedSheet = { 
@@ -267,13 +312,16 @@ const App = () => {
         species, 
         subspecies 
       };
+      console.log('handleLevelUp - saving sheet:', updatedSheet.id);
       setCurrentSheet(updatedSheet);
       saveCharacterSheet(updatedSheet);
     }
+    console.log('handleLevelUp - setting view to levelup');
     setView("levelup");
   };
 
   const handleCards = () => {
+    console.log('handleCards called, currentSheet before:', currentSheet ? `ID: ${currentSheet.id}` : 'NULL');
     // Auto-save before navigation
     if (currentSheet) {
       const updatedSheet = { 
@@ -283,13 +331,16 @@ const App = () => {
         species, 
         subspecies 
       };
+      console.log('handleCards - saving sheet:', updatedSheet.id);
       setCurrentSheet(updatedSheet);
       saveCharacterSheet(updatedSheet);
     }
+    console.log('handleCards - setting view to cards');
     setView("cards");
   };
 
   const handleBackToEditor = () => {
+    console.log('handleBackToEditor called, currentSheet before:', currentSheet ? `ID: ${currentSheet.id}` : 'NULL');
     // Auto-save before navigation
     if (currentSheet) {
       const updatedSheet = { 
@@ -299,13 +350,22 @@ const App = () => {
         species, 
         subspecies 
       };
+      console.log('handleBackToEditor - saving sheet:', updatedSheet.id);
       setCurrentSheet(updatedSheet);
+      
+      // Force immediate save without debounce
+      if (autoSaveTimeoutRef.current) {
+        clearTimeout(autoSaveTimeoutRef.current);
+      }
       saveCharacterSheet(updatedSheet);
+      console.log('handleBackToEditor - sheet saved, navigating to editor');
     }
+    console.log('handleBackToEditor - setting view to editor');
     setView("editor");
   };
 
-  const handleBackToHome = () => {
+  const handleBackToHome = async () => {
+    console.log('handleBackToHome called, currentSheet before:', currentSheet ? `ID: ${currentSheet.id}` : 'NULL');
     // Auto-save before navigation
     if (currentSheet) {
       const updatedSheet = { 
@@ -315,9 +375,18 @@ const App = () => {
         species, 
         subspecies 
       };
+      console.log('handleBackToHome - saving sheet:', updatedSheet.id);
       setCurrentSheet(updatedSheet);
+      
+      // Force immediate save without debounce
+      if (autoSaveTimeoutRef.current) {
+        clearTimeout(autoSaveTimeoutRef.current);
+      }
       saveCharacterSheet(updatedSheet);
+      console.log('handleBackToHome - sheet saved, navigating to manager');
     }
+    console.log('handleBackToHome - clearing currentSheet, setting view to manager');
+    setCurrentSheet(null);
     setView("manager");
   };
 
@@ -334,22 +403,27 @@ const App = () => {
       )}
 
       {view === "editor" && (
-        <CharacterEditor 
-          sheet={currentSheet} 
-          onSave={handleSave}
-          onLevelUp={handleLevelUp}
-          onCards={handleCards}
-          onHome={handleBackToHome}
-          onAutoSave={updateCurrentSheet}
-          charClass={charClass}
-          setCharClass={setCharClass}
-          subclass={subclass}
-          setSubclass={setSubclass}
-          species={species}
-          setSpecies={setSpecies}
-          subspecies={subspecies}
-          setSubspecies={setSubspecies}
-        />
+        <div>
+          <div style={{ background: '#f0f0f0', padding: '10px', marginBottom: '20px', fontSize: '12px' }}>
+            DEBUG: currentSheet = {currentSheet ? `ID: ${currentSheet.id}, Name: "${currentSheet.name}"` : 'NULL'}
+          </div>
+          <CharacterEditor 
+            sheet={currentSheet} 
+            onSave={handleSave}
+            onLevelUp={handleLevelUp}
+            onCards={handleCards}
+            onHome={handleBackToHome}
+            onAutoSave={updateCurrentSheet}
+            charClass={charClass}
+            setCharClass={setCharClass}
+            subclass={subclass}
+            setSubclass={setSubclass}
+            species={species}
+            setSpecies={setSpecies}
+            subspecies={subspecies}
+            setSubspecies={setSubspecies}
+          />
+        </div>
       )}
 
       {view === "levelup" && (

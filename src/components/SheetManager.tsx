@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import type { CharacterSheet } from "../types/CharacterSheet";
-import { loadAllSheets, deleteSheetById, saveCharacterSheet } from "../utils/storage"; 
+import { loadAllSheets, deleteSheetById } from "../utils/storage"; 
 
 type SheetManagerProps = {
   onLoad: (sheet: CharacterSheet) => void;
@@ -12,24 +12,42 @@ const SheetManager: React.FC<SheetManagerProps> = ({ onLoad, onNew, onClear }) =
   const [sheets, setSheets] = useState<CharacterSheet[]>([]);
 
   useEffect(() => {
-    setSheets(loadAllSheets());
-  }, []);
+    const loadSheets = () => {
+      const allSheets = loadAllSheets();
+      console.log('SheetManager: Loading sheets:', allSheets);
+      setSheets(allSheets);
+    };
+    
+    // Load initial sheets
+    loadSheets();
 
-  const testSheet: CharacterSheet = {
-    id: "sheet-001",
-    name: "Nova Strider",
-    attributes: {
-      strength: 8,
-      dexterity: 14,
-      intelligence: 12,
-    },
-    skills: ["Piloting", "Hacking", "Diplomacy"],
-  };
+    // Listen for character updates to refresh the list
+    const handleCharacterUpdate = () => {
+      console.log('SheetManager: Character updated, refreshing list');
+      loadSheets();
+    };
+
+    // Listen for storage changes from other windows
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === "rpg-character-sheets") {
+        console.log('SheetManager: Storage changed, refreshing list');
+        loadSheets();
+      }
+    };
+
+    window.addEventListener('character-updated', handleCharacterUpdate);
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('character-updated', handleCharacterUpdate);
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, []);
 
   return (
     <div>
       <button onClick={onNew}>New Character</button>
-<h2>Saved Sheets</h2>
+      <h2>Saved Sheets</h2>
       <ul>
         {sheets.map(sheet => {
           const display = `(${sheet.playerName || ""}) ${sheet.name || ""}, ${sheet.subspecies || ""} ${sheet.species || ""} ${sheet.subclass || ""} ${sheet.charClass || ""} (${sheet.xpTotal ?? 0}xp, ${sheet.spTotal ?? 0}sp)`;
