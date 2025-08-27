@@ -10,6 +10,8 @@ type Props = {
   onSave: () => void;
   onLevelUp: () => void;
   onCards: () => void;
+  onHome: () => void;
+  onAutoSave: (updates: Partial<CharacterSheet>) => void;
   charClass: string;
   setCharClass: (c: string) => void;
   subclass: string;
@@ -21,11 +23,33 @@ type Props = {
 };
 
 
-const CharacterEditor: React.FC<Props> = ({ sheet, onSave, onLevelUp, onCards, charClass, setCharClass, subclass, setSubclass, species, setSpecies, subspecies, setSubspecies }) => {
+const CharacterEditor: React.FC<Props> = ({ sheet, onSave, onLevelUp, onCards, onHome, onAutoSave, charClass, setCharClass, subclass, setSubclass, species, setSpecies, subspecies, setSubspecies }) => {
+  
+  // Auto-save helper function
+  const handleAutoSave = (fieldUpdates: Partial<CharacterSheet>) => {
+    onAutoSave(fieldUpdates);
+  };
+
   // Portrait upload state and ref
   const [portraitUrl, setPortraitUrl] = useState<string | null>(sheet?.portrait || null);
   const portraitInputRef = React.useRef<HTMLInputElement>(null);
   const [isSaved, setIsSaved] = useState(false);
+  const [isNavExpanded, setIsNavExpanded] = useState(false);
+  const menuRef = React.useRef<HTMLDivElement>(null);
+  const waffleRef = React.useRef<HTMLButtonElement>(null);
+  React.useEffect(() => {
+    if (!isNavExpanded) return;
+    function handleClick(e: MouseEvent) {
+      if (
+        menuRef.current && !menuRef.current.contains(e.target as Node) &&
+        waffleRef.current && !waffleRef.current.contains(e.target as Node)
+      ) {
+        setIsNavExpanded(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [isNavExpanded]);
 
   // Identity fields
   const [playerName, setPlayerName] = useState(sheet?.playerName || "");
@@ -1162,11 +1186,17 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onSave, onLevelUp, onCards, c
         <div className={styles.cardContent}>
           <label>
             <span>Player Name</span>
-            <input value={playerName} onChange={e => setPlayerName(e.target.value)} style={{ textAlign: 'center' }} />
+            <input value={playerName} onChange={e => {
+              setPlayerName(e.target.value);
+              handleAutoSave({ playerName: e.target.value });
+            }} style={{ textAlign: 'center' }} />
           </label>
           <label>
             <span>Character Name</span>
-            <input value={name} onChange={e => setName(e.target.value)} style={{ textAlign: 'center' }} />
+            <input value={name} onChange={e => {
+              setName(e.target.value);
+              handleAutoSave({ name: e.target.value });
+            }} style={{ textAlign: 'center' }} />
           </label>
           <label>
             <span>Class</span>
@@ -1176,6 +1206,7 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onSave, onLevelUp, onCards, c
                 onChange={e => {
                   setCharClass(e.target.value);
                   setSubclass(""); 
+                  handleAutoSave({ charClass: e.target.value, subclass: "" });
                 }} 
                 className={styles.colorSelect + ' ' + styles.selectedClassColor}
                 style={{ 
@@ -1217,7 +1248,14 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onSave, onLevelUp, onCards, c
                   setSubclass(val);
                   if (!charClass && val) {
                     const found = allSubclassOptions.find(opt => opt.value === val);
-                    if (found) setCharClass(found.class);
+                    if (found) {
+                      setCharClass(found.class);
+                      handleAutoSave({ subclass: val, charClass: found.class });
+                    } else {
+                      handleAutoSave({ subclass: val });
+                    }
+                  } else {
+                    handleAutoSave({ subclass: val });
                   }
                 }}
                 className={styles.colorSelect + ' ' + styles.selectedSubclassColor}
@@ -1258,6 +1296,7 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onSave, onLevelUp, onCards, c
                 onChange={e => {
                   setSpecies(e.target.value);
                   setSubspecies("");
+                  handleAutoSave({ species: e.target.value, subspecies: "" });
                 }}
                 className={styles.colorSelect + ' ' + styles.selectedSpeciesColor}
                 style={{ 
@@ -1297,9 +1336,23 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onSave, onLevelUp, onCards, c
                 onChange={e => {
                   const val = e.target.value;
                   setSubspecies(val);
-                  if (!species && val) {
+                  // Special case: Nocturne and Vulturine should always set species to Avenoch
+                  if (val === "Nocturne" || val === "Vulturine") {
+                    setSpecies("Avenoch");
+                    handleAutoSave({ subspecies: val, species: "Avenoch" });
+                  } else if ((val === "Infrared" || val === "Radiofrequent" || val === "X-Ray") && !species) {
+                    setSpecies("Lumenaren");
+                    handleAutoSave({ subspecies: val, species: "Lumenaren" });
+                  } else if (!species && val) {
                     const found = allSubspeciesOptions.find(opt => opt.value === val);
-                    if (found) setSpecies(found.species);
+                    if (found && found.species) {
+                      setSpecies(found.species);
+                      handleAutoSave({ subspecies: val, species: found.species });
+                    } else {
+                      handleAutoSave({ subspecies: val });
+                    }
+                  } else {
+                    handleAutoSave({ subspecies: val });
                   }
                 }}
                 className={styles.colorSelect + ' ' + styles.selectedSubspeciesColor}
@@ -1342,7 +1395,10 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onSave, onLevelUp, onCards, c
             <div className={styles.selectWrapper}>
               <select 
                 value={background} 
-                onChange={e => setBackground(e.target.value)} 
+                onChange={e => {
+                  setBackground(e.target.value);
+                  handleAutoSave({ background: e.target.value });
+                }} 
                 className={styles.colorSelect}
                 style={{ 
                   fontWeight: 'bold',
@@ -1746,7 +1802,11 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onSave, onLevelUp, onCards, c
             <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 <label style={{ color: '#990000', fontWeight: 'bold', marginBottom: 2, alignSelf: 'flex-start' }}>Current Hit Points:</label>
-                <input type="number" value={currentHitPoints} onChange={e => setCurrentHitPoints(+e.target.value)} style={{ width: 35, marginRight: 8, color: '#990000', border: '1.5px solid #990000', fontWeight: 'bold' }} />
+                <input type="number" value={currentHitPoints} onChange={e => {
+                  const newValue = +e.target.value;
+                  setCurrentHitPoints(newValue);
+                  handleAutoSave({ currentHitPoints: newValue });
+                }} style={{ width: 35, marginRight: 8, color: '#990000', border: '1.5px solid #990000', fontWeight: 'bold' }} />
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
                 <button
@@ -1904,7 +1964,11 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onSave, onLevelUp, onCards, c
             <div className={styles.numberInputContainer}>
               <button 
                 className={`${styles.numberSpinnerButton} ${styles.minus}`}
-                onClick={() => setXpTotal(Math.max(0, xpTotal - 1))}
+                onClick={() => {
+                  const newValue = Math.max(0, xpTotal - 1);
+                  setXpTotal(newValue);
+                  handleAutoSave({ xpTotal: newValue });
+                }}
                 type="button"
               >
                 −
@@ -1915,12 +1979,20 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onSave, onLevelUp, onCards, c
                 inputMode="numeric"
                 pattern="[0-9]*"
                 value={xpTotal}
-                onChange={e => setXpTotal(Math.max(0, +e.target.value.replace(/[^0-9]/g, "")))}
+                onChange={e => {
+                  const newValue = Math.max(0, +e.target.value.replace(/[^0-9]/g, ""));
+                  setXpTotal(newValue);
+                  handleAutoSave({ xpTotal: newValue });
+                }}
                 style={{ width: 80, fontWeight: 'bold' }}
               />
               <button 
                 className={`${styles.numberSpinnerButton} ${styles.plus}`}
-                onClick={() => setXpTotal(xpTotal + 1)}
+                onClick={() => {
+                  const newValue = xpTotal + 1;
+                  setXpTotal(newValue);
+                  handleAutoSave({ xpTotal: newValue });
+                }}
                 type="button"
               >
                 +
@@ -1935,7 +2007,11 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onSave, onLevelUp, onCards, c
             <div className={styles.numberInputContainer}>
               <button 
                 className={`${styles.numberSpinnerButton} ${styles.minus}`}
-                onClick={() => setSpTotal(Math.max(0, spTotal - 1))}
+                onClick={() => {
+                  const newValue = Math.max(0, spTotal - 1);
+                  setSpTotal(newValue);
+                  handleAutoSave({ spTotal: newValue });
+                }}
                 type="button"
               >
                 −
@@ -1946,12 +2022,20 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onSave, onLevelUp, onCards, c
                 inputMode="numeric"
                 pattern="[0-9]*"
                 value={spTotal}
-                onChange={e => setSpTotal(Math.max(0, +e.target.value.replace(/[^0-9]/g, "")))}
+                onChange={e => {
+                  const newValue = Math.max(0, +e.target.value.replace(/[^0-9]/g, ""));
+                  setSpTotal(newValue);
+                  handleAutoSave({ spTotal: newValue });
+                }}
                 style={{ fontWeight: 'bold' }}
               />
               <button 
                 className={`${styles.numberSpinnerButton} ${styles.plus}`}
-                onClick={() => setSpTotal(spTotal + 1)}
+                onClick={() => {
+                  const newValue = spTotal + 1;
+                  setSpTotal(newValue);
+                  handleAutoSave({ spTotal: newValue });
+                }}
                 type="button"
               >
                 +
@@ -2118,6 +2202,163 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onSave, onLevelUp, onCards, c
         </div>
       </div>
       </div> {/* End characterSheetGrid */}
+
+      {/* Floating Navigation Button */}
+      <div style={{
+        position: 'fixed',
+        bottom: '20px',
+        right: '20px',
+        zIndex: 1000
+      }}>
+        {/* Navigation Menu (expanded state) */}
+        {isNavExpanded && (
+          <div ref={menuRef} style={{
+            position: 'absolute',
+            bottom: '60px',
+            right: '0px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '8px',
+            animation: 'fadeIn 0.2s ease-out'
+          }}>
+            <button
+              onClick={onHome}
+              style={{
+                background: '#dc3545',
+                color: 'white',
+                border: 'none',
+                borderRadius: '25px',
+                padding: '12px 20px',
+                fontWeight: 'bold',
+                fontSize: '0.9em',
+                cursor: 'pointer',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                whiteSpace: 'nowrap',
+                transition: 'all 0.2s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'scale(1.05)';
+                e.currentTarget.style.boxShadow = '0 6px 16px rgba(0,0,0,0.2)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'scale(1)';
+                e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+              }}
+            >
+              🏠 Home
+            </button>
+            
+            <button
+              disabled
+              style={{
+                background: '#e9ecef',
+                color: '#6c757d',
+                border: 'none',
+                borderRadius: '25px',
+                padding: '12px 20px',
+                fontWeight: 'bold',
+                fontSize: '0.9em',
+                cursor: 'not-allowed',
+                boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
+                whiteSpace: 'nowrap',
+                opacity: 0.6
+              }}
+            >
+              👤 Character Sheet
+            </button>
+            
+            <button
+              onClick={onLevelUp}
+              style={{
+                background: '#fd7e14',
+                color: 'white',
+                border: 'none',
+                borderRadius: '25px',
+                padding: '12px 20px',
+                fontWeight: 'bold',
+                fontSize: '0.9em',
+                cursor: 'pointer',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                whiteSpace: 'nowrap',
+                transition: 'all 0.2s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'scale(1.05)';
+                e.currentTarget.style.boxShadow = '0 6px 16px rgba(0,0,0,0.2)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'scale(1)';
+                e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+              }}
+            >
+              ⬆️ Level Up
+            </button>
+            
+            <button
+              onClick={onCards}
+              style={{
+                background: '#28a745',
+                color: 'white',
+                border: 'none',
+                borderRadius: '25px',
+                padding: '12px 20px',
+                fontWeight: 'bold',
+                fontSize: '0.9em',
+                cursor: 'pointer',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                whiteSpace: 'nowrap',
+                transition: 'all 0.2s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'scale(1.05)';
+                e.currentTarget.style.boxShadow = '0 6px 16px rgba(0,0,0,0.2)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'scale(1)';
+                e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+              }}
+            >
+              🃏 Cards
+            </button>
+          </div>
+        )}
+        
+        {/* Main Waffle Button */}
+        <button
+          ref={waffleRef}
+          onClick={() => setIsNavExpanded((open) => !open)}
+          style={{
+            width: '51px',
+            height: '51px',
+            borderRadius: '50%',
+            background: '#000000',
+            color: 'white',
+            border: 'none',
+            cursor: 'pointer',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '1.3em',
+            transition: 'all 0.3s ease',
+            transform: isNavExpanded ? 'rotate(45deg)' : 'rotate(0deg)'
+          }}
+          onMouseEnter={(e) => {
+            if (!isNavExpanded) {
+              e.currentTarget.style.transform = 'scale(1.1)';
+              e.currentTarget.style.boxShadow = '0 6px 16px rgba(0,0,0,0.2)';
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (!isNavExpanded) {
+              e.currentTarget.style.transform = 'scale(1)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+            }
+          }}
+        >
+          {isNavExpanded ? '✕' : '⊞'}
+        </button>
+      </div>
 
     </div>
   );

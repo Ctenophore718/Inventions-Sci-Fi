@@ -11,6 +11,7 @@ type LevelUpProps = {
   onCards: () => void;
   onSave: () => void;
   onHome: () => void;
+  onAutoSave: (updates: Partial<CharacterSheet>) => void;
   charClass: string;
   setCharClass: (c: string) => void;
   subclass: string;
@@ -22,7 +23,13 @@ type LevelUpProps = {
 };
 
 
-const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onSave, onHome, charClass, setCharClass, subclass, setSubclass, species, setSpecies, subspecies, setSubspecies }) => {
+const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onSave, onHome, onAutoSave, charClass, setCharClass, subclass, setSubclass, species, setSpecies, subspecies, setSubspecies }) => {
+  
+  // Auto-save helper function
+  const handleAutoSave = (fieldUpdates: Partial<CharacterSheet>) => {
+    onAutoSave(fieldUpdates);
+  };
+
   // Local state for XP/SP totals (mirroring CharacterEditor)
   const [xpTotal, setXpTotal] = useState(sheet?.xpTotal ?? 0);
   const [spTotal, setSpTotal] = useState(sheet?.spTotal ?? 0);
@@ -30,6 +37,22 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onSave, onHom
   const [spSpent, setSpSpent] = useState(sheet?.spSpent ?? 0);
   const [xpSpent, setXpSpent] = useState(sheet?.xpSpent ?? 0);
   const [notice, setNotice] = useState("");
+  const [isNavExpanded, setIsNavExpanded] = useState(false);
+  const menuRef = React.useRef<HTMLDivElement>(null);
+  const waffleRef = React.useRef<HTMLButtonElement>(null);
+  React.useEffect(() => {
+    if (!isNavExpanded) return;
+    function handleClick(e: MouseEvent) {
+      if (
+        menuRef.current && !menuRef.current.contains(e.target as Node) &&
+        waffleRef.current && !waffleRef.current.contains(e.target as Node)
+      ) {
+        setIsNavExpanded(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [isNavExpanded]);
   React.useEffect(() => {
     setXpTotal(sheet?.xpTotal ?? 0);
     setSpTotal(sheet?.spTotal ?? 0);
@@ -153,6 +176,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onSave, onHom
     if (sheet) {
       const updatedSheet = { ...sheet, classCardDots: newDots, spSpent: newSpSpent, xpSpent: newXpSpent };
       saveCharacterSheet(updatedSheet);
+      handleAutoSave({ classCardDots: newDots, spSpent: newSpSpent, xpSpent: newXpSpent });
     }
   };
   // Class options (copied from CharacterEditor)
@@ -393,7 +417,11 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onSave, onHom
                 <div className={styles.numberInputContainer}>
                   <button
                     className={`${styles.numberSpinnerButton} ${styles.minus}`}
-                    onClick={() => setXpTotal(Math.max(0, xpTotal - 1))}
+                    onClick={() => {
+                      const newValue = Math.max(0, xpTotal - 1);
+                      setXpTotal(newValue);
+                      handleAutoSave({ xpTotal: newValue });
+                    }}
                     type="button"
                   >
                     −
@@ -404,12 +432,20 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onSave, onHom
                     inputMode="numeric"
                     pattern="[0-9]*"
                     value={xpTotal}
-                    onChange={e => setXpTotal(Math.max(0, +e.target.value.replace(/[^0-9]/g, "")))}
+                    onChange={e => {
+                      const newValue = Math.max(0, +e.target.value.replace(/[^0-9]/g, ""));
+                      setXpTotal(newValue);
+                      handleAutoSave({ xpTotal: newValue });
+                    }}
                     style={{ width: 80, fontWeight: 'bold' }}
                   />
                   <button
                     className={`${styles.numberSpinnerButton} ${styles.plus}`}
-                    onClick={() => setXpTotal(xpTotal + 1)}
+                    onClick={() => {
+                      const newValue = xpTotal + 1;
+                      setXpTotal(newValue);
+                      handleAutoSave({ xpTotal: newValue });
+                    }}
                     type="button"
                   >
                     +
@@ -423,7 +459,11 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onSave, onHom
                 <div className={styles.numberInputContainer}>
                   <button
                     className={`${styles.numberSpinnerButton} ${styles.minus}`}
-                    onClick={() => setSpTotal(Math.max(0, spTotal - 1))}
+                    onClick={() => {
+                      const newValue = Math.max(0, spTotal - 1);
+                      setSpTotal(newValue);
+                      handleAutoSave({ spTotal: newValue });
+                    }}
                     type="button"
                   >
                     −
@@ -434,12 +474,20 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onSave, onHom
                     inputMode="numeric"
                     pattern="[0-9]*"
                     value={spTotal}
-                    onChange={e => setSpTotal(Math.max(0, +e.target.value.replace(/[^0-9]/g, "")))}
+                    onChange={e => {
+                      const newValue = Math.max(0, +e.target.value.replace(/[^0-9]/g, ""));
+                      setSpTotal(newValue);
+                      handleAutoSave({ spTotal: newValue });
+                    }}
                     style={{ fontWeight: 'bold' }}
                   />
                   <button
                     className={`${styles.numberSpinnerButton} ${styles.plus}`}
-                    onClick={() => setSpTotal(spTotal + 1)}
+                    onClick={() => {
+                      const newValue = spTotal + 1;
+                      setSpTotal(newValue);
+                      handleAutoSave({ spTotal: newValue });
+                    }}
                     type="button"
                   >
                     +
@@ -518,7 +566,10 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onSave, onHom
             <div className={styles.selectWrapper} style={{ width: '100%' }}>
               <select
                 value={charClass}
-                onChange={e => setCharClass(e.target.value)}
+                onChange={e => {
+                  setCharClass(e.target.value);
+                  handleAutoSave({ charClass: e.target.value });
+                }}
                 className={styles.colorSelect + ' ' + styles.selectedClassColor}
                 style={{
                   '--selected-class-color': (charClass && classOptions.find(opt => opt.value === charClass)?.color) || '#000',
@@ -1324,6 +1375,164 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onSave, onHom
         {notice}
       </div>
     )}
+
+    {/* Floating Navigation Button */}
+    <div style={{
+      position: 'fixed',
+      bottom: '20px',
+      right: '20px',
+      zIndex: 1000
+    }}>
+      {/* Navigation Menu (expanded state) */}
+      {isNavExpanded && (
+        <div ref={menuRef} style={{
+          position: 'absolute',
+          bottom: '60px',
+          right: '0px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '8px',
+          animation: 'fadeIn 0.2s ease-out'
+        }}>
+          <button
+            onClick={onHome}
+            style={{
+              background: '#dc3545',
+              color: 'white',
+              border: 'none',
+              borderRadius: '25px',
+              padding: '12px 20px',
+              fontWeight: 'bold',
+              fontSize: '0.9em',
+              cursor: 'pointer',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+              whiteSpace: 'nowrap',
+              transition: 'all 0.2s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'scale(1.05)';
+              e.currentTarget.style.boxShadow = '0 6px 16px rgba(0,0,0,0.2)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'scale(1)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+            }}
+          >
+            🏠 Home
+          </button>
+          
+          <button
+            onClick={onBack}
+            style={{
+              background: '#6c757d',
+              color: 'white',
+              border: 'none',
+              borderRadius: '25px',
+              padding: '12px 20px',
+              fontWeight: 'bold',
+              fontSize: '0.9em',
+              cursor: 'pointer',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+              whiteSpace: 'nowrap',
+              transition: 'all 0.2s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'scale(1.05)';
+              e.currentTarget.style.boxShadow = '0 6px 16px rgba(0,0,0,0.2)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'scale(1)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+            }}
+          >
+            👤 Character Sheet
+          </button>
+          
+          <button
+            disabled
+            style={{
+              background: '#e9ecef',
+              color: '#6c757d',
+              border: 'none',
+              borderRadius: '25px',
+              padding: '12px 20px',
+              fontWeight: 'bold',
+              fontSize: '0.9em',
+              cursor: 'not-allowed',
+              boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
+              whiteSpace: 'nowrap',
+              opacity: 0.6
+            }}
+          >
+            ⬆️ Level Up
+          </button>
+          
+          <button
+            onClick={onCards}
+            style={{
+              background: '#28a745',
+              color: 'white',
+              border: 'none',
+              borderRadius: '25px',
+              padding: '12px 20px',
+              fontWeight: 'bold',
+              fontSize: '0.9em',
+              cursor: 'pointer',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+              whiteSpace: 'nowrap',
+              transition: 'all 0.2s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'scale(1.05)';
+              e.currentTarget.style.boxShadow = '0 6px 16px rgba(0,0,0,0.2)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'scale(1)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+            }}
+          >
+            🃏 Cards
+          </button>
+        </div>
+      )}
+      
+      {/* Main Waffle Button */}
+      <button
+        ref={waffleRef}
+        onClick={() => setIsNavExpanded((open) => !open)}
+        style={{
+          width: '51px',
+          height: '51px',
+          borderRadius: '50%',
+          background: '#000000',
+          color: 'white',
+          border: 'none',
+          cursor: 'pointer',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: '1.3em',
+          transition: 'all 0.3s ease',
+          transform: isNavExpanded ? 'rotate(45deg)' : 'rotate(0deg)'
+        }}
+        onMouseEnter={(e) => {
+          if (!isNavExpanded) {
+            e.currentTarget.style.transform = 'scale(1.1)';
+            e.currentTarget.style.boxShadow = '0 6px 16px rgba(0,0,0,0.2)';
+          }
+        }}
+        onMouseLeave={(e) => {
+          if (!isNavExpanded) {
+            e.currentTarget.style.transform = 'scale(1)';
+            e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+          }
+        }}
+      >
+        {isNavExpanded ? '✕' : '⊞'}
+      </button>
+    </div>
+
     </div>
   );
 };

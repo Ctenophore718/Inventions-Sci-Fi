@@ -18,6 +18,104 @@ const App = () => {
   const [species, setSpecies] = useState<string>(currentSheet?.species || "");
   const [subspecies, setSubspecies] = useState<string>(currentSheet?.subspecies || "");
 
+  // Auto-save debounce timeout
+  const autoSaveTimeoutRef = React.useRef<number | null>(null);
+
+  // Enhanced auto-save function that handles any character changes
+  const performAutoSave = React.useCallback((updatedSheet: CharacterSheet) => {
+    if (autoSaveTimeoutRef.current) {
+      clearTimeout(autoSaveTimeoutRef.current);
+    }
+    
+    autoSaveTimeoutRef.current = setTimeout(() => {
+      setCurrentSheet(updatedSheet);
+      saveCharacterSheet(updatedSheet);
+      console.log('Auto-saved character:', updatedSheet.name || 'Unnamed');
+    }, 300); // 300ms debounce for better UX
+  }, []);
+
+  // Function to update current sheet with any changes
+  // Helper function to create a new character sheet with default values
+  const createNewCharacterSheet = (initialUpdates: Partial<CharacterSheet> = {}): CharacterSheet => {
+    return {
+      id: Date.now().toString(),
+      // Identity
+      playerName: "",
+      name: "",
+      charClass: charClass || "",
+      subclass: subclass || "",
+      species: species || "",
+      subspecies: subspecies || "",
+      background: "",
+      
+      // Features
+      classFeature: "",
+      subclassFeature: "",
+      speciesFeature: "",
+      subspeciesFeature: "",
+      
+      // Stats
+      resistances: "",
+      immunities: "",
+      absorptions: "",
+      movement: "",
+      strike: "",
+      xpTotal: 0,
+      xpSpent: 0,
+      xpRemaining: 0,
+      spTotal: 0,
+      spSpent: 0,
+      spRemaining: 0,
+      
+      // Portrait
+      portrait: "",
+      
+      // Combat
+      speed: "",
+      strikeDamage: "",
+      maxHitPoints: 0,
+      deathCount: 0,
+      deathDots: new Array(10).fill(false),
+      
+      // Strike section
+      multiStrike: 0,
+      strikeEffects: "",
+      
+      // Attributes
+      attributes: {
+        strength: 0,
+        dexterity: 0,
+        intelligence: 0,
+      },
+      
+      // Skills
+      skills: [],
+      skillsObj: {},
+      skillDots: {},
+      currentHitPoints: 0,
+      
+      // Persistent state for Level Up Class Card dots
+      classCardDots: [],
+      
+      // Apply any initial updates
+      ...initialUpdates
+    };
+  };
+
+  const updateCurrentSheet = React.useCallback((updates: Partial<CharacterSheet>) => {
+    if (!currentSheet) {
+      // Create a new character sheet for the first save
+      console.log('Creating new character sheet with updates:', updates);
+      const newSheet = createNewCharacterSheet(updates);
+      setCurrentSheet(newSheet);
+      performAutoSave(newSheet);
+      return;
+    }
+    
+    const updatedSheet = { ...currentSheet, ...updates };
+    performAutoSave(updatedSheet);
+  }, [currentSheet, performAutoSave, charClass, subclass, species, subspecies]);
+
   // Cross-window synchronization
   React.useEffect(() => {
     const handleStorageChange = (e: StorageEvent) => {
@@ -160,18 +258,66 @@ const App = () => {
   }, [charClass, subclass, species, subspecies, currentSheet]);
 
   const handleLevelUp = () => {
+    // Auto-save before navigation
+    if (currentSheet) {
+      const updatedSheet = { 
+        ...currentSheet, 
+        charClass, 
+        subclass, 
+        species, 
+        subspecies 
+      };
+      setCurrentSheet(updatedSheet);
+      saveCharacterSheet(updatedSheet);
+    }
     setView("levelup");
   };
 
   const handleCards = () => {
+    // Auto-save before navigation
+    if (currentSheet) {
+      const updatedSheet = { 
+        ...currentSheet, 
+        charClass, 
+        subclass, 
+        species, 
+        subspecies 
+      };
+      setCurrentSheet(updatedSheet);
+      saveCharacterSheet(updatedSheet);
+    }
     setView("cards");
   };
 
   const handleBackToEditor = () => {
+    // Auto-save before navigation
+    if (currentSheet) {
+      const updatedSheet = { 
+        ...currentSheet, 
+        charClass, 
+        subclass, 
+        species, 
+        subspecies 
+      };
+      setCurrentSheet(updatedSheet);
+      saveCharacterSheet(updatedSheet);
+    }
     setView("editor");
   };
 
   const handleBackToHome = () => {
+    // Auto-save before navigation
+    if (currentSheet) {
+      const updatedSheet = { 
+        ...currentSheet, 
+        charClass, 
+        subclass, 
+        species, 
+        subspecies 
+      };
+      setCurrentSheet(updatedSheet);
+      saveCharacterSheet(updatedSheet);
+    }
     setView("manager");
   };
 
@@ -193,6 +339,8 @@ const App = () => {
           onSave={handleSave}
           onLevelUp={handleLevelUp}
           onCards={handleCards}
+          onHome={handleBackToHome}
+          onAutoSave={updateCurrentSheet}
           charClass={charClass}
           setCharClass={setCharClass}
           subclass={subclass}
@@ -211,6 +359,7 @@ const App = () => {
           onCards={handleCards}
           onSave={handleSaveOnly}
           onHome={handleBackToHome}
+          onAutoSave={updateCurrentSheet}
           charClass={charClass}
           setCharClass={setCharClass}
           subclass={subclass}
@@ -229,6 +378,8 @@ const App = () => {
           onLevelUp={handleLevelUp}
           onSave={handleSaveOnly}
           onHome={handleBackToHome}
+          onAutoSave={updateCurrentSheet}
+          charClass={charClass}
         />
       )}
     </div>
