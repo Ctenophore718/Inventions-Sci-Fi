@@ -151,6 +151,13 @@ const App = () => {
       if (updates.subspecies !== undefined) setSubspecies(updates.subspecies);
       
       performAutoSave(updatedSheet);
+    } else if (newCharacterCreated && (updates.hasFreeSkillStarterDots || updates.skillDots)) {
+      // Allow critical initialization updates even if currentSheet isn't set yet
+      console.log('Allowing critical initialization update:', updates);
+      const newSheet = createNewCharacterSheet(updates);
+      console.log('Created sheet with critical updates:', newSheet);
+      setCurrentSheet(newSheet);
+      performAutoSave(newSheet);
     } else {
       console.log('Ignoring update - no current sheet and already created character this session');
     }
@@ -220,7 +227,7 @@ const App = () => {
     setSubclass("");
     setSpecies("");
     setSubspecies("");
-    setNewCharacterCreated(false); // Reset the flag when starting new character
+    setNewCharacterCreated(true); // Set the flag when starting new character
     setView("editor");
   };
 
@@ -370,6 +377,7 @@ const App = () => {
             setSpecies={setSpecies}
             subspecies={subspecies}
             setSubspecies={setSubspecies}
+            isNewCharacter={newCharacterCreated}
           />
         </div>
       )}

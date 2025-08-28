@@ -64,6 +64,8 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
 
   // Local state for HP/XP/SP management
   const [currentHitPoints, setCurrentHitPoints] = React.useState<number>(localSheet?.currentHitPoints ?? localSheet?.maxHitPoints ?? 0);
+  // For add/subtract HP section
+  const [hpDelta, setHpDelta] = React.useState<number>(0);
   const [deathCount, setDeathCount] = React.useState(localSheet?.deathCount || 0);
   const [xpTotal, setXpTotal] = React.useState(localSheet?.xpTotal || 0);
   const [spTotal, setSpTotal] = React.useState(localSheet?.spTotal || 0);
@@ -1488,16 +1490,19 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
                   −
                 </button>
                 <input
-                  type="number"
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
                   value={xpTotal}
                   onChange={(e) => {
-                    const newValue = Math.max(0, parseInt(e.target.value) || 0);
+                    const val = e.target.value.replace(/[^0-9]/g, '');
+                    const newValue = Math.max(0, parseInt(val) || 0);
                     setXpTotal(newValue);
                     handleAutoSave({ xpTotal: newValue });
                   }}
                   style={{
-                    minWidth: '40px',
-                    width: '60px',
+                    minWidth: '32px',
+                    width: '48px',
                     textAlign: 'center',
                     fontWeight: 'bold',
                     border: '1px solid #ccc',
@@ -1543,16 +1548,19 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
                   −
                 </button>
                 <input
-                  type="number"
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
                   value={spTotal}
                   onChange={(e) => {
-                    const newValue = Math.max(0, parseInt(e.target.value) || 0);
+                    const val = e.target.value.replace(/[^0-9]/g, '');
+                    const newValue = Math.max(0, parseInt(val) || 0);
                     setSpTotal(newValue);
                     handleAutoSave({ spTotal: newValue });
                   }}
                   style={{
-                    minWidth: '40px',
-                    width: '60px',
+                    minWidth: '32px',
+                    width: '48px',
                     textAlign: 'center',
                     fontWeight: 'bold',
                     border: '1px solid #ccc',
@@ -1640,7 +1648,7 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               {/* Current HP Section */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ fontWeight: 'bold', minWidth: '120px' }}>Current Hit Points:</span>
+                <span style={{ fontWeight: 'bold', minWidth: '20px' }}>Current Hit Points:</span>
                 <button
                   className={styles.redMinusButton}
                   onClick={() => {
@@ -1652,10 +1660,13 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
                   −
                 </button>
                 <input
-                  type="number"
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
                   value={currentHitPoints}
                   onChange={(e) => {
-                    const newValue = Math.max(0, parseInt(e.target.value) || 0);
+                    const val = e.target.value.replace(/[^0-9]/g, '');
+                    const newValue = Math.max(0, parseInt(val) || 0);
                     setCurrentHitPoints(newValue);
                     handleAutoSave({ currentHitPoints: newValue });
                   }}
@@ -1666,8 +1677,10 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
                     fontWeight: 'bold',
                     border: '1px solid #ccc',
                     borderRadius: '4px',
-                    padding: '4px'
+                    padding: '4px',
+                    MozAppearance: 'textfield',
                   }}
+                  autoComplete="off"
                 />
                 <button
                   className={styles.greenPlusButton}
@@ -1679,6 +1692,50 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
                 >
                   +
                 </button>
+
+                {/* Add/Subtract Section */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginLeft: '16px' }}>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    min="1"
+                    max="999"
+                    value={hpDelta || ''}
+                    onChange={e => {
+                      const val = e.target.value.replace(/[^0-9]/g, '');
+                      setHpDelta(val ? parseInt(val) : 0);
+                    }}
+                    style={{ width: '48px', textAlign: 'center', border: '1px solid #ccc', borderRadius: '4px', padding: '2px 4px' }}
+                    placeholder="#"
+                  />
+                  <button
+                    className={styles.redMinusButton}
+                    style={{ minWidth: 28, padding: '2px 8px' }}
+                    onClick={() => {
+                      if (!hpDelta) return;
+                      const newValue = Math.max(0, currentHitPoints - hpDelta);
+                      setCurrentHitPoints(newValue);
+                      handleAutoSave({ currentHitPoints: newValue });
+                    }}
+                    title="Subtract from HP"
+                  >
+                    -
+                  </button>
+                  <button
+                    className={styles.greenPlusButton}
+                    style={{ minWidth: 28, padding: '2px 8px' }}
+                    onClick={() => {
+                      if (!hpDelta) return;
+                      const newValue = currentHitPoints + hpDelta;
+                      setCurrentHitPoints(newValue);
+                      handleAutoSave({ currentHitPoints: newValue });
+                    }}
+                    title="Add to HP"
+                  >
+                    +
+                  </button>
+                </div>
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>

@@ -121,31 +121,58 @@
   box-shadow: 0 2px 4px rgba(180,143,6,0.08);
   min-height: 120px;
 }
-/* SP Notice Bubble for Skills grid */
-.spNoticeBubble {
+/* Standardized Notice Styles */
+.standardNotice {
   position: fixed;
+  bottom: 80px; /* Above the XP/SP button */
   left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
+  transform: translateX(-50%);
   z-index: 1000;
   background: #fff3e0;
   color: #b45f06;
   border: 2px solid #b45f06;
-  border-radius: 16px;
-  padding: 18px 36px;
-  font-size: 1.2em;
+  border-radius: 12px;
+  padding: 12px 24px;
+  font-size: 1.1em;
   font-weight: bold;
   box-shadow: 0 4px 24px rgba(180,95,6,0.18);
   pointer-events: none;
   text-align: center;
-  white-space: pre-line;
-  animation: spNoticePopCenter 0.2s cubic-bezier(.4,2,.6,1) 1;
+  white-space: nowrap;
+  animation: noticePopUp 0.3s cubic-bezier(.4,2,.6,1) 1;
 }
 
-@keyframes spNoticePopCenter {
-  0% { transform: translate(-50%, -50%) scale(0.7); opacity: 0; }
-  80% { transform: translate(-50%, -50%) scale(1.08); opacity: 1; }
-  100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+@keyframes noticePopUp {
+  0% { transform: translateX(-50%) translateY(20px) scale(0.8); opacity: 0; }
+  80% { transform: translateX(-50%) translateY(-5px) scale(1.05); opacity: 1; }
+  100% { transform: translateX(-50%) translateY(0) scale(1); opacity: 1; }
+}
+
+/* Legacy SP Notice Bubble for Skills grid (keeping for backwards compatibility) */
+.spNoticeBubble {
+  position: fixed;
+  bottom: 80px; /* Above the XP/SP button */
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  background: #fff3e0;
+  color: #b45f06;
+  border: 2px solid #b45f06;
+  border-radius: 12px;
+  padding: 12px 24px;
+  font-size: 1.1em;
+  font-weight: bold;
+  box-shadow: 0 4px 24px rgba(180,95,6,0.18);
+  pointer-events: none;
+  text-align: center;
+  white-space: nowrap;
+  animation: noticePopUp 0.3s cubic-bezier(.4,2,.6,1) 1;
+}
+
+@keyframes noticePopUp {
+  0% { transform: translateX(-50%) translateY(20px) scale(0.8); opacity: 0; }
+  80% { transform: translateX(-50%) translateY(-5px) scale(1.05); opacity: 1; }
+  100% { transform: translateX(-50%) translateY(0) scale(1); opacity: 1; }
 }
 @media (max-width: 600px) {
   .characterSheetGrid {
@@ -566,8 +593,8 @@
 
 /* Damage Interactions Card - third in third row */
 .damageInteractionsCard {
-  grid-column: 3;
-  grid-row: 3;
+  grid-column: 5;
+  grid-row: 2;
   border: 2px solid #666;
   padding: 16px;
   background: #fff;

@@ -19,10 +19,11 @@ type Props = {
   setSpecies: (sp: string) => void;
   subspecies: string;
   setSubspecies: (ss: string) => void;
+  isNewCharacter?: boolean;
 };
 
 
-const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, onAutoSave, charClass, setCharClass, subclass, setSubclass, species, setSpecies, subspecies, setSubspecies }) => {
+const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, onAutoSave, charClass, setCharClass, subclass, setSubclass, species, setSpecies, subspecies, setSubspecies, isNewCharacter = false }) => {
   
   console.log('CharacterEditor render started, sheet:', sheet ? `ID: ${sheet.id}` : 'NULL');
   
@@ -277,11 +278,44 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
   
   console.log('CharacterEditor skillList defined:', skillList);
   
-  const [skillDots, setSkillDots] = useState<{ [key: string]: boolean[] }>(
-    (sheet?.skillDots) || Object.fromEntries(skillList.map(skill => [skill, Array(10).fill(false)]))
-  );
+  const [skillDots, setSkillDots] = useState<{ [key: string]: boolean[] }>(() => {
+    if (sheet?.skillDots) {
+      return sheet.skillDots;
+    } else {
+      // Default empty state - will be initialized properly in useEffect
+      return Object.fromEntries(skillList.map(skill => [skill, Array(10).fill(false)]));
+    }
+  });
+
+  // Initialize skillDots for new characters with starter dots
+  useEffect(() => {
+    if (isNewCharacter && !sheet?.skillDots) {
+      const newSkillDots = Object.fromEntries(skillList.map(skill => {
+        // For new characters, automatically fill first two columns
+        const dots = Array(10).fill(false);
+        dots[0] = true; // First column
+        dots[1] = true; // Second column
+        return [skill, dots];
+      }));
+      setSkillDots(newSkillDots);
+      
+      // Immediately mark this character as having free starter dots AND set the skillDots in one auto-save
+      // This ensures the flag is set before any SP calculations happen
+      handleAutoSave({ 
+        hasFreeSkillStarterDots: true,
+        skillDots: newSkillDots,
+        spSpent: 0 // Explicitly set SP spent to 0 for new characters
+      });
+    }
+  }, [isNewCharacter, sheet?.skillDots]);
   // Track SP spent for skills
-  const [spSpent, setSpSpent] = useState(sheet?.spSpent ?? 0);
+  const [spSpent, setSpSpent] = useState(() => {
+    if (sheet?.spSpent !== undefined) {
+      return sheet.spSpent;
+    }
+    // For new characters, SP spent should start at 0 (will be recalculated in useEffect)
+    return 0;
+  });
   const [spNotice, setSpNotice] = useState("");
 
   // Auto-dismiss SP notice bubble after 2.5 seconds
@@ -413,6 +447,25 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
 
   // SP cost per column in the skills grid
   const skillSpCosts = [1,1,2,2,3,4,5,6,8,10];
+
+  // Ensure SP spent is calculated correctly on mount
+  useEffect(() => {
+    let total = 0;
+    const hasFreeDots = sheet?.hasFreeSkillStarterDots;
+    Object.values(skillDots).forEach(dotsArr => {
+      dotsArr.forEach((dot, idx) => {
+        if (dot) {
+          // For characters with free starter dots, first two columns are free
+          if (hasFreeDots && (idx === 0 || idx === 1)) {
+            // Don't add cost for first two columns on characters with free starter dots
+          } else {
+            total += skillSpCosts[idx];
+          }
+        }
+      });
+    });
+    setSpSpent(total);
+  }, [skillDots, sheet?.hasFreeSkillStarterDots]); // Recalculate when skillDots change
 
 
   // Hit Points UI state
@@ -1754,122 +1807,6 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
         </div>
       </div>
 
-      {/* Hit Points Section */}
-      <div className={styles.hitPointsCard}>
-        <h3>Hit Points</h3>
-        <div className={styles.cardContent}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-            <div>
-              <label style={{ color: '#990000', fontWeight: 'bold' }}>Max Hit Points</label>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                <label style={{ color: '#990000', fontWeight: 'bold', marginBottom: 2, alignSelf: 'flex-start' }}>Current Hit Points:</label>
-                <input type="number" value={currentHitPoints} onChange={e => {
-                  const newValue = +e.target.value;
-                  setCurrentHitPoints(newValue);
-                  handleAutoSave({ currentHitPoints: newValue });
-                }} style={{ width: 35, marginRight: 8, color: '#990000', border: '1.5px solid #990000', fontWeight: 'bold' }} />
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
-                <button
-                  className={styles.addButton}
-                  onClick={() => setCurrentHitPoints(hp => hp + hpDelta)}
-                  title="Add to current hit points"
-                >Add</button>
-                <div className={styles.numberInputContainer}>
-                  <button
-                    className={`${styles.numberSpinnerButton} ${styles.minus}`}
-                    onClick={() => setHpDelta(Math.max(0, hpDelta - 1))}
-                    type="button"
-                  >
-                    −
-                  </button>
-                  <input
-                    className={styles.numberInputWithSpinner}
-                    type="number"
-                    min={0}
-                    step={1}
-                    inputMode="numeric"
-                    pattern="[0-9]*"
-                    value={hpDelta}
-                    onChange={e => setHpDelta(Math.max(0, +e.target.value))}
-                  />
-                  <button
-                    className={`${styles.numberSpinnerButton} ${styles.plus}`}
-                    onClick={() => setHpDelta(hpDelta + 1)}
-                    type="button"
-                  >
-                    +
-                  </button>
-                </div>
-                <button
-                  className={styles.subtractButton}
-                  onClick={() => setCurrentHitPoints(hp => hp - hpDelta)}
-                  title="Subtract from current hit points"
-                >Subtract</button>
-              </div>
-            </div>
-          </div>
-          <div style={{
-            background: '#000',
-            borderRadius: 8,
-            padding: '6px 0 6px 0',
-            margin: '8px 0 0 0',
-            textAlign: 'center',
-            display: 'inline-block',
-            width: '100%'
-          }}>
-            <label style={{ color: '#fff', background: 'transparent', padding: '2px 8px', borderRadius: 4, fontWeight: 'bold', display: 'inline-block', marginBottom: 0 }}>Death Count</label>
-            <div style={{ display: 'flex', alignItems: 'flex-end', marginTop: 0, gap: 8, width: '100%', flexWrap: 'wrap', justifyContent: 'center' }}>
-              {deathDots.map((checked, i) => {
-                // Only allow clicking if all previous are checked (for checking)
-                // Only allow unchecking the rightmost checked dot (for unchecking)
-                const canCheck = i === 0 || deathDots.slice(0, i).every(Boolean);
-                const rightmostChecked = deathDots.lastIndexOf(true);
-                const canUncheck = checked && i === rightmostChecked;
-                return (
-                  <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                    <span style={{ fontSize: '0.7em', marginBottom: 1, color: '#fff', fontWeight: 'bold' }}>{i + 1}+</span>
-                    <span
-                      onClick={() => {
-                        setDeathDots(prev => {
-                          if (!prev[i] && canCheck) {
-                            // Fill all up to i
-                            return prev.map((v, idx) => idx <= i ? true : v);
-                          }
-                          if (prev[i] && canUncheck) {
-                            // Uncheck this and all after
-                            return prev.map((v, idx) => idx < i ? v : false);
-                          }
-                          return prev;
-                        });
-                      }}
-                      style={{
-                        display: 'inline-block',
-                        width: 8,
-                        height: 8,
-                        borderRadius: '50%',
-                        border: '2px solid #fff',
-                        background: checked ? '#000' : '#fff',
-                        cursor: (canCheck && !checked) || canUncheck ? 'pointer' : 'not-allowed',
-                        marginTop: 0,
-                        opacity: (canCheck && !checked) || canUncheck ? 1 : 1,
-                        background: (!checked && !((canCheck && !checked) || canUncheck)) ? '#fff' : (checked ? '#000' : '#fff'),
-                      }}
-                      title={
-                        (!checked && canCheck)
-                          ? `Toggle ${i + 1}+`
-                          : (canUncheck ? `Uncheck rightmost first` : `Must uncheck rightmost first`)
-                      }
-                    />
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      </div>
 
 
       <div className={styles.movementStrikeCard}>
@@ -1919,97 +1856,6 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
         </div>
       </div>
 
-      <div className={styles.experienceCard}>
-        <h3 style={{ margin: 0 }}>Experience & Skill Points</h3>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, minWidth: 180, marginTop: 8 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span style={{ fontWeight: 'bold' }}>xp Total</span>
-            <div className={styles.numberInputContainer}>
-              <button 
-                className={`${styles.numberSpinnerButton} ${styles.minus}`}
-                onClick={() => {
-                  const newValue = Math.max(0, xpTotal - 1);
-                  setXpTotal(newValue);
-                  handleAutoSave({ xpTotal: newValue });
-                }}
-                type="button"
-              >
-                −
-              </button>
-              <input
-                className={styles.numberInputWithSpinner}
-                type="text"
-                inputMode="numeric"
-                pattern="[0-9]*"
-                value={xpTotal}
-                onChange={e => {
-                  const newValue = Math.max(0, +e.target.value.replace(/[^0-9]/g, ""));
-                  setXpTotal(newValue);
-                  handleAutoSave({ xpTotal: newValue });
-                }}
-                style={{ width: 80, fontWeight: 'bold' }}
-              />
-              <button 
-                className={`${styles.numberSpinnerButton} ${styles.plus}`}
-                onClick={() => {
-                  const newValue = xpTotal + 1;
-                  setXpTotal(newValue);
-                  handleAutoSave({ xpTotal: newValue });
-                }}
-                type="button"
-              >
-                +
-              </button>
-            </div>
-          </div>
-          <div style={{ fontWeight: 'bold' }}>xp Spent: <span>{sheet?.xpSpent ?? 0}</span></div>
-          <div style={{ fontWeight: 'bold' }}>Remaining xp: <span>{xpTotal - (sheet?.xpSpent ?? 0)}</span></div>
-          {/* SP fields moved underneath Remaining xp */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 12 }}>
-            <span style={{ fontWeight: 'bold' }}>sp Total</span>
-            <div className={styles.numberInputContainer}>
-              <button 
-                className={`${styles.numberSpinnerButton} ${styles.minus}`}
-                onClick={() => {
-                  const newValue = Math.max(0, spTotal - 1);
-                  setSpTotal(newValue);
-                  handleAutoSave({ spTotal: newValue });
-                }}
-                type="button"
-              >
-                −
-              </button>
-              <input
-                className={styles.numberInputWithSpinner}
-                type="text"
-                inputMode="numeric"
-                pattern="[0-9]*"
-                value={spTotal}
-                onChange={e => {
-                  const newValue = Math.max(0, +e.target.value.replace(/[^0-9]/g, ""));
-                  setSpTotal(newValue);
-                  handleAutoSave({ spTotal: newValue });
-                }}
-                style={{ fontWeight: 'bold' }}
-              />
-              <button 
-                className={`${styles.numberSpinnerButton} ${styles.plus}`}
-                onClick={() => {
-                  const newValue = spTotal + 1;
-                  setSpTotal(newValue);
-                  handleAutoSave({ spTotal: newValue });
-                }}
-                type="button"
-              >
-                +
-              </button>
-            </div>
-          </div>
-          <div style={{ fontWeight: 'bold' }}>sp Spent: <span>{spSpent}</span></div>
-          <div style={{ fontWeight: 'bold' }}>Remaining sp: <span>{spTotal - spSpent}</span></div>
-          {/* Removed inline spNotice here; only show floating bubble above Skills grid */}
-        </div>
-      </div>
 
       <div className={styles.skillsCard} style={{ position: 'relative' }}>
         <h3>Skills</h3>
@@ -2045,13 +1891,20 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
                       const canCheck = i === 0 || skillDotsForSkill.slice(0, i).every(Boolean);
                       const rightmostChecked = skillDotsForSkill.lastIndexOf(true);
                       const canUncheck = checked && i === rightmostChecked;
+                      const isFirstTwoColumns = i === 0 || i === 1;
+                      const hasFreeDots = sheet?.hasFreeSkillStarterDots;
+                      const isLockedColumn = hasFreeDots && isFirstTwoColumns;
+                      
                       return (
                         <td key={i} style={{ textAlign: 'center', padding: '2px 4px' }}>
                           <span
                             onClick={() => {
+                              // Prevent clicking on locked columns for new characters
+                              if (isLockedColumn) return;
+                              
                               setSkillDots(prev => {
                                 setSpNotice("");
-                                const arr = prev[skill].slice();
+                                const arr = (prev[skill] || Array(10).fill(false)).slice();
                                 let tempArr = arr.slice();
                                 if (!arr[i] && canCheck) {
                                   for (let j = 0; j <= i; ++j) tempArr[j] = true;
@@ -2060,19 +1913,43 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
                                 } else {
                                   return prev;
                                 }
+                                
+                                // Calculate current SP spent
+                                let currentTotal = 0;
+                                const hasFreeDots = sheet?.hasFreeSkillStarterDots;
+                                Object.values(prev).forEach(dotsArr => {
+                                  dotsArr.forEach((dot, idx) => {
+                                    if (dot) {
+                                      // For characters with free starter dots, first two columns are free
+                                      if (hasFreeDots && (idx === 0 || idx === 1)) {
+                                        // Don't add cost for first two columns
+                                      } else {
+                                        currentTotal += skillSpCosts[idx];
+                                      }
+                                    }
+                                  });
+                                });
+                                
                                 // Calculate what the new total would be
-                                let total = 0;
+                                let newTotal = 0;
                                 const newSkillDots = { ...prev, [skill]: tempArr };
                                 Object.values(newSkillDots).forEach(dotsArr => {
                                   dotsArr.forEach((dot, idx) => {
-                                    if (dot) total += skillSpCosts[idx];
+                                    if (dot) {
+                                      // For characters with free starter dots, first two columns are free
+                                      if (hasFreeDots && (idx === 0 || idx === 1)) {
+                                        // Don't add cost for first two columns
+                                      } else {
+                                        newTotal += skillSpCosts[idx];
+                                      }
+                                    }
                                   });
                                 });
-                                if (total > spTotal) {
-                                  setSpNotice("The sp cost of your selection is too high! You cannot spend more sp than your sp Total.");
+                                if (newTotal > spTotal) {
+                                  setSpNotice("Not enough sp!");
                                   return prev;
                                 }
-                                setSpSpent(total);
+                                setSpSpent(newTotal);
                                 return newSkillDots;
                               });
                             }}
@@ -2081,13 +1958,15 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
                               width: 18,
                               height: 18,
                               borderRadius: '50%',
-                              border: '2px solid #000',
-                              background: checked ? '#000' : '#fff',
-                              cursor: (canCheck && !checked) || canUncheck ? 'pointer' : 'not-allowed',
-                              opacity: (canCheck && !checked) || canUncheck ? 1 : 0.4,
+                              border: isLockedColumn ? '2px solid #666' : '2px solid #000',
+                              background: checked ? (isLockedColumn ? '#666' : '#000') : '#fff',
+                              cursor: isLockedColumn ? 'not-allowed' : ((canCheck && !checked) || canUncheck ? 'pointer' : 'not-allowed'),
+                              opacity: isLockedColumn ? 0.6 : ((canCheck && !checked) || canUncheck ? 1 : 0.4),
                             }}
                             title={
-                              (!checked && canCheck)
+                              isLockedColumn 
+                                ? 'Starting skill dots (cannot be changed)'
+                                : (!checked && canCheck)
                                 ? `Toggle`
                                 : (canUncheck ? `Uncheck rightmost first` : `Must uncheck rightmost first`)
                             }
@@ -2365,16 +2244,19 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
                   −
                 </button>
                 <input
-                  type="number"
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
                   value={xpTotal}
                   onChange={(e) => {
-                    const newValue = Math.max(0, parseInt(e.target.value) || 0);
+                    const val = e.target.value.replace(/[^0-9]/g, '');
+                    const newValue = Math.max(0, parseInt(val) || 0);
                     setXpTotal(newValue);
                     handleAutoSave({ xpTotal: newValue });
                   }}
                   style={{
-                    minWidth: '40px',
-                    width: '60px',
+                    minWidth: '32px',
+                    width: '48px',
                     textAlign: 'center',
                     fontWeight: 'bold',
                     border: '1px solid #ccc',
@@ -2420,16 +2302,19 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
                   −
                 </button>
                 <input
-                  type="number"
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
                   value={spTotal}
                   onChange={(e) => {
-                    const newValue = Math.max(0, parseInt(e.target.value) || 0);
+                    const val = e.target.value.replace(/[^0-9]/g, '');
+                    const newValue = Math.max(0, parseInt(val) || 0);
                     setSpTotal(newValue);
                     handleAutoSave({ spTotal: newValue });
                   }}
                   style={{
-                    minWidth: '40px',
-                    width: '60px',
+                    minWidth: '32px',
+                    width: '48px',
                     textAlign: 'center',
                     fontWeight: 'bold',
                     border: '1px solid #ccc',
@@ -2519,7 +2404,7 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               {/* Current HP Section */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ fontWeight: 'bold', minWidth: '120px' }}>Current Hit Points:</span>
+                <span style={{ fontWeight: 'bold', minWidth: '20px' }}>Current Hit Points:</span>
                 <button
                   className={styles.redMinusButton}
                   onClick={() => {
@@ -2531,10 +2416,13 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
                   −
                 </button>
                 <input
-                  type="number"
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
                   value={currentHitPoints}
                   onChange={(e) => {
-                    const newValue = Math.max(0, parseInt(e.target.value) || 0);
+                    const val = e.target.value.replace(/[^0-9]/g, '');
+                    const newValue = Math.max(0, parseInt(val) || 0);
                     setCurrentHitPoints(newValue);
                     handleAutoSave({ currentHitPoints: newValue });
                   }}
@@ -2545,8 +2433,10 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
                     fontWeight: 'bold',
                     border: '1px solid #ccc',
                     borderRadius: '4px',
-                    padding: '4px'
+                    padding: '4px',
+                    MozAppearance: 'textfield',
                   }}
+                  autoComplete="off"
                 />
                 <button
                   className={styles.greenPlusButton}
@@ -2558,6 +2448,50 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
                 >
                   +
                 </button>
+
+                {/* Add/Subtract Section */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginLeft: '16px' }}>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    min="1"
+                    max="999"
+                    value={hpDelta || ''}
+                    onChange={e => {
+                      const val = e.target.value.replace(/[^0-9]/g, '');
+                      setHpDelta(val ? parseInt(val) : 0);
+                    }}
+                    style={{ width: '48px', textAlign: 'center', border: '1px solid #ccc', borderRadius: '4px', padding: '2px 4px' }}
+                    placeholder="#"
+                  />
+                  <button
+                    className={styles.redMinusButton}
+                    style={{ minWidth: 28, padding: '2px 8px' }}
+                    onClick={() => {
+                      if (!hpDelta) return;
+                      const newValue = Math.max(0, currentHitPoints - hpDelta);
+                      setCurrentHitPoints(newValue);
+                      handleAutoSave({ currentHitPoints: newValue });
+                    }}
+                    title="Subtract from HP"
+                  >
+                    -
+                  </button>
+                  <button
+                    className={styles.greenPlusButton}
+                    style={{ minWidth: 28, padding: '2px 8px' }}
+                    onClick={() => {
+                      if (!hpDelta) return;
+                      const newValue = currentHitPoints + hpDelta;
+                      setCurrentHitPoints(newValue);
+                      handleAutoSave({ currentHitPoints: newValue });
+                    }}
+                    title="Add to HP"
+                  >
+                    +
+                  </button>
+                </div>
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
