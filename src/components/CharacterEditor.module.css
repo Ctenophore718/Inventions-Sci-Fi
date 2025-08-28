@@ -929,4 +929,51 @@
 .blueWaffleButton {
   background-color: #1976d2 !important;
   background: #1976d2 !important;
+  box-shadow: 0 6px 20px rgba(25,118,210,0.4) !important;
+}
+
+/* XP/SP Menu Button Styles */
+.xpSpButton {
+  background-color: #666666 !important;
+  background: #666666 !important;
+  color: white !important;
+}
+
+/* HP Button Styles */
+.hpButton {
+  background-color: #990000 !important;
+  background: #990000 !important;
+  color: white !important;
+}
+
+.redMinusButton {
+  background-color: #ff4444 !important;
+  background: #ff4444 !important;
+  color: white !important;
+  width: 30px !important;
+  height: 30px !important;
+  border: 1px solid #ccc !important;
+  border-radius: 4px !important;
+  cursor: pointer !important;
+  font-size: 16px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-weight: bold !important;
+}
+
+.greenPlusButton {
+  background-color: #44ff44 !important;
+  background: #44ff44 !important;
+  color: white !important;
+  width: 30px !important;
+  height: 30px !important;
+  border: 1px solid #ccc !important;
+  border-radius: 4px !important;
+  cursor: pointer !important;
+  font-size: 16px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-weight: bold !important;
 }

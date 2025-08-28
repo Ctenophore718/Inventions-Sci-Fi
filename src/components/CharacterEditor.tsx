@@ -35,8 +35,14 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
   const [portraitUrl, setPortraitUrl] = useState<string | null>(sheet?.portrait || null);
   const portraitInputRef = React.useRef<HTMLInputElement>(null);
   const [isNavExpanded, setIsNavExpanded] = useState(false);
+  const [isXpSpMenuExpanded, setIsXpSpMenuExpanded] = useState(false);
+  const [isHpMenuExpanded, setIsHpMenuExpanded] = useState(false);
   const menuRef = React.useRef<HTMLDivElement>(null);
   const waffleRef = React.useRef<HTMLButtonElement>(null);
+  const xpSpMenuRef = React.useRef<HTMLDivElement>(null);
+  const xpSpButtonRef = React.useRef<HTMLButtonElement>(null);
+  const hpMenuRef = React.useRef<HTMLDivElement>(null);
+  const hpButtonRef = React.useRef<HTMLButtonElement>(null);
   React.useEffect(() => {
     if (!isNavExpanded) return;
     function handleClick(e: MouseEvent) {
@@ -50,6 +56,34 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
     document.addEventListener('mousedown', handleClick);
     return () => document.removeEventListener('mousedown', handleClick);
   }, [isNavExpanded]);
+
+  React.useEffect(() => {
+    if (!isXpSpMenuExpanded) return;
+    function handleClick(e: MouseEvent) {
+      if (
+        xpSpMenuRef.current && !xpSpMenuRef.current.contains(e.target as Node) &&
+        xpSpButtonRef.current && !xpSpButtonRef.current.contains(e.target as Node)
+      ) {
+        setIsXpSpMenuExpanded(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [isXpSpMenuExpanded]);
+
+  React.useEffect(() => {
+    if (!isHpMenuExpanded) return;
+    function handleClick(e: MouseEvent) {
+      if (
+        hpMenuRef.current && !hpMenuRef.current.contains(e.target as Node) &&
+        hpButtonRef.current && !hpButtonRef.current.contains(e.target as Node)
+      ) {
+        setIsHpMenuExpanded(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [isHpMenuExpanded]);
 
   // Identity fields
   const [playerName, setPlayerName] = useState(sheet?.playerName || "");
@@ -74,6 +108,7 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
       setSpTotal(sheet.spTotal || 0);
       setPortraitUrl(sheet.portrait || null);
       setCurrentHitPoints(sheet.currentHitPoints || 0);
+      setDeathCount(sheet.deathCount || 0);
       setClassFeature(sheet.classFeature || "");
       setSubclassFeature(sheet.subclassFeature || "");
       setSpeciesFeature(sheet.speciesFeature || "");
@@ -213,7 +248,7 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
   const [speed, setSpeed] = useState(sheet?.speed || "");
   const [strikeDamage, setStrikeDamage] = useState(sheet?.strikeDamage || "");
   const [maxHitPoints, setMaxHitPoints] = useState(sheet?.maxHitPoints || 0);
-  // Removed unused deathCount field
+  const [deathCount, setDeathCount] = useState(sheet?.deathCount || 0);
 
   // Attributes
   // Removed unused attribute fields
@@ -2266,7 +2301,6 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
             color: 'white',
             border: 'none',
             cursor: 'pointer',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -2277,7 +2311,6 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
           onMouseEnter={(e) => {
             if (!isNavExpanded) {
               e.currentTarget.style.transform = 'scale(1.1)';
-              e.currentTarget.style.boxShadow = '0 6px 16px rgba(0,0,0,0.2)';
               e.currentTarget.style.backgroundColor = '#1976d2';
               e.currentTarget.style.background = '#1976d2';
             }
@@ -2285,13 +2318,333 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
           onMouseLeave={(e) => {
             if (!isNavExpanded) {
               e.currentTarget.style.transform = 'scale(1)';
-              e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
               e.currentTarget.style.backgroundColor = '#1976d2';
               e.currentTarget.style.background = '#1976d2';
             }
           }}
         >
           <span style={{ color: 'white', fontSize: '1.3em', lineHeight: 1 }}>{isNavExpanded ? '✕' : '⊞'}</span>
+        </button>
+      </div>
+
+      {/* XP/SP Summary Button */}
+      <div style={{
+        position: 'fixed',
+        bottom: '20px',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        zIndex: 999
+      }}>
+        {/* XP/SP Menu (expanded state) */}
+        {isXpSpMenuExpanded && (
+          <div ref={xpSpMenuRef} style={{
+            position: 'absolute',
+            bottom: '50px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            background: 'white',
+            border: '2px solid #ccc',
+            borderRadius: '12px',
+            padding: '16px',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+            minWidth: '280px',
+            animation: 'fadeIn 0.2s ease-out'
+          }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {/* XP Section */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontWeight: 'bold', minWidth: '80px' }}>xp Total:</span>
+                <button
+                  className={styles.redMinusButton}
+                  onClick={() => {
+                    const newValue = Math.max(0, xpTotal - 1);
+                    setXpTotal(newValue);
+                    handleAutoSave({ xpTotal: newValue });
+                  }}
+                >
+                  −
+                </button>
+                <input
+                  type="number"
+                  value={xpTotal}
+                  onChange={(e) => {
+                    const newValue = Math.max(0, parseInt(e.target.value) || 0);
+                    setXpTotal(newValue);
+                    handleAutoSave({ xpTotal: newValue });
+                  }}
+                  style={{
+                    minWidth: '40px',
+                    width: '60px',
+                    textAlign: 'center',
+                    fontWeight: 'bold',
+                    border: '1px solid #ccc',
+                    borderRadius: '4px',
+                    padding: '4px'
+                  }}
+                />
+                <button
+                  className={styles.greenPlusButton}
+                  onClick={() => {
+                    const newValue = xpTotal + 1;
+                    setXpTotal(newValue);
+                    handleAutoSave({ xpTotal: newValue });
+                  }}
+                >
+                  +
+                </button>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontWeight: 'bold', minWidth: '80px' }}>xp Spent:</span>
+                <span style={{ minWidth: '40px', textAlign: 'center' }}>{sheet?.xpSpent ?? 0}</span>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontWeight: 'bold', minWidth: '80px' }}>Remaining xp:</span>
+                <span style={{ minWidth: '40px', textAlign: 'center', color: xpTotal - (sheet?.xpSpent ?? 0) < 0 ? '#d32f2f' : '#000' }}>{xpTotal - (sheet?.xpSpent ?? 0)}</span>
+              </div>
+
+              <hr style={{ margin: '8px 0', border: '1px solid #eee' }} />
+
+              {/* SP Section */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontWeight: 'bold', minWidth: '80px' }}>sp Total:</span>
+                <button
+                  className={styles.redMinusButton}
+                  onClick={() => {
+                    const newValue = Math.max(0, spTotal - 1);
+                    setSpTotal(newValue);
+                    handleAutoSave({ spTotal: newValue });
+                  }}
+                >
+                  −
+                </button>
+                <input
+                  type="number"
+                  value={spTotal}
+                  onChange={(e) => {
+                    const newValue = Math.max(0, parseInt(e.target.value) || 0);
+                    setSpTotal(newValue);
+                    handleAutoSave({ spTotal: newValue });
+                  }}
+                  style={{
+                    minWidth: '40px',
+                    width: '60px',
+                    textAlign: 'center',
+                    fontWeight: 'bold',
+                    border: '1px solid #ccc',
+                    borderRadius: '4px',
+                    padding: '4px'
+                  }}
+                />
+                <button
+                  className={styles.greenPlusButton}
+                  onClick={() => {
+                    const newValue = spTotal + 1;
+                    setSpTotal(newValue);
+                    handleAutoSave({ spTotal: newValue });
+                  }}
+                >
+                  +
+                </button>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontWeight: 'bold', minWidth: '80px' }}>sp Spent:</span>
+                <span style={{ minWidth: '40px', textAlign: 'center' }}>{spSpent}</span>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontWeight: 'bold', minWidth: '80px' }}>Remaining sp:</span>
+                <span style={{ minWidth: '40px', textAlign: 'center', color: spTotal - spSpent < 0 ? '#d32f2f' : '#000' }}>{spTotal - spSpent}</span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Main XP/SP Button */}
+        <button
+          ref={xpSpButtonRef}
+          className={styles.xpSpButton}
+          onClick={() => setIsXpSpMenuExpanded((open) => !open)}
+          style={{
+            padding: '8px 16px',
+            borderRadius: '20px',
+            border: 'none',
+            cursor: 'pointer',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+            fontSize: '14px',
+            fontWeight: 'bold',
+            transition: 'all 0.3s ease',
+            transform: isXpSpMenuExpanded ? 'scale(1.05)' : 'scale(1)'
+          }}
+          onMouseEnter={(e) => {
+            if (!isXpSpMenuExpanded) {
+              e.currentTarget.style.transform = 'scale(1.05)';
+              e.currentTarget.style.boxShadow = '0 6px 16px rgba(0,0,0,0.2)';
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (!isXpSpMenuExpanded) {
+              e.currentTarget.style.transform = 'scale(1)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+            }
+          }}
+        >
+          xp: {xpTotal - (sheet?.xpSpent ?? 0)}/{xpTotal} | sp: {spTotal - spSpent}/{spTotal}
+        </button>
+      </div>
+
+      {/* HP Summary Button */}
+      <div style={{
+        position: 'fixed',
+        bottom: '20px',
+        left: '20px',
+        zIndex: 999
+      }}>
+        {/* HP Menu (expanded state) */}
+        {isHpMenuExpanded && (
+          <div ref={hpMenuRef} style={{
+            position: 'absolute',
+            bottom: '50px',
+            left: '0px',
+            background: 'white',
+            border: '2px solid #ccc',
+            borderRadius: '12px',
+            padding: '16px',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+            minWidth: '280px',
+            animation: 'fadeIn 0.2s ease-out'
+          }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {/* Current HP Section */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontWeight: 'bold', minWidth: '120px' }}>Current Hit Points:</span>
+                <button
+                  className={styles.redMinusButton}
+                  onClick={() => {
+                    const newValue = Math.max(0, currentHitPoints - 1);
+                    setCurrentHitPoints(newValue);
+                    handleAutoSave({ currentHitPoints: newValue });
+                  }}
+                >
+                  −
+                </button>
+                <input
+                  type="number"
+                  value={currentHitPoints}
+                  onChange={(e) => {
+                    const newValue = Math.max(0, parseInt(e.target.value) || 0);
+                    setCurrentHitPoints(newValue);
+                    handleAutoSave({ currentHitPoints: newValue });
+                  }}
+                  style={{
+                    minWidth: '40px',
+                    width: '60px',
+                    textAlign: 'center',
+                    fontWeight: 'bold',
+                    border: '1px solid #ccc',
+                    borderRadius: '4px',
+                    padding: '4px'
+                  }}
+                />
+                <button
+                  className={styles.greenPlusButton}
+                  onClick={() => {
+                    const newValue = currentHitPoints + 1;
+                    setCurrentHitPoints(newValue);
+                    handleAutoSave({ currentHitPoints: newValue });
+                  }}
+                >
+                  +
+                </button>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontWeight: 'bold', minWidth: '120px' }}>Max Hit Points:</span>
+                <span style={{ minWidth: '40px', textAlign: 'center' }}>{maxHitPoints}</span>
+              </div>
+
+              <hr style={{ margin: '8px 0', border: '1px solid #eee' }} />
+
+              {/* Death Count Section - Centered, in black bar, white font, dots turn black when selected */}
+              <div style={{
+                backgroundColor: 'black',
+                borderRadius: '16px',
+                padding: '16px 12px 12px 12px',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                marginTop: '8px',
+                marginBottom: '8px'
+              }}>
+                <span style={{
+                  color: 'white',
+                  fontWeight: 'bold',
+                  fontSize: '1.2em',
+                  textAlign: 'center',
+                  marginBottom: '4px',
+                  letterSpacing: '0.5px'
+                }}>Death Count</span>
+                <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginTop: '2px' }}>
+                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((dotNumber) => (
+                    <div key={dotNumber} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px' }}>
+                      <span style={{ color: 'white', fontSize: '12px', fontWeight: 'bold', marginBottom: '2px' }}>
+                        {dotNumber}+
+                      </span>
+                      <div
+                        style={{
+                          width: '18px',
+                          height: '18px',
+                          borderRadius: '50%',
+                          backgroundColor: deathCount >= dotNumber ? 'black' : 'white',
+                          border: '2px solid white',
+                          cursor: 'pointer',
+                          transition: 'all 0.2s ease'
+                        }}
+                        onClick={() => {
+                          const newValue = deathCount >= dotNumber ? dotNumber - 1 : dotNumber;
+                          setDeathCount(newValue);
+                          handleAutoSave({ deathCount: newValue });
+                        }}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <button
+          ref={hpButtonRef}
+          className={styles.hpButton}
+          onClick={() => setIsHpMenuExpanded((open) => !open)}
+          style={{
+            padding: '8px 16px',
+            borderRadius: '20px',
+            border: 'none',
+            cursor: 'pointer',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+            fontSize: '14px',
+            fontWeight: 'bold',
+            transition: 'all 0.3s ease',
+            transform: isHpMenuExpanded ? 'scale(1.05)' : 'scale(1)'
+          }}
+          onMouseEnter={(e) => {
+            if (!isHpMenuExpanded) {
+              e.currentTarget.style.transform = 'scale(1.05)';
+              e.currentTarget.style.boxShadow = '0 6px 16px rgba(0,0,0,0.2)';
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (!isHpMenuExpanded) {
+              e.currentTarget.style.transform = 'scale(1)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+            }
+          }}
+        >
+          hp: {currentHitPoints}/{maxHitPoints}
         </button>
       </div>
 

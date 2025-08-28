@@ -35,13 +35,21 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
   // Optionally, update local state if sheet changes
   const [spSpent, setSpSpent] = useState(sheet?.spSpent ?? 0);
   const [xpSpent, setXpSpent] = useState(sheet?.xpSpent ?? 0);
+  
+  // Local state for HP functionality
+  const [currentHitPoints, setCurrentHitPoints] = useState<number>(sheet?.currentHitPoints ?? sheet?.maxHitPoints ?? 0);
+  const [deathCount, setDeathCount] = useState(sheet?.deathCount || 0);
+  
   const [notice, setNotice] = useState("");
   const [isNavExpanded, setIsNavExpanded] = useState(false);
   const [isXpSpMenuExpanded, setIsXpSpMenuExpanded] = useState(false);
+  const [isHpMenuExpanded, setIsHpMenuExpanded] = useState(false);
   const menuRef = React.useRef<HTMLDivElement>(null);
   const waffleRef = React.useRef<HTMLButtonElement>(null);
   const xpSpMenuRef = React.useRef<HTMLDivElement>(null);
   const xpSpButtonRef = React.useRef<HTMLButtonElement>(null);
+  const hpMenuRef = React.useRef<HTMLDivElement>(null);
+  const hpButtonRef = React.useRef<HTMLButtonElement>(null);
   React.useEffect(() => {
     if (!isNavExpanded) return;
     function handleClick(e: MouseEvent) {
@@ -69,12 +77,29 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
     document.addEventListener('mousedown', handleClick);
     return () => document.removeEventListener('mousedown', handleClick);
   }, [isXpSpMenuExpanded]);
+
+  React.useEffect(() => {
+    if (!isHpMenuExpanded) return;
+    function handleClick(e: MouseEvent) {
+      if (
+        hpMenuRef.current && !hpMenuRef.current.contains(e.target as Node) &&
+        hpButtonRef.current && !hpButtonRef.current.contains(e.target as Node)
+      ) {
+        setIsHpMenuExpanded(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [isHpMenuExpanded]);
+
   React.useEffect(() => {
     setXpTotal(sheet?.xpTotal ?? 0);
     setSpTotal(sheet?.spTotal ?? 0);
     setSpSpent(sheet?.spSpent ?? 0);
     setXpSpent(sheet?.xpSpent ?? 0);
-  }, [sheet?.xpTotal, sheet?.spTotal, sheet?.spSpent, sheet?.xpSpent]);
+    setCurrentHitPoints(sheet?.currentHitPoints ?? sheet?.maxHitPoints ?? 0);
+    setDeathCount(sheet?.deathCount || 0);
+  }, [sheet?.xpTotal, sheet?.spTotal, sheet?.spSpent, sheet?.xpSpent, sheet?.currentHitPoints, sheet?.maxHitPoints, sheet?.deathCount]);
 
   // Auto-dismiss notice after 2.5 seconds
   React.useEffect(() => {
@@ -1470,7 +1495,6 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
           color: 'white',
           border: 'none',
           cursor: 'pointer',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -1481,7 +1505,6 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
         onMouseEnter={(e) => {
           if (!isNavExpanded) {
             e.currentTarget.style.transform = 'scale(1.1)';
-            e.currentTarget.style.boxShadow = '0 6px 16px rgba(0,0,0,0.2)';
             e.currentTarget.style.backgroundColor = '#1976d2';
             e.currentTarget.style.background = '#1976d2';
           }
@@ -1489,7 +1512,6 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
         onMouseLeave={(e) => {
           if (!isNavExpanded) {
             e.currentTarget.style.transform = 'scale(1)';
-            e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
             e.currentTarget.style.backgroundColor = '#1976d2';
             e.currentTarget.style.background = '#1976d2';
           }
@@ -1511,7 +1533,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
       {isXpSpMenuExpanded && (
         <div ref={xpSpMenuRef} style={{
           position: 'absolute',
-          bottom: '70px',
+          bottom: '50px',
           left: '50%',
           transform: 'translateX(-50%)',
           background: 'white',
@@ -1527,38 +1549,39 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <span style={{ fontWeight: 'bold', minWidth: '80px' }}>xp Total:</span>
               <button
+                className={styles.redMinusButton}
                 onClick={() => {
                   const newValue = Math.max(0, xpTotal - 1);
                   setXpTotal(newValue);
                   handleAutoSave({ xpTotal: newValue });
                 }}
-                style={{
-                  width: '30px',
-                  height: '30px',
-                  border: '1px solid #ccc',
-                  borderRadius: '4px',
-                  background: '#f8f8f8',
-                  cursor: 'pointer',
-                  fontSize: '16px'
-                }}
               >
                 −
               </button>
-              <span style={{ minWidth: '40px', textAlign: 'center', fontWeight: 'bold' }}>{xpTotal}</span>
-              <button
-                onClick={() => {
-                  const newValue = xpTotal + 1;
+              <input
+                type="number"
+                value={xpTotal}
+                onChange={(e) => {
+                  const newValue = Math.max(0, parseInt(e.target.value) || 0);
                   setXpTotal(newValue);
                   handleAutoSave({ xpTotal: newValue });
                 }}
                 style={{
-                  width: '30px',
-                  height: '30px',
+                  minWidth: '40px',
+                  width: '60px',
+                  textAlign: 'center',
+                  fontWeight: 'bold',
                   border: '1px solid #ccc',
                   borderRadius: '4px',
-                  background: '#f8f8f8',
-                  cursor: 'pointer',
-                  fontSize: '16px'
+                  padding: '4px'
+                }}
+              />
+              <button
+                className={styles.greenPlusButton}
+                onClick={() => {
+                  const newValue = xpTotal + 1;
+                  setXpTotal(newValue);
+                  handleAutoSave({ xpTotal: newValue });
                 }}
               >
                 +
@@ -1581,38 +1604,39 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <span style={{ fontWeight: 'bold', minWidth: '80px' }}>sp Total:</span>
               <button
+                className={styles.redMinusButton}
                 onClick={() => {
                   const newValue = Math.max(0, spTotal - 1);
                   setSpTotal(newValue);
                   handleAutoSave({ spTotal: newValue });
                 }}
-                style={{
-                  width: '30px',
-                  height: '30px',
-                  border: '1px solid #ccc',
-                  borderRadius: '4px',
-                  background: '#f8f8f8',
-                  cursor: 'pointer',
-                  fontSize: '16px'
-                }}
               >
                 −
               </button>
-              <span style={{ minWidth: '40px', textAlign: 'center', fontWeight: 'bold' }}>{spTotal}</span>
-              <button
-                onClick={() => {
-                  const newValue = spTotal + 1;
+              <input
+                type="number"
+                value={spTotal}
+                onChange={(e) => {
+                  const newValue = Math.max(0, parseInt(e.target.value) || 0);
                   setSpTotal(newValue);
                   handleAutoSave({ spTotal: newValue });
                 }}
                 style={{
-                  width: '30px',
-                  height: '30px',
+                  minWidth: '40px',
+                  width: '60px',
+                  textAlign: 'center',
+                  fontWeight: 'bold',
                   border: '1px solid #ccc',
                   borderRadius: '4px',
-                  background: '#f8f8f8',
-                  cursor: 'pointer',
-                  fontSize: '16px'
+                  padding: '4px'
+                }}
+              />
+              <button
+                className={styles.greenPlusButton}
+                onClick={() => {
+                  const newValue = spTotal + 1;
+                  setSpTotal(newValue);
+                  handleAutoSave({ spTotal: newValue });
                 }}
               >
                 +
@@ -1635,12 +1659,11 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
       {/* Main XP/SP Button */}
       <button
         ref={xpSpButtonRef}
+        className={styles.xpSpButton}
         onClick={() => setIsXpSpMenuExpanded((open) => !open)}
         style={{
           padding: '8px 16px',
           borderRadius: '20px',
-          background: '#1976d2',
-          color: 'white',
           border: 'none',
           cursor: 'pointer',
           boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
@@ -1663,6 +1686,159 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
         }}
       >
         xp: {xpTotal - xpSpent}/{xpTotal} | sp: {spTotal - spSpent}/{spTotal}
+      </button>
+    </div>
+
+    {/* HP Summary Button */}
+    <div style={{
+      position: 'fixed',
+      bottom: '20px',
+      left: '20px',
+      zIndex: 999
+    }}>
+      {/* HP Menu (expanded state) */}
+      {isHpMenuExpanded && (
+        <div ref={hpMenuRef} style={{
+          position: 'absolute',
+          bottom: '50px',
+          left: '0px',
+          background: 'white',
+          border: '2px solid #ccc',
+          borderRadius: '12px',
+          padding: '16px',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+          minWidth: '280px',
+          animation: 'fadeIn 0.2s ease-out'
+        }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {/* Current HP Section */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ fontWeight: 'bold', minWidth: '120px' }}>Current Hit Points:</span>
+              <button
+                className={styles.redMinusButton}
+                onClick={() => {
+                  const newValue = Math.max(0, currentHitPoints - 1);
+                  setCurrentHitPoints(newValue);
+                  handleAutoSave({ currentHitPoints: newValue });
+                }}
+              >
+                −
+              </button>
+              <input
+                type="number"
+                value={currentHitPoints}
+                onChange={(e) => {
+                  const newValue = Math.max(0, parseInt(e.target.value) || 0);
+                  setCurrentHitPoints(newValue);
+                  handleAutoSave({ currentHitPoints: newValue });
+                }}
+                style={{
+                  minWidth: '40px',
+                  width: '60px',
+                  textAlign: 'center',
+                  fontWeight: 'bold',
+                  border: '1px solid #ccc',
+                  borderRadius: '4px',
+                  padding: '4px'
+                }}
+              />
+              <button
+                className={styles.greenPlusButton}
+                onClick={() => {
+                  const newValue = currentHitPoints + 1;
+                  setCurrentHitPoints(newValue);
+                  handleAutoSave({ currentHitPoints: newValue });
+                }}
+              >
+                +
+              </button>
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ fontWeight: 'bold', minWidth: '120px' }}>Max Hit Points:</span>
+              <span style={{ minWidth: '40px', textAlign: 'center' }}>{sheet?.maxHitPoints ?? 0}</span>
+            </div>
+
+            <hr style={{ margin: '8px 0', border: '1px solid #eee' }} />
+
+            {/* Death Count Section - Centered, in black bar, white font, dots turn black when selected */}
+            <div style={{
+              backgroundColor: 'black',
+              borderRadius: '16px',
+              padding: '16px 12px 12px 12px',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              marginTop: '8px',
+              marginBottom: '8px'
+            }}>
+              <span style={{
+                color: 'white',
+                fontWeight: 'bold',
+                fontSize: '1.2em',
+                textAlign: 'center',
+                marginBottom: '4px',
+                letterSpacing: '0.5px'
+              }}>Death Count</span>
+              <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginTop: '2px' }}>
+                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((dotNumber) => (
+                  <div key={dotNumber} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px' }}>
+                    <span style={{ color: 'white', fontSize: '12px', fontWeight: 'bold', marginBottom: '2px' }}>
+                      {dotNumber}+
+                    </span>
+                    <div
+                      style={{
+                        width: '18px',
+                        height: '18px',
+                        borderRadius: '50%',
+                        backgroundColor: deathCount >= dotNumber ? 'black' : 'white',
+                        border: '2px solid white',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease'
+                      }}
+                      onClick={() => {
+                        const newValue = deathCount >= dotNumber ? dotNumber - 1 : dotNumber;
+                        setDeathCount(newValue);
+                        handleAutoSave({ deathCount: newValue });
+                      }}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <button
+        ref={hpButtonRef}
+        className={styles.hpButton}
+        onClick={() => setIsHpMenuExpanded((open) => !open)}
+        style={{
+          padding: '8px 16px',
+          borderRadius: '20px',
+          border: 'none',
+          cursor: 'pointer',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+          fontSize: '14px',
+          fontWeight: 'bold',
+          transition: 'all 0.3s ease',
+          transform: isHpMenuExpanded ? 'scale(1.05)' : 'scale(1)'
+        }}
+        onMouseEnter={(e) => {
+          if (!isHpMenuExpanded) {
+            e.currentTarget.style.transform = 'scale(1.05)';
+            e.currentTarget.style.boxShadow = '0 6px 16px rgba(0,0,0,0.2)';
+          }
+        }}
+        onMouseLeave={(e) => {
+          if (!isHpMenuExpanded) {
+            e.currentTarget.style.transform = 'scale(1)';
+            e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+          }
+        }}
+      >
+        hp: {currentHitPoints}/{sheet?.maxHitPoints ?? 0}
       </button>
     </div>
 
