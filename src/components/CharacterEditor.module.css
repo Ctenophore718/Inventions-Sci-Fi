@@ -1,3 +1,26 @@
+/* Inventory Card - column 1, rows 4-5 */
+.inventoryCard {
+  grid-column: 1;
+  grid-row: 4 / span 2;
+  border: 2px solid #b45f06;
+  padding: 16px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(180,95,6,0.08);
+  min-height: 120px;
+}
+
+/* Background Card - columns 2-3, row 5 */
+.backgroundCard {
+  grid-column: 2 / span 2;
+  grid-row: 5;
+  border: 2px solid #6b1172;
+  padding: 16px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(107,17,114,0.08);
+  min-height: 120px;
+}
 /* Header row for Character Sheet title and buttons */
 .headerRow {
   display: flex;
@@ -35,85 +58,71 @@
     width: 100%;
   }
 }
-/* iPad landscape specific layout for Level Up page */
-@media (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
-  .characterSheetGrid[style*="repeat(4, 1fr)"] {
-    grid-template-columns: repeat(3, 1fr) !important;
-    grid-template-rows: repeat(2, 1fr) !important;
-    gap: 16px !important;
-  }
-}
-
-/* Desktop/laptop responsive layout - switch to 2x2 when width gets narrow */
-@media (min-width: 601px) and (max-width: 900px) {
-  .characterSheetGrid[style*="repeat(4, 1fr)"] {
-    grid-template-columns: repeat(2, 1fr) !important;
-    grid-template-rows: repeat(2, 1fr) !important;
-    gap: 16px !important;
-  }
-}
-
-@media (min-width: 1101px) and (max-width: 1366px) {
-  body {
-    overflow-x: hidden !important;
-  }
+/* iPad specific layout (3 columns) */
+@media (min-width: 768px) and (max-width: 1024px) {
   .characterSheetGrid {
-    grid-template-columns: 1fr 1fr 1fr 1fr !important;
-    gap: 8px !important;
-    width: 100% !important;
-    max-width: 100vw !important;
-    box-sizing: border-box !important;
-    overflow-x: hidden !important;
-    padding: 8px !important;
+    grid-template-columns: 1fr 1fr 1fr !important;
+    gap: 16px !important;
   }
+  
   .identityCard {
-    grid-column: 1 / -1 !important;
-    width: 100% !important;
-    max-width: 100vw !important;
-    min-width: 0 !important;
-    display: block !important;
+    grid-column: 1 / span 3 !important;
+    grid-row: 1 !important;
   }
+  
   .featuresCard {
-    grid-column: 1 !important;
-    grid-row: 2 !important;
-  }
-  .movementStrikeCard {
-    grid-column: 2 !important;
-    grid-row: 2 !important;
-  }
-  .strikeCard {
-    grid-column: 3 !important;
-    grid-row: 2 !important;
-  }
-  .hitPointsCard {
-    grid-column: 4 !important;
-    grid-row: 2 !important;
-  }
-  .skillsCard {
     grid-column: 1 / span 2 !important;
-    grid-row: 3 / span 2 !important;
+    grid-row: 2 !important;
   }
-  .perksCard {
+  
+  .movementStrikeCard {
     grid-column: 3 !important;
+    grid-row: 2 !important;
+  }
+  
+  .strikeCard {
+    grid-column: 1 !important;
     grid-row: 3 !important;
   }
-  .portraitCard {
-    grid-column: 4 !important;
-    grid-row: 3 / span 2 !important;
-  }
+  
   .damageInteractionsCard {
+    grid-column: 2 !important;
+    grid-row: 3 !important;
+  }
+  
+  .skillsCard {
     grid-column: 3 !important;
     grid-row: 3 !important;
   }
-  .experienceCard {
-    grid-column: 3 !important;
+  
+  .perksCard {
+    grid-column: 1 !important;
     grid-row: 4 !important;
   }
+  
+  .inventoryCard {
+    grid-column: 2 !important;
+    grid-row: 4 !important;
+  }
+  
+  .backgroundCard {
+    grid-column: 1 / span 2 !important;
+    grid-row: 5 !important;
+  }
+  
+  .portraitCard {
+    grid-column: 3 !important;
+    grid-row: 5 !important;
+  }
 }
-/* Portrait Card */
+
+
+
+
+/* Portrait Card - column 4, row 5 */
 .portraitCard {
-  grid-column: 5;
-  grid-row: 3;
+  grid-column: 4;
+  grid-row: 5;
   border: 2px solid #000;
   padding: 16px;
   background: #fff;
@@ -174,7 +183,8 @@
   80% { transform: translateX(-50%) translateY(-5px) scale(1.05); opacity: 1; }
   100% { transform: translateX(-50%) translateY(0) scale(1); opacity: 1; }
 }
-@media (max-width: 600px) {
+/* Mobile layout (1 column) */
+@media (max-width: 767px) {
   .characterSheetGrid {
     grid-template-columns: 1fr !important;
     grid-template-rows: none !important;
@@ -185,20 +195,86 @@
     box-sizing: border-box !important;
     width: 100% !important;
   }
+  
+  /* Single column order: Identity, Features, Movement, Strike, Damage Interactions, Skills, Languages & Perks, Inventory, Background, Portrait */
+  .identityCard {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+    order: 1;
+  }
+  
+  .featuresCard {
+    grid-column: 1 !important;
+    grid-row: 2 !important;
+    order: 2;
+  }
+  
+  .movementStrikeCard {
+    grid-column: 1 !important;
+    grid-row: 3 !important;
+    order: 3;
+  }
+  
+  .strikeCard {
+    grid-column: 1 !important;
+    grid-row: 4 !important;
+    order: 4;
+  }
+  
+  .damageInteractionsCard {
+    grid-column: 1 !important;
+    grid-row: 5 !important;
+    order: 5;
+  }
+  
+  .skillsCard {
+    grid-column: 1 !important;
+    grid-row: 6 !important;
+    order: 6;
+  }
+  
+  .perksCard {
+    grid-column: 1 !important;
+    grid-row: 7 !important;
+    order: 7;
+  }
+  
+  .inventoryCard {
+    grid-column: 1 !important;
+    grid-row: 8 !important;
+    order: 8;
+  }
+  
+  .backgroundCard {
+    grid-column: 1 !important;
+    grid-row: 9 !important;
+    order: 9;
+  }
+  
+  .portraitCard {
+    grid-column: 1 !important;
+    grid-row: 10 !important;
+    order: 10;
+  }
+  
+  .saveButtonContainer {
+    grid-column: 1 !important;
+    order: 11;
+  }
+  
+  /* Fix all cards to have proper mobile styling */
   .identityCard,
   .featuresCard,
   .movementStrikeCard,
   .strikeCard,
-  .hitPointsCard,
-  .skillsCard,
   .damageInteractionsCard,
+  .skillsCard,
   .perksCard,
+  .inventoryCard,
+  .backgroundCard,
   .portraitCard,
-  .experienceCard,
   .saveButtonContainer {
     display: block !important;
-    grid-column: 1 !important;
-    grid-row: auto !important;
     width: 100% !important;
     min-width: 0 !important;
     max-width: 100% !important;
@@ -209,23 +285,25 @@
     height: auto !important;
     position: static !important;
     overflow-x: hidden !important;
-    order: unset !important;
   }
+  
   /* Fix skill circle overlap on mobile */
   .skillsCard .skillCircle {
     margin-bottom: 8px !important;
     margin-right: 8px !important;
     z-index: 1;
     display: inline-block !important;
+  }
+  
   .featuresCard {
     background: #fff !important;
     z-index: 10 !important;
     box-shadow: 0 2px 8px rgba(11,83,148,0.08) !important;
     position: relative !important;
   }
-  }
 }
-@media (max-width: 600px) {
+/* Mobile identity card adjustment */
+@media (max-width: 767px) {
   .identityCard .cardContent {
     grid-template-columns: 1fr !important;
   }
@@ -345,10 +423,10 @@
 }
 
 /* CSS Grid Layout for Character Sheet */
-/* Add a fifth column for new cards */
+/* Changed to 4 columns for new layout */
 .characterSheetGrid {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
   grid-template-rows: auto auto auto auto auto;
   gap: 16px;
   padding: 16px 0;
@@ -366,10 +444,10 @@
   box-sizing: border-box;
 }
 
-/* Perks Card */
+/* Perks Card - column 4, rows 3-4 */
 .perksCard {
   grid-column: 4;
-  grid-row: 3;
+  grid-row: 3 / span 2;
   border: 2px solid #888;
   padding: 16px;
   background: #fff;
@@ -379,9 +457,9 @@
 }
 
 /* Identity Card - spans full width at top, horizontal layout */
-/* Span all 5 columns for full width */
+/* Span all 4 columns for full width */
 .identityCard {
-  grid-column: 1 / span 5;
+  grid-column: 1 / span 4;
   grid-row: 1;
   display: flex;
   flex-wrap: wrap;
@@ -407,11 +485,61 @@
 
 
 .identityCard .cardContent {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  align-items: center;
+}
+
+.identityRow {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 6px;
+  gap: 12px;
   width: 100%;
   align-items: start;
+  justify-content: center;
+}
+
+/* Desktop: Ensure 3 columns in first row, 4 columns in second row - centered */
+.identityRow:first-child {
+  grid-template-columns: repeat(3, minmax(160px, 1fr));
+  max-width: 900px;
+}
+
+.identityRow:last-child {
+  grid-template-columns: repeat(4, minmax(160px, 1fr));
+  max-width: 1200px;
+}
+
+/* Mobile responsive: single column, centered */
+@media (max-width: 768px) {
+  .identityRow {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    max-width: 300px;
+    justify-items: center;
+  }
+  
+  .identityRow:first-child,
+  .identityRow:last-child {
+    grid-template-columns: 1fr;
+    max-width: 300px;
+  }
+}
+
+/* Tablet responsive: keep rows intact and centered */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .identityRow:first-child {
+    grid-template-columns: repeat(3, minmax(140px, 1fr));
+    max-width: 600px;
+    justify-content: center;
+  }
+  
+  .identityRow:last-child {
+    grid-template-columns: repeat(4, minmax(120px, 1fr));
+    max-width: 800px;
+    justify-content: center;
+  }
 }
 
 
@@ -453,7 +581,7 @@
   color: var(--selected-subspecies-color) !important;
 }
 
-/* Features Card - first in second row */
+/* Features Card - columns 1-2, row 2 */
 .featuresCard {
   grid-column: 1 / span 2;
   grid-row: 2;
@@ -471,7 +599,7 @@
   text-decoration: underline;
 }
 
-/* Movement Card - second in second row */
+/* Movement Card - column 3, row 2 */
 .movementStrikeCard {
   grid-column: 3;
   grid-row: 2;
@@ -489,7 +617,7 @@
   text-decoration: underline;
 }
 
-/* Strike Card - third in second row */
+/* Strike Card - column 4, row 2 */
 .strikeCard {
   grid-column: 4;
   grid-row: 2;
@@ -507,27 +635,9 @@
   text-decoration: underline;
 }
 
-/* Hit Points Card - fourth in second row */
-.hitPointsCard {
-  grid-column: 5;
-  grid-row: 2;
-  border: 2px solid #990000;
-  padding: 16px;
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.hitPointsCard h3 {
-  margin: 0 0 12px 0;
-  color: #990000;
-  font-weight: bold;
-  text-decoration: underline;
-}
-
-/* Skills Card - first in third row, spans 2 columns */
+/* Skills Card - columns 2-3, rows 3-4 */
 .skillsCard {
-  grid-column: 1 / span 2;
+  grid-column: 2 / span 2;
   grid-row: 3 / span 2;
   border: 2px solid #351c75;
   padding: 12px;
@@ -591,10 +701,10 @@
   }
 }
 
-/* Damage Interactions Card - third in third row */
+/* Damage Interactions Card - column 1, row 3 */
 .damageInteractionsCard {
-  grid-column: 5;
-  grid-row: 2;
+  grid-column: 1;
+  grid-row: 3;
   border: 2px solid #666;
   padding: 16px;
   background: #fff;
@@ -607,38 +717,6 @@
   color: #666;
   font-weight: bold;
   text-decoration: underline;
-}
-
-/* Experience Card - fourth in third row */
-.experienceCard {
-  grid-column: 3;
-  grid-row: 4;
-  border: 2px solid #b45f06;
-  padding: 16px;
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.experienceCard h3 {
-  margin: 0 0 12px 0;
-  color: #b45f06;
-  font-weight: bold;
-  text-decoration: underline;
-}
-
-/* Remove old resistances card - no longer needed */
-.resistancesCard {
-  display: none;
-}
-
-/* Save Button Container - spans full width */
-.saveButtonContainer {
-  grid-column: 1 / span 4;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 16px;
 }
 
 /* Form styling within cards */
@@ -806,9 +884,8 @@
   }
 }
 
-/* Responsive design */
-/* Medium-narrow screens: 2-column grid layout */
-@media (max-width: 1100px) and (min-width: 601px) {
+/* Medium screens: 2-column layout */
+@media (min-width: 1025px) and (max-width: 1200px) {
   .characterSheetGrid {
     grid-template-columns: 1fr 1fr !important;
     gap: 16px;
@@ -816,6 +893,7 @@
   
   .identityCard {
     grid-column: 1 / span 2;
+    grid-row: 1;
   }
   
   .featuresCard {
@@ -833,7 +911,7 @@
     grid-row: 3;
   }
   
-  .hitPointsCard {
+  .damageInteractionsCard {
     grid-column: 1;
     grid-row: 4;
   }
@@ -843,22 +921,22 @@
     grid-row: 4 / span 2;
   }
   
-  .damageInteractionsCard {
+  .perksCard {
     grid-column: 1;
     grid-row: 5;
   }
   
-  .perksCard {
+  .inventoryCard {
+    grid-column: 1;
+    grid-row: 6;
+  }
+  
+  .backgroundCard {
     grid-column: 2;
     grid-row: 6;
   }
   
   .portraitCard {
-    grid-column: 1;
-    grid-row: 6;
-  }
-  
-  .experienceCard {
     grid-column: 1;
     grid-row: 7;
   }
@@ -868,89 +946,9 @@
   }
 }
 
-@media (max-width: 1200px) and (min-width: 1101px) {
-  .characterSheetGrid {
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 12px;
-  }
-  
-  .identityCard {
-    grid-column: 1 / span 3;
-  }
-  
-  .featuresCard {
-    grid-column: 1;
-  }
-  
-  .movementStrikeCard {
-    grid-column: 2;
-  }
-  
-  .strikeCard {
-    grid-column: 3;
-  }
-  
-  .hitPointsCard {
-    grid-column: 1;
-    grid-row: 3;
-  }
-  
-  .skillsCard {
-    grid-column: 2 / span 2;
-    grid-row: 3;
-  }
-  
-  .damageInteractionsCard {
-    grid-column: 1;
-    grid-row: 4;
-  }
-  
-  .experienceCard {
-    grid-column: 2;
-    grid-row: 4;
-  }
-  
-  .saveButtonContainer {
-    grid-column: 1 / span 3;
-  }
-}
 
-@media (max-width: 600px) {
-  .characterSheetGrid {
-    grid-template-columns: 1fr;
-    gap: 12px;
-    padding: 12px;
-  }
-  
-  .identityCard {
-    grid-column: 1 / -1 !important;
-    width: 100% !important;
-  }
-  .featuresCard,
-  .hitPointsCard,
-  .movementStrikeCard,
-  .strikeCard,
-  .skillsCard,
-  .damageInteractionsCard,
-  .experienceCard,
-  .saveButtonContainer {
-    grid-column: 1;
-  }
-  
-  .identityCard .cardContent {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 6px;
-  width: 100%;
-  align-items: start;
-}
-  
-  .identityCard .cardContent label {
-    min-width: auto;
-    flex: 1;
-    max-width: 220px;
-  }
-}
+
+
 
 /* Blue waffle button override */
 .blueWaffleButton {

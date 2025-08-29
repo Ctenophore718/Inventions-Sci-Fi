@@ -47,13 +47,39 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
   // For add/subtract HP section
   const [hpDelta, setHpDelta] = useState<number>(0);
   
-  // Skills state
-  const [skillDots, setSkillDots] = useState<Record<string, boolean[]>>(sheet?.skillDots || {});
-  const [spNotice, setSpNotice] = useState("");
+  // Background state
+  const [background, setBackground] = useState(sheet?.background || "");
   
-  // Skills configuration
-  const skillList = ["Chemical", "Biological", "Computer", "Electrical", "Engineering", "Medical", "Physical", "Social"];
-  const skillSpCosts = [1, 1, 2, 2, 3, 4, 5, 6, 8, 10];
+  // Background options
+  const backgroundOptions = [
+    { label: "Adherent of the Pollen Collective", value: "Adherent of the Pollen Collective", color: "#666666" },
+    { label: "Anti-Deft Secessionist", value: "Anti-Deft Secessionist", color: "#666666" },
+    { label: "Awakened Machine", value: "Awakened Machine", color: "#666666" },
+    { label: "Belt Miner", value: "Belt Miner", color: "#666666" },
+    { label: "Black Market Executive", value: "Black Market Executive", color: "#666666" },
+    { label: "Combat Medic", value: "Combat Medic", color: "#666666" },
+    { label: "Covert Operative", value: "Covert Operative", color: "#666666" },
+    { label: "DAGR Officer", value: "DAGR Officer", color: "#666666" },
+    { label: "Exobiologist", value: "Exobiologist", color: "#666666" },
+    { label: "Feathered One", value: "Feathered One", color: "#666666" },
+    { label: "Galactapol Netizen", value: "Galactapol Netizen", color: "#666666" },
+    { label: "Interstellar Refugee", value: "Interstellar Refugee", color: "#666666" },
+    { label: "Intragalactic Nobility", value: "Intragalactic Nobility", color: "#666666" },
+    { label: "Kenos Assassin", value: "Kenos Assassin", color: "#666666" },
+    { label: "Knight of the Chromatic Blade", value: "Knight of the Chromatic Blade", color: "#666666" },
+    { label: "Military Officer", value: "Military Officer", color: "#666666" },
+    { label: "Oikomonastic Disciple", value: "Oikomonastic Disciple", color: "#666666" },
+    { label: "Physios Universal Contestant", value: "Physios Universal Contestant", color: "#666666" },
+    { label: "Scoundrel", value: "Scoundrel", color: "#666666" },
+    { label: "Signals Intelligence Collector", value: "Signals Intelligence Collector", color: "#666666" },
+    { label: "Silver Swarm Scion", value: "Silver Swarm Scion", color: "#666666" },
+    { label: "Student of Lux Academy (Ruby)", value: "Student of Lux Academy (Ruby)", color: "#666666" },
+    { label: "Student of Lux Academy (Emerald)", value: "Student of Lux Academy (Emerald)", color: "#666666" },
+    { label: "Student of Lux Academy (Sapphire)", value: "Student of Lux Academy (Sapphire)", color: "#666666" },
+    { label: "Traveling Performer", value: "Traveling Performer", color: "#666666" },
+    { label: "Wandering Yogi", value: "Wandering Yogi", color: "#666666" },
+  ];
+  
   const menuRef = React.useRef<HTMLDivElement>(null);
   const waffleRef = React.useRef<HTMLButtonElement>(null);
   const xpSpMenuRef = React.useRef<HTMLDivElement>(null);
@@ -109,7 +135,8 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
     setXpSpent(sheet?.xpSpent ?? 0);
     setCurrentHitPoints(sheet?.currentHitPoints ?? sheet?.maxHitPoints ?? 0);
     setDeathCount(sheet?.deathCount || 0);
-  }, [sheet?.xpTotal, sheet?.spTotal, sheet?.spSpent, sheet?.xpSpent, sheet?.currentHitPoints, sheet?.maxHitPoints, sheet?.deathCount]);
+    setBackground(sheet?.background || "");
+  }, [sheet?.xpTotal, sheet?.spTotal, sheet?.spSpent, sheet?.xpSpent, sheet?.currentHitPoints, sheet?.maxHitPoints, sheet?.deathCount, sheet?.background]);
 
   // Auto-dismiss notice after 2.5 seconds
   React.useEffect(() => {
@@ -186,13 +213,6 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
       saveCharacterSheet(updatedSheet);
     }
   }, [xpTotal, spTotal, sheet]);
-
-  // Sync skillDots when sheet changes
-  React.useEffect(() => {
-    if (sheet?.skillDots) {
-      setSkillDots(sheet.skillDots);
-    }
-  }, [sheet?.skillDots]);
 
   // Persistent state for class card dots (Chemist: Feature(2), Technique(4), Attack(2), Strike(1), Perks(1))
   const defaultChemistDots = [ 
@@ -2008,139 +2028,100 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
         </div>
       </div>
     
-    {/* Skills Section */}
-    <div style={{ marginTop: '2rem', marginBottom: '2rem' }}>
-      <div style={{ background: '#fff', border: '2px solid #333', borderRadius: 8, boxShadow: '0 2px 4px rgba(0,0,0,0.1)', padding: '1.2rem', position: 'relative' }}>
-        <h3 style={{ marginTop: 0, marginBottom: '1rem', fontFamily: 'Arial, Helvetica, sans-serif' }}>Skills</h3>
-        
-        {/* SP Notice Bubble */}
-        {spNotice && (
-          <div className={styles.spNoticeBubble}>
-            {spNotice}
+    {/* Background Section - styled as a 4-column-wide card matching the others */}
+    <div className={styles.characterSheetGrid} style={{ marginTop: '2rem', marginBottom: '2rem', gridTemplateColumns: 'repeat(4, 1fr)' }}>
+      <div style={{
+        background: '#fff',
+        border: '2px solid #333',
+        borderRadius: 8,
+        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+        minHeight: 80,
+        padding: '1.2rem',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gridColumn: '1 / span 4',
+        marginTop: 0,
+        marginBottom: 0
+      }}>
+        <div style={{ fontWeight: 'bold', color: 'black', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1.1em', marginBottom: 6 }}>Background</div>
+        <div style={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', margin: '16px 0' }}>
+          <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+            <select
+              value={background}
+              onChange={e => {
+                setBackground(e.target.value);
+                handleAutoSave({ background: e.target.value });
+              }}
+              className={styles.colorSelect + ' ' + styles.selectedBackgroundColor}
+              style={{
+                '--selected-background-color': (background && backgroundOptions.find(opt => opt.value === background)?.color) || '#000',
+                fontWeight: 'bold',
+                padding: '4px 8px',
+                borderRadius: '4px',
+                border: '1px solid #ccc',
+                textAlign: 'center',
+                color: `${(background && backgroundOptions.find(opt => opt.value === background)?.color) || '#000'} !important`,
+                minWidth: '180px',
+                background: 'white',
+                width: '100%',
+                fontSize: '1.3em',
+                appearance: 'none',
+                MozAppearance: 'none',
+                WebkitAppearance: 'none',
+                boxShadow: 'none'
+              } as React.CSSProperties}
+            >
+              <option value="" style={{ color: 'black', backgroundColor: 'white' }}>Select Background</option>
+              {backgroundOptions.map(opt => (
+                <option
+                  key={opt.value}
+                  value={opt.value}
+                  style={{
+                    color: opt.color,
+                    backgroundColor: 'white',
+                    fontWeight: 'bold'
+                  }}
+                >
+                  {opt.label}
+                </option>
+              ))}
+            </select>
+            {/* Down arrow icon */}
+            <span style={{
+              position: 'absolute',
+              right: '-22px',
+              top: '50%',
+              transform: 'translateY(-50%)',
+              pointerEvents: 'none',
+              fontSize: '1.2em',
+              color: '#888',
+              userSelect: 'none',
+              zIndex: 1
+            }}>
+              ▼
+            </span>
+          </div>
+        </div>
+        {background && (
+          <div style={{
+            marginTop: '1rem',
+            padding: '1rem',
+            backgroundColor: '#f8f9fa',
+            borderRadius: '6px',
+            border: '1px solid #dee2e6',
+            width: '100%'
+          }}>
+            <p style={{
+              margin: 0,
+              fontStyle: 'italic',
+              color: '#6c757d',
+              textAlign: 'center'
+            }}>
+              Selected: <strong style={{ color: '#495057' }}>{background}</strong>
+            </p>
           </div>
         )}
-        
-        <div style={{ overflowX: 'auto' }}>
-          <table style={{ borderCollapse: 'collapse', width: '100%' }}>
-            <thead>
-              <tr>
-                <th style={{ textAlign: 'left', fontWeight: 'bold', padding: '4px 8px' }}></th>
-                {[20, 18, 16, 14, 12, 10, 8, 6, 4, 2].map((val) => (
-                  <th key={val} style={{ textAlign: 'center', fontWeight: 'bold', padding: '4px 8px' }}>{val}+</th>
-                ))}
-              </tr>
-              <tr>
-                <th></th>
-                {[1,1,2,2,3,4,5,6,8,10].map((sp, idx) => (
-                  <th key={idx} style={{ textAlign: 'center', fontSize: '0.9em', color: '#888', padding: '2px 8px' }}>{sp}sp</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {skillList && skillList.map(skill => (
-                <tr key={skill}>
-                  <td style={{ fontWeight: 'bold', padding: '4px 8px', whiteSpace: 'nowrap' }}>{skill}</td>
-                  {(skillDots[skill] || Array(10).fill(false)).map((checked, i) => {
-                    const skillDotsForSkill = skillDots[skill] || Array(10).fill(false);
-                    const canCheck = i === 0 || skillDotsForSkill.slice(0, i).every(Boolean);
-                    const rightmostChecked = skillDotsForSkill.lastIndexOf(true);
-                    const canUncheck = checked && i === rightmostChecked;
-                    const isFirstTwoColumns = i === 0 || i === 1;
-                    const hasFreeDots = sheet?.hasFreeSkillStarterDots;
-                    const isLockedColumn = hasFreeDots && isFirstTwoColumns;
-                    
-                    return (
-                      <td key={i} style={{ textAlign: 'center', padding: '2px 4px' }}>
-                        <span
-                          onClick={() => {
-                            // Prevent clicking on locked columns for new characters
-                            if (isLockedColumn) return;
-                            
-                            setSkillDots(prev => {
-                              setSpNotice("");
-                              const arr = (prev[skill] || Array(10).fill(false)).slice();
-                              let tempArr = arr.slice();
-                              if (!arr[i] && canCheck) {
-                                for (let j = 0; j <= i; ++j) tempArr[j] = true;
-                              } else if (arr[i] && canUncheck) {
-                                for (let j = i; j < arr.length; ++j) tempArr[j] = false;
-                              } else {
-                                return prev;
-                              }
-                              
-                              // Calculate current SP spent
-                              let currentTotal = 0;
-                              const hasFreeDots = sheet?.hasFreeSkillStarterDots;
-                              Object.values(prev).forEach(dotsArr => {
-                                dotsArr.forEach((dot, idx) => {
-                                  if (dot) {
-                                    // For characters with free starter dots, first two columns are free
-                                    if (hasFreeDots && (idx === 0 || idx === 1)) {
-                                      // Don't add cost for first two columns
-                                    } else {
-                                      currentTotal += skillSpCosts[idx];
-                                    }
-                                  }
-                                });
-                              });
-                              
-                              // Calculate what the new total would be
-                              let newTotal = 0;
-                              const newSkillDots = { ...prev, [skill]: tempArr };
-                              Object.values(newSkillDots).forEach(dotsArr => {
-                                dotsArr.forEach((dot, idx) => {
-                                  if (dot) {
-                                    // For characters with free starter dots, first two columns are free
-                                    if (hasFreeDots && (idx === 0 || idx === 1)) {
-                                      // Don't add cost for first two columns
-                                    } else {
-                                      newTotal += skillSpCosts[idx];
-                                    }
-                                  }
-                                });
-                              });
-                              if (newTotal > spTotal) {
-                                setSpNotice("Not enough sp!");
-                                return prev;
-                              }
-                              setSpSpent(newTotal);
-                              
-                              // Auto-save the changes
-                              if (sheet) {
-                                const updatedSheet = { ...sheet, skillDots: newSkillDots, spSpent: newTotal };
-                                saveCharacterSheet(updatedSheet);
-                                handleAutoSave({ skillDots: newSkillDots, spSpent: newTotal });
-                              }
-                              
-                              return newSkillDots;
-                            });
-                          }}
-                          style={{
-                            display: 'inline-block',
-                            width: 18,
-                            height: 18,
-                            borderRadius: '50%',
-                            border: isLockedColumn ? '2px solid #666' : '2px solid #000',
-                            background: checked ? (isLockedColumn ? '#666' : '#000') : '#fff',
-                            cursor: isLockedColumn ? 'not-allowed' : ((canCheck && !checked) || canUncheck ? 'pointer' : 'not-allowed'),
-                            opacity: isLockedColumn ? 0.6 : ((canCheck && !checked) || canUncheck ? 1 : 0.4),
-                          }}
-                          title={
-                            isLockedColumn 
-                              ? 'Starting skill dots (cannot be changed)'
-                              : (!checked && canCheck)
-                              ? `Toggle`
-                              : (canUncheck ? `Uncheck rightmost first` : `Must uncheck rightmost first`)
-                          }
-                        />
-                      </td>
-                    );
-                  })}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
       </div>
     </div>
 

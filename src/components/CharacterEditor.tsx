@@ -1200,250 +1200,257 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
       <div className={styles.identityCard}>
         <h3>Identity</h3>
         <div className={styles.cardContent}>
-          <label>
-            <span>Player Name</span>
-            <input value={playerName} onChange={e => {
-              setPlayerName(e.target.value);
-              handleAutoSave({ playerName: e.target.value });
-            }} style={{ textAlign: 'center' }} />
-          </label>
-          <label>
-            <span>Character Name</span>
-            <input value={name} onChange={e => {
-              setName(e.target.value);
-              handleAutoSave({ name: e.target.value });
-            }} style={{ textAlign: 'center' }} />
-          </label>
-          <label>
-            <span>Class</span>
-            <div className={styles.selectWrapper}>
-              <select 
-                value={charClass}
-                onChange={e => {
-                  setCharClass(e.target.value);
-                  setSubclass(""); 
-                  handleAutoSave({ charClass: e.target.value, subclass: "" });
-                }} 
-                className={styles.colorSelect + ' ' + styles.selectedClassColor}
-                style={{ 
-                  '--selected-class-color': classOptions.find(opt => opt.value === charClass)?.color || '#000',
-                  fontWeight: 'bold',
-                  padding: '4px 8px',
-                  borderRadius: '4px',
-                  border: '1px solid #ccc',
-                  textAlign: 'center',
-                  color: `${classOptions.find(opt => opt.value === charClass)?.color || '#000'} !important`,
-                  minWidth: '120px',
-                  background: 'white'
-                } as React.CSSProperties}
-              >
-                <option value="" style={{ color: 'black', backgroundColor: 'white' }}>Select Class</option>
-                {classOptions.map(opt => (
-                  <option 
-                    key={opt.value} 
-                    value={opt.value} 
-                    style={{ 
-                      color: opt.color,
-                      backgroundColor: 'white',
-                      fontWeight: 'bold'
-                    }}
-                  >
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </label>
-          <label>
-            <span>Subclass</span>
-            <div className={styles.selectWrapper}>
-              <select 
-                value={subclass} 
-                onChange={e => {
-                  const val = e.target.value;
-                  setSubclass(val);
-                  if (!charClass && val) {
-                    const found = allSubclassOptions.find(opt => opt.value === val);
-                    if (found) {
-                      setCharClass(found.class);
-                      handleAutoSave({ subclass: val, charClass: found.class });
+          {/* Row 1: Player Name, Character Name, Background */}
+          <div className={styles.identityRow}>
+            <label>
+              <span>Player Name</span>
+              <input value={playerName} onChange={e => {
+                setPlayerName(e.target.value);
+                handleAutoSave({ playerName: e.target.value });
+              }} style={{ textAlign: 'center' }} />
+            </label>
+            <label>
+              <span>Character Name</span>
+              <input value={name} onChange={e => {
+                setName(e.target.value);
+                handleAutoSave({ name: e.target.value });
+              }} style={{ textAlign: 'center' }} />
+            </label>
+            <label>
+              <span>Background</span>
+              <div className={styles.selectWrapper}>
+                <select 
+                  value={background} 
+                  onChange={e => {
+                    setBackground(e.target.value);
+                    handleAutoSave({ background: e.target.value });
+                  }} 
+                  className={styles.colorSelect}
+                  style={{ 
+                    fontWeight: 'bold',
+                    padding: '4px 8px',
+                    borderRadius: '4px',
+                    border: '1px solid #ccc',
+                    color: backgroundOptions.find(opt => opt.value === background)?.color || '#000',
+                    textAlign: 'center',
+                    minWidth: '120px',
+                    background: 'white'
+                  }}
+                >
+                  <option value="" style={{ color: 'black', backgroundColor: 'white' }}>Select Background</option>
+                  {backgroundOptions.map(opt => (
+                    <option 
+                      key={opt.value} 
+                      value={opt.value} 
+                      style={{ 
+                        color: opt.color,
+                        backgroundColor: 'white',
+                        fontWeight: 'bold'
+                      }}
+                    >
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </label>
+          </div>
+          
+          {/* Row 2: Class, Subclass, Species, Subspecies */}
+          <div className={styles.identityRow}>
+            <label>
+              <span>Class</span>
+              <div className={styles.selectWrapper}>
+                <select 
+                  value={charClass}
+                  onChange={e => {
+                    setCharClass(e.target.value);
+                    setSubclass(""); 
+                    handleAutoSave({ charClass: e.target.value, subclass: "" });
+                  }} 
+                  className={styles.colorSelect + ' ' + styles.selectedClassColor}
+                  style={{ 
+                    '--selected-class-color': classOptions.find(opt => opt.value === charClass)?.color || '#000',
+                    fontWeight: 'bold',
+                    padding: '4px 8px',
+                    borderRadius: '4px',
+                    border: '1px solid #ccc',
+                    textAlign: 'center',
+                    color: `${classOptions.find(opt => opt.value === charClass)?.color || '#000'} !important`,
+                    minWidth: '120px',
+                    background: 'white'
+                  } as React.CSSProperties}
+                >
+                  <option value="" style={{ color: 'black', backgroundColor: 'white' }}>Select Class</option>
+                  {classOptions.map(opt => (
+                    <option 
+                      key={opt.value} 
+                      value={opt.value} 
+                      style={{ 
+                        color: opt.color,
+                        backgroundColor: 'white',
+                        fontWeight: 'bold'
+                      }}
+                    >
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </label>
+            <label>
+              <span>Subclass</span>
+              <div className={styles.selectWrapper}>
+                <select 
+                  value={subclass} 
+                  onChange={e => {
+                    const val = e.target.value;
+                    setSubclass(val);
+                    if (!charClass && val) {
+                      const found = allSubclassOptions.find(opt => opt.value === val);
+                      if (found) {
+                        setCharClass(found.class);
+                        handleAutoSave({ subclass: val, charClass: found.class });
+                      } else {
+                        handleAutoSave({ subclass: val });
+                      }
                     } else {
                       handleAutoSave({ subclass: val });
                     }
-                  } else {
-                    handleAutoSave({ subclass: val });
-                  }
-                }}
-                className={styles.colorSelect + ' ' + styles.selectedSubclassColor}
-                style={{ 
-                  '--selected-subclass-color': subclassOptions.find(opt => opt.value === subclass)?.color || '#000',
-                  fontWeight: 'bold',
-                  padding: '4px 8px',
-                  borderRadius: '4px',
-                  border: '1px solid #ccc',
-                  textAlign: 'center',
-                  color: `${(subclassOptions.find(opt => opt.value === subclass) || allSubclassOptions.find(opt => opt.value === subclass))?.color || '#000'} !important`,
-                  minWidth: '120px',
-                  background: 'white'
-                } as React.CSSProperties}
-              >
-                <option value="" style={{ color: 'black', backgroundColor: 'white' }}>Select Subclass</option>
-                {(charClass ? subclassOptions : allSubclassOptions).map(opt => (
-                  <option 
-                    key={opt.value} 
-                    value={opt.value} 
-                    style={{ 
-                      color: opt.color,
-                      backgroundColor: 'white',
-                      fontWeight: 'bold'
-                    }}
-                  >
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </label>
-          <label>
-            <span>Species</span>
-            <div className={styles.selectWrapper}>
-              <select 
-                value={species} 
-                onChange={e => {
-                  setSpecies(e.target.value);
-                  setSubspecies("");
-                  handleAutoSave({ species: e.target.value, subspecies: "" });
-                }}
-                className={styles.colorSelect + ' ' + styles.selectedSpeciesColor}
-                style={{ 
-                  '--selected-species-color': speciesOptions.find(opt => opt.value === species)?.color || '#000',
-                  fontWeight: 'bold',
-                  padding: '4px 8px',
-                  borderRadius: '4px',
-                  border: '1px solid #ccc',
-                  textAlign: 'center',
-                  color: `${(speciesOptions.find(opt => opt.value === species)) || allSubspeciesOptions.find(opt => opt.value === species)?.color || '#000'} !important`,
-                  minWidth: '120px',
-                  background: 'white'
-                } as React.CSSProperties}
-              >
-                <option value="" style={{ color: 'black', backgroundColor: 'white' }}>Select Species</option>
-                {speciesOptions.map(opt => (
-                  <option 
-                    key={opt.value} 
-                    value={opt.value} 
-                    style={{ 
-                      color: opt.color,
-                      backgroundColor: 'white',
-                      fontWeight: 'bold'
-                    }}
-                  >
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </label>
-          <label>
-            <span>Subspecies</span>
-            <div className={styles.selectWrapper}>
-              <select 
-                value={subspecies} 
-                onChange={e => {
-                  const val = e.target.value;
-                  setSubspecies(val);
-                  // Special case: Nocturne and Vulturine should always set species to Avenoch
-                  if (val === "Nocturne" || val === "Vulturine") {
-                    setSpecies("Avenoch");
-                    handleAutoSave({ subspecies: val, species: "Avenoch" });
-                  } else if ((val === "Infrared" || val === "Radiofrequent" || val === "X-Ray") && !species) {
-                    setSpecies("Lumenaren");
-                    handleAutoSave({ subspecies: val, species: "Lumenaren" });
-                  } else if (!species && val) {
-                    const found = allSubspeciesOptions.find(opt => opt.value === val);
-                    if (found && found.species) {
-                      setSpecies(found.species);
-                      handleAutoSave({ subspecies: val, species: found.species });
+                  }}
+                  className={styles.colorSelect + ' ' + styles.selectedSubclassColor}
+                  style={{ 
+                    '--selected-subclass-color': subclassOptions.find(opt => opt.value === subclass)?.color || '#000',
+                    fontWeight: 'bold',
+                    padding: '4px 8px',
+                    borderRadius: '4px',
+                    border: '1px solid #ccc',
+                    textAlign: 'center',
+                    color: `${(subclassOptions.find(opt => opt.value === subclass) || allSubclassOptions.find(opt => opt.value === subclass))?.color || '#000'} !important`,
+                    minWidth: '120px',
+                    background: 'white'
+                  } as React.CSSProperties}
+                >
+                  <option value="" style={{ color: 'black', backgroundColor: 'white' }}>Select Subclass</option>
+                  {(charClass ? subclassOptions : allSubclassOptions).map(opt => (
+                    <option 
+                      key={opt.value} 
+                      value={opt.value} 
+                      style={{ 
+                        color: opt.color,
+                        backgroundColor: 'white',
+                        fontWeight: 'bold'
+                      }}
+                    >
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </label>
+            <label>
+              <span>Species</span>
+              <div className={styles.selectWrapper}>
+                <select 
+                  value={species} 
+                  onChange={e => {
+                    setSpecies(e.target.value);
+                    setSubspecies("");
+                    handleAutoSave({ species: e.target.value, subspecies: "" });
+                  }}
+                  className={styles.colorSelect + ' ' + styles.selectedSpeciesColor}
+                  style={{ 
+                    '--selected-species-color': speciesOptions.find(opt => opt.value === species)?.color || '#000',
+                    fontWeight: 'bold',
+                    padding: '4px 8px',
+                    borderRadius: '4px',
+                    border: '1px solid #ccc',
+                    textAlign: 'center',
+                    color: `${(speciesOptions.find(opt => opt.value === species)) || allSubspeciesOptions.find(opt => opt.value === species)?.color || '#000'} !important`,
+                    minWidth: '120px',
+                    background: 'white'
+                  } as React.CSSProperties}
+                >
+                  <option value="" style={{ color: 'black', backgroundColor: 'white' }}>Select Species</option>
+                  {speciesOptions.map(opt => (
+                    <option 
+                      key={opt.value} 
+                      value={opt.value} 
+                      style={{ 
+                        color: opt.color,
+                        backgroundColor: 'white',
+                        fontWeight: 'bold'
+                      }}
+                    >
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </label>
+            <label>
+              <span>Subspecies</span>
+              <div className={styles.selectWrapper}>
+                <select 
+                  value={subspecies} 
+                  onChange={e => {
+                    const val = e.target.value;
+                    setSubspecies(val);
+                    // Special case: Nocturne and Vulturine should always set species to Avenoch
+                    if (val === "Nocturne" || val === "Vulturine") {
+                      setSpecies("Avenoch");
+                      handleAutoSave({ subspecies: val, species: "Avenoch" });
+                    } else if ((val === "Infrared" || val === "Radiofrequent" || val === "X-Ray") && !species) {
+                      setSpecies("Lumenaren");
+                      handleAutoSave({ subspecies: val, species: "Lumenaren" });
+                    } else if (!species && val) {
+                      const found = allSubspeciesOptions.find(opt => opt.value === val);
+                      if (found && found.species) {
+                        setSpecies(found.species);
+                        handleAutoSave({ subspecies: val, species: found.species });
+                      } else {
+                        handleAutoSave({ subspecies: val });
+                      }
                     } else {
                       handleAutoSave({ subspecies: val });
                     }
-                  } else {
-                    handleAutoSave({ subspecies: val });
-                  }
-                }}
-                className={styles.colorSelect + ' ' + styles.selectedSubspeciesColor}
-                style={{ 
-                  '--selected-subspecies-color': (subspeciesOptions.find(opt => opt.value === subspecies) || allSubspeciesOptions.find(opt => opt.value === subspecies))?.color || '#000',
-                  fontWeight: 'bold',
-                  padding: '4px 8px',
-                  borderRadius: '4px',
-                  border: '1px solid #ccc',
-                  textAlign: 'center',
-                  color: `${(subspeciesOptions.find(opt => opt.value === subspecies) || allSubspeciesOptions.find(opt => opt.value === subspecies))?.color || '#000'} !important`,
-                  minWidth: '120px',
-                  background: 'white'
-                } as React.CSSProperties}
-              >
-                <option value="" style={{ color: 'black', backgroundColor: 'white' }}>
-                  {species === "Cerebronych" ? "Select Host" : "Select Subspecies"}
-                </option>
-                {(species === "Cerebronych"
-                  ? hostOptions
-                  : (species ? subspeciesOptions : allSubspeciesOptions)
-                ).map(opt => (
-                  <option 
-                    key={opt.value} 
-                    value={opt.value} 
-                    style={{ 
-                      color: opt.color,
-                      backgroundColor: 'white',
-                      fontWeight: 'bold'
-                    }}
-                  >
-                    {opt.label}
+                  }}
+                  className={styles.colorSelect + ' ' + styles.selectedSubspeciesColor}
+                  style={{ 
+                    '--selected-subspecies-color': (subspeciesOptions.find(opt => opt.value === subspecies) || allSubspeciesOptions.find(opt => opt.value === subspecies))?.color || '#000',
+                    fontWeight: 'bold',
+                    padding: '4px 8px',
+                    borderRadius: '4px',
+                    border: '1px solid #ccc',
+                    textAlign: 'center',
+                    color: `${(subspeciesOptions.find(opt => opt.value === subspecies) || allSubspeciesOptions.find(opt => opt.value === subspecies))?.color || '#000'} !important`,
+                    minWidth: '120px',
+                    background: 'white'
+                  } as React.CSSProperties}
+                >
+                  <option value="" style={{ color: 'black', backgroundColor: 'white' }}>
+                    {species === "Cerebronych" ? "Select Host" : "Select Subspecies"}
                   </option>
-                ))}
-              </select>
-            </div>
-          </label>
-          <label>
-            <span>Background</span>
-            <div className={styles.selectWrapper}>
-              <select 
-                value={background} 
-                onChange={e => {
-                  setBackground(e.target.value);
-                  handleAutoSave({ background: e.target.value });
-                }} 
-                className={styles.colorSelect}
-                style={{ 
-                  fontWeight: 'bold',
-                  padding: '4px 8px',
-                  borderRadius: '4px',
-                  border: '1px solid #ccc',
-                  color: backgroundOptions.find(opt => opt.value === background)?.color || '#000',
-                  textAlign: 'center',
-                  minWidth: '120px',
-                  background: 'white'
-                }}
-              >
-                <option value="" style={{ color: 'black', backgroundColor: 'white' }}>Select Background</option>
-                {backgroundOptions.map(opt => (
-                  <option 
-                    key={opt.value} 
-                    value={opt.value} 
-                    style={{ 
-                      color: opt.color,
-                      backgroundColor: 'white',
-                      fontWeight: 'bold'
-                    }}
-                  >
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </label>
+                  {(species === "Cerebronych"
+                    ? hostOptions
+                    : (species ? subspeciesOptions : allSubspeciesOptions)
+                  ).map(opt => (
+                    <option 
+                      key={opt.value} 
+                      value={opt.value} 
+                      style={{ 
+                        color: opt.color,
+                        backgroundColor: 'white',
+                        fontWeight: 'bold'
+                      }}
+                    >
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </label>
+          </div>
         </div>
       </div>
 
@@ -1983,9 +1990,10 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
       </div>
       
 
+
       {/* Perks card */}
       <div className={styles.perksCard}>
-  <h3 style={{ marginTop: 0, textDecoration: 'underline' }}>Languages & Perks</h3>
+        <h3 style={{ marginTop: 0, textDecoration: 'underline' }}>Languages & Perks</h3>
         <div className={styles.cardContent}>
           <div style={{ fontWeight: 'bold', marginBottom: 6 }}>Languages</div>
           <div style={{ fontWeight: 'bold', marginBottom: 2 }}>
@@ -2001,6 +2009,18 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
           <div style={{ fontWeight: 'bold', marginBottom: 2 }}>Perk 4</div>
           <div style={{ fontWeight: 'bold', marginBottom: 2 }}>Perk 5</div>
         </div>
+      </div>
+
+      {/* Inventory card: rows 3-4, column 3 */}
+      <div className={styles.inventoryCard}>
+        <h3 style={{ marginTop: 0, textDecoration: 'underline' }}>Inventory</h3>
+        <div className={styles.cardContent}></div>
+      </div>
+
+      {/* Background card: row 4, column 4 */}
+      <div className={styles.backgroundCard}>
+        <h3 style={{ marginTop: 0, textDecoration: 'underline' }}>Background</h3>
+        <div className={styles.cardContent}></div>
       </div>
 
       {/* Portrait card */}
@@ -2396,17 +2416,19 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
             background: 'white',
             border: '2px solid #ccc',
             borderRadius: '12px',
-            padding: '16px',
+            padding: '12px',
             boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
             minWidth: '280px',
+            maxWidth: 'calc(100vw - 40px)',
             animation: 'fadeIn 0.2s ease-out'
           }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               {/* Current HP Section */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ fontWeight: 'bold', minWidth: '20px' }}>Current Hit Points:</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                <span style={{ fontWeight: 'bold', minWidth: '120px', fontSize: '14px' }}>Current Hit Points:</span>
                 <button
                   className={styles.redMinusButton}
+                  style={{ width: '26px', height: '26px', fontSize: '14px' }}
                   onClick={() => {
                     const newValue = Math.max(0, currentHitPoints - 1);
                     setCurrentHitPoints(newValue);
@@ -2428,7 +2450,7 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
                   }}
                   style={{
                     minWidth: '40px',
-                    width: '60px',
+                    width: '50px',
                     textAlign: 'center',
                     fontWeight: 'bold',
                     border: '1px solid #ccc',
@@ -2440,6 +2462,7 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
                 />
                 <button
                   className={styles.greenPlusButton}
+                  style={{ width: '26px', height: '26px', fontSize: '14px' }}
                   onClick={() => {
                     const newValue = currentHitPoints + 1;
                     setCurrentHitPoints(newValue);
@@ -2450,7 +2473,7 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
                 </button>
 
                 {/* Add/Subtract Section */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginLeft: '16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '3px', marginLeft: '8px' }}>
                   <input
                     type="text"
                     inputMode="numeric"
@@ -2462,12 +2485,12 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
                       const val = e.target.value.replace(/[^0-9]/g, '');
                       setHpDelta(val ? parseInt(val) : 0);
                     }}
-                    style={{ width: '48px', textAlign: 'center', border: '1px solid #ccc', borderRadius: '4px', padding: '2px 4px' }}
+                    style={{ width: '40px', textAlign: 'center', border: '1px solid #ccc', borderRadius: '4px', padding: '2px 4px' }}
                     placeholder="#"
                   />
                   <button
                     className={styles.redMinusButton}
-                    style={{ minWidth: 28, padding: '2px 8px' }}
+                    style={{ width: '24px', height: '24px', fontSize: '12px', padding: '0' }}
                     onClick={() => {
                       if (!hpDelta) return;
                       const newValue = Math.max(0, currentHitPoints - hpDelta);
@@ -2480,7 +2503,7 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
                   </button>
                   <button
                     className={styles.greenPlusButton}
-                    style={{ minWidth: 28, padding: '2px 8px' }}
+                    style={{ width: '24px', height: '24px', fontSize: '12px', padding: '0' }}
                     onClick={() => {
                       if (!hpDelta) return;
                       const newValue = currentHitPoints + hpDelta;
@@ -2504,8 +2527,8 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
               {/* Death Count Section - Centered, in black bar, white font, dots turn black when selected */}
               <div style={{
                 backgroundColor: 'black',
-                borderRadius: '16px',
-                padding: '16px 12px 12px 12px',
+                borderRadius: '12px',
+                padding: '12px 8px 8px 8px',
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
@@ -2515,21 +2538,21 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
                 <span style={{
                   color: 'white',
                   fontWeight: 'bold',
-                  fontSize: '1.2em',
+                  fontSize: '1.1em',
                   textAlign: 'center',
                   marginBottom: '4px',
-                  letterSpacing: '0.5px'
+                  letterSpacing: '0.3px'
                 }}>Death Count</span>
-                <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginTop: '2px' }}>
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginTop: '2px', flexWrap: 'wrap', justifyContent: 'center' }}>
                   {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((dotNumber) => (
-                    <div key={dotNumber} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px' }}>
-                      <span style={{ color: 'white', fontSize: '12px', fontWeight: 'bold', marginBottom: '2px' }}>
+                    <div key={dotNumber} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1px' }}>
+                      <span style={{ color: 'white', fontSize: '10px', fontWeight: 'bold', marginBottom: '1px' }}>
                         {dotNumber}+
                       </span>
                       <div
                         style={{
-                          width: '18px',
-                          height: '18px',
+                          width: '16px',
+                          height: '16px',
                           borderRadius: '50%',
                           backgroundColor: deathCount >= dotNumber ? 'black' : 'white',
                           border: '2px solid white',
