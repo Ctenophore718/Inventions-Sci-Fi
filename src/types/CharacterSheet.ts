@@ -56,6 +56,8 @@ export type CharacterSheet = {
   skillsObj: { [key: string]: number };
   // UI state fields
   skillDots?: { [key: string]: boolean[] };
+  automaticSkillDots?: { [key: string]: boolean[] }; // Track which skill dots are automatically granted
+  languages?: string[]; // Track languages known by the character
   currentHitPoints?: number;
   hasFreeSkillStarterDots?: boolean; // Track if this character was created with free starter dots
 

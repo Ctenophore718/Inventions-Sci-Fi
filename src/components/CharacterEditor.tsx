@@ -114,6 +114,16 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
       setSubclassFeature(sheet.subclassFeature || "");
       setSpeciesFeature(sheet.speciesFeature || "");
       setSubspeciesFeature(sheet.subspeciesFeature || "");
+      
+      // Sync automatic skill dots
+      if (sheet.automaticSkillDots) {
+        setAutomaticSkillDots(sheet.automaticSkillDots);
+      }
+      
+      // Sync languages
+      if (sheet.languages) {
+        setLanguages(sheet.languages);
+      }
     }
   }, [sheet]);
 
@@ -151,6 +161,194 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [charClass]);
 
+  // Helper function to calculate total XP/SP spent on class dots (from LevelUp page)
+  const calculateClassDotsSpent = (dots: boolean[][]): { xpSpent: number, spSpent: number } => {
+    if (!dots || !Array.isArray(dots) || dots.length === 0) {
+      return { xpSpent: 0, spSpent: 0 };
+    }
+    
+    let totalXp = 0;
+    let totalSp = 0;
+    
+    // Row 0: Subclass dots (3xp, 5xp)
+    if (dots[0] && Array.isArray(dots[0])) {
+      const xpCosts = [3, 5];
+      for (let i = 0; i < dots[0].length && i < xpCosts.length; i++) {
+        if (dots[0][i]) totalXp += xpCosts[i];
+      }
+    }
+    
+    // Row 1: Special Ability (7xp)
+    if (dots[1] && Array.isArray(dots[1]) && dots[1][0]) {
+      totalXp += 7;
+    }
+    
+    // Row 2: Attributes ([3, 6, 9] xp for different dots)
+    if (dots[2] && Array.isArray(dots[2])) {
+      const xpCosts = [3, 6, 9];
+      for (let i = 0; i < dots[2].length && i < xpCosts.length; i++) {
+        if (dots[2][i]) totalXp += xpCosts[i];
+      }
+    }
+    
+    // Row 3: Other abilities (7xp)
+    if (dots[3] && Array.isArray(dots[3]) && dots[3][0]) {
+      totalXp += 7;
+    }
+    
+    // Row 4: Other abilities (6xp)
+    if (dots[4] && Array.isArray(dots[4]) && dots[4][0]) {
+      totalXp += 6;
+    }
+    
+    // Row 5: Other abilities ([5, 8] xp)
+    if (dots[5] && Array.isArray(dots[5])) {
+      const xpCosts = [5, 8];
+      for (let i = 0; i < dots[5].length && i < xpCosts.length; i++) {
+        if (dots[5][i]) totalXp += xpCosts[i];
+      }
+    }
+    
+    // Row 6: Other abilities ([5, 8, 12] xp)
+    if (dots[6] && Array.isArray(dots[6])) {
+      const xpCosts = [5, 8, 12];
+      for (let i = 0; i < dots[6].length && i < xpCosts.length; i++) {
+        if (dots[6][i]) totalXp += xpCosts[i];
+      }
+    }
+    
+    // Row 7: Perks (10 sp for Chemical Concoctions)
+    if (dots[7] && Array.isArray(dots[7]) && dots[7][0]) {
+      totalSp += 10;
+    }
+    
+    return { xpSpent: totalXp, spSpent: totalSp };
+  };
+
+  // Helper function to check if any XP/SP has been spent anywhere
+  const hasAnyExpenditure = (): boolean => {
+    // Check class dots
+    if (sheet?.classCardDots) {
+      const classSpent = calculateClassDotsSpent(sheet.classCardDots);
+      if (classSpent.xpSpent > 0 || classSpent.spSpent > 0) return true;
+    }
+    
+    // Check skill dots (any manual dots beyond starter dots and automatic dots)
+    const hasFreeDots = sheet?.hasFreeSkillStarterDots;
+    const automaticDots = sheet?.automaticSkillDots || {};
+    
+    const manualSkillSpent = Object.entries(skillDots).some(([skillName, dotsArr]) => 
+      dotsArr.some((dot, idx) => {
+        if (!dot) return false;
+        
+        // Skip free starter dots (first two columns for characters with free starter dots)
+        if (hasFreeDots && (idx === 0 || idx === 1)) return false;
+        
+        // Skip automatic dots from class benefits
+        const automaticDotsForSkill = automaticDots[skillName] || [];
+        if (automaticDotsForSkill[idx]) return false;
+        
+        // This is a manually selected dot that costs SP
+        return true;
+      })
+    );
+    
+    return manualSkillSpent;
+  };
+
+  // Comprehensive reset function for all character aspects
+  const resetAllCharacterProgress = (newSelections: {
+    charClass?: string;
+    subclass?: string;
+    species?: string;
+    subspecies?: string;
+    background?: string;
+  } = {}) => {
+    if (!sheet) return;
+    
+    // Reset skill dots to starter configuration
+    const newSkillDots = Object.fromEntries(skillList.map(skill => {
+      const skillDots = Array(10).fill(false);
+      // Free starter dots in first two columns for characters that have them
+      if (sheet.hasFreeSkillStarterDots) {
+        skillDots[0] = true;
+        skillDots[1] = true;
+      }
+      return [skill, skillDots];
+    }));
+    
+    // Reset class card dots to empty
+    const emptyClassDots = [
+      [false, false],         // Subclass: 2 dots
+      [false],                // Special Ability: 1 dot
+      [false, false, false],  // Attributes: 3 dots
+      [false],                // Other: 1 dot  
+      [false],                // Other: 1 dot
+      [false, false],         // Other: 2 dots
+      [false, false, false],  // Other: 3 dots
+      [false],                // Perks: 1 dot
+      [false, false, false],  // Other: 3 dots
+      [false]                 // Other: 1 dot
+    ];
+    
+    // Reset automatic skill dots and languages
+    const emptyAutomaticSkillDots: { [key: string]: boolean[] } = {};
+    skillList.forEach(skill => {
+      emptyAutomaticSkillDots[skill] = Array(10).fill(false);
+    });
+    
+    // Update local state immediately
+    setSkillDots(newSkillDots);
+    setAutomaticSkillDots(emptyAutomaticSkillDots);
+    setLanguages([]);
+    
+    handleAutoSave({ 
+      ...newSelections,
+      skillDots: newSkillDots,
+      classCardDots: emptyClassDots, 
+      automaticSkillDots: emptyAutomaticSkillDots,
+      languages: [],
+      spSpent: 0, 
+      xpSpent: 0,
+      subclass: newSelections.subclass || ""  // Reset subclass when changing primary attributes
+    });
+  };
+
+  // Helper function to reset all class dots (simplified version for class-only changes)
+  const resetClassDots = (newClass?: string) => {
+    if (!sheet?.classCardDots) return;
+    
+    const spent = calculateClassDotsSpent(sheet.classCardDots);
+    
+    // Create empty dots for the new class
+    const emptyDots = [
+      [false, false],         // Subclass: 2 dots
+      [false],                // Special Ability: 1 dot
+      [false, false, false],  // Attributes: 3 dots
+      [false],                // Other: 1 dot  
+      [false],                // Other: 1 dot
+      [false, false],         // Other: 2 dots
+      [false, false, false],  // Other: 3 dots
+      [false],                // Perks: 1 dot
+      [false, false, false],  // Other: 3 dots
+      [false]                 // Other: 1 dot
+    ];
+    
+    // Calculate new SP/XP values
+    const currentSpSpent = sheet.spSpent || 0;
+    const currentXpSpent = sheet.xpSpent || 0;
+    const newSpSpent = Math.max(0, currentSpSpent - spent.spSpent);
+    const newXpSpent = Math.max(0, currentXpSpent - spent.xpSpent);
+    
+    handleAutoSave({ 
+      classCardDots: emptyDots, 
+      spSpent: newSpSpent, 
+      xpSpent: newXpSpent,
+      charClass: newClass || charClass,
+      subclass: ""  // Reset subclass when changing class
+    });
+  };
+
   // Rich JSX for Chemist, Coder, Commander, Contemplative, Devout
   // Dynamically show Crit bonus as [2] if '+2 Crit' dot is selected in classCardDots
   const chemCritBonus = sheet?.classCardDots?.[1]?.[0] ? 2 : 0;
@@ -171,15 +369,15 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
   );
   const commanderFeatureJSX = (
     <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#717211' }}>Stay Sharp.</i></b> At the beginning of the round, you and allies within <b>[3]</b>hx of you can remove an additional <i>Cooldown Token</i> from one <i>inactive</i> <b><i><span style={{ color: '#bf9000' }}>Technique</span></i></b> of their choice.
+      <b><i style={{ color: '#717211' }}>Stay Sharp.</i></b> At the beginning of the round, you and allies within <b>[3]</b>hx of you can remove an additional <i>Cooldown Token</i> from one <b><i><span style={{ color: '#bf9000' }}>Technique</span></i></b> of their choice.
     </span>
   );
   const contemplativeFeatureJSX = (
     <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#116372' }}>Psychosomatic Harmony.</i></b> You are <b>[resistant]</b> to <b><u style={{ color: '#a929ff', display: 'inline-flex', alignItems: 'center' }}>
+      <b><i style={{ color: '#116372' }}>Psychosomatic Harmony.</i></b> You are resistant to <b><u style={{ color: '#a929ff', display: 'inline-flex', alignItems: 'center' }}>
         Neural
         <img src="/Neural.png" alt="Neural" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
-      </u></b> and can <b><i style={{ color: '#351c75' }}>Strike</i></b> <b>[1]</b> extra time per turn.
+      </u></b> and can <b><i style={{ color: '#351c75' }}>Strike</i></b> one extra time per turn.
     </span>
   );
   const devoutFeatureJSX = (
@@ -287,6 +485,20 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
     }
   });
 
+  // Track which skill dots are automatically granted (non-clickable)
+  const [automaticSkillDots, setAutomaticSkillDots] = useState<{ [key: string]: boolean[] }>(() => {
+    if (sheet?.automaticSkillDots) {
+      return sheet.automaticSkillDots;
+    } else {
+      return Object.fromEntries(skillList.map(skill => [skill, Array(10).fill(false)]));
+    }
+  });
+
+  // Track languages
+  const [languages, setLanguages] = useState<string[]>(() => {
+    return sheet?.languages || [];
+  });
+
   // Initialize skillDots for new characters with starter dots
   useEffect(() => {
     if (isNewCharacter && !sheet?.skillDots) {
@@ -308,6 +520,144 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
       });
     }
   }, [isNewCharacter, sheet?.skillDots]);
+
+  // Handle automatic skill dots and languages based on class selection
+  useEffect(() => {
+    if (!sheet || !charClass) return;
+
+    const newAutomaticDots = Object.fromEntries(skillList.map(skill => [skill, Array(10).fill(false)]));
+    const newSkillDots = { ...skillDots };
+    const newLanguages = [...languages];
+    let hasChanges = false;
+    let hasLanguageChanges = false;
+
+    // Chemist gets exactly one free Investigation dot (only if they don't already have one)
+    if (charClass === 'Chemist') {
+      const investigationDots = newSkillDots['Investigation'] || Array(10).fill(false);
+      const automaticInvestigationDots = newAutomaticDots['Investigation'];
+      const currentAutomaticDots = sheet.automaticSkillDots?.['Investigation'] || Array(10).fill(false);
+      
+      // Check if we already have an automatic Investigation dot
+      const hasExistingAutomaticDot = currentAutomaticDots.some(dot => dot);
+      
+      // Only add an automatic dot if we don't already have one
+      if (!hasExistingAutomaticDot) {
+        // Find the next unclicked dot to give for free
+        let nextDotIndex = -1;
+        for (let i = 0; i < investigationDots.length; i++) {
+          if (!investigationDots[i]) {
+            nextDotIndex = i;
+            break;
+          }
+        }
+        
+        // If there's a next dot available, mark it as automatic and checked
+        if (nextDotIndex !== -1) {
+          newSkillDots['Investigation'][nextDotIndex] = true;
+          automaticInvestigationDots[nextDotIndex] = true;
+          hasChanges = true;
+        }
+      } else {
+        // Copy existing automatic dots
+        for (let i = 0; i < currentAutomaticDots.length; i++) {
+          if (currentAutomaticDots[i]) {
+            automaticInvestigationDots[i] = true;
+          }
+        }
+      }
+    }
+
+    // Coder gets exactly one free Oikomagic dot and Oikovox language
+    if (charClass === 'Coder') {
+      const oikomagicDots = newSkillDots['Oikomagic'] || Array(10).fill(false);
+      const automaticOikomagicDots = newAutomaticDots['Oikomagic'];
+      const currentAutomaticDots = sheet.automaticSkillDots?.['Oikomagic'] || Array(10).fill(false);
+      
+      // Check if we already have an automatic Oikomagic dot
+      const hasExistingAutomaticDot = currentAutomaticDots.some(dot => dot);
+      
+      // Only add an automatic dot if we don't already have one
+      if (!hasExistingAutomaticDot) {
+        // Find the next unclicked dot to give for free
+        let nextDotIndex = -1;
+        for (let i = 0; i < oikomagicDots.length; i++) {
+          if (!oikomagicDots[i]) {
+            nextDotIndex = i;
+            break;
+          }
+        }
+        
+        // If there's a next dot available, mark it as automatic and checked
+        if (nextDotIndex !== -1) {
+          newSkillDots['Oikomagic'][nextDotIndex] = true;
+          automaticOikomagicDots[nextDotIndex] = true;
+          hasChanges = true;
+        }
+      } else {
+        // Copy existing automatic dots
+        for (let i = 0; i < currentAutomaticDots.length; i++) {
+          if (currentAutomaticDots[i]) {
+            automaticOikomagicDots[i] = true;
+          }
+        }
+      }
+
+      // Add Oikovox language if not already present
+      if (!newLanguages.includes('Oikovox')) {
+        newLanguages.push('Oikovox');
+        hasLanguageChanges = true;
+      }
+    }
+
+    // Remove automatic dots if class is no longer Chemist
+    if (charClass !== 'Chemist' && sheet.automaticSkillDots?.['Investigation']) {
+      const currentAutomaticDots = sheet.automaticSkillDots['Investigation'];
+      for (let i = 0; i < currentAutomaticDots.length; i++) {
+        if (currentAutomaticDots[i]) {
+          newSkillDots['Investigation'][i] = false;
+          hasChanges = true;
+        }
+      }
+    }
+
+    // Remove automatic dots and languages if class is no longer Coder
+    if (charClass !== 'Coder' && sheet.automaticSkillDots?.['Oikomagic']) {
+      const currentAutomaticDots = sheet.automaticSkillDots['Oikomagic'];
+      for (let i = 0; i < currentAutomaticDots.length; i++) {
+        if (currentAutomaticDots[i]) {
+          newSkillDots['Oikomagic'][i] = false;
+          hasChanges = true;
+        }
+      }
+    }
+
+    // Remove Oikovox language if class is no longer Coder
+    if (charClass !== 'Coder' && newLanguages.includes('Oikovox')) {
+      const index = newLanguages.indexOf('Oikovox');
+      newLanguages.splice(index, 1);
+      hasLanguageChanges = true;
+    }
+
+    if (hasChanges || hasLanguageChanges) {
+      if (hasChanges) {
+        setSkillDots(newSkillDots);
+        setAutomaticSkillDots(newAutomaticDots);
+      }
+      if (hasLanguageChanges) {
+        setLanguages(newLanguages);
+      }
+      handleAutoSave({
+        ...(hasChanges && { skillDots: newSkillDots, automaticSkillDots: newAutomaticDots }),
+        ...(hasLanguageChanges && { languages: newLanguages })
+      });
+    } else if (charClass === 'Chemist') {
+      // Even if no changes to skill dots, make sure we preserve existing automatic dots
+      setAutomaticSkillDots(newAutomaticDots);
+    } else if (charClass === 'Coder') {
+      // Even if no changes to skill dots, make sure we preserve existing automatic dots
+      setAutomaticSkillDots(newAutomaticDots);
+    }
+  }, [charClass]); // Only depend on charClass changes, not sheet.id
   // Track SP spent for skills
   const [spSpent, setSpSpent] = useState(() => {
     if (sheet?.spSpent !== undefined) {
@@ -349,7 +699,11 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
         if (updatedSheet.spSpent !== spSpent) setSpSpent(updatedSheet.spSpent ?? 0);
         if (JSON.stringify(updatedSheet.deathDots) !== JSON.stringify(deathDots)) setDeathDots(updatedSheet.deathDots || Array(10).fill(false));
         if (updatedSheet.multiStrike !== multiStrike) setMultiStrike(updatedSheet.multiStrike || 0);
-        if (updatedSheet.strikeEffects !== strikeEffects) setStrikeEffects(updatedSheet.strikeEffects || "");          // Update character details if they've changed
+        if (updatedSheet.strikeEffects !== strikeEffects) setStrikeEffects(updatedSheet.strikeEffects || "");
+        // Update skill dots if they've changed
+        if (JSON.stringify(updatedSheet.skillDots) !== JSON.stringify(skillDots)) setSkillDots(updatedSheet.skillDots || {});
+        if (JSON.stringify(updatedSheet.automaticSkillDots) !== JSON.stringify(automaticSkillDots)) setAutomaticSkillDots(updatedSheet.automaticSkillDots || {});
+          // Update character details if they've changed
           if (updatedSheet.charClass !== charClass) setCharClass(updatedSheet.charClass || "");
           if (updatedSheet.subclass !== subclass) setSubclass(updatedSheet.subclass || "");
           if (updatedSheet.species !== species) setSpecies(updatedSheet.species || "");
@@ -378,6 +732,10 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
         if (JSON.stringify(updatedSheet.deathDots) !== JSON.stringify(deathDots)) setDeathDots(updatedSheet.deathDots || Array(10).fill(false));
         if (updatedSheet.multiStrike !== multiStrike) setMultiStrike(updatedSheet.multiStrike || 0);
         if (updatedSheet.strikeEffects !== strikeEffects) setStrikeEffects(updatedSheet.strikeEffects || "");
+        // Update skill dots if they've changed
+        if (JSON.stringify(updatedSheet.skillDots) !== JSON.stringify(skillDots)) setSkillDots(updatedSheet.skillDots || {});
+        if (JSON.stringify(updatedSheet.automaticSkillDots) !== JSON.stringify(automaticSkillDots)) setAutomaticSkillDots(updatedSheet.automaticSkillDots || {});
+        if (JSON.stringify(updatedSheet.languages) !== JSON.stringify(languages)) setLanguages(updatedSheet.languages || []);
         
         // Update character details if they've changed
         if (updatedSheet.charClass !== charClass) setCharClass(updatedSheet.charClass || "");
@@ -448,8 +806,14 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
   // SP cost per column in the skills grid
   const skillSpCosts = [1,1,2,2,3,4,5,6,8,10];
 
-  // Ensure SP spent is calculated correctly on mount
+  // Ensure SP spent is calculated correctly on mount - but only if not already set
   useEffect(() => {
+    // Only recalculate if spSpent is not already set in the sheet or if this is a new character
+    if (sheet?.spSpent !== undefined && sheet.spSpent !== null) {
+      // SP spent is already calculated and saved, don't override it
+      return;
+    }
+    
     let total = 0;
     const hasFreeDots = sheet?.hasFreeSkillStarterDots;
     Object.values(skillDots).forEach(dotsArr => {
@@ -465,7 +829,7 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
       });
     });
     setSpSpent(total);
-  }, [skillDots, sheet?.hasFreeSkillStarterDots]); // Recalculate when skillDots change
+  }, [skillDots, sheet?.hasFreeSkillStarterDots, sheet?.spSpent]); // Recalculate when skillDots change or when sheet.spSpent changes
 
 
   // Hit Points UI state
@@ -1222,8 +1586,24 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
                 <select 
                   value={background} 
                   onChange={e => {
-                    setBackground(e.target.value);
-                    handleAutoSave({ background: e.target.value });
+                    const val = e.target.value;
+                    
+                    // Check if any XP/SP has been spent when changing background
+                    if (val !== background && hasAnyExpenditure()) {
+                      const confirmed = window.confirm("All selections and spent xp and/or sp will be reset. Are you sure you want to switch your background?");
+                      if (!confirmed) {
+                        // Reset the select to the current background
+                        e.target.value = background;
+                        return;
+                      }
+                      // Reset all progress before changing background
+                      resetAllCharacterProgress({ background: val });
+                      setBackground(val);
+                      return;
+                    }
+                    
+                    setBackground(val);
+                    handleAutoSave({ background: val });
                   }} 
                   className={styles.colorSelect}
                   style={{ 
@@ -1264,9 +1644,26 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
                 <select 
                   value={charClass}
                   onChange={e => {
-                    setCharClass(e.target.value);
+                    const newClass = e.target.value;
+                    
+                    // Check if any XP/SP has been spent
+                    if (newClass !== charClass && hasAnyExpenditure()) {
+                      const confirmed = window.confirm("All selections and spent xp and/or sp will be reset. Are you sure you want to switch your class?");
+                      if (!confirmed) {
+                        // Reset the select to the current class
+                        e.target.value = charClass;
+                        return;
+                      }
+                      // Reset all progress before changing class
+                      resetAllCharacterProgress({ charClass: newClass });
+                      setCharClass(newClass);
+                      setSubclass(""); 
+                      return;
+                    }
+                    
+                    setCharClass(newClass);
                     setSubclass(""); 
-                    handleAutoSave({ charClass: e.target.value, subclass: "" });
+                    handleAutoSave({ charClass: newClass, subclass: "" });
                   }} 
                   className={styles.colorSelect + ' ' + styles.selectedClassColor}
                   style={{ 
@@ -1305,6 +1702,33 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
                   value={subclass} 
                   onChange={e => {
                     const val = e.target.value;
+                    
+                    // Check if any XP/SP has been spent when changing subclass
+                    if (val !== subclass && hasAnyExpenditure()) {
+                      const confirmed = window.confirm("All selections and spent xp and/or sp will be reset. Are you sure you want to switch your subclass?");
+                      if (!confirmed) {
+                        // Reset the select to the current subclass
+                        e.target.value = subclass;
+                        return;
+                      }
+                      // Reset all progress before changing subclass
+                      if (!charClass && val) {
+                        const found = allSubclassOptions.find(opt => opt.value === val);
+                        if (found) {
+                          resetAllCharacterProgress({ subclass: val, charClass: found.class });
+                          setCharClass(found.class);
+                          setSubclass(val);
+                        } else {
+                          resetAllCharacterProgress({ subclass: val });
+                          setSubclass(val);
+                        }
+                      } else {
+                        resetAllCharacterProgress({ subclass: val });
+                        setSubclass(val);
+                      }
+                      return;
+                    }
+                    
                     setSubclass(val);
                     if (!charClass && val) {
                       const found = allSubclassOptions.find(opt => opt.value === val);
@@ -1354,9 +1778,26 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
                 <select 
                   value={species} 
                   onChange={e => {
-                    setSpecies(e.target.value);
+                    const val = e.target.value;
+                    
+                    // Check if any XP/SP has been spent when changing species
+                    if (val !== species && hasAnyExpenditure()) {
+                      const confirmed = window.confirm("All selections and spent xp and/or sp will be reset. Are you sure you want to switch your species?");
+                      if (!confirmed) {
+                        // Reset the select to the current species
+                        e.target.value = species;
+                        return;
+                      }
+                      // Reset all progress before changing species
+                      resetAllCharacterProgress({ species: val, subspecies: "" });
+                      setSpecies(val);
+                      setSubspecies("");
+                      return;
+                    }
+                    
+                    setSpecies(val);
                     setSubspecies("");
-                    handleAutoSave({ species: e.target.value, subspecies: "" });
+                    handleAutoSave({ species: val, subspecies: "" });
                   }}
                   className={styles.colorSelect + ' ' + styles.selectedSpeciesColor}
                   style={{ 
@@ -1395,6 +1836,41 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
                   value={subspecies} 
                   onChange={e => {
                     const val = e.target.value;
+                    
+                    // Check if any XP/SP has been spent when changing subspecies
+                    if (val !== subspecies && hasAnyExpenditure()) {
+                      const confirmed = window.confirm("All selections and spent xp and/or sp will be reset. Are you sure you want to switch your subspecies?");
+                      if (!confirmed) {
+                        // Reset the select to the current subspecies
+                        e.target.value = subspecies;
+                        return;
+                      }
+                      // Reset all progress before changing subspecies
+                      if (val === "Nocturne" || val === "Vulturine") {
+                        resetAllCharacterProgress({ subspecies: val, species: "Avenoch" });
+                        setSubspecies(val);
+                        setSpecies("Avenoch");
+                      } else if ((val === "Infrared" || val === "Radiofrequent" || val === "X-Ray") && !species) {
+                        resetAllCharacterProgress({ subspecies: val, species: "Lumenaren" });
+                        setSubspecies(val);
+                        setSpecies("Lumenaren");
+                      } else if (!species && val) {
+                        const found = allSubspeciesOptions.find(opt => opt.value === val);
+                        if (found && found.species) {
+                          resetAllCharacterProgress({ subspecies: val, species: found.species });
+                          setSubspecies(val);
+                          setSpecies(found.species);
+                        } else {
+                          resetAllCharacterProgress({ subspecies: val });
+                          setSubspecies(val);
+                        }
+                      } else {
+                        resetAllCharacterProgress({ subspecies: val });
+                        setSubspecies(val);
+                      }
+                      return;
+                    }
+                    
                     setSubspecies(val);
                     // Special case: Nocturne and Vulturine should always set species to Avenoch
                     if (val === "Nocturne" || val === "Vulturine") {
@@ -1901,13 +2377,15 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
                       const isFirstTwoColumns = i === 0 || i === 1;
                       const hasFreeDots = sheet?.hasFreeSkillStarterDots;
                       const isLockedColumn = hasFreeDots && isFirstTwoColumns;
+                      const isAutomaticDot = automaticSkillDots[skill]?.[i] || false;
+                      const isClickDisabled = isLockedColumn || isAutomaticDot;
                       
                       return (
                         <td key={i} style={{ textAlign: 'center', padding: '2px 4px' }}>
                           <span
                             onClick={() => {
-                              // Prevent clicking on locked columns for new characters
-                              if (isLockedColumn) return;
+                              // Prevent clicking on locked columns or automatic dots
+                              if (isClickDisabled) return;
                               
                               setSkillDots(prev => {
                                 setSpNotice("");
@@ -1957,6 +2435,17 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
                                   return prev;
                                 }
                                 setSpSpent(newTotal);
+                                
+                                // Auto-save the updated skill dots and SP spent
+                                const timeoutId = setTimeout(() => {
+                                  if (sheet) {
+                                    handleAutoSave({
+                                      skillDots: newSkillDots,
+                                      spSpent: newTotal
+                                    });
+                                  }
+                                }, 100);
+                                
                                 return newSkillDots;
                               });
                             }}
@@ -1965,14 +2454,21 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
                               width: 18,
                               height: 18,
                               borderRadius: '50%',
-                              border: isLockedColumn ? '2px solid #666' : '2px solid #000',
-                              background: checked ? (isLockedColumn ? '#666' : '#000') : '#fff',
-                              cursor: isLockedColumn ? 'not-allowed' : ((canCheck && !checked) || canUncheck ? 'pointer' : 'not-allowed'),
-                              opacity: isLockedColumn ? 0.6 : ((canCheck && !checked) || canUncheck ? 1 : 0.4),
+                              border: isLockedColumn ? '2px solid #666' : 
+                                     isAutomaticDot ? '2px solid #721131' : '2px solid #000',
+                              background: checked ? 
+                                (isLockedColumn ? '#666' : 
+                                 isAutomaticDot ? '#721131' : '#000') : '#fff',
+                              cursor: isClickDisabled ? 'not-allowed' : 
+                                     ((canCheck && !checked) || canUncheck ? 'pointer' : 'not-allowed'),
+                              opacity: isClickDisabled ? 0.6 : 
+                                      ((canCheck && !checked) || canUncheck ? 1 : 0.4),
                             }}
                             title={
                               isLockedColumn 
                                 ? 'Starting skill dots (cannot be changed)'
+                                : isAutomaticDot 
+                                ? 'Automatic class skill dot (cannot be changed)'
                                 : (!checked && canCheck)
                                 ? `Toggle`
                                 : (canUncheck ? `Uncheck rightmost first` : `Must uncheck rightmost first`)
@@ -1995,19 +2491,31 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
       <div className={styles.perksCard}>
         <h3 style={{ marginTop: 0, textDecoration: 'underline' }}>Languages & Perks</h3>
         <div className={styles.cardContent}>
-          <div style={{ fontWeight: 'bold', marginBottom: 6 }}>Languages</div>
+          <div style={{ fontWeight: 'bold', marginBottom: 6 }}>Languages:</div>
+          {languages.length > 0 && (
+            <div style={{ marginBottom: 8, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '0.9em' }}>
+              {languages.map((language, index) => (
+                <span key={language} style={{ 
+                  color: language === 'Oikovox' ? '#112972' : '#000',
+                  fontWeight: language === 'Oikovox' ? 'bold' : 'normal'
+                }}>
+                  {language}{index < languages.length - 1 ? ', ' : ''}
+                </span>
+              ))}
+            </div>
+          )}
           <div style={{ fontWeight: 'bold', marginBottom: 2 }}>
-            Perk 1
             {sheet?.classCardDots?.[9]?.[0] && (
-              <span style={{ color: '#721131', fontWeight: 'bold', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '0.90em', marginLeft: 8 }}>
-                <b><i>Chemical Concoctions.</i></b> You can create myriad concoctions. When doing so, choose a skill. Upon drinking a concoction, the imbiber gains an advantage on the next sill roll of your choice. You can create up to 3 concoctions per day which each last until the end of the day.
+              <span style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '0.90em' }}>
+                <b><i style={{ color: '#721131' }}>Chemical Concoctions.</i></b>
+                <span style={{ color: '#000', fontWeight: 'normal', fontStyle: 'normal' }}> You can create myriad concoctions. When doing so, choose a skill. Upon drinking a concoction, the imbiber gains an advantage on the next sill roll of your choice. You can create up to 3 concoctions per day which each last until the end of the day.</span>
               </span>
             )}
           </div>
-          <div style={{ fontWeight: 'bold', marginBottom: 2 }}>Perk 2</div>
-          <div style={{ fontWeight: 'bold', marginBottom: 2 }}>Perk 3</div>
-          <div style={{ fontWeight: 'bold', marginBottom: 2 }}>Perk 4</div>
-          <div style={{ fontWeight: 'bold', marginBottom: 2 }}>Perk 5</div>
+          <div style={{ fontWeight: 'bold', marginBottom: 2 }}></div>
+          <div style={{ fontWeight: 'bold', marginBottom: 2 }}></div>
+          <div style={{ fontWeight: 'bold', marginBottom: 2 }}></div>
+          <div style={{ fontWeight: 'bold', marginBottom: 2 }}></div>
         </div>
       </div>
 

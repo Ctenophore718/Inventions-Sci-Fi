@@ -312,7 +312,7 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
                   }
                   return (
                     <>
-                      You spend any number of <i>Chem Tokens</i>. After doing so, you and allies within <b>[{hx}]</b>hx of you gain +2 to Crit rolls, +<b>[{chem}]</b>d6 <b><span style={{ color: '#de7204' }}>Chemical</span></b><img src="/Chemical.png" alt="Chemical" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /> and/or +<b>[{hxRange}]</b>hx Range to <b><i><span style={{ color: '#990000' }}>Attacks</span></i></b> for each Token spent until the start of the next round.
+                      You spend any number of <i>Chem Tokens</i>. After doing so, you and allies within <b>[{hx}]</b>hx of you gain +2 to Crit rolls, +<b>[{chem}]</b>d6 <b><span style={{ color: '#de7204' }}>Chemical</span></b><img src="/Chemical.png" alt="Chemical" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /> and +<b>[{hxRange}]</b>hx Range to <b><i><span style={{ color: '#990000' }}>Attacks</span></i></b> for each Token spent until the start of the next round.
                     </>
                   );
                 })() : (
