@@ -1353,7 +1353,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                       <span></span>
                       <span></span>
                       {/* Row 4: Resist all Damage dot (interactive, col 2) */}
-                      <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>Resist all Damage</span>
+                      <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}><i>Resist</i> all Damage</span>
                       <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
                         {(() => {
                           const arr = safeGetDotsArray(3);
@@ -1398,23 +1398,27 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                       <span></span>
                       {/* Row 5: Arrow and connection */}
                       <span></span>
-                      <span style={{ textAlign: 'center', fontSize: '1.2em', fontWeight: 'bold', color: '#666' }}>⤷</span>
+                      <span></span>
                       <span></span>
                       <span></span>
                       {/* Row 6: XP header (32xp) */}
                       <span></span>
+                      <span></span>
                       <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>32xp</span>
                       <span></span>
-                      <span></span>
                       {/* Row 7: Damage immunity dot (interactive, col 2) */}
-                      <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>Damage immunity</span>
+                      <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>Damage <i>Immunity</i></span>
+                      <span style={{ textAlign: 'center', fontSize: '1.2em', fontWeight: 'bold', color: '#666' }}>⤷</span>
                       <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
                         {(() => {
                           const arr = safeGetDotsArray(4);
                           const idx = 0;
-                          const canCheck = idx === 0 || arr.slice(0, idx).every(Boolean);
+                          // Require Resist all Damage (row 3, idx 0) to be checked first
+                          const resistAllArr = safeGetDotsArray(3);
+                          const resistAllChecked = resistAllArr[0];
+                          const canCheck = ((idx === 0 || arr.slice(0, idx).every(Boolean)) && resistAllChecked);
                           const rightmostChecked = arr.lastIndexOf(true);
-                          const canUncheck = arr[idx] && idx === rightmostChecked;
+                          const canUncheck = arr[idx] && rightmostChecked === idx;
                           // XP cost for this dot (32xp)
                           const xpCosts = [32];
                           return (
@@ -1444,11 +1448,11 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                                 cursor: (canCheck && !arr[idx]) || canUncheck ? 'pointer' : 'not-allowed',
                                 transition: 'background 0.2s'
                               }}
+                              title={resistAllChecked ? undefined : 'Requires Resist all Damage'}
                             ></span>
                           );
                         })()}
                       </span>
-                      <span></span>
                       <span></span>
                       {/* Row 8: XP header (4xp, 7xp) */}
                       <span></span>

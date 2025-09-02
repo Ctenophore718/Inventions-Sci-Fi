@@ -196,7 +196,7 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
                 fontFamily: 'Arial, Helvetica, sans-serif',
                 fontWeight: 'bold',
                 fontSize: 'clamp(0.8em, 4vw, 1.25em)',
-                color: charClass === 'Chemist' ? '#721131' : 'black',
+                color: charClass === 'Chemist' ? '#721131' : charClass === 'Coder' ? '#112972' : 'black',
                 lineHeight: 1,
                 textAlign: 'left',
                 whiteSpace: 'nowrap',
@@ -205,13 +205,13 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
                 flexShrink: 1,
                 marginRight: '5px'
               }}>
-                {charClass === 'Chemist' ? 'Volatile Experiments' : 'Class Card Name'}
+                {charClass === 'Chemist' ? 'Volatile Experiments' : charClass === 'Coder' ? 'Reflection Script' : 'Class Card Name'}
               </span>
               <span style={{
                 fontFamily: 'Arial, Helvetica, sans-serif',
                 fontStyle: 'italic',
                 fontSize: '0.75em', // 10% smaller than 0.85em
-                color: charClass === 'Chemist' ? '#721131' : 'black',
+                color: charClass === 'Chemist' ? '#721131' : charClass === 'Coder' ? '#112972' : 'black',
                 lineHeight: 1,
                 whiteSpace: 'normal',
                 wordBreak: 'keep-all',
@@ -219,12 +219,12 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
                 maxWidth: '72px',
                 display: 'inline-block',
                 textAlign: 'right'
-              }}>{charClass === 'Chemist' ? 'Chemist' : 'Class'}</span>
+              }}>{charClass === 'Chemist' ? 'Chemist' : charClass === 'Coder' ? 'Coder' : 'Class'}</span>
             </div>
             {/* Conditional image based on class */}
             <img 
-              src={charClass === 'Chemist' ? "/Volatile Experiments.png" : "/Blank Card.png"}
-              alt={charClass === 'Chemist' ? "Volatile Experiments" : "Blank Card"}
+              src={charClass === 'Chemist' ? "/Volatile Experiments.png" : charClass === 'Coder' ? "/Reflection Script.png" : "/Blank Card.png"}
+              alt={charClass === 'Chemist' ? "Volatile Experiments" : charClass === 'Coder' ? "Reflection Script" : "Blank Card"}
               style={{
                 position: 'absolute',
                 top: 35,
@@ -262,6 +262,14 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
                       if (localSheet.classCardDots[5][1]) cooldown = 2;
                     }
                     return cooldown;
+                  })() : charClass === 'Coder' ? (() => {
+                    // -1 Cooldown is row 5, indices 0 and 1 for Coder
+                    let cooldown = 4;
+                    if (localSheet && Array.isArray(localSheet.classCardDots) && Array.isArray(localSheet.classCardDots[5])) {
+                      if (localSheet.classCardDots[5][0]) cooldown = 3;
+                      if (localSheet.classCardDots[5][1]) cooldown = 2;
+                    }
+                    return cooldown;
                   })() : '#'}]
                 </span>
               </span>
@@ -292,7 +300,7 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
                 overflow: 'hidden'
               }}>
                 {charClass === 'Chemist' ? (() => {
-                  // Get the number of selected +1hx dots (row 2)
+                  // ...existing code for Chemist...
                   let hx = 3;
                   let chem = 0;
                   let hxRange = 0;
@@ -301,11 +309,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
                       const selected = localSheet.classCardDots[2].filter(Boolean).length;
                       hx = 3 + selected;
                     }
-                    // +1d6 Chemical per token is row 3, index 0
                     if (Array.isArray(localSheet.classCardDots[3]) && localSheet.classCardDots[3][0]) {
                       chem = 1;
                     }
-                    // +1hx Range per token is row 4, index 0
                     if (Array.isArray(localSheet.classCardDots[4]) && localSheet.classCardDots[4][0]) {
                       hxRange = 1;
                     }
@@ -315,9 +321,30 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
                       You spend any number of <i>Chem Tokens</i>. After doing so, you and allies within <b>[{hx}]</b>hx of you gain +2 to Crit rolls, +<b>[{chem}]</b>d6 <b><span style={{ color: '#de7204' }}>Chemical</span></b><img src="/Chemical.png" alt="Chemical" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /> and/or +<b>[{hxRange}]</b>hx Range to <b><i><span style={{ color: '#990000' }}>Attacks</span></i></b> for each Token spent until the start of the next round.
                     </>
                   );
-                })() : (
-                  'Card stats.'
-                )}
+                })() : charClass === 'Coder' ? (() => {
+                  // Row 2: +1d6 Damage dots (3 dots)
+                  let dmg = 1;
+                  let resistText = '[ - ]';
+                  if (localSheet && Array.isArray(localSheet.classCardDots)) {
+                    if (Array.isArray(localSheet.classCardDots[2])) {
+                      const selected = localSheet.classCardDots[2].filter(Boolean).length;
+                      if (selected > 0) dmg = 2 + (selected - 1);
+                    }
+                    // Row 4: Damage Immunity (dot 0)
+                    if (Array.isArray(localSheet.classCardDots[4]) && localSheet.classCardDots[4][0]) {
+                      resistText = '[Immune]';
+                    } else if (Array.isArray(localSheet.classCardDots[3]) && localSheet.classCardDots[3][0]) {
+                      // Row 3: Resist all Damage (dot 0)
+                      resistText = '[Resistant]';
+                    }
+                  }
+                  return (
+                    <>
+                      Until the start of the next round, whenever you and any ally within 3hx of you take Damage from an enemy, that enemy takes <b>[{dmg}]</b>d6 Damage of the same type it dealt. Additionally, you and allies within 3hx are <b>{resistText}</b> to the original Damage.
+                    </>
+                  );
+                })()
+                : 'Card stats.'}
               </div>
             </div>
             {/* Flavor text - absolutely positioned and locked */}
@@ -337,8 +364,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
             }}>
               {charClass === 'Chemist' ? 
                 'With the right concoctions, any spell or weapon becomes even more volatile than before.' : 
-                'Flavor text.'
-              }
+                charClass === 'Coder' ?
+                (<span>“Although it’s a universal script, the math behind reflecting energetic material is quite complex.”<br />--Luminova, X-Ray Naturalist</span>)
+                : 'Flavor text.'}
             </div>
             </div>
             

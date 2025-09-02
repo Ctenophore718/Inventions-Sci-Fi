@@ -164,9 +164,16 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
       <b><i style={{ color: '#721131' }}>Chemical Reaction.</i></b> At the start of each round, you gain 1 <i>Chem Token</i>, up to a maximum of <b>[{chemTokenMax}]</b> <i>Chem Token</i>s. While you have at least 1 <i>Chem Token</i>, your <b><i><span style={{ color: '#000' }}>Primary</span> <span style={{ color: '#990000' }}>Attack</span></i></b> gains a +<b>[{chemCritBonus}]</b> Crit and deals +1 Damage die.
     </span>
   );
+  // Show [100] if Coder's Ignore 100% Cover dot is selected (classCardDots[0][0])
+  const coderIgnore100 = charClass === "Coder" && sheet?.classCardDots?.[0]?.[0];
+  // Show Crit bonus as [1], [2], [3] if +1 Crit dots are selected (classCardDots[1])
+  let coderCritBonus = 0;
+  if (charClass === "Coder" && sheet?.classCardDots?.[1]) {
+    coderCritBonus = sheet.classCardDots[1].filter(Boolean).length;
+  }
   const coderFeatureJSX = (
     <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#112972' }}>Subtle Magic.</i></b> Your <b><i><span style={{ color: '#990000' }}>Attacks</span></i></b> ignore <b>[50]</b>% Cover and gain a +<b>[0]</b> Crit.
+      <b><i style={{ color: '#112972' }}>Subtle Magic.</i></b> Your <b><i><span style={{ color: '#990000' }}>Attacks</span></i></b> ignore <b>[{coderIgnore100 ? 100 : 50}]</b>% Cover and gain a +<b>[{coderCritBonus}]</b> Crit.
     </span>
   );
   const commanderFeatureJSX = (
@@ -1895,6 +1902,23 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
                     <td style={{ fontWeight: 'bold', padding: '4px 8px', whiteSpace: 'nowrap' }}>{skill}</td>
                     {(skillDots[skill] || Array(10).fill(false)).map((checked, i) => {
                       const skillDotsForSkill = skillDots[skill] || Array(10).fill(false);
+                      
+                      // Check for class-based automatic skill dots
+                      const isChemistInvestigation = charClass === "Chemist" && skill === "Investigation" && i === 2;
+                      const isCoderOikomagic = charClass === "Coder" && skill === "Oikomagic" && i === 2;
+                      if (isChemistInvestigation || isCoderOikomagic) {
+                        checked = true; // Force third dot to be filled for Chemist (Investigation) or Coder (Oikomagic)
+                      }
+
+                      // Define class-specific colors for automatic skill dots
+                      const getClassBoostColor = () => {
+                        if (isChemistInvestigation) return "#72515f";
+                        if (isCoderOikomagic) return "#8f95a8";
+                        // Add other class colors here in the future
+                        return "#d0d0d0"; // fallback color
+                      };
+                      const classBoostColor = getClassBoostColor();
+                      
                       const canCheck = i === 0 || skillDotsForSkill.slice(0, i).every(Boolean);
                       const rightmostChecked = skillDotsForSkill.lastIndexOf(true);
                       const canUncheck = checked && i === rightmostChecked;
@@ -1908,6 +1932,9 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
                             onClick={() => {
                               // Prevent clicking on locked columns for new characters
                               if (isLockedColumn) return;
+                              
+                              // Prevent clicking on class-based automatic skill dots
+                              if (isChemistInvestigation || isCoderOikomagic) return;
                               
                               setSkillDots(prev => {
                                 setSpNotice("");
@@ -1965,13 +1992,15 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
                               width: 18,
                               height: 18,
                               borderRadius: '50%',
-                              border: isLockedColumn ? '2px solid #666' : '2px solid #000',
-                              background: checked ? (isLockedColumn ? '#666' : '#000') : '#fff',
-                              cursor: isLockedColumn ? 'not-allowed' : ((canCheck && !checked) || canUncheck ? 'pointer' : 'not-allowed'),
-                              opacity: isLockedColumn ? 0.6 : ((canCheck && !checked) || canUncheck ? 1 : 0.4),
+                              border: (isChemistInvestigation || isCoderOikomagic) ? `2px solid ${classBoostColor}` : (isLockedColumn ? '2px solid #666' : '2px solid #000'),
+                              background: checked ? ((isChemistInvestigation || isCoderOikomagic) ? classBoostColor : (isLockedColumn ? '#666' : '#000')) : '#fff',
+                              cursor: (isLockedColumn || isChemistInvestigation || isCoderOikomagic) ? 'not-allowed' : ((canCheck && !checked) || canUncheck ? 'pointer' : 'not-allowed'),
+                              opacity: (isLockedColumn || isChemistInvestigation || isCoderOikomagic) ? 0.6 : ((canCheck && !checked) || canUncheck ? 1 : 0.4),
                             }}
                             title={
-                              isLockedColumn 
+                              isChemistInvestigation || isCoderOikomagic
+                                ? 'Class bonus skill dot (cannot be changed)'
+                                : isLockedColumn 
                                 ? 'Starting skill dots (cannot be changed)'
                                 : (!checked && canCheck)
                                 ? `Toggle`
@@ -1996,18 +2025,14 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
         <h3 style={{ marginTop: 0, textDecoration: 'underline' }}>Languages & Perks</h3>
         <div className={styles.cardContent}>
           <div style={{ fontWeight: 'bold', marginBottom: 6 }}>Languages</div>
-          <div style={{ fontWeight: 'bold', marginBottom: 2 }}>
-            Perk 1
-            {sheet?.classCardDots?.[9]?.[0] && (
-              <span style={{ color: '#721131', fontWeight: 'bold', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '0.90em', marginLeft: 8 }}>
-                <b><i>Chemical Concoctions.</i></b> You can create myriad concoctions. When doing so, choose a skill. Upon drinking a concoction, the imbiber gains an advantage on the next sill roll of your choice. You can create up to 3 concoctions per day which each last until the end of the day.
+          {/* Class Perk segment, only visible if Chemist's Chemical Concoctions dot is selected */}
+          {charClass === 'Chemist' && sheet?.classCardDots?.[9]?.[0] && (
+            <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <span>
+                <b><i style={{ color: '#721131' }}>Chemical Concoctions.</i></b> <span style={{ color: '#000' }}>You can create myriad concoctions. When doing so, choose a skill. Upon drinking a concoction, the imbiber gains an advantage on the next skill roll of your choice. You can create up to 3 concoctions per day which each last until the end of the day.</span>
               </span>
-            )}
-          </div>
-          <div style={{ fontWeight: 'bold', marginBottom: 2 }}>Perk 2</div>
-          <div style={{ fontWeight: 'bold', marginBottom: 2 }}>Perk 3</div>
-          <div style={{ fontWeight: 'bold', marginBottom: 2 }}>Perk 4</div>
-          <div style={{ fontWeight: 'bold', marginBottom: 2 }}>Perk 5</div>
+            </div>
+          )}
         </div>
       </div>
 
