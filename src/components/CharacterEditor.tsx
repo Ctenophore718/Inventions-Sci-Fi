@@ -34,6 +34,7 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
 
   // Portrait upload state and ref
   const [portraitUrl, setPortraitUrl] = useState<string | null>(sheet?.portrait || null);
+  const [showPortraitOptions, setShowPortraitOptions] = useState(false);
   const portraitInputRef = React.useRef<HTMLInputElement>(null);
   const [isNavExpanded, setIsNavExpanded] = useState(false);
   const [isXpSpMenuExpanded, setIsXpSpMenuExpanded] = useState(false);
@@ -459,20 +460,25 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
   useEffect(() => {
     let total = 0;
     const hasFreeDots = sheet?.hasFreeSkillStarterDots;
-    Object.values(skillDots).forEach(dotsArr => {
+    Object.entries(skillDots).forEach(([skillName, dotsArr]) => {
       dotsArr.forEach((dot, idx) => {
         if (dot) {
+          // Check if this is a booster dot (should not cost SP)
+          const isBoosterDot = (charClass === "Chemist" && skillName === "Investigation" && idx === 2) ||
+                              (charClass === "Coder" && skillName === "Oikomagic" && idx === 2);
+          
           // For characters with free starter dots, first two columns are free
           if (hasFreeDots && (idx === 0 || idx === 1)) {
             // Don't add cost for first two columns on characters with free starter dots
-          } else {
+          } else if (!isBoosterDot) {
+            // Don't add cost for booster dots
             total += skillSpCosts[idx];
           }
         }
       });
     });
     setSpSpent(total);
-  }, [skillDots, sheet?.hasFreeSkillStarterDots]); // Recalculate when skillDots change
+  }, [skillDots, sheet?.hasFreeSkillStarterDots, charClass]); // Recalculate when skillDots or charClass change
 
 
   // Hit Points UI state
@@ -1200,31 +1206,29 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
       // Force all children to inherit light mode
       forcedColorAdjust: 'none'
     }}>
-      <div className={styles.headerRow}>
-        <h2 className={styles.headerTitle}>Character Sheet</h2>
-      </div>
+  {/* Character Sheet header moved to App.tsx for right alignment */}
       <div className={styles.characterSheetGrid}>
       <div className={styles.identityCard}>
-        <h3>Identity</h3>
+  <h3 style={{ fontFamily: 'Arial, sans-serif' }}>Identity</h3>
         <div className={styles.cardContent}>
           {/* Row 1: Player Name, Character Name, Background */}
           <div className={styles.identityRow}>
             <label>
-              <span>Player Name</span>
+              <span style={{ fontFamily: 'Arial, sans-serif' }}>Player Name</span>
               <input value={playerName} onChange={e => {
                 setPlayerName(e.target.value);
                 handleAutoSave({ playerName: e.target.value });
               }} style={{ textAlign: 'center' }} />
             </label>
             <label>
-              <span>Character Name</span>
+              <span style={{ fontFamily: 'Arial, sans-serif' }}>Character Name</span>
               <input value={name} onChange={e => {
                 setName(e.target.value);
                 handleAutoSave({ name: e.target.value });
               }} style={{ textAlign: 'center' }} />
             </label>
             <label>
-              <span>Background</span>
+              <span style={{ fontFamily: 'Arial, sans-serif' }}>Background</span>
               <div className={styles.selectWrapper}>
                 <select 
                   value={background} 
@@ -1266,7 +1270,7 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
           {/* Row 2: Class, Subclass, Species, Subspecies */}
           <div className={styles.identityRow}>
             <label>
-              <span>Class</span>
+              <span style={{ fontFamily: 'Arial, sans-serif' }}>Class</span>
               <div className={styles.selectWrapper}>
                 <select 
                   value={charClass}
@@ -1306,7 +1310,7 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
               </div>
             </label>
             <label>
-              <span>Subclass</span>
+              <span style={{ fontFamily: 'Arial, sans-serif' }}>Subclass</span>
               <div className={styles.selectWrapper}>
                 <select 
                   value={subclass} 
@@ -1356,7 +1360,7 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
               </div>
             </label>
             <label>
-              <span>Species</span>
+              <span style={{ fontFamily: 'Arial, sans-serif' }}>Species</span>
               <div className={styles.selectWrapper}>
                 <select 
                   value={species} 
@@ -1396,7 +1400,7 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
               </div>
             </label>
             <label>
-              <span>Subspecies</span>
+              <span style={{ fontFamily: 'Arial, sans-serif' }}>Subspecies</span>
               <div className={styles.selectWrapper}>
                 <select 
                   value={subspecies} 
@@ -1463,7 +1467,7 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
 
       {/* Move Features section here */}
       <div className={styles.featuresCard}>
-        <h3>Features</h3>
+  <h3 style={{ fontFamily: 'Arial, sans-serif' }}>Features</h3>
         <div className={styles.cardContent}>
           <label style={{ color: '#0b5394', fontWeight: 'bold', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '0.90em' }}>{
             charClass === "Chemist"
@@ -1824,21 +1828,21 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
 
 
       <div className={styles.movementStrikeCard}>
-        <h3>Movement</h3>
+  <h3 style={{ fontFamily: 'Arial, sans-serif' }}>Movement</h3>
         <div className={styles.cardContent}>
-          <div className={styles.horizontalLabel} style={{ color: '#38761d', fontWeight: 'bold' }}>Speed: {speed}</div>
-          <div className={styles.horizontalLabel} style={{ color: '#38761d', fontWeight: 'bold' }}>Speed Types: {movement}</div>
-          <div className={styles.horizontalLabel} style={{ color: '#38761d', fontWeight: 'bold' }}>Jump Speed: {strike}</div>
-          <div className={styles.horizontalLabel} style={{ color: '#38761d', fontWeight: 'bold' }}>Jump Amount</div>
-          <div className={styles.horizontalLabel} style={{ color: '#38761d', fontWeight: 'bold' }}>Speed Effects: {resistances}</div>
+          <div className={styles.horizontalLabel} style={{ color: '#38761d', fontWeight: 'bold' }}>Speed {speed}</div>
+          <div className={styles.horizontalLabel} style={{ color: '#38761d', fontWeight: 'bold' }}>Speed Types {movement}</div>
+          <div className={styles.horizontalLabel} style={{ color: '#38761d', fontWeight: 'bold' }}>Jump Speed {strike}</div>
+          <div className={styles.horizontalLabel} style={{ color: '#38761d', fontWeight: 'bold' }}>Jump Amount </div>
+          <div className={styles.horizontalLabel} style={{ color: '#38761d', fontWeight: 'bold' }}>Speed Effects {resistances}</div>
         </div>
       </div>
 
       <div className={styles.strikeCard}>
-        <h3>Strike</h3>
+  <h3 style={{ fontFamily: 'Arial, sans-serif' }}>Strike</h3>
         <div className={styles.cardContent}>
           <div className={styles.horizontalLabel} style={{ color: '#351c75', fontWeight: 'bold', display: 'flex', alignItems: 'center' }}>
-            <span style={{ fontWeight: 'bold', fontFamily: 'inherit', color: '#351c75', marginRight: 4 }}>Strike Damage:</span>
+            <span style={{ fontWeight: 'bold', fontFamily: 'inherit', color: '#351c75', marginRight: 4 }}>Strike Damage</span>
             {charClass === 'Chemist' ? (
               (() => {
                 const damageDots = sheet?.classCardDots?.[8] || [];
@@ -1855,24 +1859,24 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
               })()
             ) : <span style={{ fontWeight: 'bold', fontFamily: 'inherit', color: '#000', marginLeft: 4 }}>{strikeDamage}</span>}
           </div>
-          <div className={styles.horizontalLabel} style={{ color: '#351c75', fontWeight: 'bold' }}>Multi Strike</div>
-          <div className={styles.horizontalLabel} style={{ color: '#351c75', fontWeight: 'bold' }}>Strike Effects: {strikeEffects}</div>
+          <div className={styles.horizontalLabel} style={{ color: '#351c75', fontWeight: 'bold' }}>Multi Strike </div>
+          <div className={styles.horizontalLabel} style={{ color: '#351c75', fontWeight: 'bold' }}>Strike Effects {strikeEffects}</div>
         </div>
       </div>
 
       {/* Damage Interactions Section */}
       <div className={styles.damageInteractionsCard}>
-        <h3>Damage Interactions</h3>
+  <h3 style={{ fontFamily: 'Arial, sans-serif' }}>Damage Interactions</h3>
         <div className={styles.cardContent}>
-          <div style={{ fontWeight: 'bold', marginBottom: 6 }}>Resistances</div>
-          <div style={{ fontWeight: 'bold', marginBottom: 2 }}>Immunities</div>
-          <div style={{ fontWeight: 'bold', marginBottom: 2 }}>Absorptions</div>
+          <div style={{ fontWeight: 'bold', marginBottom: 6, fontFamily: 'Arial, sans-serif', color: '#666666' }}>Resistances</div>
+          <div style={{ fontWeight: 'bold', marginBottom: 2, fontFamily: 'Arial, sans-serif', color: '#666666' }}>Immunities</div>
+          <div style={{ fontWeight: 'bold', marginBottom: 2, fontFamily: 'Arial, sans-serif', color: '#666666' }}>Absorptions</div>
         </div>
       </div>
 
 
       <div className={styles.skillsCard} style={{ position: 'relative' }}>
-        <h3>Skills</h3>
+        <h3 style={{ fontFamily: 'Arial, sans-serif', color: '#000' }}>Skills</h3>
         <div className={styles.cardContent}>
           {/* SP Notice Bubble */}
           {spNotice && (
@@ -1884,22 +1888,22 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
             <table style={{ borderCollapse: 'collapse', width: '100%' }}>
               <thead>
                 <tr>
-                  <th style={{ textAlign: 'left', fontWeight: 'bold', padding: '4px 8px' }}></th>
+                  <th style={{ textAlign: 'left', fontWeight: 'bold', padding: '4px 8px', fontFamily: 'Arial, sans-serif' }}></th>
                   {[20, 18, 16, 14, 12, 10, 8, 6, 4,  2].map((val) => (
-                    <th key={val} style={{ textAlign: 'center', fontWeight: 'bold', padding: '4px 8px' }}>{val}+</th>
+                    <th key={val} style={{ textAlign: 'center', fontWeight: 'bold', padding: '4px 8px', fontFamily: 'Arial, sans-serif' }}>{val}+</th>
                   ))}
                 </tr>
                 <tr>
-                  <th></th>
+                  <th style={{ fontFamily: 'Arial, sans-serif' }}></th>
                   {[1,1,2,2,3,4,5,6,8,10].map((sp, idx) => (
-                    <th key={idx} style={{ textAlign: 'center', fontSize: '0.9em', color: '#888', padding: '2px 8px' }}>{sp}sp</th>
+                    <th key={idx} style={{ textAlign: 'center', fontSize: '0.9em', color: '#888', padding: '2px 8px', fontFamily: 'Arial, sans-serif' }}>{sp}sp</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {skillList && skillList.map(skill => (
                   <tr key={skill}>
-                    <td style={{ fontWeight: 'bold', padding: '4px 8px', whiteSpace: 'nowrap' }}>{skill}</td>
+                    <td style={{ fontWeight: 'bold', padding: '4px 8px', whiteSpace: 'nowrap', fontFamily: 'Arial, sans-serif' }}>{skill}</td>
                     {(skillDots[skill] || Array(10).fill(false)).map((checked, i) => {
                       const skillDotsForSkill = skillDots[skill] || Array(10).fill(false);
                       
@@ -1912,14 +1916,20 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
 
                       // Define class-specific colors for automatic skill dots
                       const getClassBoostColor = () => {
-                        if (isChemistInvestigation) return "#72515f";
-                        if (isCoderOikomagic) return "#8f95a8";
+                        if (isChemistInvestigation) return "rgba(114,17,49,0.5)";
+                        if (isCoderOikomagic) return "rgba(17,33,114,0.5)";
                         // Add other class colors here in the future
                         return "#d0d0d0"; // fallback color
                       };
                       const classBoostColor = getClassBoostColor();
                       
-                      const canCheck = i === 0 || skillDotsForSkill.slice(0, i).every(Boolean);
+                      // Account for booster dots when checking if previous dots are filled
+                      const canCheck = i === 0 || skillDotsForSkill.slice(0, i).every((dotFilled, dotIndex) => {
+                        // Check if this position has a booster dot
+                        const isBoosterDot = (charClass === "Chemist" && skill === "Investigation" && dotIndex === 2) ||
+                                           (charClass === "Coder" && skill === "Oikomagic" && dotIndex === 2);
+                        return dotFilled || isBoosterDot;
+                      });
                       const rightmostChecked = skillDotsForSkill.lastIndexOf(true);
                       const canUncheck = checked && i === rightmostChecked;
                       const isFirstTwoColumns = i === 0 || i === 1;
@@ -1951,13 +1961,18 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
                                 // Calculate current SP spent
                                 let currentTotal = 0;
                                 const hasFreeDots = sheet?.hasFreeSkillStarterDots;
-                                Object.values(prev).forEach(dotsArr => {
+                                Object.entries(prev).forEach(([skillName, dotsArr]) => {
                                   dotsArr.forEach((dot, idx) => {
                                     if (dot) {
+                                      // Check if this is a booster dot (should not cost SP)
+                                      const isBoosterDot = (charClass === "Chemist" && skillName === "Investigation" && idx === 2) ||
+                                                          (charClass === "Coder" && skillName === "Oikomagic" && idx === 2);
+                                      
                                       // For characters with free starter dots, first two columns are free
                                       if (hasFreeDots && (idx === 0 || idx === 1)) {
                                         // Don't add cost for first two columns
-                                      } else {
+                                      } else if (!isBoosterDot) {
+                                        // Don't add cost for booster dots
                                         currentTotal += skillSpCosts[idx];
                                       }
                                     }
@@ -1967,13 +1982,18 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
                                 // Calculate what the new total would be
                                 let newTotal = 0;
                                 const newSkillDots = { ...prev, [skill]: tempArr };
-                                Object.values(newSkillDots).forEach(dotsArr => {
+                                Object.entries(newSkillDots).forEach(([skillName, dotsArr]) => {
                                   dotsArr.forEach((dot, idx) => {
                                     if (dot) {
+                                      // Check if this is a booster dot (should not cost SP)
+                                      const isBoosterDot = (charClass === "Chemist" && skillName === "Investigation" && idx === 2) ||
+                                                          (charClass === "Coder" && skillName === "Oikomagic" && idx === 2);
+                                      
                                       // For characters with free starter dots, first two columns are free
                                       if (hasFreeDots && (idx === 0 || idx === 1)) {
                                         // Don't add cost for first two columns
-                                      } else {
+                                      } else if (!isBoosterDot) {
+                                        // Don't add cost for booster dots
                                         newTotal += skillSpCosts[idx];
                                       }
                                     }
@@ -2022,14 +2042,28 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
 
       {/* Perks card */}
       <div className={styles.perksCard}>
-        <h3 style={{ marginTop: 0, textDecoration: 'underline' }}>Languages & Perks</h3>
+  <h3 style={{ marginTop: 0, textDecoration: 'underline', fontFamily: 'Arial, sans-serif' }}>Languages & Perks</h3>
         <div className={styles.cardContent}>
-          <div style={{ fontWeight: 'bold', marginBottom: 6 }}>Languages</div>
-          {/* Class Perk segment, only visible if Chemist's Chemical Concoctions dot is selected */}
+          <div style={{ fontWeight: 'bold', marginBottom: 6, fontFamily: 'Arial, sans-serif', display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span>Languages</span>
+            {charClass === 'Coder' && (
+              <span style={{ fontWeight: 'normal', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', color: '#222' }}>
+                Oikovox
+              </span>
+            )}
+          </div>
+          {/* Class Perk segment, visible if Chemist's Chemical Concoctions dot or Coder's Code Reader dot is selected */}
           {charClass === 'Chemist' && sheet?.classCardDots?.[9]?.[0] && (
             <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
               <span>
                 <b><i style={{ color: '#721131' }}>Chemical Concoctions.</i></b> <span style={{ color: '#000' }}>You can create myriad concoctions. When doing so, choose a skill. Upon drinking a concoction, the imbiber gains an advantage on the next skill roll of your choice. You can create up to 3 concoctions per day which each last until the end of the day.</span>
+              </span>
+            </div>
+          )}
+          {charClass === 'Coder' && sheet?.classCardDots?.[12]?.[0] && (
+            <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <span>
+                <b><i style={{ color: '#112972' }}>Code Reader.</i></b> <span style={{ color: '#000' }}>You easily see the inherent logic of the natural world around you, including the Oikomagic infused in it, giving you an edge when inspecting magical or rationality-based subjects and objects. Gain an advantage on related skill rolls.</span>
               </span>
             </div>
           )}
@@ -2038,22 +2072,90 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
 
       {/* Inventory card: rows 3-4, column 3 */}
       <div className={styles.inventoryCard}>
-        <h3 style={{ marginTop: 0, textDecoration: 'underline' }}>Inventory</h3>
+  <h3 style={{ marginTop: 0, textDecoration: 'underline', color: '#bf9000', fontFamily: 'Arial, sans-serif' }}>Inventory</h3>
         <div className={styles.cardContent}></div>
       </div>
 
       {/* Background card: row 4, column 4 */}
       <div className={styles.backgroundCard}>
-        <h3 style={{ marginTop: 0, textDecoration: 'underline' }}>Background</h3>
+  <h3 style={{ marginTop: 0, textDecoration: 'underline', fontFamily: 'Arial, sans-serif' }}>Background</h3>
         <div className={styles.cardContent}></div>
       </div>
 
       {/* Portrait card */}
       <div className={styles.portraitCard}>
-        <h3 style={{ marginTop: 0, textDecoration: 'underline' }}>Portrait</h3>
+  <h3 style={{ marginTop: 0, textDecoration: 'underline', fontFamily: 'Arial, sans-serif' }}>Portrait</h3>
         <div className={styles.cardContent} style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', minHeight: 100 }}>
           {portraitUrl ? (
-            <img src={portraitUrl} alt="Character Portrait" style={{ width: '95%', height: 'auto', margin: '0 auto 12px auto', display: 'block', borderRadius: 8, border: '1px solid #ccc' }} />
+            <div style={{ position: 'relative', width: '95%' }}>
+              <img 
+                src={portraitUrl} 
+                alt="Character Portrait" 
+                style={{ 
+                  width: '100%', 
+                  height: 'auto', 
+                  margin: '0 auto 12px auto', 
+                  display: 'block', 
+                  borderRadius: 8, 
+                  border: '1px solid #ccc',
+                  cursor: 'pointer'
+                }}
+                onClick={() => setShowPortraitOptions(!showPortraitOptions)}
+              />
+              {showPortraitOptions && (
+                <div style={{
+                  position: 'absolute',
+                  top: '50%',
+                  left: '50%',
+                  transform: 'translate(-50%, -50%)',
+                  background: 'rgba(255, 255, 255, 0.95)',
+                  border: '1px solid #ccc',
+                  borderRadius: 8,
+                  padding: '10px',
+                  display: 'flex',
+                  gap: '8px',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.2)'
+                }}>
+                  <button
+                    style={{ 
+                      padding: '8px 16px', 
+                      fontSize: '0.9em', 
+                      borderRadius: 4, 
+                      border: '1px solid #888', 
+                      background: '#f0f0f0', 
+                      cursor: 'pointer', 
+                      fontFamily: 'Arial, sans-serif' 
+                    }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowPortraitOptions(false);
+                      portraitInputRef.current && portraitInputRef.current.click();
+                    }}
+                  >
+                    Change
+                  </button>
+                  <button
+                    style={{ 
+                      padding: '8px 16px', 
+                      fontSize: '0.9em', 
+                      borderRadius: 4, 
+                      border: '1px solid #c00', 
+                      background: '#fff0f0', 
+                      color: '#c00', 
+                      cursor: 'pointer', 
+                      fontFamily: 'Arial, sans-serif' 
+                    }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowPortraitOptions(false);
+                      setPortraitUrl(null);
+                    }}
+                  >
+                    Remove
+                  </button>
+                </div>
+              )}
+            </div>
           ) : null}
           <input
             type="file"
@@ -2071,22 +2173,14 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
               }
             }}
           />
-          <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
+          {!portraitUrl && (
             <button
-              style={{ padding: '10px 20px', fontSize: '1em', borderRadius: 6, border: '1px solid #888', background: '#f0f0f0', cursor: 'pointer' }}
+              style={{ padding: '10px 20px', fontSize: '1em', borderRadius: 6, border: '1px solid #888', background: '#f0f0f0', cursor: 'pointer', fontFamily: 'Arial, sans-serif' }}
               onClick={() => portraitInputRef.current && portraitInputRef.current.click()}
             >
-              {portraitUrl ? 'Change' : 'Add Character Portrait'}
+              Add Character Portrait
             </button>
-            {portraitUrl && (
-              <button
-                style={{ padding: '10px 20px', fontSize: '1em', borderRadius: 6, border: '1px solid #c00', background: '#fff0f0', color: '#c00', cursor: 'pointer' }}
-                onClick={() => setPortraitUrl(null)}
-              >
-                Remove
-              </button>
-            )}
-          </div>
+          )}
         </div>
       </div>
       </div> {/* End characterSheetGrid */}

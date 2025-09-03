@@ -46,9 +46,9 @@ const SheetManager: React.FC<SheetManagerProps> = ({ onLoad, onNew, onClear }) =
 
   return (
     <div>
-      <button onClick={onNew}>New Character</button>
-      <h2>Saved Sheets</h2>
-      <ul>
+  <button onClick={onNew} style={{ fontFamily: 'Arial, sans-serif' }}>New Character</button>
+  <h2 style={{ fontFamily: 'Arial, sans-serif' }}>Saved Sheets</h2>
+      <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
         {sheets.map(sheet => {
           // Color maps (should match LevelUp.tsx)
           const classOptions = [
@@ -185,8 +185,50 @@ const SheetManager: React.FC<SheetManagerProps> = ({ onLoad, onNew, onClear }) =
             return undefined;
           };
           return (
-            <li key={sheet.id}>
-              <button onClick={() => onLoad(sheet)} style={{ fontWeight: 'bold' }}>
+            <li key={sheet.id} style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
+              {/* Portrait thumbnail */}
+              <div style={{ 
+                width: '48px', 
+                height: '48px', 
+                flexShrink: 0,
+                border: '2px solid #ccc',
+                borderRadius: '4px',
+                overflow: 'hidden',
+                backgroundColor: '#f5f5f5',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                {sheet.portrait ? (
+                  <img 
+                    src={sheet.portrait} 
+                    alt={`${sheet.name || 'Character'} portrait`}
+                    style={{ 
+                      width: '100%', 
+                      height: '100%', 
+                      objectFit: 'cover' 
+                    }}
+                  />
+                ) : (
+                  <span style={{ fontSize: '24px', color: '#999' }}>👤</span>
+                )}
+              </div>
+              
+              {/* Character info button */}
+              <button 
+                onClick={() => onLoad(sheet)} 
+                style={{ 
+                  fontWeight: 'bold',
+                  fontFamily: 'Arial, sans-serif',
+                  flex: 1,
+                  textAlign: 'left',
+                  padding: '8px 12px',
+                  border: '1px solid #ccc',
+                  borderRadius: '4px',
+                  backgroundColor: '#f9f9f9',
+                  cursor: 'pointer'
+                }}
+              >
                 {sheet.playerName ? `(${sheet.playerName}) ` : ""}
                 {sheet.name ? `${sheet.name}, ` : ""}
                 {sheet.subspecies && (
@@ -203,6 +245,8 @@ const SheetManager: React.FC<SheetManagerProps> = ({ onLoad, onNew, onClear }) =
                 )}
                 ({sheet.xpTotal ?? 0}xp, {sheet.spTotal ?? 0}sp)
               </button>
+              
+              {/* Delete button */}
               <button
                 onClick={() => {
                   const confirmed = window.confirm(`Delete "${sheet.name}"? This cannot be undone.`);
@@ -211,6 +255,19 @@ const SheetManager: React.FC<SheetManagerProps> = ({ onLoad, onNew, onClear }) =
                     setSheets(loadAllSheets());
                     onClear();
                   }
+                }}
+                style={{
+                  width: '36px',
+                  height: '36px',
+                  border: '1px solid #dc3545',
+                  borderRadius: '4px',
+                  backgroundColor: '#fff',
+                  color: '#dc3545',
+                  cursor: 'pointer',
+                  fontSize: '16px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
                 }}
               >
                 🗑️

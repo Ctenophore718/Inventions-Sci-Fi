@@ -1,8 +1,8 @@
-/* Inventory Card - column 1, rows 4-5 */
+/* Inventory Card - Rows 5 and 6, column 1 */
 .inventoryCard {
   grid-column: 1;
-  grid-row: 4 / span 2;
-  border: 2px solid #b45f06;
+  grid-row: 5 / span 2;
+  border: 2px solid #bf9000;
   padding: 16px;
   background: #fff;
   border-radius: 8px;
@@ -10,11 +10,11 @@
   min-height: 120px;
 }
 
-/* Background Card - columns 2-3, row 5 */
+/* Background Card - Row 7, columns 1 and 2 */
 .backgroundCard {
-  grid-column: 2 / span 2;
-  grid-row: 5;
-  border: 2px solid #6b1172;
+  grid-column: 1 / span 2;
+  grid-row: 7;
+  border: 2px solid #000;
   padding: 16px;
   background: #fff;
   border-radius: 8px;
@@ -80,49 +80,49 @@
     grid-row: 2 !important;
   }
   
+  .skillsCard {
+    grid-column: 1 / span 2 !important;
+    grid-row: 3 / span 2 !important;
+  }
+  
   .strikeCard {
-    grid-column: 1 !important;
+    grid-column: 3 !important;
     grid-row: 3 !important;
   }
   
   .damageInteractionsCard {
-    grid-column: 2 !important;
-    grid-row: 3 !important;
-  }
-  
-  .skillsCard {
     grid-column: 3 !important;
-    grid-row: 3 !important;
-  }
-  
-  .perksCard {
-    grid-column: 1 !important;
     grid-row: 4 !important;
   }
   
   .inventoryCard {
-    grid-column: 2 !important;
-    grid-row: 4 !important;
+    grid-column: 1 !important;
+    grid-row: 5 / span 2 !important;
   }
   
-  .backgroundCard {
-    grid-column: 1 / span 2 !important;
-    grid-row: 5 !important;
+  .perksCard {
+    grid-column: 2 !important;
+    grid-row: 5 / span 2 !important;
   }
   
   .portraitCard {
     grid-column: 3 !important;
-    grid-row: 5 !important;
+    grid-row: 5 / span 2 !important;
+  }
+  
+  .backgroundCard {
+    grid-column: 1 / span 2 !important;
+    grid-row: 7 !important;
   }
 }
 
 
 
 
-/* Portrait Card - column 4, row 5 */
+/* Portrait Card - Rows 5, 6, and 7, column 3 */
 .portraitCard {
-  grid-column: 4;
-  grid-row: 5;
+  grid-column: 3;
+  grid-row: 5 / span 3;
   border: 2px solid #000;
   padding: 16px;
   background: #fff;
@@ -196,7 +196,7 @@
     width: 100% !important;
   }
   
-  /* Single column order: Identity, Features, Movement, Strike, Damage Interactions, Skills, Languages & Perks, Inventory, Background, Portrait */
+  /* Single column order: Identity, Features, Movement, Skills, Strike, Damage Interactions, Inventory, Languages & Perks, Portrait, Background */
   .identityCard {
     grid-column: 1 !important;
     grid-row: 1 !important;
@@ -215,43 +215,43 @@
     order: 3;
   }
   
-  .strikeCard {
+  .skillsCard {
     grid-column: 1 !important;
     grid-row: 4 !important;
     order: 4;
   }
   
-  .damageInteractionsCard {
+  .strikeCard {
     grid-column: 1 !important;
     grid-row: 5 !important;
     order: 5;
   }
   
-  .skillsCard {
+  .damageInteractionsCard {
     grid-column: 1 !important;
     grid-row: 6 !important;
     order: 6;
   }
   
-  .perksCard {
+  .inventoryCard {
     grid-column: 1 !important;
     grid-row: 7 !important;
     order: 7;
   }
   
-  .inventoryCard {
+  .perksCard {
     grid-column: 1 !important;
     grid-row: 8 !important;
     order: 8;
   }
   
-  .backgroundCard {
+  .portraitCard {
     grid-column: 1 !important;
     grid-row: 9 !important;
     order: 9;
   }
   
-  .portraitCard {
+  .backgroundCard {
     grid-column: 1 !important;
     grid-row: 10 !important;
     order: 10;
@@ -423,11 +423,11 @@
 }
 
 /* CSS Grid Layout for Character Sheet */
-/* Changed to 4 columns for new layout */
+/* 3-column layout as requested */
 .characterSheetGrid {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
-  grid-template-rows: auto auto auto auto auto;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: auto auto auto auto auto auto auto;
   gap: 16px;
   padding: 16px 0;
   width: 100%;
@@ -444,11 +444,11 @@
   box-sizing: border-box;
 }
 
-/* Perks Card - column 4, rows 3-4 */
+/* Languages & Perks Card - Rows 5 and 6, column 2 */
 .perksCard {
-  grid-column: 4;
-  grid-row: 3 / span 2;
-  border: 2px solid #888;
+  grid-column: 2;
+  grid-row: 5 / span 2;
+  border: 2px solid #000;
   padding: 16px;
   background: #fff;
   border-radius: 8px;
@@ -456,10 +456,9 @@
   min-height: 120px;
 }
 
-/* Identity Card - spans full width at top, horizontal layout */
-/* Span all 4 columns for full width */
+/* Identity Card - Row 1, spans 3 columns */
 .identityCard {
-  grid-column: 1 / span 4;
+  grid-column: 1 / span 3;
   grid-row: 1;
   display: flex;
   flex-wrap: wrap;
@@ -581,7 +580,7 @@
   color: var(--selected-subspecies-color) !important;
 }
 
-/* Features Card - columns 1-2, row 2 */
+/* Features Card - Row 2, spans 2 columns */
 .featuresCard {
   grid-column: 1 / span 2;
   grid-row: 2;
@@ -599,7 +598,7 @@
   text-decoration: underline;
 }
 
-/* Movement Card - column 3, row 2 */
+/* Movement Card - Row 2, column 3 */
 .movementStrikeCard {
   grid-column: 3;
   grid-row: 2;
@@ -617,10 +616,10 @@
   text-decoration: underline;
 }
 
-/* Strike Card - column 4, row 2 */
+/* Strike Card - Row 3, column 3 */
 .strikeCard {
-  grid-column: 4;
-  grid-row: 2;
+  grid-column: 3;
+  grid-row: 3;
   border: 2px solid #351c75;
   padding: 16px;
   background: #fff;
@@ -635,11 +634,11 @@
   text-decoration: underline;
 }
 
-/* Skills Card - columns 2-3, rows 3-4 */
+/* Skills Card - Rows 3 and 4, spans 2 columns */
 .skillsCard {
-  grid-column: 2 / span 2;
+  grid-column: 1 / span 2;
   grid-row: 3 / span 2;
-  border: 2px solid #351c75;
+  border: 2px solid #000;
   padding: 12px;
   background: #fff;
   border-radius: 8px;
@@ -701,10 +700,10 @@
   }
 }
 
-/* Damage Interactions Card - column 1, row 3 */
+/* Damage Interactions Card - Row 4, column 3 */
 .damageInteractionsCard {
-  grid-column: 1;
-  grid-row: 3;
+  grid-column: 3;
+  grid-row: 4;
   border: 2px solid #666;
   padding: 16px;
   background: #fff;
@@ -911,17 +910,12 @@
     grid-row: 3;
   }
   
-  .damageInteractionsCard {
-    grid-column: 1;
+  .skillsCard {
+    grid-column: 1 / span 2;
     grid-row: 4;
   }
   
-  .skillsCard {
-    grid-column: 2;
-    grid-row: 4 / span 2;
-  }
-  
-  .perksCard {
+  .damageInteractionsCard {
     grid-column: 1;
     grid-row: 5;
   }
@@ -931,13 +925,18 @@
     grid-row: 6;
   }
   
-  .backgroundCard {
+  .perksCard {
     grid-column: 2;
     grid-row: 6;
   }
   
   .portraitCard {
-    grid-column: 1;
+    grid-column: 2;
+    grid-row: 5;
+  }
+  
+  .backgroundCard {
+    grid-column: 1 / span 2;
     grid-row: 7;
   }
   

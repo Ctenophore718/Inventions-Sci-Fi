@@ -149,13 +149,11 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
         `}
       </style>
       <div style={{ padding: "1rem" }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
-        <h2 style={{ fontFamily: 'Arial, Helvetica, sans-serif', margin: 0, fontSize: '2em', flexShrink: 0 }}>Cards</h2>
-      </div>
+  {/* Cards header moved to App.tsx for right alignment */}
       
       {/* Responsive card grid with fixed card sizes (240px × 336px) - optimized for 3 cards on iPad */}
       <div style={{ 
-        marginTop: '2rem', 
+        marginTop: '0.5rem', 
         marginBottom: '2rem',
         display: 'flex',
         flexWrap: 'wrap',

@@ -1,5 +1,6 @@
 
 import React, { useState } from "react";
+import './responsive-headers.css';
 import SheetManager from "./components/SheetManager";
 import CharacterEditor from "./components/CharacterEditor";
 import LevelUp from "./components/LevelUp";
@@ -351,7 +352,18 @@ const App = () => {
 
   return (
     <div style={{ padding: "2rem" }}>
-      <h1 style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>Inventions Sci-Fi</h1>
+      <div className="headerRowResponsive" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1em' }}>
+        <h1 style={{ fontFamily: 'Arial, Helvetica, sans-serif', margin: 0 }}>Inventions Sci-Fi</h1>
+        {view === "editor" && (
+          <span className="pageHeader" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '2.0em', fontWeight: 600, marginLeft: 'auto', textAlign: 'right' }}>Character Sheet</span>
+        )}
+        {view === "levelup" && (
+          <span className="pageHeader" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '2.0em', fontWeight: 600, marginLeft: 'auto', textAlign: 'right' }}>Level Up</span>
+        )}
+        {view === "cards" && (
+          <span className="pageHeader" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '2.0em', fontWeight: 600, marginLeft: 'auto', textAlign: 'right' }}>Cards</span>
+        )}
+      </div>
 
       {view === "manager" && (
         <SheetManager 

@@ -35,6 +35,37 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
   // Optionally, update local state if sheet changes
   const [spSpent, setSpSpent] = useState(sheet?.spSpent ?? 0);
   const [xpSpent, setXpSpent] = useState(sheet?.xpSpent ?? 0);
+
+  // Add skillDots state for LevelUp (mirroring CharacterEditor)
+  const skillList = [
+    "Acrobatics",
+    "Athletics", 
+    "Awareness",
+    "Computers",
+    "Culture",
+    "Deception",
+    "Diplomacy",
+    "Intimidation",
+    "Investigation",
+    "Medicine",
+    "Oikomagic",
+    "Performance",
+    "Piloting",
+    "Stealth",
+    "Survival",
+    "Technology",
+    "Thievery",
+    "Xenomagic"
+  ];
+
+  const [skillDots, setSkillDots] = useState<{ [key: string]: boolean[] }>(() => {
+    if (sheet?.skillDots) {
+      return sheet.skillDots;
+    } else {
+      // Default empty state - will be initialized properly in useEffect
+      return Object.fromEntries(skillList.map(skill => [skill, Array(10).fill(false)]));
+    }
+  });
   
   // Local state for HP functionality
   const [currentHitPoints, setCurrentHitPoints] = useState<number>(sheet?.currentHitPoints ?? sheet?.maxHitPoints ?? 0);
@@ -136,7 +167,14 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
     setCurrentHitPoints(sheet?.currentHitPoints ?? sheet?.maxHitPoints ?? 0);
     setDeathCount(sheet?.deathCount || 0);
     setBackground(sheet?.background || "");
-  }, [sheet?.xpTotal, sheet?.spTotal, sheet?.spSpent, sheet?.xpSpent, sheet?.currentHitPoints, sheet?.maxHitPoints, sheet?.deathCount, sheet?.background]);
+    // Update skillDots when sheet changes
+    if (sheet?.skillDots) {
+      setSkillDots(sheet.skillDots);
+    } else {
+      // Initialize with default empty state
+      setSkillDots(Object.fromEntries(skillList.map(skill => [skill, Array(10).fill(false)])));
+    }
+  }, [sheet?.id]);
 
   // Auto-dismiss notice after 2.5 seconds
   React.useEffect(() => {
@@ -164,6 +202,11 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
             setClassCardDots(updatedSheet.classCardDots.map((row: boolean[]) => [...row]));
           }
           
+          // Update skillDots only if they've changed
+          if (updatedSheet.skillDots && JSON.stringify(updatedSheet.skillDots) !== JSON.stringify(skillDots)) {
+            setSkillDots(updatedSheet.skillDots);
+          }
+          
           // Update character details only if they've changed
           if (updatedSheet.charClass !== charClass) setCharClass(updatedSheet.charClass || "");
           if (updatedSheet.subclass !== subclass) setSubclass(updatedSheet.subclass || "");
@@ -187,6 +230,11 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
           setClassCardDots(updatedSheet.classCardDots.map((row: boolean[]) => [...row]));
         }
         
+        // Update skillDots only if they've changed
+        if (updatedSheet.skillDots && JSON.stringify(updatedSheet.skillDots) !== JSON.stringify(skillDots)) {
+          setSkillDots(updatedSheet.skillDots);
+        }
+        
         // Update character details only if they've changed
         if (updatedSheet.charClass !== charClass) setCharClass(updatedSheet.charClass || "");
         if (updatedSheet.subclass !== subclass) setSubclass(updatedSheet.subclass || "");
@@ -204,7 +252,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
       window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('character-updated', handleCharacterUpdate as EventListener);
     };
-  }, [sheet?.id, charClass, subclass, species, subspecies, xpTotal, spTotal, xpSpent, spSpent]);
+  }, [sheet?.id, charClass, subclass, species, subspecies, xpTotal, spTotal, xpSpent, spSpent, skillDots]);
 
   // Auto-save when XP/SP totals change
   React.useEffect(() => {
@@ -214,7 +262,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
     }
   }, [xpTotal, spTotal, sheet]);
 
-  // Persistent state for class card dots (Chemist: Feature(2), Technique(4), Attack(2), Strike(1), Perks(1))
+  // Persistent state for class card dots
   const defaultChemistDots = [ 
     [false, false], // Feature: +1 Chem Token max (2 dots)
     [false],        // Feature: +2 Crit (1 dot)
@@ -227,7 +275,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
     [false, false, false], // Strike: +1 Damage die (3 dots)
     [false]         // Perks: Chemical Concoctions (1 dot)
   ];
-  
+
   // Coder dots structure: Feature(4), Technique(5), Attack(11), Perks(1)
   const defaultCoderDots = [
     [false],                // Feature: Ignore 100% Cover (1 dot)
@@ -244,6 +292,20 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
     [false, false],         // Secondary Attack: -1 Cooldown (2 dots)
     [false]                 // Perks: Code Reader (1 dot)
   ];
+
+  // Commander dots structure: Feature(3), Technique(6), Attack(6), Strike(2), Perks(1)
+  const defaultCommanderDots = [
+    [false, false, false], // Feature: +1hx (3 dots)
+    [false],               // Feature: Includes Attacks (1 dot)
+    [false],               // Feature: 10xp (1 dot)
+    [false, false, false], // Technique: +1hx (3 dots)
+    [false, false, false], // Technique: +1 ally (3 dots)
+    [false, false],        // Technique: -1 Cooldown (2 dots)
+    [false, false, false], // Attack: +1 Damage die (3 dots)
+    [false, false, false], // Attack: +1 Crit (3 dots)
+    [false, false],        // Strike: +1 Damage die (2 dots)
+    [false]                // Perks: Natural Leader (1 dot)
+  ];
   const [classCardDots, setClassCardDots] = useState<boolean[][]>(() => {
     if (sheet?.classCardDots && Array.isArray(sheet.classCardDots) && sheet.classCardDots.length > 0) {
       return sheet.classCardDots.map(row => [...row]);
@@ -251,6 +313,9 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
     // Default based on current class
     if (charClass === "Coder") {
       return defaultCoderDots.map(row => [...row]);
+    }
+    if (charClass === "Commander") {
+      return defaultCommanderDots.map(row => [...row]);
     }
     return defaultChemistDots.map(row => [...row]);
   });
@@ -261,9 +326,38 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
       if (charClass === "Coder") {
         return defaultCoderDots[index] || [];
       }
+      if (charClass === "Commander") {
+        return defaultCommanderDots[index] || [];
+      }
       return defaultChemistDots[index] || [];
     }
     return classCardDots[index] || [];
+  };
+
+  // Helper function to safely clone classCardDots array
+  const safeCloneClassCardDots = (): boolean[][] => {
+    console.log('safeCloneClassCardDots called:', {
+      classCardDots,
+      charClass,
+      classCardDotsLength: classCardDots?.length,
+      isArray: Array.isArray(classCardDots)
+    });
+    
+    if (!classCardDots || !Array.isArray(classCardDots) || classCardDots.length === 0) {
+      console.warn('classCardDots is not properly initialized, returning default for class:', charClass);
+      if (charClass === "Coder") {
+        const result = defaultCoderDots.map(row => [...row]);
+        console.log('Returning default Coder dots:', result);
+        return result;
+      }
+      const result = defaultChemistDots.map(row => [...row]);
+      console.log('Returning default Chemist dots:', result);
+      return result;
+    }
+    
+    const result = classCardDots.map(row => Array.isArray(row) ? [...row] : []);
+    console.log('Returning cloned classCardDots:', result);
+    return result;
   };
 
   // Save to sheet and localStorage
@@ -465,14 +559,10 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
 
   return (
     <div style={{ padding: "1rem" }}>
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', flex: 1 }}>
-          <h2 style={{ fontFamily: 'Arial, Helvetica, sans-serif', margin: 0, fontSize: '2em', flexShrink: 0 }}>Level Up</h2>
-        </div>
-      </div>
+  {/* Level Up header moved to App.tsx for right alignment */}
       
       {/* 4-column, 2-row CSS grid, outer grey box removed */}
-      <div className={styles.characterSheetGrid} style={{ marginTop: '2rem', marginBottom: '2rem', gridTemplateColumns: 'repeat(4, 1fr)' }}>
+  <div className={styles.characterSheetGrid} style={{ marginTop: '0.5rem', marginBottom: '2rem', gridTemplateColumns: 'repeat(4, 1fr)' }}>
         {/* Class Card */}
         <div style={{ background: '#fff', border: '2px solid #333', borderRadius: 8, boxShadow: '0 2px 4px rgba(0,0,0,0.1)', minHeight: 80, padding: '1.2rem', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <div style={{ fontWeight: 'bold', color: 'black', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1.1em', marginBottom: 6 }}>Class</div>
@@ -574,13 +664,15 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                           <span
                             onClick={() => {
                               if (!arr[idx] && canCheck) {
-                                const newDots = classCardDots.map(row => [...row]);
+                                const newDots = safeCloneClassCardDots();
+                                console.log('About to set newDots[0][j], newDots:', newDots, 'newDots[0]:', newDots[0], 'idx:', idx);
                                 for (let j = 0; j <= idx; ++j) newDots[0][j] = true;
                                 let delta = 0;
                                 for (let j = 0; j <= idx; ++j) if (!arr[j]) delta += xpCosts[j];
                                 persistClassCardDots(newDots, 0, delta);
                               } else if (arr[idx] && canUncheck) {
-                                const newDots = classCardDots.map(row => [...row]);
+                                const newDots = safeCloneClassCardDots();
+                                console.log('About to set newDots[0][j] false, newDots:', newDots, 'newDots[0]:', newDots[0], 'idx:', idx);
                                 for (let j = idx; j < arr.length; ++j) newDots[0][j] = false;
                                 let delta = 0;
                                 for (let j = idx; j < arr.length; ++j) if (arr[j]) delta -= xpCosts[j];
@@ -634,13 +726,13 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                           <span
                             onClick={() => {
                               if (!arr[idx] && canCheck) {
-                                const newDots = classCardDots.map(row => [...row]);
+                                const newDots = safeCloneClassCardDots();
                                 for (let j = 0; j <= idx; ++j) newDots[1][j] = true;
                                 let delta = 0;
                                 for (let j = 0; j <= idx; ++j) if (!arr[j]) delta += xpCosts[j];
                                 persistClassCardDots(newDots, 0, delta);
                               } else if (arr[idx] && canUncheck) {
-                                const newDots = classCardDots.map(row => [...row]);
+                                const newDots = safeCloneClassCardDots();
                                 for (let j = idx; j < arr.length; ++j) newDots[1][j] = false;
                                 let delta = 0;
                                 for (let j = idx; j < arr.length; ++j) if (arr[j]) delta -= xpCosts[j];
@@ -704,13 +796,13 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                             <span
                               onClick={() => {
                                 if (!arr[idx] && canCheck) {
-                                  const newDots = classCardDots.map(row => [...row]);
+                                  const newDots = safeCloneClassCardDots();
                                   for (let j = 0; j <= idx; ++j) newDots[2][j] = true;
                                   let delta = 0;
                                   for (let j = 0; j <= idx; ++j) if (!arr[j]) delta += xpCosts[j];
                                   persistClassCardDots(newDots, 0, delta);
                                 } else if (arr[idx] && canUncheck) {
-                                  const newDots = classCardDots.map(row => [...row]);
+                                  const newDots = safeCloneClassCardDots();
                                   for (let j = idx; j < arr.length; ++j) newDots[2][j] = false;
                                   let delta = 0;
                                   for (let j = idx; j < arr.length; ++j) if (arr[j]) delta -= xpCosts[j];
@@ -760,13 +852,13 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                             <span
                               onClick={() => {
                                 if (!arr[idx] && canCheck) {
-                                  const newDots = classCardDots.map(row => [...row]);
+                                  const newDots = safeCloneClassCardDots();
                                   for (let j = 0; j <= idx; ++j) newDots[3][j] = true;
                                   let delta = 0;
                                   for (let j = 0; j <= idx; ++j) if (!arr[j]) delta += xpCosts[j];
                                   persistClassCardDots(newDots, 0, delta);
                                 } else if (arr[idx] && canUncheck) {
-                                  const newDots = classCardDots.map(row => [...row]);
+                                  const newDots = safeCloneClassCardDots();
                                   for (let j = idx; j < arr.length; ++j) newDots[3][j] = false;
                                   let delta = 0;
                                   for (let j = idx; j < arr.length; ++j) if (arr[j]) delta -= xpCosts[j];
@@ -811,13 +903,13 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                             <span
                               onClick={() => {
                                 if (!arr[idx] && canCheck) {
-                                  const newDots = classCardDots.map(row => [...row]);
+                                  const newDots = safeCloneClassCardDots();
                                   for (let j = 0; j <= idx; ++j) newDots[4][j] = true;
                                   let delta = 0;
                                   for (let j = 0; j <= idx; ++j) if (!arr[j]) delta += xpCosts[j];
                                   persistClassCardDots(newDots, 0, delta);
                                 } else if (arr[idx] && canUncheck) {
-                                  const newDots = classCardDots.map(row => [...row]);
+                                  const newDots = safeCloneClassCardDots();
                                   for (let j = idx; j < arr.length; ++j) newDots[4][j] = false;
                                   let delta = 0;
                                   for (let j = idx; j < arr.length; ++j) if (arr[j]) delta -= xpCosts[j];
@@ -861,13 +953,13 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                             <span
                               onClick={() => {
                                 if (!arr[idx] && canCheck) {
-                                  const newDots = classCardDots.map(row => [...row]);
+                                  const newDots = safeCloneClassCardDots();
                                   for (let j = 0; j <= idx; ++j) newDots[5][j] = true;
                                   let delta = 0;
                                   for (let j = 0; j <= idx; ++j) if (!arr[j]) delta += xpCosts[j];
                                   persistClassCardDots(newDots, 0, delta);
                                 } else if (arr[idx] && canUncheck) {
-                                  const newDots = classCardDots.map(row => [...row]);
+                                  const newDots = safeCloneClassCardDots();
                                   for (let j = idx; j < arr.length; ++j) newDots[5][j] = false;
                                   let delta = 0;
                                   for (let j = idx; j < arr.length; ++j) if (arr[j]) delta -= xpCosts[j];
@@ -930,14 +1022,14 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                             <span
                               onClick={() => {
                                 if (!arr[idx] && canCheck) {
-                                  const newDots = classCardDots.map(row => [...row]);
+                                  const newDots = safeCloneClassCardDots();
                                   for (let j = 0; j <= idx; ++j) newDots[6][j] = true;
                                   // Add up all xp costs for newly checked dots
                                   let delta = 0;
                                   for (let j = 0; j <= idx; ++j) if (!arr[j]) delta += xpCosts[j];
                                   persistClassCardDots(newDots, 0, delta);
                                 } else if (arr[idx] && canUncheck) {
-                                  const newDots = classCardDots.map(row => [...row]);
+                                  const newDots = safeCloneClassCardDots();
                                   for (let j = idx; j < arr.length; ++j) newDots[6][j] = false;
                                   // Subtract all xp costs for unchecked dots
                                   let delta = 0;
@@ -978,14 +1070,14 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                             <span
                               onClick={() => {
                                 if (!arr[idx] && canCheck) {
-                                  const newDots = classCardDots.map(row => [...row]);
+                                  const newDots = safeCloneClassCardDots();
                                   for (let j = 0; j <= idx; ++j) newDots[7][j] = true;
                                   // Add up all xp costs for newly checked dots
                                   let delta = 0;
                                   for (let j = 0; j <= idx; ++j) if (!arr[j]) delta += xpCosts[j];
                                   persistClassCardDots(newDots, 0, delta);
                                 } else if (arr[idx] && canUncheck) {
-                                  const newDots = classCardDots.map(row => [...row]);
+                                  const newDots = safeCloneClassCardDots();
                                   for (let j = idx; j < arr.length; ++j) newDots[7][j] = false;
                                   // Subtract all xp costs for unchecked dots
                                   let delta = 0;
@@ -1050,14 +1142,14 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                             <span
                               onClick={() => {
                                 if (!arr[idx] && canCheck) {
-                                  const newDots = classCardDots.map(row => [...row]);
+                                  const newDots = safeCloneClassCardDots();
                                   for (let j = 0; j <= idx; ++j) newDots[8][j] = true;
                                   // Add up all xp costs for newly checked dots
                                   let delta = 0;
                                   for (let j = 0; j <= idx; ++j) if (!arr[j]) delta += xpCosts[j];
                                   persistClassCardDots(newDots, 0, delta);
                                 } else if (arr[idx] && canUncheck) {
-                                  const newDots = classCardDots.map(row => [...row]);
+                                  const newDots = safeCloneClassCardDots();
                                   for (let j = idx; j < arr.length; ++j) newDots[8][j] = false;
                                   // Subtract all xp costs for unchecked dots
                                   let delta = 0;
@@ -1116,11 +1208,11 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                               <span
                                 onClick={() => {
                                   if (!arr[idx] && canCheck) {
-                                    const newDots = classCardDots.map(row => [...row]);
+                                    const newDots = safeCloneClassCardDots();
                                     for (let j = 0; j <= idx; ++j) newDots[9][j] = true;
                                     persistClassCardDots(newDots, 10);
                                   } else if (arr[idx] && canUncheck) {
-                                    const newDots = classCardDots.map(row => [...row]);
+                                    const newDots = safeCloneClassCardDots();
                                     for (let j = idx; j < arr.length; ++j) newDots[9][j] = false;
                                     persistClassCardDots(newDots, -10);
                                   }
@@ -1148,6 +1240,564 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
               </div>
             )}
             
+            {/* Feature information when Commander is selected */}
+            {charClass === "Commander" && (
+              <div style={{ width: '100%', marginTop: '1rem', textAlign: 'left', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
+                {/* Feature header */}
+                <div style={{ color: '#0b5394', fontWeight: 'bold', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1.08em', marginBottom: '8px' }}>
+                  <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+                    <div style={{ fontWeight: 'bold', color: '#0b5394', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Feature</u></div>
+                    <span style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
+                      <b><i style={{ color: '#717211', fontSize: '1em' }}>Stay Sharp.</i></b> <span style={{ fontSize: '1em', fontWeight: 400 }}>At the beginning of the round, you and allies within 3hx of you can remove an additional <i>Cooldown Token</i> from one <i>inactive</i> <b><i style={{ color: '#bf9000' }}>Technique</i></b> of their choice.</span>
+                    </span>
+                  </span>
+                </div>
+                {/* XP progression table - interactive dots */}
+                <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px' }}>
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: '1fr 24px 24px 24px',
+                    gridTemplateRows: 'repeat(5, auto)',
+                    columnGap: '6px',
+                    rowGap: '2px',
+                    alignItems: 'start',
+                    marginBottom: '2px',
+                    width: '100%',
+                    paddingLeft: '4px'
+                  }}>
+                    {/* Row 1: XP header */}
+                    <span></span>
+                    <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>3xp</span>
+                    <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>6xp</span>
+                    <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>9xp</span>
+                    {/* Row 2: +1hx dots (interactive) */}
+                    <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>+1hx</span>
+                    {[0,1,2].map(idx => {
+                      const arr = safeGetDotsArray(0);
+                      if (!arr || !Array.isArray(arr) || arr.length === 0) {
+                        return (
+                          <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
+                            <span style={{
+                              width: 16,
+                              height: 16,
+                              borderRadius: '50%',
+                              border: '2px solid #ddd',
+                              background: '#fff',
+                              cursor: 'not-allowed'
+                            }}></span>
+                          </span>
+                        );
+                      }
+                      const canCheck = idx === 0 || arr.slice(0, idx).every(Boolean);
+                      const rightmostChecked = arr.lastIndexOf(true);
+                      const canUncheck = arr[idx] && idx === rightmostChecked;
+                      // XP cost for each dot (3xp, 6xp, 9xp)
+                      const xpCosts = [3, 6, 9];
+                      return (
+                        <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
+                          <span
+                            onClick={() => {
+                              if (!arr[idx] && canCheck) {
+                                const newDots = safeCloneClassCardDots();
+                                for (let j = 0; j <= idx; ++j) newDots[0][j] = true;
+                                let delta = 0;
+                                for (let j = 0; j <= idx; ++j) if (!arr[j]) delta += xpCosts[j];
+                                persistClassCardDots(newDots, 0, delta);
+                              } else if (arr[idx] && canUncheck) {
+                                const newDots = safeCloneClassCardDots();
+                                for (let j = idx; j < arr.length; ++j) newDots[0][j] = false;
+                                let delta = 0;
+                                for (let j = idx; j < arr.length; ++j) if (arr[j]) delta -= xpCosts[j];
+                                persistClassCardDots(newDots, 0, delta);
+                              }
+                            }}
+                            style={{
+                              width: '15px',
+                              height: '15px',
+                              border: '2px solid #000',
+                              borderRadius: '50%',
+                              display: 'block',
+                              background: arr[idx] ? '#000' : '#fff',
+                              cursor: (canCheck && !arr[idx]) || canUncheck ? 'pointer' : 'not-allowed',
+                              transition: 'background 0.2s'
+                            }}
+                          ></span>
+                        </span>
+                      );
+                    })}
+                    {/* Row 3: 10xp header (styled like other XP headers) */}
+                    <span></span>
+                    <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>10xp</span>
+                    <span></span>
+                    <span></span>
+                    {/* Row 4: Includes Attacks label and dot (dot under 3xp) */}
+                    <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>Includes <b><i style={{ color: '#990000' }}>Attacks</i></b></span>
+                    {[0].map(idx => {
+                      const arr = safeGetDotsArray(1);
+                      const canCheck = idx === 0 || arr.slice(0, idx).every(Boolean);
+                      const rightmostChecked = arr.lastIndexOf(true);
+                      const canUncheck = arr[idx] && idx === rightmostChecked;
+                      // XP cost for this dot (10xp)
+                      const xpCosts = [10];
+                      return (
+                        <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
+                          <span
+                            onClick={() => {
+                              if (!arr[idx] && canCheck) {
+                                const newDots = safeCloneClassCardDots();
+                                for (let j = 0; j <= idx; ++j) newDots[1][j] = true;
+                                let delta = 0;
+                                for (let j = 0; j <= idx; ++j) if (!arr[j]) delta += xpCosts[j];
+                                persistClassCardDots(newDots, 0, delta);
+                              } else if (arr[idx] && canUncheck) {
+                                const newDots = safeCloneClassCardDots();
+                                for (let j = idx; j < arr.length; ++j) newDots[1][j] = false;
+                                let delta = 0;
+                                for (let j = idx; j < arr.length; ++j) if (arr[j]) delta -= xpCosts[j];
+                                persistClassCardDots(newDots, 0, delta);
+                              }
+                            }}
+                            style={{
+                              width: '15px',
+                              height: '15px',
+                              border: '2px solid #000',
+                              borderRadius: '50%',
+                              display: 'block',
+                              background: arr[idx] ? '#000' : '#fff',
+                              cursor: (canCheck && !arr[idx]) || canUncheck ? 'pointer' : 'not-allowed',
+                              transition: 'background 0.2s'
+                            }}
+                          ></span>
+                        </span>
+                      );
+                    })}
+                    <span></span>
+                    <span></span>
+                  </div>
+                </div>
+                {/* Technique section */}
+                <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+                  <div style={{ fontWeight: 'bold', color: '#bf9000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Technique</u></div>
+                  <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+                    <i style={{ color: '#717211' }}><b>Combat Delegation</b> (Cooldown 4).</i> One ally within 5hx that can see and/or hear you gains an extra <i>Action</i>.
+                  </div>
+                  {/* XP progression table for Technique */}
+                  <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px' }}>
+                    <div style={{
+                      display: 'grid',
+                      gridTemplateColumns: '1fr 24px 24px 24px',
+                      gridTemplateRows: 'repeat(6, auto)',
+                      columnGap: '6px',
+                      rowGap: '2px',
+                      alignItems: 'start',
+                      marginBottom: '2px',
+                      width: '100%',
+                      paddingLeft: '4px'
+                    }}>
+                      {/* Row 1: XP header */}
+                      <span></span>
+                      <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>3xp</span>
+                      <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>5xp</span>
+                      <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>8xp</span>
+                      {/* Row 2: +1hx dots (interactive) */}
+                      <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>+1hx</span>
+                      {[0,1,2].map(idx => {
+                        const arr = safeGetDotsArray(3);
+                        if (!arr || !Array.isArray(arr) || arr.length === 0) {
+                          return (
+                            <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
+                              <span style={{
+                                width: 16,
+                                height: 16,
+                                borderRadius: '50%',
+                                border: '2px solid #ddd',
+                                background: '#fff',
+                                cursor: 'not-allowed'
+                              }}></span>
+                            </span>
+                          );
+                        }
+                        const canCheck = idx === 0 || arr.slice(0, idx).every(Boolean);
+                        const rightmostChecked = arr.lastIndexOf(true);
+                        const canUncheck = arr[idx] && idx === rightmostChecked;
+                        // XP cost for each dot (3xp, 5xp, 8xp)
+                        const xpCosts = [3, 5, 8];
+                        return (
+                          <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
+                            <span
+                              onClick={() => {
+                                if (!arr[idx] && canCheck) {
+                                  const newDots = safeCloneClassCardDots();
+                                  for (let j = 0; j <= idx; ++j) newDots[3][j] = true;
+                                  let delta = 0;
+                                  for (let j = 0; j <= idx; ++j) if (!arr[j]) delta += xpCosts[j];
+                                  persistClassCardDots(newDots, 0, delta);
+                                } else if (arr[idx] && canUncheck) {
+                                  const newDots = safeCloneClassCardDots();
+                                  for (let j = idx; j < arr.length; ++j) newDots[3][j] = false;
+                                  let delta = 0;
+                                  for (let j = idx; j < arr.length; ++j) if (arr[j]) delta -= xpCosts[j];
+                                  persistClassCardDots(newDots, 0, delta);
+                                }
+                              }}
+                              style={{
+                                width: '15px',
+                                height: '15px',
+                                border: '2px solid #000',
+                                borderRadius: '50%',
+                                display: 'block',
+                                background: arr[idx] ? '#000' : '#fff',
+                                cursor: (canCheck && !arr[idx]) || canUncheck ? 'pointer' : 'not-allowed',
+                                transition: 'background 0.2s'
+                              }}
+                            ></span>
+                          </span>
+                        );
+                      })}
+                      {/* Row 3: XP header for +1 ally */}
+                      <span></span>
+                      <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>6xp</span>
+                      <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>10xp</span>
+                      <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>14xp</span>
+                      {/* Row 3: +1 ally dots (interactive) */}
+                      <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>+1 ally</span>
+                      {[0,1,2].map(idx => {
+                        const arr = safeGetDotsArray(4);
+                        const canCheck = idx === 0 || arr.slice(0, idx).every(Boolean);
+                        const rightmostChecked = arr.lastIndexOf(true);
+                        const canUncheck = arr[idx] && idx === rightmostChecked;
+                        // XP cost for each dot (6xp, 10xp, 14xp)
+                        const xpCosts = [6, 10, 14];
+                        return (
+                          <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
+                            <span
+                              onClick={() => {
+                                if (!arr[idx] && canCheck) {
+                                  const newDots = safeCloneClassCardDots();
+                                  for (let j = 0; j <= idx; ++j) newDots[4][j] = true;
+                                  let delta = 0;
+                                  for (let j = 0; j <= idx; ++j) if (!arr[j]) delta += xpCosts[j];
+                                  persistClassCardDots(newDots, 0, delta);
+                                } else if (arr[idx] && canUncheck) {
+                                  const newDots = safeCloneClassCardDots();
+                                  for (let j = idx; j < arr.length; ++j) newDots[4][j] = false;
+                                  let delta = 0;
+                                  for (let j = idx; j < arr.length; ++j) if (arr[j]) delta -= xpCosts[j];
+                                  persistClassCardDots(newDots, 0, delta);
+                                }
+                              }}
+                              style={{
+                                width: '15px',
+                                height: '15px',
+                                border: '2px solid #000',
+                                borderRadius: '50%',
+                                display: 'block',
+                                background: arr[idx] ? '#000' : '#fff',
+                                cursor: (canCheck && !arr[idx]) || canUncheck ? 'pointer' : 'not-allowed',
+                                transition: 'background 0.2s'
+                              }}
+                            ></span>
+                          </span>
+                        );
+                      })}
+                      {/* Row 4: -1 Cooldown dots (interactive) */}
+                      <span></span>
+                      <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>4xp</span>
+                      <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>7xp</span>
+                      <span></span>
+                      <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>-1 <i>Cooldown</i></span>
+                      {[0,1].map(idx => {
+                        const arr = safeGetDotsArray(5);
+                        const canCheck = idx === 0 || arr.slice(0, idx).every(Boolean);
+                        const rightmostChecked = arr.lastIndexOf(true);
+                        const canUncheck = arr[idx] && idx === rightmostChecked;
+                        // XP cost for each dot (4xp, 7xp)
+                        const xpCosts = [4, 7];
+                        return (
+                          <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
+                            <span
+                              onClick={() => {
+                                if (!arr[idx] && canCheck) {
+                                  const newDots = safeCloneClassCardDots();
+                                  for (let j = 0; j <= idx; ++j) newDots[5][j] = true;
+                                  let delta = 0;
+                                  for (let j = 0; j <= idx; ++j) if (!arr[j]) delta += xpCosts[j];
+                                  persistClassCardDots(newDots, 0, delta);
+                                } else if (arr[idx] && canUncheck) {
+                                  const newDots = safeCloneClassCardDots();
+                                  for (let j = idx; j < arr.length; ++j) newDots[5][j] = false;
+                                  let delta = 0;
+                                  for (let j = idx; j < arr.length; ++j) if (arr[j]) delta -= xpCosts[j];
+                                  persistClassCardDots(newDots, 0, delta);
+                                }
+                              }}
+                              style={{
+                                width: '15px',
+                                height: '15px',
+                                border: '2px solid #000',
+                                borderRadius: '50%',
+                                display: 'block',
+                                background: arr[idx] ? '#000' : '#fff',
+                                cursor: (canCheck && !arr[idx]) || canUncheck ? 'pointer' : 'not-allowed',
+                                transition: 'background 0.2s'
+                              }}
+                            ></span>
+                          </span>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+                {/* Attack section */}
+                <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+                  <div style={{ fontWeight: 'bold', color: '#990000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Attack</u></div>
+                  <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+                    <b><i>Primary <span style={{ color: '#990000' }}>Attack</span>.</i></b><br /> <i>Rifles.</i> 10hx Range, single target, 18+ Crit, 1d6 Damage.
+                  </div>
+                  {/* XP progression table for Attack */}
+                  <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px' }}>
+                    <div style={{
+                      display: 'grid',
+                      gridTemplateColumns: '1fr 24px 24px 24px',
+                      gridTemplateRows: 'repeat(5, auto)',
+                      columnGap: '6px',
+                      rowGap: '2px',
+                      alignItems: 'start',
+                      marginBottom: '2px',
+                      width: '100%',
+                      paddingLeft: '4px'
+                    }}>
+                      {/* Row 1: XP header */}
+                      <span></span>
+                      <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>5xp</span>
+                      <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>8xp</span>
+                      <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>15xp</span>
+                      {/* Row 2: +1 Damage die dots (interactive) */}
+                      <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>+1 Damage die</span>
+                      {[0,1,2].map(idx => {
+                        const arr = safeGetDotsArray(6);
+                        const canCheck = idx === 0 || arr.slice(0, idx).every(Boolean);
+                        const rightmostChecked = arr.lastIndexOf(true);
+                        const canUncheck = arr[idx] && idx === rightmostChecked;
+                        // XP cost for each dot (5xp, 8xp, 15xp)
+                        const xpCosts = [5, 8, 15];
+                        return (
+                          <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
+                            <span
+                              onClick={() => {
+                                if (!arr[idx] && canCheck) {
+                                  const newDots = safeCloneClassCardDots();
+                                  for (let j = 0; j <= idx; ++j) newDots[6][j] = true;
+                                  let delta = 0;
+                                  for (let j = 0; j <= idx; ++j) if (!arr[j]) delta += xpCosts[j];
+                                  persistClassCardDots(newDots, 0, delta);
+                                } else if (arr[idx] && canUncheck) {
+                                  const newDots = safeCloneClassCardDots();
+                                  for (let j = idx; j < arr.length; ++j) newDots[6][j] = false;
+                                  let delta = 0;
+                                  for (let j = idx; j < arr.length; ++j) if (arr[j]) delta -= xpCosts[j];
+                                  persistClassCardDots(newDots, 0, delta);
+                                }
+                              }}
+                              style={{
+                                width: '15px',
+                                height: '15px',
+                                border: '2px solid #000',
+                                borderRadius: '50%',
+                                display: 'block',
+                                background: arr[idx] ? '#000' : '#fff',
+                                cursor: (canCheck && !arr[idx]) || canUncheck ? 'pointer' : 'not-allowed',
+                                transition: 'background 0.2s'
+                              }}
+                            ></span>
+                          </span>
+                        );
+                      })}
+                      <span></span>
+                      <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>2xp</span>
+                      <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>4xp</span>
+                      <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>6xp</span>
+                      {/* Row 3: +1 Crit dots (interactive) */}
+                      <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>+1 Crit</span>
+                      {[0,1,2].map(idx => {
+                        const arr = safeGetDotsArray(7);
+                        const canCheck = idx === 0 || arr.slice(0, idx).every(Boolean);
+                        const rightmostChecked = arr.lastIndexOf(true);
+                        const canUncheck = arr[idx] && idx === rightmostChecked;
+                        // XP cost for each dot (2xp, 4xp, 6xp)
+                        const xpCosts = [2, 4, 6];
+                        return (
+                          <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
+                            <span
+                              onClick={() => {
+                                if (!arr[idx] && canCheck) {
+                                  const newDots = safeCloneClassCardDots();
+                                  for (let j = 0; j <= idx; ++j) newDots[7][j] = true;
+                                  let delta = 0;
+                                  for (let j = 0; j <= idx; ++j) if (!arr[j]) delta += xpCosts[j];
+                                  persistClassCardDots(newDots, 0, delta);
+                                } else if (arr[idx] && canUncheck) {
+                                  const newDots = safeCloneClassCardDots();
+                                  for (let j = idx; j < arr.length; ++j) newDots[7][j] = false;
+                                  let delta = 0;
+                                  for (let j = idx; j < arr.length; ++j) if (arr[j]) delta -= xpCosts[j];
+                                  persistClassCardDots(newDots, 0, delta);
+                                }
+                              }}
+                              style={{
+                                width: '15px',
+                                height: '15px',
+                                border: '2px solid #000',
+                                borderRadius: '50%',
+                                display: 'block',
+                                background: arr[idx] ? '#000' : '#fff',
+                                cursor: (canCheck && !arr[idx]) || canUncheck ? 'pointer' : 'not-allowed',
+                                transition: 'background 0.2s'
+                              }}
+                            ></span>
+                          </span>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+                {/* Strike section */}
+                <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+                  <div style={{ fontWeight: 'bold', color: '#351c75', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Strike</u></div>
+                  <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+                    <b><i><span style={{ color: '#351c75' }}>Strike</span> Damage.</i></b> 1d6.
+                  </div>
+                  {/* XP progression table for Strike */}
+                  <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px' }}>
+                    <div style={{
+                      display: 'grid',
+                      gridTemplateColumns: '1fr 24px 24px',
+                      gridTemplateRows: 'repeat(3, auto)',
+                      columnGap: '6px',
+                      rowGap: '2px',
+                      alignItems: 'start',
+                      marginBottom: '2px',
+                      width: '100%',
+                      paddingLeft: '4px'
+                    }}>
+                      {/* Row 1: XP header */}
+                      <span></span>
+                      <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>6xp</span>
+                      <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>10xp</span>
+                      {/* Row 2: +1 Damage die dots (interactive) */}
+                      <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>+1 Damage die</span>
+                      {[0,1].map(idx => {
+                        const arr = safeGetDotsArray(8);
+                        const canCheck = idx === 0 || arr.slice(0, idx).every(Boolean);
+                        const rightmostChecked = arr.lastIndexOf(true);
+                        const canUncheck = arr[idx] && idx === rightmostChecked;
+                        // XP cost for each dot (6xp, 10xp)
+                        const xpCosts = [6, 10];
+                        return (
+                          <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
+                            <span
+                              onClick={() => {
+                                if (!arr[idx] && canCheck) {
+                                  const newDots = safeCloneClassCardDots();
+                                  for (let j = 0; j <= idx; ++j) newDots[8][j] = true;
+                                  let delta = 0;
+                                  for (let j = 0; j <= idx; ++j) if (!arr[j]) delta += xpCosts[j];
+                                  persistClassCardDots(newDots, 0, delta);
+                                } else if (arr[idx] && canUncheck) {
+                                  const newDots = safeCloneClassCardDots();
+                                  for (let j = idx; j < arr.length; ++j) newDots[8][j] = false;
+                                  let delta = 0;
+                                  for (let j = idx; j < arr.length; ++j) if (arr[j]) delta -= xpCosts[j];
+                                  persistClassCardDots(newDots, 0, delta);
+                                }
+                              }}
+                              style={{
+                                width: '15px',
+                                height: '15px',
+                                border: '2px solid #000',
+                                borderRadius: '50%',
+                                display: 'block',
+                                background: arr[idx] ? '#000' : '#fff',
+                                cursor: (canCheck && !arr[idx]) || canUncheck ? 'pointer' : 'not-allowed',
+                                transition: 'background 0.2s'
+                              }}
+                            ></span>
+                          </span>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+                {/* Perks section */}
+                <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+                  <div style={{ fontWeight: 'bold', color: '#000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Perks</u></div>
+                  <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+                    <i><b>Skills.</b> Diplomacy</i> +2<br/>
+                    <b>Natural Leader.</b> You are inherently adept at leading others and getting them to both trust and follow you. Gain an advantage on related skill rolls.<br/>
+                    <b>9sp</b>
+                  </div>
+                  {/* Perk dot (interactive) */}
+                  <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px' }}>
+                    <div style={{
+                      display: 'grid',
+                      gridTemplateColumns: '1fr 24px',
+                      gridTemplateRows: 'repeat(2, auto)',
+                      columnGap: '6px',
+                      rowGap: '2px',
+                      alignItems: 'start',
+                      marginBottom: '2px',
+                      width: '100%',
+                      paddingLeft: '4px'
+                    }}>
+                      {/* Row 1: Perk header */}
+                      <span></span>
+                      <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>9sp</span>
+                      {/* Row 2: Perk dot (interactive) */}
+                      <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>Natural Leader</span>
+                      {[0].map(idx => {
+                        const arr = safeGetDotsArray(9);
+                        const canCheck = idx === 0 || arr.slice(0, idx).every(Boolean);
+                        const rightmostChecked = arr.lastIndexOf(true);
+                        const canUncheck = arr[idx] && idx === rightmostChecked;
+                        // SP cost for this dot (9sp)
+                        const spCosts = [9];
+                        return (
+                          <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
+                            <span
+                              onClick={() => {
+                                if (!arr[idx] && canCheck) {
+                                  const newDots = safeCloneClassCardDots();
+                                  for (let j = 0; j <= idx; ++j) newDots[9][j] = true;
+                                  let delta = 0;
+                                  for (let j = 0; j <= idx; ++j) if (!arr[j]) delta += spCosts[j];
+                                  persistClassCardDots(newDots, 1, delta);
+                                } else if (arr[idx] && canUncheck) {
+                                  const newDots = safeCloneClassCardDots();
+                                  for (let j = idx; j < arr.length; ++j) newDots[9][j] = false;
+                                  let delta = 0;
+                                  for (let j = idx; j < arr.length; ++j) if (arr[j]) delta -= spCosts[j];
+                                  persistClassCardDots(newDots, 1, delta);
+                                }
+                              }}
+                              style={{
+                                width: '15px',
+                                height: '15px',
+                                border: '2px solid #000',
+                                borderRadius: '50%',
+                                display: 'block',
+                                background: arr[idx] ? '#000' : '#fff',
+                                cursor: (canCheck && !arr[idx]) || canUncheck ? 'pointer' : 'not-allowed',
+                                transition: 'background 0.2s'
+                              }}
+                            ></span>
+                          </span>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
             {/* Feature information when Coder is selected */}
             {charClass === "Coder" && (
               <div style={{ width: '100%', marginTop: '1rem', textAlign: 'left', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
@@ -1205,13 +1855,13 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                           <span
                             onClick={() => {
                               if (!arr[idx] && canCheck) {
-                                const newDots = classCardDots.map(row => [...row]);
+                                const newDots = safeCloneClassCardDots();
                                 for (let j = 0; j <= idx; ++j) newDots[0][j] = true;
                                 let delta = 0;
                                 for (let j = 0; j <= idx; ++j) if (!arr[j]) delta += xpCosts[j];
                                 persistClassCardDots(newDots, 0, delta);
                               } else if (arr[idx] && canUncheck) {
-                                const newDots = classCardDots.map(row => [...row]);
+                                const newDots = safeCloneClassCardDots();
                                 for (let j = idx; j < arr.length; ++j) newDots[0][j] = false;
                                 let delta = 0;
                                 for (let j = idx; j < arr.length; ++j) if (arr[j]) delta -= xpCosts[j];
@@ -1253,13 +1903,13 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                           <span
                             onClick={() => {
                               if (!arr[idx] && canCheck) {
-                                const newDots = classCardDots.map(row => [...row]);
+                                const newDots = safeCloneClassCardDots();
                                 for (let j = 0; j <= idx; ++j) newDots[1][j] = true;
                                 let delta = 0;
                                 for (let j = 0; j <= idx; ++j) if (!arr[j]) delta += xpCosts[j];
                                 persistClassCardDots(newDots, 0, delta);
                               } else if (arr[idx] && canUncheck) {
-                                const newDots = classCardDots.map(row => [...row]);
+                                const newDots = safeCloneClassCardDots();
                                 for (let j = idx; j < arr.length; ++j) newDots[1][j] = false;
                                 let delta = 0;
                                 for (let j = idx; j < arr.length; ++j) if (arr[j]) delta -= xpCosts[j];
@@ -1320,13 +1970,13 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                             <span
                               onClick={() => {
                                 if (!arr[idx] && canCheck) {
-                                  const newDots = classCardDots.map(row => [...row]);
+                                  const newDots = safeCloneClassCardDots();
                                   for (let j = 0; j <= idx; ++j) newDots[2][j] = true;
                                   let delta = 0;
                                   for (let j = 0; j <= idx; ++j) if (!arr[j]) delta += xpCosts[j];
                                   persistClassCardDots(newDots, 0, delta);
                                 } else if (arr[idx] && canUncheck) {
-                                  const newDots = classCardDots.map(row => [...row]);
+                                  const newDots = safeCloneClassCardDots();
                                   for (let j = idx; j < arr.length; ++j) newDots[2][j] = false;
                                   let delta = 0;
                                   for (let j = idx; j < arr.length; ++j) if (arr[j]) delta -= xpCosts[j];
@@ -1367,13 +2017,13 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                             <span
                               onClick={() => {
                                 if (!arr[idx] && canCheck) {
-                                  const newDots = classCardDots.map(row => [...row]);
+                                  const newDots = safeCloneClassCardDots();
                                   for (let j = 0; j <= idx; ++j) newDots[3][j] = true;
                                   let delta = 0;
                                   for (let j = 0; j <= idx; ++j) if (!arr[j]) delta += xpCosts[j];
                                   persistClassCardDots(newDots, 0, delta);
                                 } else if (arr[idx] && canUncheck) {
-                                  const newDots = classCardDots.map(row => [...row]);
+                                  const newDots = safeCloneClassCardDots();
                                   for (let j = idx; j < arr.length; ++j) newDots[3][j] = false;
                                   let delta = 0;
                                   for (let j = idx; j < arr.length; ++j) if (arr[j]) delta -= xpCosts[j];
@@ -1425,13 +2075,13 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                             <span
                               onClick={() => {
                                 if (!arr[idx] && canCheck) {
-                                  const newDots = classCardDots.map(row => [...row]);
+                                  const newDots = safeCloneClassCardDots();
                                   for (let j = 0; j <= idx; ++j) newDots[4][j] = true;
                                   let delta = 0;
                                   for (let j = 0; j <= idx; ++j) if (!arr[j]) delta += xpCosts[j];
                                   persistClassCardDots(newDots, 0, delta);
                                 } else if (arr[idx] && canUncheck) {
-                                  const newDots = classCardDots.map(row => [...row]);
+                                  const newDots = safeCloneClassCardDots();
                                   for (let j = idx; j < arr.length; ++j) newDots[4][j] = false;
                                   let delta = 0;
                                   for (let j = idx; j < arr.length; ++j) if (arr[j]) delta -= xpCosts[j];
@@ -1473,13 +2123,13 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                             <span
                               onClick={() => {
                                 if (!arr[idx] && canCheck) {
-                                  const newDots = classCardDots.map(row => [...row]);
+                                  const newDots = safeCloneClassCardDots();
                                   for (let j = 0; j <= idx; ++j) newDots[5][j] = true;
                                   let delta = 0;
                                   for (let j = 0; j <= idx; ++j) if (!arr[j]) delta += xpCosts[j];
                                   persistClassCardDots(newDots, 0, delta);
                                 } else if (arr[idx] && canUncheck) {
-                                  const newDots = classCardDots.map(row => [...row]);
+                                  const newDots = safeCloneClassCardDots();
                                   for (let j = idx; j < arr.length; ++j) newDots[5][j] = false;
                                   let delta = 0;
                                   for (let j = idx; j < arr.length; ++j) if (arr[j]) delta -= xpCosts[j];
@@ -1542,13 +2192,13 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                             <span
                               onClick={() => {
                                 if (!arr[idx] && canCheck) {
-                                  const newDots = classCardDots.map(row => [...row]);
+                                  const newDots = safeCloneClassCardDots();
                                   for (let j = 0; j <= idx; ++j) newDots[6][j] = true;
                                   let delta = 0;
                                   for (let j = 0; j <= idx; ++j) if (!arr[j]) delta += xpCosts[j];
                                   persistClassCardDots(newDots, 0, delta);
                                 } else if (arr[idx] && canUncheck) {
-                                  const newDots = classCardDots.map(row => [...row]);
+                                  const newDots = safeCloneClassCardDots();
                                   for (let j = idx; j < arr.length; ++j) newDots[6][j] = false;
                                   let delta = 0;
                                   for (let j = idx; j < arr.length; ++j) if (arr[j]) delta -= xpCosts[j];
@@ -1588,13 +2238,13 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                             <span
                               onClick={() => {
                                 if (!arr[idx] && canCheck) {
-                                  const newDots = classCardDots.map(row => [...row]);
+                                  const newDots = safeCloneClassCardDots();
                                   for (let j = 0; j <= idx; ++j) newDots[7][j] = true;
                                   let delta = 0;
                                   for (let j = 0; j <= idx; ++j) if (!arr[j]) delta += xpCosts[j];
                                   persistClassCardDots(newDots, 0, delta);
                                 } else if (arr[idx] && canUncheck) {
-                                  const newDots = classCardDots.map(row => [...row]);
+                                  const newDots = safeCloneClassCardDots();
                                   for (let j = idx; j < arr.length; ++j) newDots[7][j] = false;
                                   let delta = 0;
                                   for (let j = idx; j < arr.length; ++j) if (arr[j]) delta -= xpCosts[j];
@@ -1654,13 +2304,13 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                             <span
                               onClick={() => {
                                 if (!arr[idx] && canCheck) {
-                                  const newDots = classCardDots.map(row => [...row]);
+                                  const newDots = safeCloneClassCardDots();
                                   for (let j = 0; j <= idx; ++j) newDots[8][j] = true;
                                   let delta = 0;
                                   for (let j = 0; j <= idx; ++j) if (!arr[j]) delta += xpCosts[j];
                                   persistClassCardDots(newDots, 0, delta);
                                 } else if (arr[idx] && canUncheck) {
-                                  const newDots = classCardDots.map(row => [...row]);
+                                  const newDots = safeCloneClassCardDots();
                                   for (let j = idx; j < arr.length; ++j) newDots[8][j] = false;
                                   let delta = 0;
                                   for (let j = idx; j < arr.length; ++j) if (arr[j]) delta -= xpCosts[j];
@@ -1700,13 +2350,13 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                             <span
                               onClick={() => {
                                 if (!arr[idx] && canCheck) {
-                                  const newDots = classCardDots.map(row => [...row]);
+                                  const newDots = safeCloneClassCardDots();
                                   for (let j = 0; j <= idx; ++j) newDots[9][j] = true;
                                   let delta = 0;
                                   for (let j = 0; j <= idx; ++j) if (!arr[j]) delta += xpCosts[j];
                                   persistClassCardDots(newDots, 0, delta);
                                 } else if (arr[idx] && canUncheck) {
-                                  const newDots = classCardDots.map(row => [...row]);
+                                  const newDots = safeCloneClassCardDots();
                                   for (let j = idx; j < arr.length; ++j) newDots[9][j] = false;
                                   let delta = 0;
                                   for (let j = idx; j < arr.length; ++j) if (arr[j]) delta -= xpCosts[j];
@@ -1746,13 +2396,13 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                             <span
                               onClick={() => {
                                 if (!arr[idx] && canCheck) {
-                                  const newDots = classCardDots.map(row => [...row]);
+                                  const newDots = safeCloneClassCardDots();
                                   for (let j = 0; j <= idx; ++j) newDots[10][j] = true;
                                   let delta = 0;
                                   for (let j = 0; j <= idx; ++j) if (!arr[j]) delta += xpCosts[j];
                                   persistClassCardDots(newDots, 0, delta);
                                 } else if (arr[idx] && canUncheck) {
-                                  const newDots = classCardDots.map(row => [...row]);
+                                  const newDots = safeCloneClassCardDots();
                                   for (let j = idx; j < arr.length; ++j) newDots[10][j] = false;
                                   let delta = 0;
                                   for (let j = idx; j < arr.length; ++j) if (arr[j]) delta -= xpCosts[j];
@@ -1792,13 +2442,13 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                             <span
                               onClick={() => {
                                 if (!arr[idx] && canCheck) {
-                                  const newDots = classCardDots.map(row => [...row]);
+                                  const newDots = safeCloneClassCardDots();
                                   for (let j = 0; j <= idx; ++j) newDots[11][j] = true;
                                   let delta = 0;
                                   for (let j = 0; j <= idx; ++j) if (!arr[j]) delta += xpCosts[j];
                                   persistClassCardDots(newDots, 0, delta);
                                 } else if (arr[idx] && canUncheck) {
-                                  const newDots = classCardDots.map(row => [...row]);
+                                  const newDots = safeCloneClassCardDots();
                                   for (let j = idx; j < arr.length; ++j) newDots[11][j] = false;
                                   let delta = 0;
                                   for (let j = idx; j < arr.length; ++j) if (arr[j]) delta -= xpCosts[j];
@@ -1858,11 +2508,11 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                               <span
                                 onClick={() => {
                                   if (!arr[idx] && canCheck) {
-                                    const newDots = classCardDots.map(row => [...row]);
+                                    const newDots = safeCloneClassCardDots();
                                     for (let j = 0; j <= idx; ++j) newDots[12][j] = true;
                                     persistClassCardDots(newDots, 8);
                                   } else if (arr[idx] && canUncheck) {
-                                    const newDots = classCardDots.map(row => [...row]);
+                                    const newDots = safeCloneClassCardDots();
                                     for (let j = idx; j < arr.length; ++j) newDots[12][j] = false;
                                     persistClassCardDots(newDots, -8);
                                   }
