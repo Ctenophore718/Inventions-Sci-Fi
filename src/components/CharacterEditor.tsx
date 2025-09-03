@@ -297,7 +297,7 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
 
   // Initialize skillDots for new characters with starter dots
   useEffect(() => {
-    if (isNewCharacter && !sheet?.skillDots) {
+    if (isNewCharacter && !sheet?.skillDots && (!sheet?.spSpent || sheet.spSpent === 0)) {
       const newSkillDots = Object.fromEntries(skillList.map(skill => {
         // For new characters, automatically fill first two columns
         const dots = Array(10).fill(false);
@@ -312,10 +312,10 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
       handleAutoSave({ 
         hasFreeSkillStarterDots: true,
         skillDots: newSkillDots,
-        spSpent: 0 // Explicitly set SP spent to 0 for new characters
+        spSpent: 0 // Explicitly set SP spent to 0 for new characters only
       });
     }
-  }, [isNewCharacter, sheet?.skillDots]);
+  }, [isNewCharacter, sheet?.skillDots, sheet?.spSpent]);
   // Track SP spent for skills
   const [spSpent, setSpSpent] = useState(() => {
     if (sheet?.spSpent !== undefined) {
