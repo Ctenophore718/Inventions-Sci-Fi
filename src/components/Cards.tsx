@@ -194,7 +194,7 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
                 fontFamily: 'Arial, Helvetica, sans-serif',
                 fontWeight: 'bold',
                 fontSize: 'clamp(0.8em, 4vw, 1.25em)',
-                color: charClass === 'Chemist' ? '#721131' : charClass === 'Coder' ? '#112972' : charClass === 'Commander' ? '#717211' : charClass === 'Contemplative' ? '#116372' : 'black',
+                color: charClass === 'Chemist' ? '#721131' : charClass === 'Coder' ? '#112972' : charClass === 'Commander' ? '#717211' : charClass === 'Contemplative' ? '#116372' : charClass === 'Devout' ? '#6b1172' : 'black',
                 lineHeight: 1,
                 textAlign: 'left',
                 whiteSpace: 'nowrap',
@@ -203,13 +203,13 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
                 flexShrink: 1,
                 marginRight: '5px'
               }}>
-                {charClass === 'Chemist' ? 'Volatile Experiments' : charClass === 'Coder' ? 'Reflection Script' : charClass === 'Commander' ? 'Combat Delegation' : charClass === 'Contemplative' ? 'Swift Reaction' : 'Class Card Name'}
+                {charClass === 'Devout' ? <span style={{ color: '#6b1172', fontWeight: 'bold' }}>Flagellation</span> : charClass === 'Chemist' ? 'Volatile Experiments' : charClass === 'Coder' ? 'Reflection Script' : charClass === 'Commander' ? 'Combat Delegation' : charClass === 'Contemplative' ? 'Swift Reaction' : 'Class Card Name'}
               </span>
               <span style={{
                 fontFamily: 'Arial, Helvetica, sans-serif',
                 fontStyle: 'italic',
                 fontSize: '0.75em', // 10% smaller than 0.85em
-                color: charClass === 'Chemist' ? '#721131' : charClass === 'Coder' ? '#112972' : 'black',
+                color: charClass === 'Chemist' ? '#721131' : charClass === 'Coder' ? '#112972' : charClass === 'Commander' ? '#717211' : charClass === 'Contemplative' ? '#116372' : charClass === 'Devout' ? '#6b1172' : 'black',
                 lineHeight: 1,
                 whiteSpace: 'normal',
                 wordBreak: 'keep-all',
@@ -218,12 +218,12 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
                 display: 'inline-block',
                 textAlign: 'right',
                 marginRight: '0px'
-              }}>{charClass === 'Chemist' ? 'Chemist' : charClass === 'Coder' ? 'Coder' : charClass === 'Commander' ? 'Commander' : charClass === 'Contemplative' ? 'Contemplative' : 'Class'}</span>
+              }}>{charClass === 'Chemist' ? 'Chemist' : charClass === 'Coder' ? 'Coder' : charClass === 'Commander' ? 'Commander' : charClass === 'Contemplative' ? 'Contemplative' : charClass === 'Devout' ? 'Devout' : 'Class'}</span>
             </div>
             {/* Conditional image based on class */}
             <img 
-              src={charClass === 'Chemist' ? "/Volatile Experiments.png" : charClass === 'Coder' ? "/Reflection Script.png" : charClass === 'Commander' ? "/Combat Delegation.png" : charClass === 'Contemplative' ? "/Swift Reaction.png" : "/Blank Card.png"}
-              alt={charClass === 'Chemist' ? "Volatile Experiments" : charClass === 'Coder' ? "Reflection Script" : charClass === 'Commander' ? "Combat Delegation" : charClass === 'Contemplative' ? "Swift Reaction" : "Blank Card"}
+              src={charClass === 'Devout' ? "/Flagellation.png" : charClass === 'Chemist' ? "/Volatile Experiments.png" : charClass === 'Coder' ? "/Reflection Script.png" : charClass === 'Commander' ? "/Combat Delegation.png" : charClass === 'Contemplative' ? "/Swift Reaction.png" : "/Blank Card.png"}
+              alt={charClass === 'Devout' ? "Flagellation" : charClass === 'Chemist' ? "Volatile Experiments" : charClass === 'Coder' ? "Reflection Script" : charClass === 'Commander' ? "Combat Delegation" : charClass === 'Contemplative' ? "Swift Reaction" : "Blank Card"}
               style={{
                 position: 'absolute',
                 top: 35,
@@ -252,37 +252,47 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
             }}>
               <span style={{ color: '#bf9000', fontFamily: 'Arial, Helvetica, sans-serif', fontWeight: 'bold', fontSize: '1.1em', textAlign: 'left' }}>Technique</span>
               <span style={{ color: '#bf9000', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '0.875em', fontStyle: 'italic', marginRight: 22, whiteSpace: 'nowrap', maxWidth: 'calc(100% - 120px)', overflow: 'hidden', textOverflow: 'ellipsis', textAlign: 'right' }}>
-                Cooldown <span style={{ fontWeight: 'bold', fontStyle: 'normal' }}>
-                  [{charClass === 'Chemist' ? (() => {
-                    let cooldown = 4;
-                    if (localSheet && Array.isArray(localSheet.classCardDots) && Array.isArray(localSheet.classCardDots[5])) {
-                      cooldown = 4 - localSheet.classCardDots[5].filter(Boolean).length;
-                      if (cooldown < 1) cooldown = 1;
-                    }
-                    return cooldown;
-                  })() : charClass === 'Coder' ? (() => {
-                    let cooldown = 4;
-                    if (localSheet && Array.isArray(localSheet.classCardDots) && Array.isArray(localSheet.classCardDots[5])) {
-                      cooldown = 4 - localSheet.classCardDots[5].filter(Boolean).length;
-                      if (cooldown < 1) cooldown = 1;
-                    }
-                    return cooldown;
-                  })() : charClass === 'Commander' ? (() => {
-                    let cooldown = 4;
-                    if (localSheet && Array.isArray(localSheet.classCardDots) && Array.isArray(localSheet.classCardDots[5])) {
-                      cooldown = 4 - localSheet.classCardDots[5].filter(Boolean).length;
-                      if (cooldown < 1) cooldown = 1;
-                    }
-                    return cooldown;
-                  })() : charClass === 'Contemplative' ? (() => {
-                    let cooldown = 4;
-                    if (localSheet && Array.isArray(localSheet.classCardDots) && Array.isArray(localSheet.classCardDots[4])) {
-                      cooldown = 4 - localSheet.classCardDots[4].filter(Boolean).length;
-                      if (cooldown < 1) cooldown = 1;
-                    }
-                    return cooldown;
-                  })() : '#'}]
-                </span>
+                {charClass === 'Devout' ? (() => {
+                  let cooldown = 4;
+                  if (localSheet && Array.isArray(localSheet.classCardDots) && Array.isArray(localSheet.classCardDots[3])) {
+                    const selected = localSheet.classCardDots[3].filter(Boolean).length;
+                    if (selected === 1) cooldown = 3;
+                    if (selected === 2) cooldown = 2;
+                  }
+                  return (<span>Cooldown <span style={{ fontWeight: 'bold', fontStyle: 'normal' }}>[{cooldown}]</span></span>);
+                })() : (
+                  <>Cooldown <span style={{ fontWeight: 'bold', fontStyle: 'normal' }}>
+                    [{charClass === 'Chemist' ? (() => {
+                      let cooldown = 4;
+                      if (localSheet && Array.isArray(localSheet.classCardDots) && Array.isArray(localSheet.classCardDots[5])) {
+                        cooldown = 4 - localSheet.classCardDots[5].filter(Boolean).length;
+                        if (cooldown < 1) cooldown = 1;
+                      }
+                      return cooldown;
+                    })() : charClass === 'Coder' ? (() => {
+                      let cooldown = 4;
+                      if (localSheet && Array.isArray(localSheet.classCardDots) && Array.isArray(localSheet.classCardDots[5])) {
+                        cooldown = 4 - localSheet.classCardDots[5].filter(Boolean).length;
+                        if (cooldown < 1) cooldown = 1;
+                      }
+                      return cooldown;
+                    })() : charClass === 'Commander' ? (() => {
+                      let cooldown = 4;
+                      if (localSheet && Array.isArray(localSheet.classCardDots) && Array.isArray(localSheet.classCardDots[5])) {
+                        cooldown = 4 - localSheet.classCardDots[5].filter(Boolean).length;
+                        if (cooldown < 1) cooldown = 1;
+                      }
+                      return cooldown;
+                    })() : charClass === 'Contemplative' ? (() => {
+                      let cooldown = 4;
+                      if (localSheet && Array.isArray(localSheet.classCardDots) && Array.isArray(localSheet.classCardDots[4])) {
+                        cooldown = 4 - localSheet.classCardDots[4].filter(Boolean).length;
+                        if (cooldown < 1) cooldown = 1;
+                      }
+                      return cooldown;
+                    })() : '#'}]
+                  </span></>
+                )}
               </span>
             </div>
             
@@ -310,7 +320,23 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
                 maxHeight: '100%',
                 overflow: 'hidden'
               }}>
-                {charClass === 'Chemist' ? (() => {
+                {charClass === 'Devout' ? (() => {
+                  let hxRange = 0;
+                  let attackD6 = 0;
+                  if (localSheet && Array.isArray(localSheet.classCardDots)) {
+                    if (Array.isArray(localSheet.classCardDots[1]) && localSheet.classCardDots[1][0]) {
+                      hxRange = 1;
+                    }
+                    if (Array.isArray(localSheet.classCardDots[2]) && localSheet.classCardDots[2][0]) {
+                      attackD6 = 1;
+                    }
+                  }
+                  return (
+                    <>
+                      You choose to deal 1d4 to 5d4 untyped Damage to yourself that cannot be reduced in any way. As a result, you gain a +2 Crit, +<b>[{hxRange}]</b>hx Range and +<b>[{attackD6}]</b>d6 Damage to your next <b><i style={{ color: '#990000' }}>Attack</i></b> for each die of Damage you dealt yourself.
+                    </>
+                  );
+                })() : charClass === 'Chemist' ? (() => {
                   // ...existing code for Chemist...
                   let hx = 3;
                   let chem = 0;
@@ -398,12 +424,14 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
               color: '#000',
               fontFamily: 'Arial, Helvetica, sans-serif',
               fontStyle: 'italic',
-              fontSize: '0.62em',
+              fontSize: '0.7em',
               fontWeight: 400,
               zIndex: 3,
               textAlign: 'left'
             }}>
-              {charClass === 'Chemist' ? 
+              {charClass === 'Devout' ? (
+                <span>“Sacrifice is a necessary cost of any spiritual power. The most devout sacrifice their own flesh.” <br />--Theodora de la Fe, Defteran Devout</span>
+              ) : charClass === 'Chemist' ? 
                 'With the right concoctions, any spell or weapon becomes even more volatile than before.' : 
                 charClass === 'Coder' ?
                 (<span>“Although it’s a universal script, the math behind reflecting energetic material is quite complex.”<br />--Luminova, X-Ray Naturalist</span>)

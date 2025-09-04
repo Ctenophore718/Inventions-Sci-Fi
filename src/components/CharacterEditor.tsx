@@ -200,9 +200,16 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
       </u></b> and can <b><i style={{ color: '#351c75' }}>Strike</i></b> <b>[1]</b> extra time per turn.
     </span>
   );
+  // Dynamically show [2] or [3] for Blood Trade feature based on Devout +1d6 Damage dots (classCardDots[0])
+  let devoutBloodTradeBonus = 1;
+  if (charClass === "Devout" && sheet?.classCardDots?.[0]) {
+    const dots = sheet.classCardDots[0];
+    if (dots[0]) devoutBloodTradeBonus = 2;
+    if (dots[0] && dots[1]) devoutBloodTradeBonus = 3;
+  }
   const devoutFeatureJSX = (
     <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#6b1172' }}>Blood Trade.</i></b> Whenever you take Damage, you gain +<b>[1]</b>d6 Damage on your next <b><i><span style={{ color: '#351c75' }}>Strike</span></i></b> or <b><i><span style={{ color: '#990000' }}>Attack</span></i></b>. The Damage type matches your next <b><i><span style={{ color: '#351c75' }}>Strike</span></i></b>  or <b><i><span style={{ color:'#990000' }}>Attack</span></i></b> and doesn’t stack if you are Damaged multiple times.   
+      <b><i style={{ color: '#6b1172' }}>Blood Trade.</i></b> Whenever you take Damage, you gain +<b>[{devoutBloodTradeBonus}]</b>d6 Damage on your next <b><i><span style={{ color: '#351c75' }}>Strike</span></i></b> or <b><i><span style={{ color: '#990000' }}>Attack</span></i></b>. The Damage type matches your next <b><i><span style={{ color: '#351c75' }}>Strike</span></i></b>  or <b><i><span style={{ color:'#990000' }}>Attack</span></i></b> and doesnt stack if you are Damaged multiple times.   
     </span>
   );  
   const elementalistFeatureJSX = (
@@ -477,7 +484,8 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
           const isBoosterDot = (charClass === "Chemist" && skillName === "Investigation" && idx === 2) ||
                               (charClass === "Coder" && skillName === "Oikomagic" && idx === 2) ||
                               (charClass === "Commander" && skillName === "Diplomacy" && idx === 2) ||
-                              (charClass === "Contemplative" && skillName === "Awareness" && idx === 2);
+                              (charClass === "Contemplative" && skillName === "Awareness" && idx === 2) ||
+                              (charClass === "Devout" && skillName === "Xenomagic" && idx === 2);
           
           // For characters with free starter dots, first two columns are free
           if (hasFreeDots && (idx === 0 || idx === 1)) {
@@ -1961,7 +1969,8 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
                       const isCoderOikomagic = charClass === "Coder" && skill === "Oikomagic" && i === 2;
                       const isCommanderDiplomacy = charClass === "Commander" && skill === "Diplomacy" && i === 2;
                       const isContemplativeAwareness = charClass === "Contemplative" && skill === "Awareness" && i === 2;
-                      if (isChemistInvestigation || isCoderOikomagic || isCommanderDiplomacy || isContemplativeAwareness) {
+                      const isDevoutXenomagic = charClass === "Devout" && skill === "Xenomagic" && i === 2;
+                      if (isChemistInvestigation || isCoderOikomagic || isCommanderDiplomacy || isContemplativeAwareness || isDevoutXenomagic) {
                         checked = true; // Force dot to be filled for class booster skills
                       }
 
@@ -1971,6 +1980,7 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
                         if (isCoderOikomagic) return "rgba(17,33,114,0.5)";
                         if (isCommanderDiplomacy) return "rgba(113,114,17,0.5)";
                         if (isContemplativeAwareness) return "rgba(17,99,114,0.5)";
+                        if (isDevoutXenomagic) return "rgba(107,17,114,0.5)";
                         // Add other class colors here in the future
                         return "#d0d0d0"; // fallback color
                       };
@@ -1982,7 +1992,8 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
                         const isBoosterDot = (charClass === "Chemist" && skill === "Investigation" && dotIndex === 2) ||
                                            (charClass === "Coder" && skill === "Oikomagic" && dotIndex === 2) ||
                                            (charClass === "Commander" && skill === "Diplomacy" && dotIndex === 2) ||
-                                           (charClass === "Contemplative" && skill === "Awareness" && dotIndex === 2);
+                                           (charClass === "Contemplative" && skill === "Awareness" && dotIndex === 2) ||
+                                           (charClass === "Devout" && skill === "Xenomagic" && dotIndex === 2);
                         return dotFilled || isBoosterDot;
                       });
                       const rightmostChecked = skillDotsForSkill.lastIndexOf(true);
@@ -1999,7 +2010,7 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
                               if (isLockedColumn) return;
                               
                               // Prevent clicking on class-based automatic skill dots
-                              if (isChemistInvestigation || isCoderOikomagic || isCommanderDiplomacy || isContemplativeAwareness) return;
+                              if (isChemistInvestigation || isCoderOikomagic || isCommanderDiplomacy || isContemplativeAwareness || isDevoutXenomagic) return;
                               
                               setSkillDots(prev => {
                                 setSpNotice("");
@@ -2023,7 +2034,8 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
                                       const isBoosterDot = (charClass === "Chemist" && skillName === "Investigation" && idx === 2) ||
                                                           (charClass === "Coder" && skillName === "Oikomagic" && idx === 2) ||
                                                           (charClass === "Commander" && skillName === "Diplomacy" && idx === 2) ||
-                                                          (charClass === "Contemplative" && skillName === "Awareness" && idx === 2);
+                                                          (charClass === "Contemplative" && skillName === "Awareness" && idx === 2) ||
+                                                          (charClass === "Devout" && skillName === "Xenomagic" && idx === 2);
                                       
                                       // For characters with free starter dots, first two columns are free
                                       if (hasFreeDots && (idx === 0 || idx === 1)) {
@@ -2046,7 +2058,8 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
                                       const isBoosterDot = (charClass === "Chemist" && skillName === "Investigation" && idx === 2) ||
                                                           (charClass === "Coder" && skillName === "Oikomagic" && idx === 2) ||
                                                           (charClass === "Commander" && skillName === "Diplomacy" && idx === 2) ||
-                                                          (charClass === "Contemplative" && skillName === "Awareness" && idx === 2);
+                                                          (charClass === "Contemplative" && skillName === "Awareness" && idx === 2) ||
+                                                          (charClass === "Devout" && skillName === "Xenomagic" && idx === 2);
                                       
                                       // For characters with free starter dots, first two columns are free
                                       if (hasFreeDots && (idx === 0 || idx === 1)) {
@@ -2071,13 +2084,13 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
                               width: 18,
                               height: 18,
                               borderRadius: '50%',
-                              border: (isChemistInvestigation || isCoderOikomagic || isCommanderDiplomacy || isContemplativeAwareness) ? `2px solid ${classBoostColor}` : (isLockedColumn ? '2px solid #666' : '2px solid #000'),
-                              background: checked ? ((isChemistInvestigation || isCoderOikomagic || isCommanderDiplomacy || isContemplativeAwareness) ? classBoostColor : (isLockedColumn ? '#666' : '#000')) : '#fff',
-                              cursor: (isLockedColumn || isChemistInvestigation || isCoderOikomagic || isCommanderDiplomacy || isContemplativeAwareness) ? 'not-allowed' : ((canCheck && !checked) || canUncheck ? 'pointer' : 'not-allowed'),
-                              opacity: (isLockedColumn || isChemistInvestigation || isCoderOikomagic || isCommanderDiplomacy || isContemplativeAwareness) ? 0.6 : ((canCheck && !checked) || canUncheck ? 1 : 0.4),
+                              border: (isChemistInvestigation || isCoderOikomagic || isCommanderDiplomacy || isContemplativeAwareness || isDevoutXenomagic) ? `2px solid ${classBoostColor}` : (isLockedColumn ? '2px solid #666' : '2px solid #000'),
+                              background: checked ? ((isChemistInvestigation || isCoderOikomagic || isCommanderDiplomacy || isContemplativeAwareness || isDevoutXenomagic) ? classBoostColor : (isLockedColumn ? '#666' : '#000')) : '#fff',
+                              cursor: (isLockedColumn || isChemistInvestigation || isCoderOikomagic || isCommanderDiplomacy || isContemplativeAwareness || isDevoutXenomagic) ? 'not-allowed' : ((canCheck && !checked) || canUncheck ? 'pointer' : 'not-allowed'),
+                              opacity: (isLockedColumn || isChemistInvestigation || isCoderOikomagic || isCommanderDiplomacy || isContemplativeAwareness || isDevoutXenomagic) ? 0.6 : ((canCheck && !checked) || canUncheck ? 1 : 0.4),
                             }}
                             title={
-                              isChemistInvestigation || isCoderOikomagic || isCommanderDiplomacy || isContemplativeAwareness
+                              isChemistInvestigation || isCoderOikomagic || isCommanderDiplomacy || isContemplativeAwareness || isDevoutXenomagic
                                 ? 'Class bonus skill dot (cannot be changed)'
                                 : isLockedColumn 
                                 ? 'Starting skill dots (cannot be changed)'
@@ -2110,6 +2123,11 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
                 Oikovox
               </span>
             )}
+            {charClass === 'Devout' && (
+              <span style={{ fontWeight: 'normal', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', color: '#222' }}>
+                Xenovox
+              </span>
+            )}
           </div>
           {/* Class Perk segment, visible if Chemist's Chemical Concoctions dot or Coder's Code Reader dot is selected */}
           {charClass === 'Chemist' && sheet?.classCardDots?.[9]?.[0] && (
@@ -2130,6 +2148,13 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
             <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
               <span>
                 <b><i style={{ color: '#717211' }}>Natural Leader.</i></b> <span style={{ color: '#000' }}>You are inherently adept at leading others and getting them to both trust and follow you. Gain an advantage on related skill rolls.</span>
+              </span>
+            </div>
+          )}
+          {charClass === 'Devout' && sheet?.classCardDots?.[10]?.[0] && (
+            <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <span>
+                <b><i style={{ color: '#6b1172' }}>Higher Power.</i></b> <span style={{ color: '#000' }}>You draw your energy and abilities from a divine entity. Gain an advantage on related skill rolls when you give homage to your deity and choose the transrational option.</span>
               </span>
             </div>
           )}
