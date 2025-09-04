@@ -194,7 +194,7 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
                 fontFamily: 'Arial, Helvetica, sans-serif',
                 fontWeight: 'bold',
                 fontSize: 'clamp(0.8em, 4vw, 1.25em)',
-                color: charClass === 'Chemist' ? '#721131' : charClass === 'Coder' ? '#112972' : 'black',
+                color: charClass === 'Chemist' ? '#721131' : charClass === 'Coder' ? '#112972' : charClass === 'Commander' ? '#717211' : charClass === 'Contemplative' ? '#116372' : 'black',
                 lineHeight: 1,
                 textAlign: 'left',
                 whiteSpace: 'nowrap',
@@ -203,7 +203,7 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
                 flexShrink: 1,
                 marginRight: '5px'
               }}>
-                {charClass === 'Chemist' ? 'Volatile Experiments' : charClass === 'Coder' ? 'Reflection Script' : 'Class Card Name'}
+                {charClass === 'Chemist' ? 'Volatile Experiments' : charClass === 'Coder' ? 'Reflection Script' : charClass === 'Commander' ? 'Combat Delegation' : charClass === 'Contemplative' ? 'Swift Reaction' : 'Class Card Name'}
               </span>
               <span style={{
                 fontFamily: 'Arial, Helvetica, sans-serif',
@@ -214,15 +214,16 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
                 whiteSpace: 'normal',
                 wordBreak: 'keep-all',
                 overflowWrap: 'anywhere',
-                maxWidth: '72px',
+                maxWidth: '78px',
                 display: 'inline-block',
-                textAlign: 'right'
-              }}>{charClass === 'Chemist' ? 'Chemist' : charClass === 'Coder' ? 'Coder' : 'Class'}</span>
+                textAlign: 'right',
+                marginRight: '0px'
+              }}>{charClass === 'Chemist' ? 'Chemist' : charClass === 'Coder' ? 'Coder' : charClass === 'Commander' ? 'Commander' : charClass === 'Contemplative' ? 'Contemplative' : 'Class'}</span>
             </div>
             {/* Conditional image based on class */}
             <img 
-              src={charClass === 'Chemist' ? "/Volatile Experiments.png" : charClass === 'Coder' ? "/Reflection Script.png" : "/Blank Card.png"}
-              alt={charClass === 'Chemist' ? "Volatile Experiments" : charClass === 'Coder' ? "Reflection Script" : "Blank Card"}
+              src={charClass === 'Chemist' ? "/Volatile Experiments.png" : charClass === 'Coder' ? "/Reflection Script.png" : charClass === 'Commander' ? "/Combat Delegation.png" : charClass === 'Contemplative' ? "/Swift Reaction.png" : "/Blank Card.png"}
+              alt={charClass === 'Chemist' ? "Volatile Experiments" : charClass === 'Coder' ? "Reflection Script" : charClass === 'Commander' ? "Combat Delegation" : charClass === 'Contemplative' ? "Swift Reaction" : "Blank Card"}
               style={{
                 position: 'absolute',
                 top: 35,
@@ -253,19 +254,31 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
               <span style={{ color: '#bf9000', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '0.875em', fontStyle: 'italic', marginRight: 22, whiteSpace: 'nowrap', maxWidth: 'calc(100% - 120px)', overflow: 'hidden', textOverflow: 'ellipsis', textAlign: 'right' }}>
                 Cooldown <span style={{ fontWeight: 'bold', fontStyle: 'normal' }}>
                   [{charClass === 'Chemist' ? (() => {
-                    // -1 Cooldown is row 5, indices 0 and 1
                     let cooldown = 4;
                     if (localSheet && Array.isArray(localSheet.classCardDots) && Array.isArray(localSheet.classCardDots[5])) {
-                      if (localSheet.classCardDots[5][0]) cooldown = 3;
-                      if (localSheet.classCardDots[5][1]) cooldown = 2;
+                      cooldown = 4 - localSheet.classCardDots[5].filter(Boolean).length;
+                      if (cooldown < 1) cooldown = 1;
                     }
                     return cooldown;
                   })() : charClass === 'Coder' ? (() => {
-                    // -1 Cooldown is row 5, indices 0 and 1 for Coder
                     let cooldown = 4;
                     if (localSheet && Array.isArray(localSheet.classCardDots) && Array.isArray(localSheet.classCardDots[5])) {
-                      if (localSheet.classCardDots[5][0]) cooldown = 3;
-                      if (localSheet.classCardDots[5][1]) cooldown = 2;
+                      cooldown = 4 - localSheet.classCardDots[5].filter(Boolean).length;
+                      if (cooldown < 1) cooldown = 1;
+                    }
+                    return cooldown;
+                  })() : charClass === 'Commander' ? (() => {
+                    let cooldown = 4;
+                    if (localSheet && Array.isArray(localSheet.classCardDots) && Array.isArray(localSheet.classCardDots[5])) {
+                      cooldown = 4 - localSheet.classCardDots[5].filter(Boolean).length;
+                      if (cooldown < 1) cooldown = 1;
+                    }
+                    return cooldown;
+                  })() : charClass === 'Contemplative' ? (() => {
+                    let cooldown = 4;
+                    if (localSheet && Array.isArray(localSheet.classCardDots) && Array.isArray(localSheet.classCardDots[4])) {
+                      cooldown = 4 - localSheet.classCardDots[4].filter(Boolean).length;
+                      if (cooldown < 1) cooldown = 1;
                     }
                     return cooldown;
                   })() : '#'}]
@@ -341,8 +354,38 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
                       Until the start of the next round, whenever you and any ally within 3hx of you take Damage from an enemy, that enemy takes <b>[{dmg}]</b>d6 Damage of the same type it dealt. Additionally, you and allies within 3hx are <b>{resistText}</b> to the original Damage.
                     </>
                   );
-                })()
-                : 'Card stats.'}
+                })() : charClass === 'Commander' ? (() => {
+                  // Commander: +1hx dots for Combat Delegation are in classCardDots[3], +1 ally dots are in classCardDots[4]
+                  let hx = 5;
+                  let allies = 1;
+                  if (localSheet && Array.isArray(localSheet.classCardDots)) {
+                    if (Array.isArray(localSheet.classCardDots[3])) {
+                      const selectedHx = localSheet.classCardDots[3].filter(Boolean).length;
+                      hx = 5 + selectedHx;
+                    }
+                    if (Array.isArray(localSheet.classCardDots[4])) {
+                      const selectedAllies = localSheet.classCardDots[4].filter(Boolean).length;
+                      allies = 1 + selectedAllies;
+                    }
+                  }
+                  return (
+                    <>
+                      <b>[{allies}]</b> ally(s) within <b>[{hx}]</b>hx that can see and/or hear you gains an extra <i>Action</i>.
+                    </>
+                  );
+                })() : charClass === 'Contemplative' ? (
+                  (() => {
+                    let hx = 3;
+                    if (localSheet && Array.isArray(localSheet.classCardDots) && Array.isArray(localSheet.classCardDots[3])) {
+                      hx = 3 + localSheet.classCardDots[3].filter(Boolean).length;
+                    }
+                    return (
+                      <>
+                        Until the beginning of the next round, you and all allies within <b>[{hx}]</b>hx can <b><i style={{ color: '#38761d' }}>Move</i></b> their <b><i style={{ color: '#38761d' }}>Speed</i></b> whenever they take Damage from an <b><i><span style={{ color: '#990000' }}>Attack</span></i></b>. You can <b><i style={{ color: '#351c75' }}>Strike</i></b> during this <b><i style={{ color: '#38761d' }}>Movement</i></b>.
+                      </>
+                    );
+                  })()
+                ) : 'Card stats.'}
               </div>
             </div>
             {/* Flavor text - absolutely positioned and locked */}
@@ -355,7 +398,7 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
               color: '#000',
               fontFamily: 'Arial, Helvetica, sans-serif',
               fontStyle: 'italic',
-              fontSize: '0.70em',
+              fontSize: '0.62em',
               fontWeight: 400,
               zIndex: 3,
               textAlign: 'left'
@@ -364,7 +407,11 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
                 'With the right concoctions, any spell or weapon becomes even more volatile than before.' : 
                 charClass === 'Coder' ?
                 (<span>“Although it’s a universal script, the math behind reflecting energetic material is quite complex.”<br />--Luminova, X-Ray Naturalist</span>)
-                : 'Flavor text.'}
+                : charClass === 'Commander' ? (
+                  <span>“...That&apos;s &apos;cause I got people with me, people who trust each other, who do for each other and ain&apos;t always looking for the advantage.” --Mal, Human Captain of Serenity</span>
+                ) : charClass === 'Contemplative' ? (
+                  <span>“One must always be responsive at a moment’s notice to fight not only another day, but another instant.” --Master Li Ren, Felid Contemplative</span>
+                ) : 'Flavor text.'}
             </div>
             </div>
             
