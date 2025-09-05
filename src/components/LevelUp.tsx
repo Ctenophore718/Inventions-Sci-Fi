@@ -78,6 +78,20 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
   // For add/subtract HP section
   const [hpDelta, setHpDelta] = useState<number>(0);
   
+  // Calculate effective Max Hit Points (base + class bonuses)
+  const calculateEffectiveMaxHP = (baseHP: number, charClass: string): number => {
+    let effectiveHP = baseHP;
+    
+    // Exospecialist gets +20 Max Hit Points
+    if (charClass === "Exospecialist") {
+      effectiveHP += 20;
+    }
+    
+    return effectiveHP;
+  };
+
+  const effectiveMaxHP = calculateEffectiveMaxHP(sheet?.maxHitPoints ?? 0, charClass);
+  
   // Background state
   const [background, setBackground] = useState(sheet?.background || "");
   
@@ -352,11 +366,11 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
     [false, false],         // Secondary Attack: -1 Cooldown (2 dots)
     [false]                 // Perks: Elemental Detection (1 dot)
   ];
-  // Exospecialist dots structure: Feature, Technique, Primary Attack, Secondary Attack, Perks
+  // Exospecialist dots structure: Technique, Primary Attack, Secondary Attack, Perks
   const defaultExospecialistDots = [
-    [false, false, false],  // Feature: +1hx (3 dots)
-    [false, false, false],  // Feature: +2 Crit (3 dots)
-    [false],                // Feature: Ignore 100% Cover (1 dot)
+    [false, false, false],  // Technique: +1hx (3 dots)
+    [false, false, false],  // Technique: +2 Crit (3 dots)
+    [false],                // Technique: Ignore 100% Cover (1 dot)
     [false, false],         // Technique: -1 Cooldown (2 dots)
     [false, false, false],  // Primary Attack: +2 Damage dice (3 dots)
     [false, false, false],  // Primary Attack: +1 Crit (3 dots)
@@ -836,35 +850,22 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                       );
                     })}
                     <span></span>
-                    {/* Row 3: XP header (7xp in col 2) */}
+                    {/* Row 3: XP header (5xp 8xp 11xp) */}
                     <span></span>
-                    <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>7xp</span>
-                    <span></span>
-                    <span></span>
-                    {/* Row 4: +2 Crit dot (interactive, col 2) */}
+                    <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>5xp</span>
+                    <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>8xp</span>
+                    <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>11xp</span>
+                    {/* Row 4: +2 Crit dots (interactive) */}
                     <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>+2 Crit</span>
-                    <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
-                      {(() => {
-                        const arr = safeGetDotsArray(1);
-                        if (arr.length === 0) {
-                          return (
-                            <span style={{
-                              width: 16,
-                              height: 16,
-                              borderRadius: '50%',
-                              border: '2px solid #ddd',
-                              background: '#fff',
-                              cursor: 'not-allowed'
-                            }}></span>
-                          );
-                        }
-                        const idx = 0;
-                        const canCheck = idx === 0 || arr.slice(0, idx).every(Boolean);
-                        const rightmostChecked = arr.lastIndexOf(true);
-                        const canUncheck = arr[idx] && idx === rightmostChecked;
-                        // XP cost for this dot (7xp)
-                        const xpCosts = [7];
-                        return (
+                    {[0,1,2].map(idx => {
+                      const arr = safeGetDotsArray(1);
+                      const canCheck = idx === 0 || arr.slice(0, idx).every(Boolean);
+                      const rightmostChecked = arr.lastIndexOf(true);
+                      const canUncheck = arr[idx] && idx === rightmostChecked;
+                      // XP cost for each dot (5xp, 8xp, 11xp)
+                      const xpCosts = [5, 8, 11];
+                      return (
+                        <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
                           <span
                             onClick={() => {
                               if (!arr[idx] && canCheck) {
@@ -892,9 +893,9 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                               transition: 'background 0.2s'
                             }}
                           ></span>
-                        );
-                      })()}
-                    </span>
+                        </span>
+                      );
+                    })}
                     <span></span>
                     <span></span>
                   </div>
@@ -907,11 +908,11 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                   </div>
                   <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif' }}>
                     {/* Technique XP/dot grid */}
-                    {/* 4x8 grid: alternating XP label header rows and feature text/dot rows, with correct XP/dot placement and no borders */}
+                    {/* 4x10 grid: alternating XP label header rows and feature text/dot rows, with correct XP/dot placement and no borders */}
                     <div style={{
                       display: 'grid',
                       gridTemplateColumns: '1fr 24px 24px 24px',
-                      gridTemplateRows: 'repeat(8, auto)',
+                      gridTemplateRows: 'repeat(10, auto)',
                       columnGap: '6px',
                       rowGap: '2px',
                       alignItems: 'start',
@@ -927,7 +928,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                       {/* Row 2: +1hx dots (interactive) */}
                       <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>+1hx</span>
                       {[0,1,2].map(idx => {
-                        const arr = safeGetDotsArray(2);
+                        const arr = safeGetDotsArray(0);
                         const canCheck = idx === 0 || arr.slice(0, idx).every(Boolean);
                         const rightmostChecked = arr.lastIndexOf(true);
                         const canUncheck = arr[idx] && idx === rightmostChecked;
@@ -939,13 +940,13 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                               onClick={() => {
                                 if (!arr[idx] && canCheck) {
                                   const newDots = safeCloneClassCardDots();
-                                  for (let j = 0; j <= idx; ++j) newDots[2][j] = true;
+                                  for (let j = 0; j <= idx; ++j) newDots[0][j] = true;
                                   let delta = 0;
                                   for (let j = 0; j <= idx; ++j) if (!arr[j]) delta += xpCosts[j];
                                   persistClassCardDots(newDots, 0, delta);
                                 } else if (arr[idx] && canUncheck) {
                                   const newDots = safeCloneClassCardDots();
-                                  for (let j = idx; j < arr.length; ++j) newDots[2][j] = false;
+                                  for (let j = idx; j < arr.length; ++j) newDots[0][j] = false;
                                   let delta = 0;
                                   for (let j = idx; j < arr.length; ++j) if (arr[j]) delta -= xpCosts[j];
                                   persistClassCardDots(newDots, 0, delta);
@@ -1034,7 +1035,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                       </span>
                       <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
                         {(() => {
-                          const arr = safeGetDotsArray(4);
+                          const arr = safeGetDotsArray(3);
                           const idx = 0;
                           const canCheck = idx === 0 || arr.slice(0, idx).every(Boolean);
                           const rightmostChecked = arr.lastIndexOf(true);
@@ -3668,11 +3669,17 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                   <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32, fontFamily: 'Arial, Helvetica, sans-serif' }}>
                     <div style={{ fontWeight: 'bold', color: '#0b5394', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Feature</u></div>
                     <span style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
-                      <b><i style={{ color: '#231172', fontSize: '1em' }}>Exosuit.</i></b> <span style={{ fontSize: '1em', fontWeight: 400 }}>You Resist <b><span style={{ color: '#915927' }}><u>Bludgeoning</u></span></b> <img src="/Bludgeoning.png" alt="Bludgeoning" style={{ height: '1em', verticalAlign: 'middle', marginLeft: '2px', marginRight: '2px' }} />, <b><span style={{ color: '#878686' }}><u>Piercing</u></span></b> <img src="/Piercing.png" alt="Piercing" style={{ height: '1em', verticalAlign: 'middle', marginLeft: '2px', marginRight: '2px' }} /> and <b><span style={{ color: '#2aff88' }}><u>Slashing</u></span></b> <img src="/Slashing.png" alt="Slashing" style={{ height: '1em', verticalAlign: 'middle', marginLeft: '2px', marginRight: '2px' }} /> Damage and have an additional 20 Hit Points.</span>
+                      <b><i style={{ color: '#117233', fontSize: '1em' }}>Exosuit.</i></b> <span style={{ fontSize: '1em', fontWeight: 400 }}>You <i>Resist</i> <b><span style={{ color: '#915927' }}><u>Bludgeoning</u></span></b> <img src="/Bludgeoning.png" alt="Bludgeoning" style={{ height: '1em', verticalAlign: 'middle', marginLeft: '2px', marginRight: '2px' }} />, <b><span style={{ color: '#a6965f' }}><u>Piercing</u></span></b> <img src="/Piercing.png" alt="Piercing" style={{ height: '1em', verticalAlign: 'middle', marginLeft: '2px', marginRight: '2px' }} /> and <b><span style={{ color: '#808080' }}><u>Slashing</u></span></b> <img src="/Slashing.png" alt="Slashing" style={{ height: '1em', verticalAlign: 'middle', marginLeft: '2px', marginRight: '2px' }} /> Damage and have an additional 20 <b><i><span style={{ color: '#990000' }}>Hit Points</span></i></b>.</span>
                     </span>
                   </span>
                 </div>
-                
+
+                {/* Technique section */}
+                <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+                  <div style={{ fontWeight: 'bold', color: '#bf9000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Technique</u></div>
+                  <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+                    <i><span style={{ color: '#117233' }}><b>Target Lock</b> (Cooldown 3).</span></i> You and allies within 3hx gain a +2 to Crit rolls on <i><span style={{ color: '#990000' }}><b>Attacks</b></span></i> and ignore 50% Cover until the start of the next round.
+                  </div>
                 {/* Feature XP progression table */}
                 <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px' }}>
                   <div style={{
@@ -3685,17 +3692,17 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                   }}>
                     {/* Row 1: XP costs */}
                     <span></span>
-                    <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>5xp</span>
-                    <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>8xp</span>
-                    <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>12xp</span>
+                    <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>3xp</span>
+                    <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>6xp</span>
+                    <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>9xp</span>
                     {/* Row 2: +5 Hit Points dots */}
-                    <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>+5 Hit Points</span>
+                    <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>+1hx</span>
                     {[0,1,2].map(idx => {
                       const arr = safeGetDotsArray(0);
                       const canCheck = idx === 0 || arr.slice(0, idx).every(Boolean);
                       const rightmostChecked = arr.lastIndexOf(true);
                       const canUncheck = arr[idx] && idx === rightmostChecked;
-                      const xpCosts = [5, 8, 12];
+                      const xpCosts = [3, 6, 9];
                       return (
                         <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
                           <span
@@ -3730,7 +3737,6 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                     })}
                   </div>
                 </div>
-
                 {/* Second XP progression table - +1 Armor */}
                 <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px' }}>
                   <div style={{
@@ -3743,17 +3749,17 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                   }}>
                     {/* Row 1: XP costs */}
                     <span></span>
-                    <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>6xp</span>
-                    <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>9xp</span>
-                    <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>14xp</span>
+                    <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>5xp</span>
+                    <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>8xp</span>
+                    <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>11xp</span>
                     {/* Row 2: +1 Armor dots */}
-                    <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>+1 Armor</span>
+                    <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>+2 Crit</span>
                     {[0,1,2].map(idx => {
                       const arr = safeGetDotsArray(1);
                       const canCheck = idx === 0 || arr.slice(0, idx).every(Boolean);
                       const rightmostChecked = arr.lastIndexOf(true);
                       const canUncheck = arr[idx] && idx === rightmostChecked;
-                      const xpCosts = [6, 9, 14];
+                      const xpCosts = [5, 8, 11];
                       return (
                         <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
                           <span
@@ -3788,8 +3794,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                     })}
                   </div>
                 </div>
-
-                {/* Third row: Single dot for +15 Power Levels */}
+                  {/* Third row: Single dot for +15 Power Levels */}
                 <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px' }}>
                   <div style={{
                     display: 'grid',
@@ -3801,11 +3806,11 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                   }}>
                     {/* Row 1: XP costs */}
                     <span></span>
-                    <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>20xp</span>
+                    <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>11xp</span>
                     <span></span>
                     <span></span>
                     {/* Row 2: +15 Power Levels dot */}
-                    <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>+15 Power Levels</span>
+                    <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>Ignore 100% Cover</span>
                     <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
                         {(() => {
                           const arr = safeGetDotsArray(2);
@@ -3821,13 +3826,13 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                                   if (newDots[2]) {
                                     for (let j = 0; j <= idx; ++j) newDots[2][j] = true;
                                   }
-                                  persistClassCardDots(newDots, 0, 20);
+                                  persistClassCardDots(newDots, 0, 11);
                                 } else if (arr[idx] && canUncheck) {
                                   const newDots = safeCloneClassCardDots();
                                   if (newDots[2]) {
                                     for (let j = idx; j < arr.length; ++j) newDots[2][j] = false;
                                   }
-                                  persistClassCardDots(newDots, 0, -20);
+                                  persistClassCardDots(newDots, 0, -11);
                                 }
                               }}
                               style={{
@@ -3848,13 +3853,6 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                     <span></span>
                   </div>
                 </div>
-
-                {/* Technique section */}
-                <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
-                  <div style={{ fontWeight: 'bold', color: '#bf9000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Technique</u></div>
-                  <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
-                    <i><span style={{ color: '#231172' }}><b>Target Lock</b> (Cooldown 5).</span></i> Select a target that you can see to become <i>Targeted</i>. Your <b><i><span style={{ color: '#990000' }}>Attacks</span></i></b> against that target get +3 to Roll and deal an additional 1d6 <b><span style={{ color: '#516fff' }}><u>Force</u></span></b> <img src="/Force.png" alt="Force" style={{ height: '1em', verticalAlign: 'middle', marginLeft: '2px', marginRight: '2px' }} /> Damage.
-                  </div>
                   <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginBottom: '8px' }}>
                     <div style={{
                       display: 'grid',
@@ -3865,8 +3863,8 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                     }}>
                       {/* Row 1: XP costs */}
                       <span></span>
-                      <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>8xp</span>
-                      <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>12xp</span>
+                      <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>5xp</span>
+                      <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>10xp</span>
                       <span></span>
                       {/* Row 2: -1 Cooldown dots */}
                       <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>-1 <i>Cooldown</i></span>
@@ -3875,7 +3873,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                         const canCheck = idx === 0 || arr.slice(0, idx).every(Boolean);
                         const rightmostChecked = arr.lastIndexOf(true);
                         const canUncheck = arr[idx] && idx === rightmostChecked;
-                        const xpCosts = [8, 12];
+                        const xpCosts = [5, 10];
                         return (
                           <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
                             <span
@@ -3915,10 +3913,10 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
 
                 {/* Primary Attack section */}
                 <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
-                  <div style={{ fontWeight: 'bold', color: '#990000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Primary Attack</u></div>
+                  <div style={{ fontWeight: 'bold', color: '#990000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Attack</u></div>
                   <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
-                    <i><b>Integrated Blasters</b> (Cooldown 0).</i><br />
-                    6hx Range, Single Target, 16+ Crit, 1d6+2 <b><span style={{ color: '#516fff' }}><u>Force</u></span></b> <img src="/Force.png" alt="Force" style={{ height: '1em', verticalAlign: 'middle', marginLeft: '2px', marginRight: '2px' }} /> Damage.
+                    <i><b>Primary <span style={{ color: '#990000' }}>Attack.</span></b></i><br />
+                    <i>Integrated Blasters.</i> 1hx Range, <i>AoE</i> 4hx-cone, 18+ Crit, 2d6 Damage.
                   </div>
 
                   {/* +1hx Range */}
@@ -3932,17 +3930,17 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                     }}>
                       {/* Row 1: XP costs */}
                       <span></span>
-                      <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>3xp</span>
-                      <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>5xp</span>
                       <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>8xp</span>
+                      <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>13xp</span>
+                      <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>21xp</span>
                       {/* Row 2: +1hx Range dots */}
-                      <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>+1hx Range</span>
+                      <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>+2 Damage dice</span>
                       {[0,1,2].map(idx => {
                         const arr = safeGetDotsArray(4);
                         const canCheck = idx === 0 || arr.slice(0, idx).every(Boolean);
                         const rightmostChecked = arr.lastIndexOf(true);
                         const canUncheck = arr[idx] && idx === rightmostChecked;
-                        const xpCosts = [3, 5, 8];
+                        const xpCosts = [8, 13, 21];
                         return (
                           <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
                             <span
@@ -4037,13 +4035,10 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                 </div>
 
                 {/* Secondary Attack section */}
-                <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
-                  <div style={{ fontWeight: 'bold', color: '#990000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Secondary Attack</u></div>
                   <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
-                    <i><b>Smart Missiles</b> (Cooldown 4).</i><br />
-                    8hx Range, 1hx Blast, 18+ Crit, 1d6 <b><span style={{ color: '#516fff' }}><u>Force</u></span></b> <img src="/Force.png" alt="Force" style={{ height: '1em', verticalAlign: 'middle', marginLeft: '2px', marginRight: '2px' }} /> Damage.
-                  </div>
-
+                    <i><b>Secondary <span style={{ color: '#990000' }}>Attack</span></b> (Cooldown 4).</i><br />
+                    <i>Smart Missiles.</i> 12hx Range, Single Target, Arcing, Repeat 1, 18+ Crit, 1d4 Damage.
+                  
                   {/* +1hx Range */}
                   <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginBottom: '8px' }}>
                     <div style={{
@@ -4055,17 +4050,17 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                     }}>
                       {/* Row 1: XP costs */}
                       <span></span>
-                      <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>4xp</span>
-                      <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>7xp</span>
-                      <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>10xp</span>
+                      <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>5xp</span>
+                      <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>8xp</span>
+                      <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>15xp</span>
                       {/* Row 2: +1hx Range dots */}
-                      <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>+1hx Range</span>
+                      <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>+1hx Damage die</span>
                       {[0,1,2].map(idx => {
                         const arr = safeGetDotsArray(6);
                         const canCheck = idx === 0 || arr.slice(0, idx).every(Boolean);
                         const rightmostChecked = arr.lastIndexOf(true);
                         const canUncheck = arr[idx] && idx === rightmostChecked;
-                        const xpCosts = [4, 7, 10];
+                        const xpCosts = [5, 8, 15];
                         return (
                           <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
                             <span
@@ -4112,17 +4107,17 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                     }}>
                       {/* Row 1: XP costs */}
                       <span></span>
-                      <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>5xp</span>
-                      <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>8xp</span>
+                      <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>12xp</span>
+                      <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>21xp</span>
                       <span></span>
-                      {/* Row 2: +1hx Blast dots */}
-                      <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>+1hx Blast</span>
+                      {/* Row 2: Repeat +1 dots */}
+                      <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>Repeat +1</span>
                       {[0,1].map(idx => {
                         const arr = safeGetDotsArray(7);
                         const canCheck = idx === 0 || arr.slice(0, idx).every(Boolean);
                         const rightmostChecked = arr.lastIndexOf(true);
                         const canUncheck = arr[idx] && idx === rightmostChecked;
-                        const xpCosts = [5, 8];
+                        const xpCosts = [12, 21];
                         return (
                           <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
                             <span
@@ -4170,17 +4165,17 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                     }}>
                       {/* Row 1: XP costs */}
                       <span></span>
-                      <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>5xp</span>
+                      <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>4xp</span>
                       <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>8xp</span>
                       <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>12xp</span>
                       {/* Row 2: +1d6 Damage dots */}
-                      <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>+1d6 <b><span style={{ color: '#516fff' }}><u>Force</u></span></b> <img src="/Force.png" alt="Force" style={{ height: '1em', verticalAlign: 'middle', marginLeft: '2px', marginRight: '2px' }} /> Damage</span>
+                      <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>+3hx Range</span>
                       {[0,1,2].map(idx => {
                         const arr = safeGetDotsArray(8);
                         const canCheck = idx === 0 || arr.slice(0, idx).every(Boolean);
                         const rightmostChecked = arr.lastIndexOf(true);
                         const canUncheck = arr[idx] && idx === rightmostChecked;
-                        const xpCosts = [5, 8, 12];
+                        const xpCosts = [4, 8, 12];
                         return (
                           <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
                             <span
@@ -4227,9 +4222,9 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                     }}>
                       {/* Row 1: XP costs */}
                       <span></span>
+                      <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>3xp</span>
                       <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>5xp</span>
                       <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>8xp</span>
-                      <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>12xp</span>
                       {/* Row 2: +1 Crit dots */}
                       <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>+1 Crit</span>
                       {[0,1,2].map(idx => {
@@ -4237,7 +4232,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                         const canCheck = idx === 0 || arr.slice(0, idx).every(Boolean);
                         const rightmostChecked = arr.lastIndexOf(true);
                         const canUncheck = arr[idx] && idx === rightmostChecked;
-                        const xpCosts = [5, 8, 12];
+                        const xpCosts = [3, 5, 8];
                         return (
                           <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
                             <span
@@ -4285,7 +4280,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                       {/* Row 1: XP costs */}
                       <span></span>
                       <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>5xp</span>
-                      <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>8xp</span>
+                      <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>6xp</span>
                       <span></span>
                       {/* Row 2: -1 Cooldown dots */}
                       <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>-1 <i>Cooldown</i></span>
@@ -4294,7 +4289,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                         const canCheck = idx === 0 || arr.slice(0, idx).every(Boolean);
                         const rightmostChecked = arr.lastIndexOf(true);
                         const canUncheck = arr[idx] && idx === rightmostChecked;
-                        const xpCosts = [5, 8];
+                        const xpCosts = [5, 6];
                         return (
                           <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
                             <span
@@ -4334,7 +4329,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
 
                 {/* Perks section */}
                 <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
-                  <div style={{ fontWeight: 'bold', color: '#0b5394', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Perks</u></div>
+                  <div style={{ fontWeight: 'bold', color: '#000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Perks</u></div>
                   <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginBottom: '8px' }}>
                     <div style={{
                       display: 'grid',
@@ -4343,14 +4338,10 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                       gap: '4px',
                       alignItems: 'start'
                     }}>
-                      {/* Row 1: XP costs */}
-                      <span></span>
-                      <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>25xp</span>
-                      <span></span>
-                      <span></span>
-                      {/* Row 2: Military Training dot */}
-                      <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>Military Training</span>
-                      <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
+                      {/* Row 1: 7sp */}
+                        <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>7sp</span>
+                      {/* Row 2: dot (interactive) */}
+                      <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px', width: '100%' }}>
                           {(() => {
                             const arr = safeGetDotsArray(11);
                             const idx = 0;
@@ -4365,13 +4356,13 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                                     if (newDots[11]) {
                                       for (let j = 0; j <= idx; ++j) newDots[11][j] = true;
                                     }
-                                    persistClassCardDots(newDots, 0, 25);
+                                    persistClassCardDots(newDots, 0, 7);
                                   } else if (arr[idx] && canUncheck) {
                                     const newDots = safeCloneClassCardDots();
                                     if (newDots[11]) {
                                       for (let j = idx; j < arr.length; ++j) newDots[11][j] = false;
                                     }
-                                    persistClassCardDots(newDots, 0, -25);
+                                    persistClassCardDots(newDots, 0, -7);
                                   }
                                 }}
                                 style={{
@@ -6401,7 +6392,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <span style={{ fontWeight: 'bold', minWidth: '120px' }}>Max Hit Points:</span>
-              <span style={{ minWidth: '40px', textAlign: 'center' }}>{sheet?.maxHitPoints ?? 0}</span>
+              <span style={{ minWidth: '40px', textAlign: 'center' }}>{effectiveMaxHP}</span>
             </div>
 
             <hr style={{ margin: '8px 0', border: '1px solid #eee' }} />
@@ -6483,7 +6474,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
           }
         }}
       >
-        hp: {currentHitPoints}/{sheet?.maxHitPoints ?? 0}
+        hp: {currentHitPoints}/{effectiveMaxHP}
       </button>
     </div>
 

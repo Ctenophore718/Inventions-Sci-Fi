@@ -132,6 +132,20 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
     };
   }, [sheet?.id, localSheet]);
 
+  // Calculate effective max HP with class bonuses
+  const calculateEffectiveMaxHP = (): number => {
+    const baseHP = localSheet?.maxHitPoints ?? 0;
+    
+    // Add class-specific bonuses
+    if (localSheet?.charClass === 'Exospecialist') {
+      return baseHP + 20;
+    }
+    
+    return baseHP;
+  };
+
+  const effectiveMaxHP = calculateEffectiveMaxHP();
+
   return (
     <>
       <style>
@@ -1905,7 +1919,7 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <span style={{ fontWeight: 'bold', minWidth: '120px' }}>Max Hit Points:</span>
-                <span style={{ minWidth: '40px', textAlign: 'center' }}>{localSheet?.maxHitPoints ?? 0}</span>
+                <span style={{ minWidth: '40px', textAlign: 'center' }}>{effectiveMaxHP}</span>
               </div>
 
               <hr style={{ margin: '8px 0', border: '1px solid #eee' }} />
@@ -1987,7 +2001,7 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
             }
           }}
         >
-          hp: {currentHitPoints}/{localSheet?.maxHitPoints ?? 0}
+          hp: {currentHitPoints}/{effectiveMaxHP}
         </button>
       </div>
 
