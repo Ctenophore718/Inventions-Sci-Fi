@@ -212,9 +212,23 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
       <b><i style={{ color: '#6b1172' }}>Blood Trade.</i></b> Whenever you take Damage, you gain +<b>[{devoutBloodTradeBonus}]</b>d6 Damage on your next <b><i><span style={{ color: '#351c75' }}>Strike</span></i></b> or <b><i><span style={{ color: '#990000' }}>Attack</span></i></b>. The Damage type matches your next <b><i><span style={{ color: '#351c75' }}>Strike</span></i></b>  or <b><i><span style={{ color:'#990000' }}>Attack</span></i></b> and doesnt stack if you are Damaged multiple times.   
     </span>
   );  
+  // Dynamically calculate Elementalist Elemental Excitement values based on classCardDots
+  let elementalistHxRange = 3;
+  let elementalistD6Bonus = 0;
+  if (charClass === "Elementalist" && sheet?.classCardDots) {
+    // +1hx dots: Check classCardDots[0] (Feature: +1hx in Level Up page)
+    if (Array.isArray(sheet.classCardDots[0])) {
+      const hxDots = sheet.classCardDots[0].filter(Boolean).length;
+      elementalistHxRange = 3 + hxDots; // [3] becomes [4], [5], [6]
+    }
+    // Deal +1d6 dots: Check classCardDots[1] (Feature: Deal +1d6 in Level Up page)
+    if (Array.isArray(sheet.classCardDots[1])) {
+      elementalistD6Bonus = sheet.classCardDots[1].filter(Boolean).length; // [0] becomes [1], [2], [3]
+    }
+  }
   const elementalistFeatureJSX = (
     <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#231172' }}>Elemental Excitement.</i></b> When another creature within <b>[3]</b>hx of you takes {
+      <b><i style={{ color: '#231172' }}>Elemental Excitement.</i></b> When another creature within <b>[{elementalistHxRange}]</b>hx of you takes {
         subclass === "Air" ? (
           <><b><u style={{ color: '#516fff', display: 'inline-flex', alignItems: 'center' }}>Force<img src="/Force.png" alt="Force" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> Damage</>
         ) : subclass === "Earth" ? (
@@ -226,7 +240,25 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
         ) : (
           "Damage associated with your subclass"
         )
-      }, you may remove a <i>Cooldown Token</i> from any of your <b><i><span style={{ color: '#990000' }}>Attacks</span></i></b> or <b><i><span style={{ color: '#bf9000' }}>Techniques</span></i></b>.
+      }, {subclass === "Air" ? (
+        <>
+          you deal +<b>[{elementalistD6Bonus}]</b>d6 <b><u style={{ color: '#516fff', display: 'inline-flex', alignItems: 'center' }}>Force<img src="/Force.png" alt="Force" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> Damage on your next <b><i><span style={{ color: '#990000' }}>Attack</span></i></b> or <b><i><span style={{ color: '#351c75' }}>Strike</span></i></b>, and you may remove a <i>Cooldown Token</i> from any of your <b><i><span style={{ color: '#990000' }}>Attacks</span></i></b> or <b><i><span style={{ color: '#bf9000' }}>Techniques</span></i></b>.
+        </>
+      ) : subclass === "Earth" ? (
+        <>
+          you deal +<b>[{elementalistD6Bonus}]</b>d6 <b><u style={{ color: '#915927', display: 'inline-flex', alignItems: 'center' }}>Bludgeoning<img src="/Bludgeoning.png" alt="Bludgeoning" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> Damage on your next <b><i><span style={{ color: '#990000' }}>Attack</span></i></b> or <b><i><span style={{ color: '#351c75' }}>Strike</span></i></b>, and you may remove a <i>Cooldown Token</i> from any of your <b><i><span style={{ color: '#990000' }}>Attacks</span></i></b> or <b><i><span style={{ color: '#bf9000' }}>Techniques</span></i></b>.
+        </>
+      ) : subclass === "Fire" ? (
+        <>
+          you deal +<b>[{elementalistD6Bonus}]</b>d6 <b><u style={{ color: '#f90102', display: 'inline-flex', alignItems: 'center' }}>Fire<img src="/Fire.png" alt="Fire" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> Damage on your next <b><i><span style={{ color: '#990000' }}>Attack</span></i></b> or <b><i><span style={{ color: '#351c75' }}>Strike</span></i></b>, and you may remove a <i>Cooldown Token</i> from any of your <b><i><span style={{ color: '#990000' }}>Attacks</span></i></b> or <b><i><span style={{ color: '#bf9000' }}>Techniques</span></i></b>.
+        </>
+      ) : subclass === "Water" ? (
+        <>
+          you deal +<b>[{elementalistD6Bonus}]</b>d6 <b><u style={{ color: '#3ebbff', display: 'inline-flex', alignItems: 'center' }}>Cold<img src="/Cold.png" alt="Cold" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> Damage on your next <b><i><span style={{ color: '#990000' }}>Attack</span></i></b> or <b><i><span style={{ color: '#351c75' }}>Strike</span></i></b>, and you may remove a <i>Cooldown Token</i> from any of your <b><i><span style={{ color: '#990000' }}>Attacks</span></i></b> or <b><i><span style={{ color: '#bf9000' }}>Techniques</span></i></b>.
+        </>
+      ) : (
+        <>you deal +<b>[{elementalistD6Bonus}]</b>d6 Damage associated with your subclass on your next <b><i><span style={{ color: '#990000' }}>Attack</span></i></b> or <b><i><span style={{ color: '#351c75' }}>Strike</span></i></b>, and you may remove a <i>Cooldown Token</i> from any of your <b><i><span style={{ color: '#990000' }}>Attacks</span></i></b> or <b><i><span style={{ color: '#bf9000' }}>Techniques</span></i></b>.</>
+      )}
     </span>
   );  
   const exospecialistFeatureJSX = (
@@ -485,7 +517,8 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
                               (charClass === "Coder" && skillName === "Oikomagic" && idx === 2) ||
                               (charClass === "Commander" && skillName === "Diplomacy" && idx === 2) ||
                               (charClass === "Contemplative" && skillName === "Awareness" && idx === 2) ||
-                              (charClass === "Devout" && skillName === "Xenomagic" && idx === 2);
+                              (charClass === "Devout" && skillName === "Xenomagic" && idx === 2) ||
+                              (charClass === "Elementalist" && skillName === "Xenomagic" && idx === 2);
           
           // For characters with free starter dots, first two columns are free
           if (hasFreeDots && (idx === 0 || idx === 1)) {
@@ -1970,7 +2003,8 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
                       const isCommanderDiplomacy = charClass === "Commander" && skill === "Diplomacy" && i === 2;
                       const isContemplativeAwareness = charClass === "Contemplative" && skill === "Awareness" && i === 2;
                       const isDevoutXenomagic = charClass === "Devout" && skill === "Xenomagic" && i === 2;
-                      if (isChemistInvestigation || isCoderOikomagic || isCommanderDiplomacy || isContemplativeAwareness || isDevoutXenomagic) {
+                      const isElementalistXenomagic = charClass === "Elementalist" && skill === "Xenomagic" && i === 2;
+                      if (isChemistInvestigation || isCoderOikomagic || isCommanderDiplomacy || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic) {
                         checked = true; // Force dot to be filled for class booster skills
                       }
 
@@ -1981,6 +2015,7 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
                         if (isCommanderDiplomacy) return "rgba(113,114,17,0.5)";
                         if (isContemplativeAwareness) return "rgba(17,99,114,0.5)";
                         if (isDevoutXenomagic) return "rgba(107,17,114,0.5)";
+                        if (isElementalistXenomagic) return "rgba(35,17,114,0.5)";
                         // Add other class colors here in the future
                         return "#d0d0d0"; // fallback color
                       };
@@ -1993,7 +2028,8 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
                                            (charClass === "Coder" && skill === "Oikomagic" && dotIndex === 2) ||
                                            (charClass === "Commander" && skill === "Diplomacy" && dotIndex === 2) ||
                                            (charClass === "Contemplative" && skill === "Awareness" && dotIndex === 2) ||
-                                           (charClass === "Devout" && skill === "Xenomagic" && dotIndex === 2);
+                                           (charClass === "Devout" && skill === "Xenomagic" && dotIndex === 2) ||
+                                           (charClass === "Elementalist" && skill === "Xenomagic" && dotIndex === 2);
                         return dotFilled || isBoosterDot;
                       });
                       const rightmostChecked = skillDotsForSkill.lastIndexOf(true);
@@ -2010,7 +2046,7 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
                               if (isLockedColumn) return;
                               
                               // Prevent clicking on class-based automatic skill dots
-                              if (isChemistInvestigation || isCoderOikomagic || isCommanderDiplomacy || isContemplativeAwareness || isDevoutXenomagic) return;
+                              if (isChemistInvestigation || isCoderOikomagic || isCommanderDiplomacy || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic) return;
                               
                               setSkillDots(prev => {
                                 setSpNotice("");
@@ -2035,7 +2071,8 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
                                                           (charClass === "Coder" && skillName === "Oikomagic" && idx === 2) ||
                                                           (charClass === "Commander" && skillName === "Diplomacy" && idx === 2) ||
                                                           (charClass === "Contemplative" && skillName === "Awareness" && idx === 2) ||
-                                                          (charClass === "Devout" && skillName === "Xenomagic" && idx === 2);
+                                                          (charClass === "Devout" && skillName === "Xenomagic" && idx === 2) ||
+                                                          (charClass === "Elementalist" && skillName === "Xenomagic" && idx === 2);
                                       
                                       // For characters with free starter dots, first two columns are free
                                       if (hasFreeDots && (idx === 0 || idx === 1)) {
@@ -2059,7 +2096,8 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
                                                           (charClass === "Coder" && skillName === "Oikomagic" && idx === 2) ||
                                                           (charClass === "Commander" && skillName === "Diplomacy" && idx === 2) ||
                                                           (charClass === "Contemplative" && skillName === "Awareness" && idx === 2) ||
-                                                          (charClass === "Devout" && skillName === "Xenomagic" && idx === 2);
+                                                          (charClass === "Devout" && skillName === "Xenomagic" && idx === 2) ||
+                                                          (charClass === "Elementalist" && skillName === "Xenomagic" && idx === 2);
                                       
                                       // For characters with free starter dots, first two columns are free
                                       if (hasFreeDots && (idx === 0 || idx === 1)) {
@@ -2084,13 +2122,13 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
                               width: 18,
                               height: 18,
                               borderRadius: '50%',
-                              border: (isChemistInvestigation || isCoderOikomagic || isCommanderDiplomacy || isContemplativeAwareness || isDevoutXenomagic) ? `2px solid ${classBoostColor}` : (isLockedColumn ? '2px solid #666' : '2px solid #000'),
-                              background: checked ? ((isChemistInvestigation || isCoderOikomagic || isCommanderDiplomacy || isContemplativeAwareness || isDevoutXenomagic) ? classBoostColor : (isLockedColumn ? '#666' : '#000')) : '#fff',
-                              cursor: (isLockedColumn || isChemistInvestigation || isCoderOikomagic || isCommanderDiplomacy || isContemplativeAwareness || isDevoutXenomagic) ? 'not-allowed' : ((canCheck && !checked) || canUncheck ? 'pointer' : 'not-allowed'),
-                              opacity: (isLockedColumn || isChemistInvestigation || isCoderOikomagic || isCommanderDiplomacy || isContemplativeAwareness || isDevoutXenomagic) ? 0.6 : ((canCheck && !checked) || canUncheck ? 1 : 0.4),
+                              border: (isChemistInvestigation || isCoderOikomagic || isCommanderDiplomacy || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic) ? `2px solid ${classBoostColor}` : (isLockedColumn ? '2px solid #666' : '2px solid #000'),
+                              background: checked ? ((isChemistInvestigation || isCoderOikomagic || isCommanderDiplomacy || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic) ? classBoostColor : (isLockedColumn ? '#666' : '#000')) : '#fff',
+                              cursor: (isLockedColumn || isChemistInvestigation || isCoderOikomagic || isCommanderDiplomacy || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic) ? 'not-allowed' : ((canCheck && !checked) || canUncheck ? 'pointer' : 'not-allowed'),
+                              opacity: (isLockedColumn || isChemistInvestigation || isCoderOikomagic || isCommanderDiplomacy || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic) ? 0.6 : ((canCheck && !checked) || canUncheck ? 1 : 0.4),
                             }}
                             title={
-                              isChemistInvestigation || isCoderOikomagic || isCommanderDiplomacy || isContemplativeAwareness || isDevoutXenomagic
+                              isChemistInvestigation || isCoderOikomagic || isCommanderDiplomacy || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic
                                 ? 'Class bonus skill dot (cannot be changed)'
                                 : isLockedColumn 
                                 ? 'Starting skill dots (cannot be changed)'
@@ -2128,6 +2166,11 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
                 Xenovox
               </span>
             )}
+            {charClass === 'Elementalist' && (
+              <span style={{ fontWeight: 'normal', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', color: '#231172' }}>
+                Xenoelemental
+              </span>
+            )}
           </div>
           {/* Class Perk segment, visible if Chemist's Chemical Concoctions dot or Coder's Code Reader dot is selected */}
           {charClass === 'Chemist' && sheet?.classCardDots?.[9]?.[0] && (
@@ -2162,6 +2205,13 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
             <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
               <span>
                 <b><i style={{ color: '#116372' }}>Inherent Telepath.</i></b> <span style={{ color: '#000' }}>You can communicate telepathically one-way with any language-speaking creature within 10hx of you.</span>
+              </span>
+            </div>
+          )}
+          {charClass === 'Elementalist' && sheet?.classCardDots?.[13]?.[0] && (
+            <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <span>
+                <b><i style={{ color: '#231172' }}>Elemental Detection.</i></b> <span style={{ color: '#000' }}>You can sense the presence of any elemental entity or substance within 10hx of you - namely earth, air, water and fire.</span>
               </span>
             </div>
           )}

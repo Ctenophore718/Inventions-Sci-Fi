@@ -203,7 +203,13 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
                 flexShrink: 1,
                 marginRight: '5px'
               }}>
-                {charClass === 'Devout' ? <span style={{ color: '#6b1172', fontWeight: 'bold' }}>Flagellation</span> : charClass === 'Chemist' ? 'Volatile Experiments' : charClass === 'Coder' ? 'Reflection Script' : charClass === 'Commander' ? 'Combat Delegation' : charClass === 'Contemplative' ? 'Swift Reaction' : 'Class Card Name'}
+                {charClass === 'Devout' ? <span style={{ color: '#6b1172', fontWeight: 'bold' }}>Flagellation</span>
+                  : charClass === 'Chemist' ? 'Volatile Experiments'
+                  : charClass === 'Coder' ? 'Reflection Script'
+                  : charClass === 'Commander' ? 'Combat Delegation'
+                  : charClass === 'Contemplative' ? 'Swift Reaction'
+                  : charClass === 'Elementalist' ? 'Commune'
+                  : 'Class Card Name'}
               </span>
               <span style={{
                 fontFamily: 'Arial, Helvetica, sans-serif',
@@ -218,12 +224,30 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
                 display: 'inline-block',
                 textAlign: 'right',
                 marginRight: '0px'
-              }}>{charClass === 'Chemist' ? 'Chemist' : charClass === 'Coder' ? 'Coder' : charClass === 'Commander' ? 'Commander' : charClass === 'Contemplative' ? 'Contemplative' : charClass === 'Devout' ? 'Devout' : 'Class'}</span>
+              }}>{charClass === 'Chemist' ? 'Chemist'
+                : charClass === 'Coder' ? 'Coder'
+                : charClass === 'Commander' ? 'Commander'
+                : charClass === 'Contemplative' ? 'Contemplative'
+                : charClass === 'Devout' ? 'Devout'
+                : charClass === 'Elementalist' ? 'Elementalist'
+                : 'Class'}</span>
             </div>
             {/* Conditional image based on class */}
             <img 
-              src={charClass === 'Devout' ? "/Flagellation.png" : charClass === 'Chemist' ? "/Volatile Experiments.png" : charClass === 'Coder' ? "/Reflection Script.png" : charClass === 'Commander' ? "/Combat Delegation.png" : charClass === 'Contemplative' ? "/Swift Reaction.png" : "/Blank Card.png"}
-              alt={charClass === 'Devout' ? "Flagellation" : charClass === 'Chemist' ? "Volatile Experiments" : charClass === 'Coder' ? "Reflection Script" : charClass === 'Commander' ? "Combat Delegation" : charClass === 'Contemplative' ? "Swift Reaction" : "Blank Card"}
+              src={charClass === 'Devout' ? "/Flagellation.png"
+                : charClass === 'Chemist' ? "/Volatile Experiments.png"
+                : charClass === 'Coder' ? "/Reflection Script.png"
+                : charClass === 'Commander' ? "/Combat Delegation.png"
+                : charClass === 'Contemplative' ? "/Swift Reaction.png"
+                : charClass === 'Elementalist' ? "/Commune.png"
+                : "/Blank Card.png"}
+              alt={charClass === 'Devout' ? "Flagellation"
+                : charClass === 'Chemist' ? "Volatile Experiments"
+                : charClass === 'Coder' ? "Reflection Script"
+                : charClass === 'Commander' ? "Combat Delegation"
+                : charClass === 'Contemplative' ? "Swift Reaction"
+                : charClass === 'Elementalist' ? "Commune"
+                : "Blank Card"}
               style={{
                 position: 'absolute',
                 top: 35,
@@ -258,6 +282,14 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
                     const selected = localSheet.classCardDots[3].filter(Boolean).length;
                     if (selected === 1) cooldown = 3;
                     if (selected === 2) cooldown = 2;
+                  }
+                  return (<span>Cooldown <span style={{ fontWeight: 'bold', fontStyle: 'normal' }}>[{cooldown}]</span></span>);
+                })() : charClass === 'Elementalist' ? (() => {
+                  let cooldown = 4;
+                  if (localSheet && Array.isArray(localSheet.classCardDots) && Array.isArray(localSheet.classCardDots[3])) {
+                    const selected = localSheet.classCardDots[3].filter(Boolean).length;
+                    cooldown = 4 - selected;
+                    if (cooldown < 1) cooldown = 1;
                   }
                   return (<span>Cooldown <span style={{ fontWeight: 'bold', fontStyle: 'normal' }}>[{cooldown}]</span></span>);
                 })() : (
@@ -411,7 +443,37 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
                       </>
                     );
                   })()
-                ) : 'Card stats.'}
+                ) : charClass === 'Elementalist' ? (() => {
+                  // Elementalist Commune card logic
+                  let hx = 3;
+                  let resistText = '[ - ]';
+                  let d6 = 1;
+                  if (localSheet && Array.isArray(localSheet.classCardDots)) {
+                    // hx range: classCardDots[2] (row 3)
+                    if (Array.isArray(localSheet.classCardDots[2])) {
+                      const selected = localSheet.classCardDots[2].filter(Boolean).length;
+                      hx = 3 + selected;
+                    }
+                    // d6: classCardDots[3] (row 4)
+                    if (Array.isArray(localSheet.classCardDots[3]) && localSheet.classCardDots[3][0]) {
+                      d6 = 2;
+                    }
+                    // resist: classCardDots[4] (row 5)
+                    if (Array.isArray(localSheet.classCardDots[4]) && localSheet.classCardDots[4][0]) {
+                      resistText = '[Immune]';
+                    } else if (Array.isArray(localSheet.classCardDots[5]) && localSheet.classCardDots[5][0]) {
+                      resistText = '[Resistant]';
+                    }
+                  }
+                  // If classCardDots[2][0] (Triple Damage dice) is selected, show [triple] instead of [double]
+                  const triple = Array.isArray(localSheet?.classCardDots?.[2]) && localSheet.classCardDots[2][0];
+                  return (
+                    <>
+                      You deal <b>[{triple ? 'triple' : 'double'}]</b> Damage dice with your next <b><i style={{ color: '#990000' }}>Attack</i></b>.
+                    </>
+                  );
+                })()
+                : 'Card stats.'}
               </div>
             </div>
             {/* Flavor text - absolutely positioned and locked */}
@@ -432,13 +494,15 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
               {charClass === 'Devout' ? (
                 <span>“Sacrifice is a necessary cost of any spiritual power. The most devout sacrifice their own flesh.” <br />--Theodora de la Fe, Defteran Devout</span>
               ) : charClass === 'Chemist' ? 
-                'With the right concoctions, any spell or weapon becomes even more volatile than before.' : 
-                charClass === 'Coder' ?
+                'With the right concoctions, any spell or weapon becomes even more volatile than before.' 
+                : charClass === 'Coder' ?
                 (<span>“Although it’s a universal script, the math behind reflecting energetic material is quite complex.”<br />--Luminova, X-Ray Naturalist</span>)
                 : charClass === 'Commander' ? (
                   <span>“...That&apos;s &apos;cause I got people with me, people who trust each other, who do for each other and ain&apos;t always looking for the advantage.” --Mal, Human Captain of Serenity</span>
                 ) : charClass === 'Contemplative' ? (
                   <span>“One must always be responsive at a moment’s notice to fight not only another day, but another instant.” --Master Li Ren, Felid Contemplative</span>
+                ) : charClass === 'Elementalist' ? (
+                  <span>A little prayer with your Xenomagical elemental sprite can go a long way.</span>
                 ) : 'Flavor text.'}
             </div>
             </div>

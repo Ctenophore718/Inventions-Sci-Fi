@@ -352,6 +352,21 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
     [false, false],         // Secondary Attack: -1 Cooldown (2 dots)
     [false]                 // Perks: Elemental Detection (1 dot)
   ];
+  // Exospecialist dots structure: Feature, Technique, Primary Attack, Secondary Attack, Perks
+  const defaultExospecialistDots = [
+    [false, false, false],  // Feature: +1hx (3 dots)
+    [false, false, false],  // Feature: +2 Crit (3 dots)
+    [false],                // Feature: Ignore 100% Cover (1 dot)
+    [false, false],         // Technique: -1 Cooldown (2 dots)
+    [false, false, false],  // Primary Attack: +2 Damage dice (3 dots)
+    [false, false, false],  // Primary Attack: +1 Crit (3 dots)
+    [false, false, false],  // Secondary Attack: +1 Damage die (3 dots)
+    [false, false],         // Secondary Attack: Repeat +1 (2 dots)
+    [false, false, false],  // Secondary Attack: +3hx Range (3 dots)
+    [false, false, false],  // Secondary Attack: +1 Crit (3 dots)
+    [false, false],         // Secondary Attack: -1 Cooldown (2 dots)
+    [false]                 // Perks: Man in the Machine (1 dot)
+  ];
   const [classCardDots, setClassCardDots] = useState<boolean[][]>(() => {
     // Helper to normalize loaded dots to match the default structure
     function normalizeDots(loaded: boolean[][], def: boolean[][]) {
@@ -382,6 +397,9 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
       if (charClass === "Elementalist") {
         return normalizeDots(sheet.classCardDots, defaultElementalistDots);
       }
+      if (charClass === "Exospecialist") {
+        return normalizeDots(sheet.classCardDots, defaultExospecialistDots);
+      }
       return normalizeDots(sheet.classCardDots, defaultChemistDots);
     }
     // Default based on current class
@@ -399,6 +417,9 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
     }
     if (charClass === "Elementalist") {
       return defaultElementalistDots.map(row => [...row]);
+    }
+    if (charClass === "Exospecialist") {
+      return defaultExospecialistDots.map(row => [...row]);
     }
     return defaultChemistDots.map(row => [...row]);
   });
@@ -420,6 +441,9 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
       }
       if (charClass === "Elementalist") {
         return defaultElementalistDots[index] || [];
+      }
+      if (charClass === "Exospecialist") {
+        return defaultExospecialistDots[index] || [];
       }
       return defaultChemistDots[index] || [];
     }
@@ -460,6 +484,11 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
       if (charClass === "Elementalist") {
         const result = defaultElementalistDots.map(row => [...row]);
         console.log('Returning default Elementalist dots:', result);
+        return result;
+      }
+      if (charClass === "Exospecialist") {
+        const result = defaultExospecialistDots.map(row => [...row]);
+        console.log('Returning default Exospecialist dots:', result);
         return result;
       }
       const result = defaultChemistDots.map(row => [...row]);
@@ -2747,11 +2776,31 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                   <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32, fontFamily: 'Arial, Helvetica, sans-serif' }}>
                     <div style={{ fontWeight: 'bold', color: '#0b5394', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Feature</u></div>
                     <span style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
-                      <b><i style={{ color: '#231172', fontSize: '1em' }}>Elemental Excitement.</i></b> <span style={{ fontSize: '1em', fontWeight: 400 }}>When another creature within 3hx of you takes Damage associated with your subclass, you may remove a <i>Cooldown Token</i> from any of your <b><i><span style={{ color: '#990000' }}>Attacks</span></i></b> or <b><i><span style={{ color: '#bf9000' }}>Techniques</span></i></b>.<br />
-                      <b style={{ color: '#0ee2df' }}>Air:</b> <b style={{ color: '#516fff', textDecoration: 'underline' }}><u>Force</u></b> <img src="/Force.png" alt="Force" style={{ height: '1em', verticalAlign: 'middle', marginLeft: '2px' }} /><br />
-                      <b style={{ color: '#e2b90e' }}>Earth:</b> <b style={{ color: '#915927', textDecoration: 'underline' }}><u>Bludgeoning</u></b> <img src="/Bludgeoning.png" alt="Bludgeoning" style={{ height: '1em', verticalAlign: 'middle', marginLeft: '2px' }} /><br />
-                      <b style={{ color: '#e20e0e' }}>Fire:</b> <b style={{ color: '#f90102', textDecoration: 'underline' }}><u>Fire</u></b> <img src="/Fire.png" alt="Fire" style={{ height: '1em', verticalAlign: 'middle', marginLeft: '2px' }} /><br />
-                      <b style={{ color: '#0e42e2' }}>Water:</b> <b style={{ color: '#3ebbff', textDecoration: 'underline' }}><u>Cold</u></b> <img src="/Cold.png" alt="Cold" style={{ height: '1em', verticalAlign: 'middle', marginLeft: '2px' }} /></span>
+                      <b><i style={{ color: '#231172', fontSize: '1em' }}>Elemental Excitement.</i></b> {subclass === 'Air' ? (
+                        <span style={{ fontSize: '1em', fontWeight: 400 }}>
+                          When another creature within 3hx of you takes <b><span style={{ color: '#516fff' }}><u>Force</u></span></b> <img src="/Force.png" alt="Force" style={{ height: '1em', verticalAlign: 'middle', marginLeft: '2px', marginRight: '2px' }} /> Damage, you may remove a <i>Cooldown Token</i> from any of your <b><i><span style={{ color: '#990000' }}>Attacks</span></i></b> or <b><i><span style={{ color: '#bf9000' }}>Techniques</span></i></b>.
+                        </span>
+                      ) : subclass === 'Earth' ? (
+                        <span style={{ fontSize: '1em', fontWeight: 400 }}>
+                          When another creature within 3hx of you takes <b><span style={{ color: '#915927' }}><u>Bludgeoning</u></span></b> <img src="/Bludgeoning.png" alt="Bludgeoning" style={{ height: '1em', verticalAlign: 'middle', marginLeft: '2px', marginRight: '2px' }} /> Damage, you may remove a <i>Cooldown Token</i> from any of your <b><i><span style={{ color: '#990000' }}>Attacks</span></i></b> or <b><i><span style={{ color: '#bf9000' }}>Techniques</span></i></b>.
+                        </span>
+                      ) : subclass === 'Fire' ? (
+                        <span style={{ fontSize: '1em', fontWeight: 400 }}>
+                          When another creature within 3hx of you takes <b><span style={{ color: '#f90102' }}><u>Fire</u></span></b> <img src="/Fire.png" alt="Fire" style={{ height: '1em', verticalAlign: 'middle', marginLeft: '2px', marginRight: '2px' }} /> Damage, you may remove a <i>Cooldown Token</i> from any of your <b><i><span style={{ color: '#990000' }}>Attacks</span></i></b> or <b><i><span style={{ color: '#bf9000' }}>Techniques</span></i></b>.
+                        </span>
+                      ) : subclass === 'Water' ? (
+                        <span style={{ fontSize: '1em', fontWeight: 400 }}>
+                          When another creature within 3hx of you takes <b><span style={{ color: '#3ebbff' }}><u>Cold</u></span></b> <img src="/Cold.png" alt="Cold" style={{ height: '1em', verticalAlign: 'middle', marginLeft: '2px', marginRight: '2px' }} /> Damage, you may remove a <i>Cooldown Token</i> from any of your <b><i><span style={{ color: '#990000' }}>Attacks</span></i></b> or <b><i><span style={{ color: '#bf9000' }}>Techniques</span></i></b>.
+                        </span>
+                      ) : (
+                        <span style={{ fontSize: '1em', fontWeight: 400 }}>
+                          When another creature within 3hx of you takes Damage associated with your subclass, you may remove a <i>Cooldown Token</i> from any of your <b><i><span style={{ color: '#990000' }}>Attacks</span></i></b> or <b><i><span style={{ color: '#bf9000' }}>Techniques</span></i></b>.<br />
+                          <b style={{ color: '#0ee2df' }}>Air:</b> <b style={{ color: '#516fff', textDecoration: 'underline' }}><u>Force</u></b> <img src="/Force.png" alt="Force" style={{ height: '1em', verticalAlign: 'middle', marginLeft: '2px' }} /><br />
+                          <b style={{ color: '#e2b90e' }}>Earth:</b> <b style={{ color: '#915927', textDecoration: 'underline' }}><u>Bludgeoning</u></b> <img src="/Bludgeoning.png" alt="Bludgeoning" style={{ height: '1em', verticalAlign: 'middle', marginLeft: '2px' }} /><br />
+                          <b style={{ color: '#e20e0e' }}>Fire:</b> <b style={{ color: '#f90102', textDecoration: 'underline' }}><u>Fire</u></b> <img src="/Fire.png" alt="Fire" style={{ height: '1em', verticalAlign: 'middle', marginLeft: '2px' }} /><br />
+                          <b style={{ color: '#0e42e2' }}>Water:</b> <b style={{ color: '#3ebbff', textDecoration: 'underline' }}><u>Cold</u></b> <img src="/Cold.png" alt="Cold" style={{ height: '1em', verticalAlign: 'middle', marginLeft: '2px' }} />
+                        </span>
+                      )}
                     </span>
                   </span>
                 </div>
@@ -2832,11 +2881,23 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                     {/* Row 2: Deal +1d6 or ◯ on next Attack or Strike dots */}
                     <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>
                       Deal +1d6
-                      <img src="/Force.png" alt="Force" style={{ height: '1em', verticalAlign: 'middle', marginLeft: '3px', marginRight: '3px' }} />
-                      <img src="/Bludgeoning.png" alt="Bludgeoning" style={{ height: '1em', verticalAlign: 'middle', marginLeft: '3px', marginRight: '3px' }} />
-                      <img src="/Fire.png" alt="Fire" style={{ height: '1em', verticalAlign: 'middle', marginLeft: '3px', marginRight: '3px' }} />
-                      or
-                      <img src="/Cold.png" alt="Cold" style={{ height: '1em', verticalAlign: 'middle', marginLeft: '3px', marginRight: '3px' }} />
+                      {subclass === 'Earth' ? (
+                        <img src="/Bludgeoning.png" alt="Bludgeoning" style={{ height: '1em', verticalAlign: 'middle', marginLeft: '3px', marginRight: '3px' }} />
+                      ) : subclass === 'Fire' ? (
+                        <img src="/Fire.png" alt="Fire" style={{ height: '1em', verticalAlign: 'middle', marginLeft: '3px', marginRight: '3px' }} />
+                      ) : subclass === 'Water' ? (
+                        <img src="/Cold.png" alt="Cold" style={{ height: '1em', verticalAlign: 'middle', marginLeft: '3px', marginRight: '3px' }} />
+                      ) : (
+                        <>
+                          <img src="/Force.png" alt="Force" style={{ height: '1em', verticalAlign: 'middle', marginLeft: '3px', marginRight: '3px' }} />
+                          {subclass !== 'Air' && <>
+                            <img src="/Bludgeoning.png" alt="Bludgeoning" style={{ height: '1em', verticalAlign: 'middle', marginLeft: '3px', marginRight: '3px' }} />
+                            <img src="/Fire.png" alt="Fire" style={{ height: '1em', verticalAlign: 'middle', marginLeft: '3px', marginRight: '3px' }} />
+                            or
+                            <img src="/Cold.png" alt="Cold" style={{ height: '1em', verticalAlign: 'middle', marginLeft: '3px', marginRight: '3px' }} />
+                          </>}
+                        </>
+                      )}
                       on next <b><i><span style={{ color: '#990000' }}>Attack</span></i></b> or <b><i><span style={{ color: '#351c75' }}>Strike</span></i></b>
                     </span>
                     {[0,1,2].map(idx => {
@@ -3593,6 +3654,742 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                           })()}
                         </span>
                       </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            {/* Feature information when Exospecialist is selected */}
+            {charClass === "Exospecialist" && (
+              <div style={{ width: '100%', marginTop: '1rem', textAlign: 'left', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
+                {/* Feature header */}
+                <div style={{ color: '#0b5394', fontWeight: 'bold', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1.08em', marginBottom: '8px' }}>
+                  <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+                    <div style={{ fontWeight: 'bold', color: '#0b5394', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Feature</u></div>
+                    <span style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
+                      <b><i style={{ color: '#231172', fontSize: '1em' }}>Exosuit.</i></b> <span style={{ fontSize: '1em', fontWeight: 400 }}>You Resist <b><span style={{ color: '#915927' }}><u>Bludgeoning</u></span></b> <img src="/Bludgeoning.png" alt="Bludgeoning" style={{ height: '1em', verticalAlign: 'middle', marginLeft: '2px', marginRight: '2px' }} />, <b><span style={{ color: '#878686' }}><u>Piercing</u></span></b> <img src="/Piercing.png" alt="Piercing" style={{ height: '1em', verticalAlign: 'middle', marginLeft: '2px', marginRight: '2px' }} /> and <b><span style={{ color: '#2aff88' }}><u>Slashing</u></span></b> <img src="/Slashing.png" alt="Slashing" style={{ height: '1em', verticalAlign: 'middle', marginLeft: '2px', marginRight: '2px' }} /> Damage and have an additional 20 Hit Points.</span>
+                    </span>
+                  </span>
+                </div>
+                
+                {/* Feature XP progression table */}
+                <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px' }}>
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: '1fr 24px 24px 24px',
+                    gridTemplateRows: 'repeat(2, auto)',
+                    gap: '4px',
+                    alignItems: 'start',
+                    marginBottom: '12px'
+                  }}>
+                    {/* Row 1: XP costs */}
+                    <span></span>
+                    <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>5xp</span>
+                    <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>8xp</span>
+                    <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>12xp</span>
+                    {/* Row 2: +5 Hit Points dots */}
+                    <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>+5 Hit Points</span>
+                    {[0,1,2].map(idx => {
+                      const arr = safeGetDotsArray(0);
+                      const canCheck = idx === 0 || arr.slice(0, idx).every(Boolean);
+                      const rightmostChecked = arr.lastIndexOf(true);
+                      const canUncheck = arr[idx] && idx === rightmostChecked;
+                      const xpCosts = [5, 8, 12];
+                      return (
+                        <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
+                          <span
+                            onClick={() => {
+                              if (!arr[idx] && canCheck) {
+                                const newDots = safeCloneClassCardDots();
+                                for (let j = 0; j <= idx; ++j) newDots[0][j] = true;
+                                let delta = 0;
+                                for (let j = 0; j <= idx; ++j) if (!arr[j]) delta += xpCosts[j];
+                                persistClassCardDots(newDots, 0, delta);
+                              } else if (arr[idx] && canUncheck) {
+                                const newDots = safeCloneClassCardDots();
+                                for (let j = idx; j < arr.length; ++j) newDots[0][j] = false;
+                                let delta = 0;
+                                for (let j = idx; j < arr.length; ++j) if (arr[j]) delta -= xpCosts[j];
+                                persistClassCardDots(newDots, 0, delta);
+                              }
+                            }}
+                            style={{
+                              width: '15px',
+                              height: '15px',
+                              border: '2px solid #000',
+                              borderRadius: '50%',
+                              display: 'block',
+                              background: arr[idx] ? '#000' : '#fff',
+                              cursor: (canCheck && !arr[idx]) || canUncheck ? 'pointer' : 'not-allowed',
+                              transition: 'background 0.2s'
+                            }}
+                          ></span>
+                        </span>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Second XP progression table - +1 Armor */}
+                <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px' }}>
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: '1fr 24px 24px 24px',
+                    gridTemplateRows: 'repeat(2, auto)',
+                    gap: '4px',
+                    alignItems: 'start',
+                    marginBottom: '12px'
+                  }}>
+                    {/* Row 1: XP costs */}
+                    <span></span>
+                    <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>6xp</span>
+                    <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>9xp</span>
+                    <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>14xp</span>
+                    {/* Row 2: +1 Armor dots */}
+                    <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>+1 Armor</span>
+                    {[0,1,2].map(idx => {
+                      const arr = safeGetDotsArray(1);
+                      const canCheck = idx === 0 || arr.slice(0, idx).every(Boolean);
+                      const rightmostChecked = arr.lastIndexOf(true);
+                      const canUncheck = arr[idx] && idx === rightmostChecked;
+                      const xpCosts = [6, 9, 14];
+                      return (
+                        <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
+                          <span
+                            onClick={() => {
+                              if (!arr[idx] && canCheck) {
+                                const newDots = safeCloneClassCardDots();
+                                for (let j = 0; j <= idx; ++j) newDots[1][j] = true;
+                                let delta = 0;
+                                for (let j = 0; j <= idx; ++j) if (!arr[j]) delta += xpCosts[j];
+                                persistClassCardDots(newDots, 0, delta);
+                              } else if (arr[idx] && canUncheck) {
+                                const newDots = safeCloneClassCardDots();
+                                for (let j = idx; j < arr.length; ++j) newDots[1][j] = false;
+                                let delta = 0;
+                                for (let j = idx; j < arr.length; ++j) if (arr[j]) delta -= xpCosts[j];
+                                persistClassCardDots(newDots, 0, delta);
+                              }
+                            }}
+                            style={{
+                              width: '15px',
+                              height: '15px',
+                              border: '2px solid #000',
+                              borderRadius: '50%',
+                              display: 'block',
+                              background: arr[idx] ? '#000' : '#fff',
+                              cursor: (canCheck && !arr[idx]) || canUncheck ? 'pointer' : 'not-allowed',
+                              transition: 'background 0.2s'
+                            }}
+                          ></span>
+                        </span>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Third row: Single dot for +15 Power Levels */}
+                <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px' }}>
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: '1fr 24px 24px 24px',
+                    gridTemplateRows: 'repeat(2, auto)',
+                    gap: '4px',
+                    alignItems: 'start',
+                    marginBottom: '12px'
+                  }}>
+                    {/* Row 1: XP costs */}
+                    <span></span>
+                    <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>20xp</span>
+                    <span></span>
+                    <span></span>
+                    {/* Row 2: +15 Power Levels dot */}
+                    <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>+15 Power Levels</span>
+                    <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
+                        {(() => {
+                          const arr = safeGetDotsArray(2);
+                          const idx = 0;
+                          const canCheck = idx === 0 || arr.slice(0, idx).every(Boolean);
+                          const rightmostChecked = arr.lastIndexOf(true);
+                          const canUncheck = arr[idx] && idx === rightmostChecked;
+                          return (
+                            <span
+                              onClick={() => {
+                                if (!arr[idx] && canCheck) {
+                                  const newDots = safeCloneClassCardDots();
+                                  if (newDots[2]) {
+                                    for (let j = 0; j <= idx; ++j) newDots[2][j] = true;
+                                  }
+                                  persistClassCardDots(newDots, 0, 20);
+                                } else if (arr[idx] && canUncheck) {
+                                  const newDots = safeCloneClassCardDots();
+                                  if (newDots[2]) {
+                                    for (let j = idx; j < arr.length; ++j) newDots[2][j] = false;
+                                  }
+                                  persistClassCardDots(newDots, 0, -20);
+                                }
+                              }}
+                              style={{
+                                width: '15px',
+                                height: '15px',
+                                border: '2px solid #000',
+                                borderRadius: '50%',
+                                display: 'block',
+                                background: arr[idx] ? '#000' : '#fff',
+                                cursor: 'pointer',
+                                transition: 'background 0.2s'
+                              }}
+                            ></span>
+                          );
+                        })()}
+                    </span>
+                    <span></span>
+                    <span></span>
+                  </div>
+                </div>
+
+                {/* Technique section */}
+                <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+                  <div style={{ fontWeight: 'bold', color: '#bf9000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Technique</u></div>
+                  <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+                    <i><span style={{ color: '#231172' }}><b>Target Lock</b> (Cooldown 5).</span></i> Select a target that you can see to become <i>Targeted</i>. Your <b><i><span style={{ color: '#990000' }}>Attacks</span></i></b> against that target get +3 to Roll and deal an additional 1d6 <b><span style={{ color: '#516fff' }}><u>Force</u></span></b> <img src="/Force.png" alt="Force" style={{ height: '1em', verticalAlign: 'middle', marginLeft: '2px', marginRight: '2px' }} /> Damage.
+                  </div>
+                  <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginBottom: '8px' }}>
+                    <div style={{
+                      display: 'grid',
+                      gridTemplateColumns: '1fr 24px 24px 24px',
+                      gridTemplateRows: 'repeat(2, auto)',
+                      gap: '4px',
+                      alignItems: 'start'
+                    }}>
+                      {/* Row 1: XP costs */}
+                      <span></span>
+                      <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>8xp</span>
+                      <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>12xp</span>
+                      <span></span>
+                      {/* Row 2: -1 Cooldown dots */}
+                      <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>-1 <i>Cooldown</i></span>
+                      {[0,1].map(idx => {
+                        const arr = safeGetDotsArray(3);
+                        const canCheck = idx === 0 || arr.slice(0, idx).every(Boolean);
+                        const rightmostChecked = arr.lastIndexOf(true);
+                        const canUncheck = arr[idx] && idx === rightmostChecked;
+                        const xpCosts = [8, 12];
+                        return (
+                          <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
+                            <span
+                              onClick={() => {
+                                if (!arr[idx] && canCheck) {
+                                  const newDots = safeCloneClassCardDots();
+                                  for (let j = 0; j <= idx; ++j) newDots[3][j] = true;
+                                  let delta = 0;
+                                  for (let j = 0; j <= idx; ++j) if (!arr[j]) delta += xpCosts[j];
+                                  persistClassCardDots(newDots, 0, delta);
+                                } else if (arr[idx] && canUncheck) {
+                                  const newDots = safeCloneClassCardDots();
+                                  for (let j = idx; j < arr.length; ++j) newDots[3][j] = false;
+                                  let delta = 0;
+                                  for (let j = idx; j < arr.length; ++j) if (arr[j]) delta -= xpCosts[j];
+                                  persistClassCardDots(newDots, 0, delta);
+                                }
+                              }}
+                              style={{
+                                width: '15px',
+                                height: '15px',
+                                border: '2px solid #000',
+                                borderRadius: '50%',
+                                display: 'block',
+                                background: arr[idx] ? '#000' : '#fff',
+                                cursor: (canCheck && !arr[idx]) || canUncheck ? 'pointer' : 'not-allowed',
+                                transition: 'background 0.2s'
+                              }}
+                            ></span>
+                          </span>
+                        );
+                      })}
+                      <span></span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Primary Attack section */}
+                <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+                  <div style={{ fontWeight: 'bold', color: '#990000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Primary Attack</u></div>
+                  <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+                    <i><b>Integrated Blasters</b> (Cooldown 0).</i><br />
+                    6hx Range, Single Target, 16+ Crit, 1d6+2 <b><span style={{ color: '#516fff' }}><u>Force</u></span></b> <img src="/Force.png" alt="Force" style={{ height: '1em', verticalAlign: 'middle', marginLeft: '2px', marginRight: '2px' }} /> Damage.
+                  </div>
+
+                  {/* +1hx Range */}
+                  <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginBottom: '8px' }}>
+                    <div style={{
+                      display: 'grid',
+                      gridTemplateColumns: '1fr 24px 24px 24px',
+                      gridTemplateRows: 'repeat(2, auto)',
+                      gap: '4px',
+                      alignItems: 'start'
+                    }}>
+                      {/* Row 1: XP costs */}
+                      <span></span>
+                      <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>3xp</span>
+                      <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>5xp</span>
+                      <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>8xp</span>
+                      {/* Row 2: +1hx Range dots */}
+                      <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>+1hx Range</span>
+                      {[0,1,2].map(idx => {
+                        const arr = safeGetDotsArray(4);
+                        const canCheck = idx === 0 || arr.slice(0, idx).every(Boolean);
+                        const rightmostChecked = arr.lastIndexOf(true);
+                        const canUncheck = arr[idx] && idx === rightmostChecked;
+                        const xpCosts = [3, 5, 8];
+                        return (
+                          <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
+                            <span
+                              onClick={() => {
+                                if (!arr[idx] && canCheck) {
+                                  const newDots = safeCloneClassCardDots();
+                                  for (let j = 0; j <= idx; ++j) newDots[4][j] = true;
+                                  let delta = 0;
+                                  for (let j = 0; j <= idx; ++j) if (!arr[j]) delta += xpCosts[j];
+                                  persistClassCardDots(newDots, 0, delta);
+                                } else if (arr[idx] && canUncheck) {
+                                  const newDots = safeCloneClassCardDots();
+                                  for (let j = idx; j < arr.length; ++j) newDots[4][j] = false;
+                                  let delta = 0;
+                                  for (let j = idx; j < arr.length; ++j) if (arr[j]) delta -= xpCosts[j];
+                                  persistClassCardDots(newDots, 0, delta);
+                                }
+                              }}
+                              style={{
+                                width: '15px',
+                                height: '15px',
+                                border: '2px solid #000',
+                                borderRadius: '50%',
+                                display: 'block',
+                                background: arr[idx] ? '#000' : '#fff',
+                                cursor: (canCheck && !arr[idx]) || canUncheck ? 'pointer' : 'not-allowed',
+                                transition: 'background 0.2s'
+                              }}
+                            ></span>
+                          </span>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* +1 Crit */}
+                  <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginBottom: '8px' }}>
+                    <div style={{
+                      display: 'grid',
+                      gridTemplateColumns: '1fr 24px 24px 24px',
+                      gridTemplateRows: 'repeat(2, auto)',
+                      gap: '4px',
+                      alignItems: 'start'
+                    }}>
+                      {/* Row 1: XP costs */}
+                      <span></span>
+                      <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>3xp</span>
+                      <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>5xp</span>
+                      <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>8xp</span>
+                      {/* Row 2: +1 Crit dots */}
+                      <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>+1 Crit</span>
+                      {[0,1,2].map(idx => {
+                        const arr = safeGetDotsArray(5);
+                        const canCheck = idx === 0 || arr.slice(0, idx).every(Boolean);
+                        const rightmostChecked = arr.lastIndexOf(true);
+                        const canUncheck = arr[idx] && idx === rightmostChecked;
+                        const xpCosts = [3, 5, 8];
+                        return (
+                          <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
+                            <span
+                              onClick={() => {
+                                if (!arr[idx] && canCheck) {
+                                  const newDots = safeCloneClassCardDots();
+                                  for (let j = 0; j <= idx; ++j) newDots[5][j] = true;
+                                  let delta = 0;
+                                  for (let j = 0; j <= idx; ++j) if (!arr[j]) delta += xpCosts[j];
+                                  persistClassCardDots(newDots, 0, delta);
+                                } else if (arr[idx] && canUncheck) {
+                                  const newDots = safeCloneClassCardDots();
+                                  for (let j = idx; j < arr.length; ++j) newDots[5][j] = false;
+                                  let delta = 0;
+                                  for (let j = idx; j < arr.length; ++j) if (arr[j]) delta -= xpCosts[j];
+                                  persistClassCardDots(newDots, 0, delta);
+                                }
+                              }}
+                              style={{
+                                width: '15px',
+                                height: '15px',
+                                border: '2px solid #000',
+                                borderRadius: '50%',
+                                display: 'block',
+                                background: arr[idx] ? '#000' : '#fff',
+                                cursor: (canCheck && !arr[idx]) || canUncheck ? 'pointer' : 'not-allowed',
+                                transition: 'background 0.2s'
+                              }}
+                            ></span>
+                          </span>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Secondary Attack section */}
+                <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+                  <div style={{ fontWeight: 'bold', color: '#990000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Secondary Attack</u></div>
+                  <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+                    <i><b>Smart Missiles</b> (Cooldown 4).</i><br />
+                    8hx Range, 1hx Blast, 18+ Crit, 1d6 <b><span style={{ color: '#516fff' }}><u>Force</u></span></b> <img src="/Force.png" alt="Force" style={{ height: '1em', verticalAlign: 'middle', marginLeft: '2px', marginRight: '2px' }} /> Damage.
+                  </div>
+
+                  {/* +1hx Range */}
+                  <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginBottom: '8px' }}>
+                    <div style={{
+                      display: 'grid',
+                      gridTemplateColumns: '1fr 24px 24px 24px',
+                      gridTemplateRows: 'repeat(2, auto)',
+                      gap: '4px',
+                      alignItems: 'start'
+                    }}>
+                      {/* Row 1: XP costs */}
+                      <span></span>
+                      <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>4xp</span>
+                      <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>7xp</span>
+                      <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>10xp</span>
+                      {/* Row 2: +1hx Range dots */}
+                      <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>+1hx Range</span>
+                      {[0,1,2].map(idx => {
+                        const arr = safeGetDotsArray(6);
+                        const canCheck = idx === 0 || arr.slice(0, idx).every(Boolean);
+                        const rightmostChecked = arr.lastIndexOf(true);
+                        const canUncheck = arr[idx] && idx === rightmostChecked;
+                        const xpCosts = [4, 7, 10];
+                        return (
+                          <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
+                            <span
+                              onClick={() => {
+                                if (!arr[idx] && canCheck) {
+                                  const newDots = safeCloneClassCardDots();
+                                  for (let j = 0; j <= idx; ++j) newDots[6][j] = true;
+                                  let delta = 0;
+                                  for (let j = 0; j <= idx; ++j) if (!arr[j]) delta += xpCosts[j];
+                                  persistClassCardDots(newDots, 0, delta);
+                                } else if (arr[idx] && canUncheck) {
+                                  const newDots = safeCloneClassCardDots();
+                                  for (let j = idx; j < arr.length; ++j) newDots[6][j] = false;
+                                  let delta = 0;
+                                  for (let j = idx; j < arr.length; ++j) if (arr[j]) delta -= xpCosts[j];
+                                  persistClassCardDots(newDots, 0, delta);
+                                }
+                              }}
+                              style={{
+                                width: '15px',
+                                height: '15px',
+                                border: '2px solid #000',
+                                borderRadius: '50%',
+                                display: 'block',
+                                background: arr[idx] ? '#000' : '#fff',
+                                cursor: (canCheck && !arr[idx]) || canUncheck ? 'pointer' : 'not-allowed',
+                                transition: 'background 0.2s'
+                              }}
+                            ></span>
+                          </span>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* +1hx Blast */}
+                  <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginBottom: '8px' }}>
+                    <div style={{
+                      display: 'grid',
+                      gridTemplateColumns: '1fr 24px 24px 24px',
+                      gridTemplateRows: 'repeat(2, auto)',
+                      gap: '4px',
+                      alignItems: 'start'
+                    }}>
+                      {/* Row 1: XP costs */}
+                      <span></span>
+                      <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>5xp</span>
+                      <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>8xp</span>
+                      <span></span>
+                      {/* Row 2: +1hx Blast dots */}
+                      <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>+1hx Blast</span>
+                      {[0,1].map(idx => {
+                        const arr = safeGetDotsArray(7);
+                        const canCheck = idx === 0 || arr.slice(0, idx).every(Boolean);
+                        const rightmostChecked = arr.lastIndexOf(true);
+                        const canUncheck = arr[idx] && idx === rightmostChecked;
+                        const xpCosts = [5, 8];
+                        return (
+                          <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
+                            <span
+                              onClick={() => {
+                                if (!arr[idx] && canCheck) {
+                                  const newDots = safeCloneClassCardDots();
+                                  for (let j = 0; j <= idx; ++j) newDots[7][j] = true;
+                                  let delta = 0;
+                                  for (let j = 0; j <= idx; ++j) if (!arr[j]) delta += xpCosts[j];
+                                  persistClassCardDots(newDots, 0, delta);
+                                } else if (arr[idx] && canUncheck) {
+                                  const newDots = safeCloneClassCardDots();
+                                  for (let j = idx; j < arr.length; ++j) newDots[7][j] = false;
+                                  let delta = 0;
+                                  for (let j = idx; j < arr.length; ++j) if (arr[j]) delta -= xpCosts[j];
+                                  persistClassCardDots(newDots, 0, delta);
+                                }
+                              }}
+                              style={{
+                                width: '15px',
+                                height: '15px',
+                                border: '2px solid #000',
+                                borderRadius: '50%',
+                                display: 'block',
+                                background: arr[idx] ? '#000' : '#fff',
+                                cursor: (canCheck && !arr[idx]) || canUncheck ? 'pointer' : 'not-allowed',
+                                transition: 'background 0.2s'
+                              }}
+                            ></span>
+                          </span>
+                        );
+                      })}
+                      <span></span>
+                    </div>
+                  </div>
+
+                  {/* +1d6 Damage */}
+                  <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginBottom: '8px' }}>
+                    <div style={{
+                      display: 'grid',
+                      gridTemplateColumns: '1fr 24px 24px 24px',
+                      gridTemplateRows: 'repeat(2, auto)',
+                      gap: '4px',
+                      alignItems: 'start'
+                    }}>
+                      {/* Row 1: XP costs */}
+                      <span></span>
+                      <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>5xp</span>
+                      <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>8xp</span>
+                      <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>12xp</span>
+                      {/* Row 2: +1d6 Damage dots */}
+                      <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>+1d6 <b><span style={{ color: '#516fff' }}><u>Force</u></span></b> <img src="/Force.png" alt="Force" style={{ height: '1em', verticalAlign: 'middle', marginLeft: '2px', marginRight: '2px' }} /> Damage</span>
+                      {[0,1,2].map(idx => {
+                        const arr = safeGetDotsArray(8);
+                        const canCheck = idx === 0 || arr.slice(0, idx).every(Boolean);
+                        const rightmostChecked = arr.lastIndexOf(true);
+                        const canUncheck = arr[idx] && idx === rightmostChecked;
+                        const xpCosts = [5, 8, 12];
+                        return (
+                          <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
+                            <span
+                              onClick={() => {
+                                if (!arr[idx] && canCheck) {
+                                  const newDots = safeCloneClassCardDots();
+                                  for (let j = 0; j <= idx; ++j) newDots[8][j] = true;
+                                  let delta = 0;
+                                  for (let j = 0; j <= idx; ++j) if (!arr[j]) delta += xpCosts[j];
+                                  persistClassCardDots(newDots, 0, delta);
+                                } else if (arr[idx] && canUncheck) {
+                                  const newDots = safeCloneClassCardDots();
+                                  for (let j = idx; j < arr.length; ++j) newDots[8][j] = false;
+                                  let delta = 0;
+                                  for (let j = idx; j < arr.length; ++j) if (arr[j]) delta -= xpCosts[j];
+                                  persistClassCardDots(newDots, 0, delta);
+                                }
+                              }}
+                              style={{
+                                width: '15px',
+                                height: '15px',
+                                border: '2px solid #000',
+                                borderRadius: '50%',
+                                display: 'block',
+                                background: arr[idx] ? '#000' : '#fff',
+                                cursor: (canCheck && !arr[idx]) || canUncheck ? 'pointer' : 'not-allowed',
+                                transition: 'background 0.2s'
+                              }}
+                            ></span>
+                          </span>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* +1 Crit */}
+                  <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginBottom: '8px' }}>
+                    <div style={{
+                      display: 'grid',
+                      gridTemplateColumns: '1fr 24px 24px 24px',
+                      gridTemplateRows: 'repeat(2, auto)',
+                      gap: '4px',
+                      alignItems: 'start'
+                    }}>
+                      {/* Row 1: XP costs */}
+                      <span></span>
+                      <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>5xp</span>
+                      <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>8xp</span>
+                      <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>12xp</span>
+                      {/* Row 2: +1 Crit dots */}
+                      <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>+1 Crit</span>
+                      {[0,1,2].map(idx => {
+                        const arr = safeGetDotsArray(9);
+                        const canCheck = idx === 0 || arr.slice(0, idx).every(Boolean);
+                        const rightmostChecked = arr.lastIndexOf(true);
+                        const canUncheck = arr[idx] && idx === rightmostChecked;
+                        const xpCosts = [5, 8, 12];
+                        return (
+                          <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
+                            <span
+                              onClick={() => {
+                                if (!arr[idx] && canCheck) {
+                                  const newDots = safeCloneClassCardDots();
+                                  for (let j = 0; j <= idx; ++j) newDots[9][j] = true;
+                                  let delta = 0;
+                                  for (let j = 0; j <= idx; ++j) if (!arr[j]) delta += xpCosts[j];
+                                  persistClassCardDots(newDots, 0, delta);
+                                } else if (arr[idx] && canUncheck) {
+                                  const newDots = safeCloneClassCardDots();
+                                  for (let j = idx; j < arr.length; ++j) newDots[9][j] = false;
+                                  let delta = 0;
+                                  for (let j = idx; j < arr.length; ++j) if (arr[j]) delta -= xpCosts[j];
+                                  persistClassCardDots(newDots, 0, delta);
+                                }
+                              }}
+                              style={{
+                                width: '15px',
+                                height: '15px',
+                                border: '2px solid #000',
+                                borderRadius: '50%',
+                                display: 'block',
+                                background: arr[idx] ? '#000' : '#fff',
+                                cursor: (canCheck && !arr[idx]) || canUncheck ? 'pointer' : 'not-allowed',
+                                transition: 'background 0.2s'
+                              }}
+                            ></span>
+                          </span>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* -1 Cooldown */}
+                  <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginBottom: '8px' }}>
+                    <div style={{
+                      display: 'grid',
+                      gridTemplateColumns: '1fr 24px 24px 24px',
+                      gridTemplateRows: 'repeat(2, auto)',
+                      gap: '4px',
+                      alignItems: 'start'
+                    }}>
+                      {/* Row 1: XP costs */}
+                      <span></span>
+                      <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>5xp</span>
+                      <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>8xp</span>
+                      <span></span>
+                      {/* Row 2: -1 Cooldown dots */}
+                      <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>-1 <i>Cooldown</i></span>
+                      {[0,1].map(idx => {
+                        const arr = safeGetDotsArray(10);
+                        const canCheck = idx === 0 || arr.slice(0, idx).every(Boolean);
+                        const rightmostChecked = arr.lastIndexOf(true);
+                        const canUncheck = arr[idx] && idx === rightmostChecked;
+                        const xpCosts = [5, 8];
+                        return (
+                          <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
+                            <span
+                              onClick={() => {
+                                if (!arr[idx] && canCheck) {
+                                  const newDots = safeCloneClassCardDots();
+                                  for (let j = 0; j <= idx; ++j) newDots[10][j] = true;
+                                  let delta = 0;
+                                  for (let j = 0; j <= idx; ++j) if (!arr[j]) delta += xpCosts[j];
+                                  persistClassCardDots(newDots, 0, delta);
+                                } else if (arr[idx] && canUncheck) {
+                                  const newDots = safeCloneClassCardDots();
+                                  for (let j = idx; j < arr.length; ++j) newDots[10][j] = false;
+                                  let delta = 0;
+                                  for (let j = idx; j < arr.length; ++j) if (arr[j]) delta -= xpCosts[j];
+                                  persistClassCardDots(newDots, 0, delta);
+                                }
+                              }}
+                              style={{
+                                width: '15px',
+                                height: '15px',
+                                border: '2px solid #000',
+                                borderRadius: '50%',
+                                display: 'block',
+                                background: arr[idx] ? '#000' : '#fff',
+                                cursor: (canCheck && !arr[idx]) || canUncheck ? 'pointer' : 'not-allowed',
+                                transition: 'background 0.2s'
+                              }}
+                            ></span>
+                          </span>
+                        );
+                      })}
+                      <span></span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Perks section */}
+                <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+                  <div style={{ fontWeight: 'bold', color: '#0b5394', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Perks</u></div>
+                  <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginBottom: '8px' }}>
+                    <div style={{
+                      display: 'grid',
+                      gridTemplateColumns: '1fr 24px 24px 24px',
+                      gridTemplateRows: 'repeat(2, auto)',
+                      gap: '4px',
+                      alignItems: 'start'
+                    }}>
+                      {/* Row 1: XP costs */}
+                      <span></span>
+                      <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>25xp</span>
+                      <span></span>
+                      <span></span>
+                      {/* Row 2: Military Training dot */}
+                      <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>Military Training</span>
+                      <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
+                          {(() => {
+                            const arr = safeGetDotsArray(11);
+                            const idx = 0;
+                            const canCheck = idx === 0 || arr.slice(0, idx).every(Boolean);
+                            const rightmostChecked = arr.lastIndexOf(true);
+                            const canUncheck = arr[idx] && idx === rightmostChecked;
+                            return (
+                              <span
+                                onClick={() => {
+                                  if (!arr[idx] && canCheck) {
+                                    const newDots = safeCloneClassCardDots();
+                                    if (newDots[11]) {
+                                      for (let j = 0; j <= idx; ++j) newDots[11][j] = true;
+                                    }
+                                    persistClassCardDots(newDots, 0, 25);
+                                  } else if (arr[idx] && canUncheck) {
+                                    const newDots = safeCloneClassCardDots();
+                                    if (newDots[11]) {
+                                      for (let j = idx; j < arr.length; ++j) newDots[11][j] = false;
+                                    }
+                                    persistClassCardDots(newDots, 0, -25);
+                                  }
+                                }}
+                                style={{
+                                  width: '15px',
+                                  height: '15px',
+                                  border: '2px solid #000',
+                                  borderRadius: '50%',
+                                  display: 'block',
+                                  background: arr[idx] ? '#000' : '#fff',
+                                  cursor: 'pointer',
+                                  transition: 'background 0.2s'
+                                }}
+                              ></span>
+                            );
+                          })()}
+                      </span>
+                      <span></span>
+                      <span></span>
                     </div>
                   </div>
                 </div>
