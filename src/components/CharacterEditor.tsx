@@ -465,7 +465,9 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
         if (dot) {
           // Check if this is a booster dot (should not cost SP)
           const isBoosterDot = (charClass === "Chemist" && skillName === "Investigation" && idx === 2) ||
-                              (charClass === "Coder" && skillName === "Oikomagic" && idx === 2);
+                              (charClass === "Coder" && skillName === "Oikomagic" && idx === 2) ||
+                              (charClass === "Commander" && skillName === "Diplomacy" && idx === 2) ||
+                              (charClass === "Exospecialist" && skillName === "Athletics" && idx === 2);
           
           // For characters with free starter dots, first two columns are free
           if (hasFreeDots && (idx === 0 || idx === 1)) {
@@ -1868,7 +1870,22 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
       <div className={styles.damageInteractionsCard}>
   <h3 style={{ fontFamily: 'Arial, sans-serif' }}>Damage Interactions</h3>
         <div className={styles.cardContent}>
-          <div style={{ fontWeight: 'bold', marginBottom: 6, fontFamily: 'Arial, sans-serif', color: '#666666' }}>Resistances</div>
+            <div style={{ fontWeight: 'bold', marginBottom: 6, fontFamily: 'Arial, sans-serif', color: '#666666' }}>
+              Resistances
+              {charClass === 'Exospecialist' && (
+                <span style={{ marginLeft: 8, display: 'inline-flex', gap: 8 }}>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', color: '#915927' }}>
+                    Bludgeoning <img src="/Bludgeoning.png" alt="Bludgeoning" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+                  </span>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', color: '#a6965f' }}>
+                    Piercing <img src="/Piercing.png" alt="Piercing" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+                  </span>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', color: '#808080' }}>
+                    Slashing <img src="/Slashing.png" alt="Slashing" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+                  </span>
+                </span>
+              )}
+            </div>
           <div style={{ fontWeight: 'bold', marginBottom: 2, fontFamily: 'Arial, sans-serif', color: '#666666' }}>Immunities</div>
           <div style={{ fontWeight: 'bold', marginBottom: 2, fontFamily: 'Arial, sans-serif', color: '#666666' }}>Absorptions</div>
         </div>
@@ -1910,14 +1927,28 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
                       // Check for class-based automatic skill dots
                       const isChemistInvestigation = charClass === "Chemist" && skill === "Investigation" && i === 2;
                       const isCoderOikomagic = charClass === "Coder" && skill === "Oikomagic" && i === 2;
-                      if (isChemistInvestigation || isCoderOikomagic) {
-                        checked = true; // Force third dot to be filled for Chemist (Investigation) or Coder (Oikomagic)
+                      const isContemplativeAwareness = charClass === "Contemplative" && skill === "Awareness" && i === 2;
+                      const isDevoutXenomagic = charClass === "Devout" && skill === "Xenomagic" && i === 2;
+                      const isElementalistXenomagic = charClass === "Elementalist" && skill === "Xenomagic" && i === 2;
+                      const isExospecialistAthletics = charClass === "Exospecialist" && skill === "Athletics" && i === 2;
+                      const isGunslingerDeception = charClass === "Gunslinger" && skill === "Deception" && i === 2;
+                      const isCommanderDiplomacy = charClass === "Commander" && skill === "Diplomacy" && i === 2;
+                      const isTechnicianTechnology = charClass === "Technician" && skill === "Technology" && i === 2;
+                      if (isChemistInvestigation || isCoderOikomagic || isCommanderDiplomacy || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isGunslingerDeception || isTechnicianTechnology) {
+                        checked = true; // Force third dot to be filled for class booster dots
                       }
 
                       // Define class-specific colors for automatic skill dots
                       const getClassBoostColor = () => {
                         if (isChemistInvestigation) return "rgba(114,17,49,0.5)";
                         if (isCoderOikomagic) return "rgba(17,33,114,0.5)";
+                        if (isCommanderDiplomacy) return "rgba(113,114,17,0.5)";
+                        if (isContemplativeAwareness) return "rgba(17,99,114,0.5)";
+                        if (isDevoutXenomagic) return "rgba(107,17,114,0.5)";
+                        if (isElementalistXenomagic) return "rgba(35,17,114,0.5)";
+                        if (isExospecialistAthletics) return "rgba(17,114,51,0.5)";
+                        if (isGunslingerDeception) return "rgba(78,114,17,0.5)";
+                        if (isTechnicianTechnology) return "rgba(114,72,17,0.5)";
                         // Add other class colors here in the future
                         return "#d0d0d0"; // fallback color
                       };
@@ -1927,7 +1958,14 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
                       const canCheck = i === 0 || skillDotsForSkill.slice(0, i).every((dotFilled, dotIndex) => {
                         // Check if this position has a booster dot
                         const isBoosterDot = (charClass === "Chemist" && skill === "Investigation" && dotIndex === 2) ||
-                                           (charClass === "Coder" && skill === "Oikomagic" && dotIndex === 2);
+                                           (charClass === "Coder" && skill === "Oikomagic" && dotIndex === 2) ||
+                                           (charClass === "Exospecialist" && skill === "Athletics" && dotIndex === 2) ||
+                                           (charClass === "Commander" && skill === "Diplomacy" && dotIndex === 2) ||
+                                           (charClass === "Contemplative" && skill === "Awareness" && dotIndex === 2) ||
+                                           (charClass === "Devout" && skill === "Xenomagic" && dotIndex === 2) ||
+                                           (charClass === "Elementalist" && skill === "Xenomagic" && dotIndex === 2) ||
+                                           (charClass === "Gunslinger" && skill === "Deception" && dotIndex === 2) ||
+                                           (charClass === "Technician" && skill === "Technology" && dotIndex === 2);
                         return dotFilled || isBoosterDot;
                       });
                       const rightmostChecked = skillDotsForSkill.lastIndexOf(true);
@@ -1944,8 +1982,8 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
                               if (isLockedColumn) return;
                               
                               // Prevent clicking on class-based automatic skill dots
-                              if (isChemistInvestigation || isCoderOikomagic) return;
-                              
+                              if (isChemistInvestigation || isCoderOikomagic || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isCommanderDiplomacy || isGunslingerDeception || isTechnicianTechnology) return;
+
                               setSkillDots(prev => {
                                 setSpNotice("");
                                 const arr = (prev[skill] || Array(10).fill(false)).slice();
@@ -1966,8 +2004,15 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
                                     if (dot) {
                                       // Check if this is a booster dot (should not cost SP)
                                       const isBoosterDot = (charClass === "Chemist" && skillName === "Investigation" && idx === 2) ||
-                                                          (charClass === "Coder" && skillName === "Oikomagic" && idx === 2);
-                                      
+                                                          (charClass === "Coder" && skillName === "Oikomagic" && idx === 2) ||
+                                                          (charClass === "Contemplative" && skillName === "Awareness" && idx === 2) ||
+                                                          (charClass === "Devout" && skillName === "Xenomagic" && idx === 2) ||
+                                                          (charClass === "Elementalist" && skillName === "Xenomagic" && idx === 2) ||
+                                                          (charClass === "Exospecialist" && skillName === "Athletics" && idx === 2) ||
+                                                          (charClass === "Commander" && skillName === "Diplomacy" && idx === 2) ||
+                                                          (charClass === "Gunslinger" && skillName === "Deception" && idx === 2) ||
+                                                          (charClass === "Technician" && skillName === "Technology" && idx === 2);
+
                                       // For characters with free starter dots, first two columns are free
                                       if (hasFreeDots && (idx === 0 || idx === 1)) {
                                         // Don't add cost for first two columns
@@ -1987,8 +2032,15 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
                                     if (dot) {
                                       // Check if this is a booster dot (should not cost SP)
                                       const isBoosterDot = (charClass === "Chemist" && skillName === "Investigation" && idx === 2) ||
-                                                          (charClass === "Coder" && skillName === "Oikomagic" && idx === 2);
-                                      
+                                                          (charClass === "Coder" && skillName === "Oikomagic" && idx === 2) ||
+                                                          (charClass === "Contemplative" && skillName === "Awareness" && idx === 2) ||
+                                                          (charClass === "Devout" && skillName === "Xenomagic" && idx === 2) ||
+                                                          (charClass === "Elementalist" && skillName === "Xenomagic" && idx === 2) ||
+                                                          (charClass === "Exospecialist" && skillName === "Athletics" && idx === 2) ||
+                                                          (charClass === "Commander" && skillName === "Diplomacy" && idx === 2) ||
+                                                          (charClass === "Gunslinger" && skillName === "Deception" && idx === 2) ||
+                                                          (charClass === "Technician" && skillName === "Technology" && idx === 2);
+
                                       // For characters with free starter dots, first two columns are free
                                       if (hasFreeDots && (idx === 0 || idx === 1)) {
                                         // Don't add cost for first two columns
@@ -2012,13 +2064,13 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
                               width: 18,
                               height: 18,
                               borderRadius: '50%',
-                              border: (isChemistInvestigation || isCoderOikomagic) ? `2px solid ${classBoostColor}` : (isLockedColumn ? '2px solid #666' : '2px solid #000'),
-                              background: checked ? ((isChemistInvestigation || isCoderOikomagic) ? classBoostColor : (isLockedColumn ? '#666' : '#000')) : '#fff',
-                              cursor: (isLockedColumn || isChemistInvestigation || isCoderOikomagic) ? 'not-allowed' : ((canCheck && !checked) || canUncheck ? 'pointer' : 'not-allowed'),
-                              opacity: (isLockedColumn || isChemistInvestigation || isCoderOikomagic) ? 0.6 : ((canCheck && !checked) || canUncheck ? 1 : 0.4),
+                              border: (isChemistInvestigation || isCoderOikomagic || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isCommanderDiplomacy || isGunslingerDeception || isTechnicianTechnology) ? `2px solid ${classBoostColor}` : (isLockedColumn ? '2px solid #666' : '2px solid #000'),
+                              background: checked ? ((isChemistInvestigation || isCoderOikomagic || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isCommanderDiplomacy || isGunslingerDeception || isTechnicianTechnology) ? classBoostColor : (isLockedColumn ? '#666' : '#000')) : '#fff',
+                              cursor: (isLockedColumn || isChemistInvestigation || isCoderOikomagic || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isCommanderDiplomacy || isGunslingerDeception || isTechnicianTechnology) ? 'not-allowed' : ((canCheck && !checked) || canUncheck ? 'pointer' : 'not-allowed'),
+                              opacity: (isLockedColumn || isChemistInvestigation || isCoderOikomagic || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isCommanderDiplomacy || isGunslingerDeception || isTechnicianTechnology) ? 0.6 : ((canCheck && !checked) || canUncheck ? 1 : 0.4),
                             }}
                             title={
-                              isChemistInvestigation || isCoderOikomagic
+                              isChemistInvestigation || isCoderOikomagic || isCommanderDiplomacy || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isGunslingerDeception || isTechnicianTechnology
                                 ? 'Class bonus skill dot (cannot be changed)'
                                 : isLockedColumn 
                                 ? 'Starting skill dots (cannot be changed)'
@@ -2064,6 +2116,13 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
             <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
               <span>
                 <b><i style={{ color: '#112972' }}>Code Reader.</i></b> <span style={{ color: '#000' }}>You easily see the inherent logic of the natural world around you, including the Oikomagic infused in it, giving you an edge when inspecting magical or rationality-based subjects and objects. Gain an advantage on related skill rolls.</span>
+              </span>
+            </div>
+          )}
+          {charClass === 'Exospecialist' && sheet?.classCardDots?.[11]?.[0] && (
+            <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <span>
+                <b><i style={{ color: '#117233' }}>Man in the Machine.</i></b> <span style={{ color: '#000' }}>Your specialized armor provides the capability of withstanding a multitude of extreme environments, including heat, cold, underwater, very high altitudes and the vacuum of space.</span>
               </span>
             </div>
           )}
@@ -2638,7 +2697,7 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <span style={{ fontWeight: 'bold', minWidth: '120px' }}>Max Hit Points:</span>
-                <span style={{ minWidth: '40px', textAlign: 'center' }}>{maxHitPoints}</span>
+                <span style={{ minWidth: '40px', textAlign: 'center' }}>{charClass === "Exospecialist" ? maxHitPoints + 20 : maxHitPoints}</span>
               </div>
 
               <hr style={{ margin: '8px 0', border: '1px solid #eee' }} />
@@ -2720,7 +2779,7 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
             }
           }}
         >
-          hp: {currentHitPoints}/{maxHitPoints}
+          hp: {currentHitPoints}/{charClass === "Exospecialist" ? maxHitPoints + 20 : maxHitPoints}
         </button>
       </div>
 
