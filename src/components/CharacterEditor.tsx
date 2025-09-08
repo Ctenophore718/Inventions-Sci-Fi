@@ -136,10 +136,10 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
     Commander: "Stay Sharp.",
     Contemplative: "Psychosomatic Harmony.",
     Devout: "Blood Trade.",
-    Elementalist: "test 6",
-    Exospecialist: "test 7",
-    Gunslinger: "test 8",
-    Technician: "test 9",
+    Elementalist: "Elemental Excitement.",
+    Exospecialist: "Exosuit.",
+    Gunslinger: "Sharpshooter.",
+    Technician: "Master Mechanic.",
   };
 
   // Auto-fill classFeature when class changes, unless user has typed something custom
@@ -151,11 +151,7 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [charClass]);
-
-  // Rich JSX for Chemist, Coder, Commander, Contemplative, Devout
-  // Dynamically show Crit bonus as [2] if '+2 Crit' dot is selected in classCardDots
-  const chemCritBonus = sheet?.classCardDots?.[1]?.[0] ? 2 : 0;
-  // Dynamically show Chem Token max as [4] or [5] if '+1 Chem Token max' dots are selected
+  const chemCritBonus = (sheet?.classCardDots?.[1]?.filter(Boolean).length ?? 0) * 2;
   const chemTokenDots = sheet?.classCardDots?.[0] || [];
   let chemTokenMax = 3;
   if (chemTokenDots[0]) chemTokenMax = 4;
@@ -165,9 +161,7 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
       <b><i style={{ color: '#721131' }}>Chemical Reaction.</i></b> At the start of each round, you gain 1 <i>Chem Token</i>, up to a maximum of <b>[{chemTokenMax}]</b> <i>Chem Token</i>s. While you have at least 1 <i>Chem Token</i>, your <b><i><span style={{ color: '#000' }}>Primary</span> <span style={{ color: '#990000' }}>Attack</span></i></b> gains a +<b>[{chemCritBonus}]</b> Crit and deals +1 Damage die.
     </span>
   );
-  // Show [100] if Coder's Ignore 100% Cover dot is selected (classCardDots[0][0])
   const coderIgnore100 = charClass === "Coder" && sheet?.classCardDots?.[0]?.[0];
-  // Show Crit bonus as [1], [2], [3] if +1 Crit dots are selected (classCardDots[1])
   let coderCritBonus = 0;
   if (charClass === "Coder" && sheet?.classCardDots?.[1]) {
     coderCritBonus = sheet.classCardDots[1].filter(Boolean).length;
@@ -177,9 +171,16 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
       <b><i style={{ color: '#112972' }}>Subtle Magic.</i></b> Your <b><i><span style={{ color: '#990000' }}>Attacks</span></i></b> ignore <b>[{coderIgnore100 ? 100 : 50}]</b>% Cover and gain a +<b>[{coderCritBonus}]</b> Crit.
     </span>
   );
+  const commanderHx = charClass === "Commander" ? (sheet?.classCardDots?.[0]?.filter(Boolean).length ?? 0) : 0;
+  
+  let commanderIncludesAttacks = 0;
+  if (charClass === "Commander" && sheet?.classCardDots?.[1]) {
+    commanderIncludesAttacks = sheet.classCardDots[1].filter(Boolean).length;
+  }
+  const commanderIncludesAttacksDot = charClass === "Commander" && sheet?.classCardDots?.[1]?.[0];
   const commanderFeatureJSX = (
     <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#717211' }}>Stay Sharp.</i></b> At the beginning of the round, you and allies within <b>[3]</b>hx of you can remove an additional <i>Cooldown Token</i> from one <i>inactive</i> <b><i><span style={{ color: '#bf9000' }}>Technique</span></i></b> of their choice.
+      <b><i style={{ color: '#717211' }}>Stay Sharp.</i></b> At the beginning of the round, you and allies within <b>[{3 + commanderHx}]</b>hx of you can remove an additional <i>Cooldown Token</i> from one <i>inactive</i> <b><i><span style={{ color: '#bf9000' }}>Technique</span></i></b> or <b>[{commanderIncludesAttacksDot ? <i style={{ fontWeight: 'bold', color: '#990000' }}>Attacks</i> : " - "}]</b> of their choice.
     </span>
   );
   const contemplativeFeatureJSX = (
@@ -187,17 +188,17 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
       <b><i style={{ color: '#116372' }}>Psychosomatic Harmony.</i></b> You are <b>[resistant]</b> to <b><u style={{ color: '#a929ff', display: 'inline-flex', alignItems: 'center' }}>
         Neural
         <img src="/Neural.png" alt="Neural" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
-      </u></b> and can <b><i style={{ color: '#351c75' }}>Strike</i></b> <b>[1]</b> extra time per turn.
+      </u></b> and can <b><i style={{ color: '#351c75' }}>Strike</i></b> <b>[{sheet?.classCardDots?.[1]?.[0] ? 2 : 1}]</b> extra time per turn.
     </span>
   );
   const devoutFeatureJSX = (
     <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#6b1172' }}>Blood Trade.</i></b> Whenever you take Damage, you gain +<b>[1]</b>d6 Damage on your next <b><i><span style={{ color: '#351c75' }}>Strike</span></i></b> or <b><i><span style={{ color: '#990000' }}>Attack</span></i></b>. The Damage type matches your next <b><i><span style={{ color: '#351c75' }}>Strike</span></i></b>  or <b><i><span style={{ color:'#990000' }}>Attack</span></i></b> and doesn’t stack if you are Damaged multiple times.   
+      <b><i style={{ color: '#6b1172' }}>Blood Trade.</i></b> Whenever you take Damage, you gain +<b>[{1 + (charClass === 'Devout' && sheet?.classCardDots?.[0] ? sheet.classCardDots[0].filter(Boolean).length : 0)}]</b>d6 Damage on your next <b><i><span style={{ color: '#351c75' }}>Strike</span></i></b> or <b><i><span style={{ color: '#990000' }}>Attack</span></i></b>. The Damage type matches your next <b><i><span style={{ color: '#351c75' }}>Strike</span></i></b>  or <b><i><span style={{ color:'#990000' }}>Attack</span></i></b> and doesn’t stack if you are Damaged multiple times.   
     </span>
   );  
   const elementalistFeatureJSX = (
     <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#231172' }}>Elemental Excitement.</i></b> When another creature within <b>[3]</b>hx of you takes {
+      <b><i style={{ color: '#231172' }}>Elemental Excitement.</i></b> When another creature within <b>[{3 + (charClass === 'Elementalist' && sheet?.classCardDots?.[0] ? sheet.classCardDots[0].filter(Boolean).length : 0)}]</b>hx of you takes {
         subclass === "Air" ? (
           <><b><u style={{ color: '#516fff', display: 'inline-flex', alignItems: 'center' }}>Force<img src="/Force.png" alt="Force" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> Damage</>
         ) : subclass === "Earth" ? (
@@ -209,7 +210,19 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
         ) : (
           "Damage associated with your subclass"
         )
-      }, you may remove a <i>Cooldown Token</i> from any of your <b><i><span style={{ color: '#990000' }}>Attacks</span></i></b> or <b><i><span style={{ color: '#bf9000' }}>Techniques</span></i></b>.
+      }, you may remove a <i>Cooldown Token</i> from any of your <b><i><span style={{ color: '#990000' }}>Attacks</span></i></b> or <b><i><span style={{ color: '#bf9000' }}>Techniques</span></i></b> and deal +<b>[{0 + (charClass === 'Elementalist' && sheet?.classCardDots?.[0] ? sheet.classCardDots[1].filter(Boolean).length : 0)}]</b>d6 {
+        subclass === "Air" ? (
+          <><b><u style={{ color: '#516fff', display: 'inline-flex', alignItems: 'center' }}>Force<img src="/Force.png" alt="Force" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> Damage</>
+        ) : subclass === "Earth" ? (
+          <><b><u style={{ color: '#915927', display: 'inline-flex', alignItems: 'center' }}>Bludgeoning<img src="/Bludgeoning.png" alt="Bludgeoning" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> Damage</>
+        ) : subclass === "Fire" ? (
+          <><b><u style={{ color: '#f90102', display: 'inline-flex', alignItems: 'center' }}>Fire<img src="/Fire.png" alt="Fire" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> Damage</>
+        ) : subclass === "Water" ? (
+          <><b><u style={{ color: '#3ebbff', display: 'inline-flex', alignItems: 'center' }}>Cold<img src="/Cold.png" alt="Cold" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> Damage</>
+        ) : (
+          "Damage associated with your subclass"
+        )
+      } on your next <b><i><span style={{ color: '#990000' }}>Attack</span></i></b> or <b><i><span style={{ color: '#351c75' }}>Strike</span></i></b>.
     </span>
   );  
   const exospecialistFeatureJSX = (
@@ -227,9 +240,10 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
     </span>
   );
 
+
   const gunslingerFeatureJSX = (
     <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#4e7211' }}>Sharpshooter.</i></b> You gain a +<b>[2]</b> to Crit rolls on all <b><i><span style={{ color: '#990000' }}>Attacks</span></i></b>.
+      <b><i style={{ color: '#4e7211' }}>Sharpshooter.</i></b> You gain a +<b>[{2 + (charClass === 'Gunslinger' && sheet?.classCardDots?.[0] ? sheet.classCardDots[0].filter(Boolean).length : 0)}]</b> to Crit rolls and a +<b>[{0 + (charClass === 'Gunslinger' && sheet?.classCardDots?.[1] ? sheet.classCardDots[1].filter(Boolean).length : 0)}]</b>hx Range on all <b><i><span style={{ color: '#990000' }}>Attacks</span></i></b>.
     </span>
   );  
 
@@ -456,9 +470,9 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
   // SP cost per column in the skills grid
   const skillSpCosts = [1,1,2,2,3,4,5,6,8,10];
 
-  // Ensure SP spent is calculated correctly on mount
+  // Calculate SP spent on skills only (preserve class card dot SP costs)
   useEffect(() => {
-    let total = 0;
+    let skillSpTotal = 0;
     const hasFreeDots = sheet?.hasFreeSkillStarterDots;
     Object.entries(skillDots).forEach(([skillName, dotsArr]) => {
       dotsArr.forEach((dot, idx) => {
@@ -474,13 +488,41 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
             // Don't add cost for first two columns on characters with free starter dots
           } else if (!isBoosterDot) {
             // Don't add cost for booster dots
-            total += skillSpCosts[idx];
+            skillSpTotal += skillSpCosts[idx];
           }
         }
       });
     });
-    setSpSpent(total);
-  }, [skillDots, sheet?.hasFreeSkillStarterDots, charClass]); // Recalculate when skillDots or charClass change
+    
+    // Calculate SP spent on class card dots
+    let classCardSpTotal = 0;
+    if (sheet?.classCardDots && charClass === "Coder") {
+      // Code Reader perk costs 8sp if checked
+      if (sheet.classCardDots[12]?.[0]) {
+        classCardSpTotal += 8;
+      }
+    }
+    // Add similar calculations for other classes if they have SP-costing perks
+    
+    // Only update spSpent if we have a valid sheet to preserve existing class card costs
+    // or if this is the initial calculation for a new character
+    if (sheet) {
+      // Use existing spSpent if it's higher than our skill calculation
+      // This preserves class card costs that were set in LevelUp
+      const existingSpSpent = sheet.spSpent || 0;
+      const calculatedTotal = skillSpTotal + classCardSpTotal;
+      
+      // Only override if our calculation matches or if this seems like a fresh character
+      if (existingSpSpent === 0 || calculatedTotal >= existingSpSpent || !sheet.classCardDots) {
+        setSpSpent(calculatedTotal);
+      } else {
+        // Preserve the existing spSpent value that includes class card costs
+        setSpSpent(existingSpSpent);
+      }
+    } else {
+      setSpSpent(skillSpTotal);
+    }
+  }, [skillDots, sheet?.hasFreeSkillStarterDots, charClass, sheet?.classCardDots, sheet?.spSpent]); // Recalculate when relevant data changes
 
 
   // Hit Points UI state
@@ -902,7 +944,7 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
 
   const brawlerFeatureJSX = (
     <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#d8a53d' }}>Fightin' Dirty.</i></b> When you <b><i style={{ color: '#351c75' }}>Strike</i></b> an enemy, you inflict <b>[1]</b> of the following conditions: <b><i>Blind</i></b>, <b><i>Spike</i></b> (<b><u style={{ color: '#915927', display: 'inline-flex', alignItems: 'center' }}>Bludgeoning<img src="/Bludgeoning.png" alt="Bludgeoning" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>), or <b><i>Restrain</i></b>.
+      <b><i style={{ color: '#d8a53d' }}>Fightin' Dirty.</i></b> When you <b><i style={{ color: '#351c75' }}>Strike</i></b> an enemy, you inflict <b>[1]</b> of the following conditions: <b><i>Blind</i></b>, <b><i>Spike</i></b> (<b><u style={{ color: '#915927' }}>Bludgeoning<img src="/Bludgeoning.png" alt="Bludgeoning" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>), or <b><i>Restrain</i></b>.
     </span>
   );
 
@@ -980,7 +1022,7 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
   );
 
   const cerebronychFeatureJSX = (
-    <span style={{ color: '#000', fontWeight: 400 }}>
+    <span style={{ color: '#000', fontWeight:  400 }}>
       <b><i style={{ color: '#5f5e2b' }}>Parasitic Composure.</i></b> You are <i>Immune</i> to the <b><i>Confuse</i></b> condition and have <b><u style={{ color: '#de7204', display: 'inline-flex', alignItems: 'center' }}>Chemical<img src="/Chemical.png" alt="Chemical" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> and <b><u style={{ color: '#02b900', display: 'inline-flex', alignItems: 'center' }}>
         Toxic
         <img src="/Toxic.png" alt="Toxic" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
@@ -1860,9 +1902,24 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
                 );
               })()
             ) : <span style={{ fontWeight: 'bold', fontFamily: 'inherit', color: '#000', marginLeft: 4 }}>{strikeDamage}</span>}
+            {charClass === 'Commander' ? (
+              (() => {
+                const damageDots = sheet?.classCardDots?.[8] || [];
+                const numDice = 1 + damageDots.filter(Boolean).length;
+                return (
+                  <span style={{ fontWeight: 'bold', fontFamily: 'inherit', color: '#000', marginLeft: 0, display: 'flex', alignItems: 'center' }}>
+                    {numDice}d6&nbsp;
+                  </span>
+                );
+              })()
+            ) : <span style={{ fontWeight: 'bold', fontFamily: 'inherit', color: '#000', marginLeft: 4 }}>{strikeDamage}</span>}
           </div>
-          <div className={styles.horizontalLabel} style={{ color: '#351c75', fontWeight: 'bold' }}>Multi Strike </div>
-          <div className={styles.horizontalLabel} style={{ color: '#351c75', fontWeight: 'bold' }}>Strike Effects {strikeEffects}</div>
+          <div className={styles.horizontalLabel} style={{ color: '#351c75', fontWeight: 'bold' }}>Multi Strike <span style={{ color: '#000' }}>{charClass === 'Contemplative' ? (2 + (sheet?.classCardDots?.[1]?.[0] ? 1 : 0)) : (multiStrike > 0 ? multiStrike : <span style={{ visibility: 'hidden' }}>0</span>)}</span></div>
+          <div className={styles.horizontalLabel} style={{ color: '#351c75', fontWeight: 'bold' }}>
+            Strike Effects {charClass === 'Contemplative' && sheet?.classCardDots?.[2]?.[0]
+              ? <span style={{ color: '#000', fontWeight: 'normal' }}>Can <span style={{ color: '#351c75' }}><b><i>Strike</i></b></span> a single target multiple times</span>
+              : strikeEffects}
+          </div>
         </div>
       </div>
 
@@ -1870,24 +1927,35 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
       <div className={styles.damageInteractionsCard}>
   <h3 style={{ fontFamily: 'Arial, sans-serif' }}>Damage Interactions</h3>
         <div className={styles.cardContent}>
-            <div style={{ fontWeight: 'bold', marginBottom: 6, fontFamily: 'Arial, sans-serif', color: '#666666' }}>
+            <div style={{ fontWeight: 'bold', marginBottom: 6, fontFamily: 'Arial, sans-serif', color: '#666666', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
               Resistances
               {charClass === 'Exospecialist' && (
-                <span style={{ marginLeft: 8, display: 'inline-flex', gap: 8 }}>
-                  <span style={{ display: 'inline-flex', alignItems: 'center', color: '#915927' }}>
-                    Bludgeoning <img src="/Bludgeoning.png" alt="Bludgeoning" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+                <span style={{ marginLeft: 8, display: 'inline-flex', gap: 8, flexWrap: 'wrap' }}>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', color: '#915927', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                    <u>Bludgeoning</u> <img src="/Bludgeoning.png" alt="Bludgeoning" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
                   </span>
-                  <span style={{ display: 'inline-flex', alignItems: 'center', color: '#a6965f' }}>
-                    Piercing <img src="/Piercing.png" alt="Piercing" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+                  <span style={{ display: 'inline-flex', alignItems: 'center', color: '#a6965f', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                    <u>Piercing</u> <img src="/Piercing.png" alt="Piercing" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
                   </span>
-                  <span style={{ display: 'inline-flex', alignItems: 'center', color: '#808080' }}>
-                    Slashing <img src="/Slashing.png" alt="Slashing" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+                  <span style={{ display: 'inline-flex', alignItems: 'center', color: '#808080', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                    <u>Slashing</u> <img src="/Slashing.png" alt="Slashing" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
                   </span>
                 </span>
               )}
+              {charClass === 'Contemplative' && !(sheet?.classCardDots?.[0]?.[0]) && (
+                <span style={{ marginLeft: 8, display: 'inline-flex', alignItems: 'center', color: '#a929ff', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                  <u>Neural</u> <img src="/Neural.png" alt="Neural" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+                </span>
+              )}
             </div>
-          <div style={{ fontWeight: 'bold', marginBottom: 2, fontFamily: 'Arial, sans-serif', color: '#666666' }}>Immunities</div>
-          <div style={{ fontWeight: 'bold', marginBottom: 2, fontFamily: 'Arial, sans-serif', color: '#666666' }}>Absorptions</div>
+          <div style={{ fontWeight: 'bold', marginBottom: 2, fontFamily: 'Arial, sans-serif', color: '#666666', wordBreak: 'break-word', overflowWrap: 'break-word' }}>Immunities
+            {charClass === 'Contemplative' && sheet?.classCardDots?.[0]?.[0] && (
+              <span style={{ marginLeft: 8, display: 'inline-flex', alignItems: 'center', color: '#a929ff', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                <u>Neural</u> <img src="/Neural.png" alt="Neural" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+              </span>
+            )}
+          </div>
+          <div style={{ fontWeight: 'bold', marginBottom: 2, fontFamily: 'Arial, sans-serif', color: '#666666', wordBreak: 'break-word', overflowWrap: 'break-word' }}>Absorptions</div>
         </div>
       </div>
 
@@ -1920,7 +1988,7 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
               <tbody>
                 {skillList && skillList.map(skill => (
                   <tr key={skill}>
-                    <td style={{ fontWeight: 'bold', padding: '4px 8px', whiteSpace: 'nowrap', fontFamily: 'Arial, sans-serif' }}>{skill}</td>
+                    <td style={{ fontSize: '1.15em', fontWeight: 'bold', padding: '4px 8px', whiteSpace: 'nowrap', fontFamily: 'Arial, sans-serif' }}>{skill}</td>
                     {(skillDots[skill] || Array(10).fill(false)).map((checked, i) => {
                       const skillDotsForSkill = skillDots[skill] || Array(10).fill(false);
                       
@@ -2099,12 +2167,22 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
           <div style={{ fontWeight: 'bold', marginBottom: 6, fontFamily: 'Arial, sans-serif', display: 'flex', alignItems: 'center', gap: 8 }}>
             <span>Languages</span>
             {charClass === 'Coder' && (
-              <span style={{ fontWeight: 'normal', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', color: '#222' }}>
+              <span style={{ fontWeight: 'normal', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', color: '#000' }}>
                 Oikovox
               </span>
             )}
+            {charClass === 'Devout' && (
+              <span style={{ fontWeight: 'normal', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', color: '#000' }}>
+                Xenovox
+              </span>
+            )}
+            {charClass === 'Elementalist' && (
+              <span style={{ fontWeight: 'normal', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', color: '#000' }}>
+                Xenoelemental
+              </span>
+            )}
           </div>
-          {/* Class Perk segment, visible if Chemist's Chemical Concoctions dot or Coder's Code Reader dot is selected */}
+          {/* Class Perk segment, visible if Class Perk dot is selected */}
           {charClass === 'Chemist' && sheet?.classCardDots?.[9]?.[0] && (
             <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
               <span>
@@ -2119,10 +2197,45 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
               </span>
             </div>
           )}
+          {charClass === 'Commander' && sheet?.classCardDots?.[9]?.[0] && (
+            <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <span>
+                <b><i style={{ color: '#717211' }}>Natural Leader.</i></b> <span style={{ color: '#000' }}>You are inherently adept at leading others and getting them to both trust and follow you. Gain an advantage on related skill rolls.</span>
+              </span>
+            </div>
+          )}
+          {charClass === 'Contemplative' && sheet?.classCardDots?.[12]?.[0] && (
+            <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <span>
+                <b><i style={{ color: '#116372' }}>Inherent Telepath.</i></b> <span style={{ color: '#000' }}>You can communicate telepathically one-way with any language-speaking creature within 10hx of you.</span>
+              </span>
+            </div>
+          )}
+          {charClass === 'Devout' && sheet?.classCardDots?.[10]?.[0] && (
+            <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <span>
+                <b><i style={{ color: '#6b1172' }}>Higher Power.</i></b> <span style={{ color: '#000' }}>You draw your energy and abilities from a divine entity. Gain an advantage on related skill rolls when you give homage to your deity and choose the transrational option.</span>
+              </span>
+            </div>
+          )}
+          {charClass === 'Elementalist' && sheet?.classCardDots?.[13]?.[0] && (
+            <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <span>
+                <b><i style={{ color: '#231172' }}>Elemental Detection.</i></b> <span style={{ color: '#000' }}>You can sense the presence of any elemental entity or substance within 10hx of you - namely earth, air, water and fire.</span>
+              </span>
+            </div>
+          )}
           {charClass === 'Exospecialist' && sheet?.classCardDots?.[11]?.[0] && (
             <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
               <span>
                 <b><i style={{ color: '#117233' }}>Man in the Machine.</i></b> <span style={{ color: '#000' }}>Your specialized armor provides the capability of withstanding a multitude of extreme environments, including heat, cold, underwater, very high altitudes and the vacuum of space.</span>
+              </span>
+            </div>
+          )}
+          {charClass === 'Gunslinger' && sheet?.classCardDots?.[7]?.[0] && (
+            <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <span>
+                <b><i style={{ color: '#4e7211' }}>Gunslinger's Grit.</i></b> <span style={{ color: '#000' }}>You’ve been in sticky situations enough times to see what’s coming around the bend. Gain an advantage on related skills when identifying potentially dangerous social situations or defending yours or your companions’ reputations.</span>
               </span>
             </div>
           )}

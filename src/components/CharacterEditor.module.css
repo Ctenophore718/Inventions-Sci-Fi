@@ -93,6 +93,8 @@
   .damageInteractionsCard {
     grid-column: 3 !important;
     grid-row: 4 !important;
+    word-break: break-word;
+    overflow-wrap: break-word;
   }
   
   .inventoryCard {

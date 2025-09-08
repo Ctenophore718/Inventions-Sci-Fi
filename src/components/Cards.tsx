@@ -354,6 +354,13 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
                         if (cooldown < 1) cooldown = 1;
                       }
                       return cooldown;
+                    })() : charClass === 'Gunslinger' ? (() => {
+                      let cooldown = 4;
+                      if (localSheet && Array.isArray(localSheet.classCardDots) && Array.isArray(localSheet.classCardDots[4])) {
+                        cooldown = 4 - localSheet.classCardDots[4].filter(Boolean).length;
+                        if (cooldown < 1) cooldown = 1;
+                      }
+                      return cooldown;
                     })() : '#'}]
                   </span></>
                 )}
@@ -384,151 +391,170 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
                 maxHeight: '100%',
                 overflow: 'hidden'
               }}>
-                {charClass === 'Devout' ? (() => {
-                  let hxRange = 0;
-                  let attackD6 = 0;
-                  if (localSheet && Array.isArray(localSheet.classCardDots)) {
-                    if (Array.isArray(localSheet.classCardDots[1]) && localSheet.classCardDots[1][0]) {
-                      hxRange = 1;
-                    }
-                    if (Array.isArray(localSheet.classCardDots[2]) && localSheet.classCardDots[2][0]) {
-                      attackD6 = 1;
-                    }
-                  }
-                  return (
-                    <>
-                      You choose to deal 1d4 to 5d4 untyped Damage to yourself that cannot be reduced in any way. As a result, you gain a +2 Crit, +<b>[{hxRange}]</b>hx Range and +<b>[{attackD6}]</b>d6 Damage to your next <b><i style={{ color: '#990000' }}>Attack</i></b> for each die of Damage you dealt yourself.
-                    </>
-                  );
-                })() : charClass === 'Exospecialist' ? (
-                  (() => {
-                    let hx = 3;
-                    let crit = 2;
+                {charClass === 'Gunslinger'
+                  ? (() => {
+                      // Get number of '+1 Attack' dots from classCardDots[2]
+                      let creatureDots = 0;
+                      if (localSheet && Array.isArray(localSheet.classCardDots) && Array.isArray(localSheet.classCardDots[3])) {
+                        creatureDots = localSheet.classCardDots[3].filter(Boolean).length;
+                      }
+                      let attackDots = 0;
+                      if (localSheet && Array.isArray(localSheet.classCardDots) && Array.isArray(localSheet.classCardDots[2])) {
+                        attackDots = localSheet.classCardDots[2].filter(Boolean).length;
+                      }
+                      const enemyCount = 1 + creatureDots;
+                      const attackCount = 1 + attackDots;
+                      return (
+                        <>
+                          Until the start of the next round, when <b>[{enemyCount}]</b> enemy(s) <b><i><span style={{ color: '#38761d' }}>Moves</span></i></b> in your <i>Line-of-Sight</i> and is in Range, you can make <b>[{attackCount}]</b> <b><i>Primary</i></b> <b><i><span style={{ color: '#990000' }}>Attack(s)</span></i></b> against them as long as the <b><i><span style={{ color: '#990000' }}>Attack</span></i></b> is <i>Active</i>. After you make the <b><i><span style={{ color: '#990000' }}>Attack(s)</span></i></b>, <i><span style={{ color: '#4e7211' }}>Quick Shot</span></i> expires.
+                        </>
+                      );
+                    })()
+                  : charClass === 'Devout' ? (() => {
+                    let hxRange = 0;
+                    let attackD6 = 0;
                     if (localSheet && Array.isArray(localSheet.classCardDots)) {
-                      if (Array.isArray(localSheet.classCardDots[0])) {
-                        hx = 3 + localSheet.classCardDots[0].filter(Boolean).length;
+                      if (Array.isArray(localSheet.classCardDots[1]) && localSheet.classCardDots[1][0]) {
+                        hxRange = 1;
                       }
-                      // +2 Crit dots are in classCardDots[1]
-                      if (Array.isArray(localSheet.classCardDots[1])) {
-                        crit = 2 + 2 * localSheet.classCardDots[1].filter(Boolean).length;
+                      if (Array.isArray(localSheet.classCardDots[2]) && localSheet.classCardDots[2][0]) {
+                        attackD6 = 1;
                       }
-                    }
-                    let cover = 50;
-                    // Ignore 100% Cover dot is in classCardDots[2][0]
-                    if (localSheet && Array.isArray(localSheet.classCardDots) && Array.isArray(localSheet.classCardDots[2]) && localSheet.classCardDots[2][0]) {
-                      cover = 100;
                     }
                     return (
                       <>
-                        You and allies within <b>[{hx}]</b>hx gain a +<b>[{crit}]</b> to Crit rolls on <b><i style={{ color: '#990000' }}>Attacks</i></b> and ignore <b>[{cover}]</b>% Cover until the start of the next round.
+                        You choose to deal 1d4 to 5d4 untyped Damage to yourself that cannot be reduced in any way. As a result, you gain a +2 Crit, +<b>[{hxRange}]</b>hx Range and +<b>[{attackD6}]</b>d6 Damage to your next <b><i style={{ color: '#990000' }}>Attack</i></b> for each die of Damage you dealt yourself.
                       </>
                     );
-                })()) 
-                : charClass === 'Chemist' ? (() => {
-                  // Chemist: +1hx dots are in classCardDots[2], +1d6 Chemical per Token (classCardDots[3]), +1hx Range per Token (classCardDots[4])
-                  let chemHx = 3;
-                  let chemD6 = 0;
-                  let chemHxRng = 0;
-                  if (localSheet && Array.isArray(localSheet.classCardDots)) {
-                      if (Array.isArray(localSheet.classCardDots[2])) {
-                      chemHx += localSheet.classCardDots[2].filter(Boolean).length;
-                    }
-                    if (Array.isArray(localSheet.classCardDots[3]) && localSheet.classCardDots[3][0]) {
-                      chemD6 = 1;
-                    }
-                    if (Array.isArray(localSheet.classCardDots[4]) && localSheet.classCardDots[4][0]) {
-                      chemHxRng = 1;
-                    }
-                  }
-                  return (
-                    <>
-                      You spend any number of <i>Chem Tokens</i>. After doing so, you and allies within <b>[{chemHx}]</b>hx of you gain +2 to Crit rolls, +<b>[{chemD6}]</b>d6 <br /><u><b style ={{ color: '#de7204' }}>Chemical</b></u><img src="/Chemical.png" alt="Chemical" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /> and/or +<b>[{chemHxRng}]</b>hx Range to <b><i style={{ color: '#990000' }}>Attacks</i></b> for each <i>Token</i> spent until the start of the next round.
-                    </>
-                  );
-                })() : charClass === 'Coder' ? (() => {
-                  // Row 2: +1d6 Damage dots (3 dots)
-                  let dmg = 1;
-                  let resistText = '[ - ]';
-                  if (localSheet && Array.isArray(localSheet.classCardDots)) {
-                    if (Array.isArray(localSheet.classCardDots[2])) {
-                      const selected = localSheet.classCardDots[2].filter(Boolean).length;
-                      if (selected > 0) dmg = 2 + (selected - 1);
-                    }
-                    // Row 4: Damage Immunity (dot 0)
-                    if (Array.isArray(localSheet.classCardDots[4]) && localSheet.classCardDots[4][0]) {
-                      resistText = '[Immune]';
-                    } else if (Array.isArray(localSheet.classCardDots[3]) && localSheet.classCardDots[3][0]) {
-                      // Row 3: Resist all Damage (dot 0)
-                      resistText = '[Resistant]';
-                    }
-                  }
-                  return (
-                    <>
-                      Until the start of the next round, whenever you and any ally within 3hx of you take Damage from an enemy, that enemy takes <b>[{dmg}]</b>d6 Damage of the same type it dealt. Additionally, you and allies within 3hx are <b>{resistText}</b> to the original Damage.
-                    </>
-                  );
-                })() : charClass === 'Commander' ? (() => {
-                  // Commander: +1hx dots for Combat Delegation are in classCardDots[3], +1 ally dots are in classCardDots[4]
-                  let hx = 5;
-                  let allies = 1;
-                  if (localSheet && Array.isArray(localSheet.classCardDots)) {
-                    if (Array.isArray(localSheet.classCardDots[3])) {
-                      const selectedHx = localSheet.classCardDots[3].filter(Boolean).length;
-                      hx = 5 + selectedHx;
-                    }
-                    if (Array.isArray(localSheet.classCardDots[4])) {
-                      const selectedAllies = localSheet.classCardDots[4].filter(Boolean).length;
-                      allies = 1 + selectedAllies;
-                    }
-                  }
-                  return (
-                    <>
-                      <b>[{allies}]</b> ally(s) within <b>[{hx}]</b>hx that can see and/or hear you gains an extra <i>Action</i>.
-                    </>
-                  );
-                })() : charClass === 'Contemplative' ? (
-                  (() => {
-                    let hx = 3;
-                    if (localSheet && Array.isArray(localSheet.classCardDots) && Array.isArray(localSheet.classCardDots[3])) {
-                      hx = 3 + localSheet.classCardDots[3].filter(Boolean).length;
+                  })() : charClass === 'Exospecialist' ? (
+                    (() => {
+                      let hx = 3;
+                      let crit = 2;
+                      if (localSheet && Array.isArray(localSheet.classCardDots)) {
+                        if (Array.isArray(localSheet.classCardDots[0])) {
+                          hx = 3 + localSheet.classCardDots[0].filter(Boolean).length;
+                        }
+                        // +2 Crit dots are in classCardDots[1]
+                        if (Array.isArray(localSheet.classCardDots[1])) {
+                          crit = 2 + 2 * localSheet.classCardDots[1].filter(Boolean).length;
+                        }
+                      }
+                      let cover = 50;
+                      // Ignore 100% Cover dot is in classCardDots[2][0]
+                      if (localSheet && Array.isArray(localSheet.classCardDots) && Array.isArray(localSheet.classCardDots[2]) && localSheet.classCardDots[2][0]) {
+                        cover = 100;
+                      }
+                      return (
+                        <>
+                          You and allies within <b>[{hx}]</b>hx gain a +<b>[{crit}]</b> to Crit rolls on <b><i style={{ color: '#990000' }}>Attacks</i></b> and ignore <b>[{cover}]</b>% Cover until the start of the next round.
+                        </>
+                      );
+                  })()) 
+                  : charClass === 'Chemist' ? (() => {
+                    // Chemist: +1hx dots are in classCardDots[2], +1d6 Chemical per Token (classCardDots[3]), +1hx Range per Token (classCardDots[4])
+                    let chemHx = 3;
+                    let chemD6 = 0;
+                    let chemHxRng = 0;
+                    if (localSheet && Array.isArray(localSheet.classCardDots)) {
+                        if (Array.isArray(localSheet.classCardDots[2])) {
+                        chemHx += localSheet.classCardDots[2].filter(Boolean).length;
+                      }
+                      if (Array.isArray(localSheet.classCardDots[3]) && localSheet.classCardDots[3][0]) {
+                        chemD6 = 1;
+                      }
+                      if (Array.isArray(localSheet.classCardDots[4]) && localSheet.classCardDots[4][0]) {
+                        chemHxRng = 1;
+                      }
                     }
                     return (
                       <>
-                        Until the beginning of the next round, you and all allies within <b>[{hx}]</b>hx can <b><i style={{ color: '#38761d' }}>Move</i></b> their <b><i style={{ color: '#38761d' }}>Speed</i></b> whenever they take Damage from an <b><i><span style={{ color: '#990000' }}>Attack</span></i></b>. You can <b><i style={{ color: '#351c75' }}>Strike</i></b> during this <b><i style={{ color: '#38761d' }}>Movement</i></b>.
+                        You spend any number of <i>Chem Tokens</i>. After doing so, you and allies within <b>[{chemHx}]</b>hx of you gain +2 to Crit rolls, +<b>[{chemD6}]</b>d6 <br /><u><b style ={{ color: '#de7204' }}>Chemical</b></u><img src="/Chemical.png" alt="Chemical" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /> and/or +<b>[{chemHxRng}]</b>hx Range to <b><i style={{ color: '#990000' }}>Attacks</i></b> for each <i>Token</i> spent until the start of the next round.
+                      </>
+                    );
+                  })() : charClass === 'Coder' ? (() => {
+                    // Row 2: +1d6 Damage dots (3 dots)
+                    let dmg = 1;
+                    let resistText = '[ - ]';
+                    if (localSheet && Array.isArray(localSheet.classCardDots)) {
+                      if (Array.isArray(localSheet.classCardDots[2])) {
+                        const selected = localSheet.classCardDots[2].filter(Boolean).length;
+                        if (selected > 0) dmg = 2 + (selected - 1);
+                      }
+                      // Row 4: Damage Immunity (dot 0)
+                      if (Array.isArray(localSheet.classCardDots[4]) && localSheet.classCardDots[4][0]) {
+                        resistText = '[Immune]';
+                      } else if (Array.isArray(localSheet.classCardDots[3]) && localSheet.classCardDots[3][0]) {
+                        // Row 3: Resist all Damage (dot 0)
+                        resistText = '[Resistant]';
+                      }
+                    }
+                    return (
+                      <>
+                        Until the start of the next round, whenever you and any ally within 3hx of you take Damage from an enemy, that enemy takes <b>[{dmg}]</b>d6 Damage of the same type it dealt. Additionally, you and allies within 3hx are <b>{resistText}</b> to the original Damage.
+                      </>
+                    );
+                  })() : charClass === 'Commander' ? (() => {
+                    // Commander: +1hx dots for Combat Delegation are in classCardDots[3], +1 ally dots are in classCardDots[4]
+                    let hx = 5;
+                    let allies = 1;
+                    if (localSheet && Array.isArray(localSheet.classCardDots)) {
+                      if (Array.isArray(localSheet.classCardDots[3])) {
+                        const selectedHx = localSheet.classCardDots[3].filter(Boolean).length;
+                        hx = 5 + selectedHx;
+                      }
+                      if (Array.isArray(localSheet.classCardDots[4])) {
+                        const selectedAllies = localSheet.classCardDots[4].filter(Boolean).length;
+                        allies = 1 + selectedAllies;
+                      }
+                    }
+                    return (
+                      <>
+                        <b>[{allies}]</b> ally(s) within <b>[{hx}]</b>hx that can see and/or hear you gains an extra <i>Action</i>.
+                      </>
+                    );
+                  })() : charClass === 'Contemplative' ? (
+                    (() => {
+                      let hx = 3;
+                      if (localSheet && Array.isArray(localSheet.classCardDots) && Array.isArray(localSheet.classCardDots[3])) {
+                        hx = 3 + localSheet.classCardDots[3].filter(Boolean).length;
+                      }
+                      return (
+                        <>
+                          Until the beginning of the next round, you and all allies within <b>[{hx}]</b>hx can <b><i style={{ color: '#38761d' }}>Move</i></b> their <b><i style={{ color: '#38761d' }}>Speed</i></b> whenever they take Damage from an <b><i><span style={{ color: '#990000' }}>Attack</span></i></b>. You can <b><i style={{ color: '#351c75' }}>Strike</i></b> during this <b><i style={{ color: '#38761d' }}>Movement</i></b>.
+                        </>
+                      );
+                    })()
+                  ) : charClass === 'Elementalist' ? (() => {
+                    // Elementalist Commune card logic
+                    let hx = 3;
+                    let resistText = '[ - ]';
+                    let d6 = 1;
+                    if (localSheet && Array.isArray(localSheet.classCardDots)) {
+                      // hx range: classCardDots[2] (row 3)
+                      if (Array.isArray(localSheet.classCardDots[2])) {
+                        const selected = localSheet.classCardDots[2].filter(Boolean).length;
+                        hx = 3 + selected;
+                      }
+                      // d6: classCardDots[3] (row 4)
+                      if (Array.isArray(localSheet.classCardDots[3]) && localSheet.classCardDots[3][0]) {
+                        d6 = 2;
+                      }
+                      // resist: classCardDots[4] (row 5)
+                      if (Array.isArray(localSheet.classCardDots[4]) && localSheet.classCardDots[4][0]) {
+                        resistText = '[Immune]';
+                      } else if (Array.isArray(localSheet.classCardDots[5]) && localSheet.classCardDots[5][0]) {
+                        resistText = '[Resistant]';
+                      }
+                    }
+                    // If classCardDots[2][0] (Triple Damage dice) is selected, show [triple] instead of [double]
+                    const triple = Array.isArray(localSheet?.classCardDots?.[2]) && localSheet.classCardDots[2][0];
+                    return (
+                      <>
+                        You deal <b>[{triple ? 'triple' : 'double'}]</b> Damage dice with your next <b><i style={{ color: '#990000' }}>Attack</i></b>.
                       </>
                     );
                   })()
-                ) : charClass === 'Elementalist' ? (() => {
-                  // Elementalist Commune card logic
-                  let hx = 3;
-                  let resistText = '[ - ]';
-                  let d6 = 1;
-                  if (localSheet && Array.isArray(localSheet.classCardDots)) {
-                    // hx range: classCardDots[2] (row 3)
-                    if (Array.isArray(localSheet.classCardDots[2])) {
-                      const selected = localSheet.classCardDots[2].filter(Boolean).length;
-                      hx = 3 + selected;
-                    }
-                    // d6: classCardDots[3] (row 4)
-                    if (Array.isArray(localSheet.classCardDots[3]) && localSheet.classCardDots[3][0]) {
-                      d6 = 2;
-                    }
-                    // resist: classCardDots[4] (row 5)
-                    if (Array.isArray(localSheet.classCardDots[4]) && localSheet.classCardDots[4][0]) {
-                      resistText = '[Immune]';
-                    } else if (Array.isArray(localSheet.classCardDots[5]) && localSheet.classCardDots[5][0]) {
-                      resistText = '[Resistant]';
-                    }
-                  }
-                  // If classCardDots[2][0] (Triple Damage dice) is selected, show [triple] instead of [double]
-                  const triple = Array.isArray(localSheet?.classCardDots?.[2]) && localSheet.classCardDots[2][0];
-                  return (
-                    <>
-                      You deal <b>[{triple ? 'triple' : 'double'}]</b> Damage dice with your next <b><i style={{ color: '#990000' }}>Attack</i></b>.
-                    </>
-                  );
-                })()
-                : 'Card stats.'}
+                  : 'Card stats.'}
               </div>
             </div>
             {/* Flavor text - absolutely positioned and locked */}
