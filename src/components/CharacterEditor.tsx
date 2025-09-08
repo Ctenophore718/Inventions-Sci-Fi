@@ -151,7 +151,11 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [charClass]);
-  const chemCritBonus = (sheet?.classCardDots?.[1]?.filter(Boolean).length ?? 0) * 2;
+
+  // Rich JSX for Chemist, Coder, Commander, Contemplative, Devout
+  // Dynamically show Crit bonus as [2] if '+2 Crit' dot is selected in classCardDots
+  const chemCritBonus = sheet?.classCardDots?.[1]?.[0] ? 2 : 0;
+  // Dynamically show Chem Token max as [4] or [5] if '+1 Chem Token max' dots are selected
   const chemTokenDots = sheet?.classCardDots?.[0] || [];
   let chemTokenMax = 3;
   if (chemTokenDots[0]) chemTokenMax = 4;
@@ -161,7 +165,9 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
       <b><i style={{ color: '#721131' }}>Chemical Reaction.</i></b> At the start of each round, you gain 1 <i>Chem Token</i>, up to a maximum of <b>[{chemTokenMax}]</b> <i>Chem Token</i>s. While you have at least 1 <i>Chem Token</i>, your <b><i><span style={{ color: '#000' }}>Primary</span> <span style={{ color: '#990000' }}>Attack</span></i></b> gains a +<b>[{chemCritBonus}]</b> Crit and deals +1 Damage die.
     </span>
   );
+  // Show [100] if Coder's Ignore 100% Cover dot is selected (classCardDots[0][0])
   const coderIgnore100 = charClass === "Coder" && sheet?.classCardDots?.[0]?.[0];
+  // Show Crit bonus as [1], [2], [3] if +1 Crit dots are selected (classCardDots[1])
   let coderCritBonus = 0;
   if (charClass === "Coder" && sheet?.classCardDots?.[1]) {
     coderCritBonus = sheet.classCardDots[1].filter(Boolean).length;
@@ -249,7 +255,7 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
 
   const technicianFeatureJSX = (
     <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#724811' }}>Master Mechanic.</i></b> Friendly <i>Drones</i>, <i style={{ color: '#2b3b5f' }}>Cognizants</i>, and <i style={{ color: '#117233' }}>Exospecialists</i> that start their turn within <b>[3]</b>hx of you gain <b>[1]</b>d6 <b><i style={{ color: '#990000' }}>Hit Points</i></b>.
+  <b><i style={{ color: '#724811' }}>Master Mechanic.</i></b> Friendly <i>Drones</i>, <i style={{ color: '#2b3b5f' }}>Cognizants</i>, and <i style={{ color: '#117233' }}>Exospecialists</i> that start their turn within <b>[{3 + (charClass === 'Technician' && sheet?.classCardDots?.[0] ? sheet.classCardDots[0].filter(Boolean).length : 0)}]</b>hx of you gain <b>[{1 + (charClass === 'Technician' && sheet?.classCardDots?.[1] ? sheet.classCardDots[1].filter(Boolean).length : 0)}]</b>d6 <b><i style={{ color: '#990000' }}>Hit Points</i></b>.
     </span>
   );
 
@@ -1887,7 +1893,21 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
         <div className={styles.cardContent}>
           <div className={styles.horizontalLabel} style={{ color: '#351c75', fontWeight: 'bold', display: 'flex', alignItems: 'center' }}>
             <span style={{ fontWeight: 'bold', fontFamily: 'inherit', color: '#351c75', marginRight: 4 }}>Strike Damage</span>
-            {charClass === 'Chemist' ? (
+            {charClass === 'Technician' ? (
+              (() => {
+                const strikeDots = sheet?.classCardDots?.[11] || [];
+                const numDice = 1 + strikeDots.filter(Boolean).length;
+                return (
+                  <span style={{ fontWeight: 'bold', fontFamily: 'inherit', color: '#000', marginLeft: 4, display: 'flex', alignItems: 'center' }}>
+                    {numDice}d6&nbsp;
+                    <span style={{ color: '#d5d52a', textDecoration: 'underline', fontWeight: 'bold', fontFamily: 'inherit', display: 'inline-flex', alignItems: 'center' }}>
+                      Electric
+                      <img src="/Electric.png" alt="Electric" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+                    </span>
+                  </span>
+                );
+              })()
+            ) : charClass === 'Chemist' ? (
               (() => {
                 const damageDots = sheet?.classCardDots?.[8] || [];
                 const numDice = 1 + damageDots.filter(Boolean).length;
@@ -1901,8 +1921,7 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
                   </span>
                 );
               })()
-            ) : <span style={{ fontWeight: 'bold', fontFamily: 'inherit', color: '#000', marginLeft: 4 }}>{strikeDamage}</span>}
-            {charClass === 'Commander' ? (
+            ) : charClass === 'Commander' ? (
               (() => {
                 const damageDots = sheet?.classCardDots?.[8] || [];
                 const numDice = 1 + damageDots.filter(Boolean).length;
@@ -2236,6 +2255,13 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
             <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
               <span>
                 <b><i style={{ color: '#4e7211' }}>Gunslinger's Grit.</i></b> <span style={{ color: '#000' }}>You’ve been in sticky situations enough times to see what’s coming around the bend. Gain an advantage on related skills when identifying potentially dangerous social situations or defending yours or your companions’ reputations.</span>
+              </span>
+            </div>
+          )}
+          {charClass === 'Technician' && sheet?.classCardDots?.[12]?.[0] && (
+            <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <span>
+                <b><i style={{ color: '#724811' }}>Machinist.</i></b> <span style={{ color: '#000' }}>You are a whiz when it comes to machinery of all kinds. While repairing, rewiring, reprogramming, building or dismantling various machines, gain an advantage on related skill rolls.</span>
               </span>
             </div>
           )}

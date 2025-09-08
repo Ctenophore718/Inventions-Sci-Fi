@@ -208,7 +208,7 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
                 fontFamily: 'Arial, Helvetica, sans-serif',
                 fontWeight: 'bold',
                 fontSize: 'clamp(0.8em, 4vw, 1.25em)',
-                color: charClass === 'Chemist' ? '#721131' : charClass === 'Coder' ? '#112972' : charClass === 'Commander' ? '#717211' : charClass === 'Contemplative' ? '#116372' : charClass === 'Devout' ? '#6b1172' : charClass === 'Elementalist' ? '#231172' : charClass === 'Exospecialist' ? '#117233' : charClass === 'Gunslinger' ? '#4e7211' : 'black',
+                color: charClass === 'Chemist' ? '#721131' : charClass === 'Coder' ? '#112972' : charClass === 'Commander' ? '#717211' : charClass === 'Contemplative' ? '#116372' : charClass === 'Devout' ? '#6b1172' : charClass === 'Elementalist' ? '#231172' : charClass === 'Exospecialist' ? '#117233' : charClass === 'Gunslinger' ? '#4e7211' : charClass === 'Technician' ? '#724811' : 'black',
                 lineHeight: 1,
                 textAlign: 'left',
                 whiteSpace: 'nowrap',
@@ -225,13 +225,14 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
                   : charClass === 'Elementalist' ? 'Commune'
                   : charClass === 'Exospecialist' ? 'Target Lock'
                   : charClass === 'Gunslinger' ? 'Quick Shot'
+                  : charClass === 'Technician' ? 'Trapmaker'
                   : 'Class Card Name'}
               </span>
               <span style={{
                 fontFamily: 'Arial, Helvetica, sans-serif',
                 fontStyle: 'italic',
                 fontSize: '0.75em', // 10% smaller than 0.85em
-                color: charClass === 'Chemist' ? '#721131' : charClass === 'Coder' ? '#112972' : charClass === 'Commander' ? '#717211' : charClass === 'Contemplative' ? '#116372' : charClass === 'Devout' ? '#6b1172' : charClass === 'Elementalist' ? '#231172' : charClass === 'Exospecialist' ? '#117233' : charClass === 'Gunslinger' ? '#4e7211' : 'black',
+                color: charClass === 'Chemist' ? '#721131' : charClass === 'Coder' ? '#112972' : charClass === 'Commander' ? '#717211' : charClass === 'Contemplative' ? '#116372' : charClass === 'Devout' ? '#6b1172' : charClass === 'Elementalist' ? '#231172' : charClass === 'Exospecialist' ? '#117233' : charClass === 'Gunslinger' ? '#4e7211' : charClass === 'Technician' ? '#724811' : 'black',
                 lineHeight: 1,
                 whiteSpace: 'normal',
                 wordBreak: 'keep-all',
@@ -248,6 +249,7 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
                 : charClass === 'Elementalist' ? 'Elementalist'
                 : charClass === 'Exospecialist' ? 'Exospecialist'
                 : charClass === 'Gunslinger' ? 'Gunslinger'
+                : charClass === 'Technician' ? 'Technician'
                 : 'Class'}</span>
             </div>
             {/* Conditional image based on class */}
@@ -260,6 +262,7 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
                 : charClass === 'Elementalist' ? "/Commune.png"
                 : charClass === 'Exospecialist' ? "/Target Lock.png"
                 : charClass === 'Gunslinger' ? "/Quick Shot.png"
+                : charClass === 'Technician' ? "/Trapmaker.png"
                 : "/Blank Card.png"}
               alt={charClass === 'Devout' ? "Flagellation"
                 : charClass === 'Chemist' ? "Volatile Experiments"
@@ -269,6 +272,7 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
                 : charClass === 'Elementalist' ? "Commune"
                 : charClass === 'Exospecialist' ? "Target Lock"
                 : charClass === 'Gunslinger' ? "Quick Shot"
+                : charClass === 'Technician' ? "Trapmaker"
                 : "Blank Card"}
               style={{
                 position: 'absolute',
@@ -358,6 +362,13 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
                       let cooldown = 4;
                       if (localSheet && Array.isArray(localSheet.classCardDots) && Array.isArray(localSheet.classCardDots[4])) {
                         cooldown = 4 - localSheet.classCardDots[4].filter(Boolean).length;
+                        if (cooldown < 1) cooldown = 1;
+                      }
+                      return cooldown;
+                    })() : charClass === 'Technician' ? (() => {
+                      let cooldown = 4;
+                      if (localSheet && Array.isArray(localSheet.classCardDots) && Array.isArray(localSheet.classCardDots[4])) {
+                        cooldown = 4 - localSheet.classCardDots[6].filter(Boolean).length;
                         if (cooldown < 1) cooldown = 1;
                       }
                       return cooldown;
@@ -554,6 +565,18 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
                       </>
                     );
                   })()
+                   : charClass === 'Technician' ? (() => {
+                    // Technician Trapmaker card logic
+                    const hxChain = 3 + (charClass === 'Technician' && localSheet?.classCardDots?.[2] ? localSheet.classCardDots[2].filter(Boolean).length * 2 : 0);
+                    const includesSleep = charClass === 'Technician' && localSheet?.classCardDots?.[3]?.[0];
+                    const affectsFly = charClass === 'Technician' && localSheet?.classCardDots?.[4]?.[0];
+                    const extraCondition = charClass === 'Technician' && localSheet?.classCardDots?.[5]?.[0] ? 1 : 0;
+                    return (
+                      <div style={{ fontSize: '0.95em' }}>
+                        You create <i>Dangerous Terrain</i> in an <i>AoE</i> <b>[{hxChain}]</b>hx-chain originating from a point up to 3hx away from you. <b>[{1 + extraCondition}]</b> effect(s) of the <i>Terrain</i> can be chosen from the following: <b><i>Blind</i></b>, <b><i>Confuse</i></b>, <b><i>Demoralize</i></b>, <b><i>Drain</i></b>, <b><i>Restrain</i></b>, <b><i>Spike</i></b> (any Damage type), or <br /><b>[{includesSleep ? <i>Sleep</i> : ' - '}]</b>. This <i>Terrain</i> affects <b>[{affectsFly ? <i><span style={{ color: '#38761d' }}>Fly</span></i> : ' - '}]</b> and lasts until the end of battle or is dismantled.
+                      </div>
+                    );
+                  })()
                   : 'Card stats.'}
               </div>
             </div>
@@ -579,7 +602,7 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
                 : charClass === 'Coder' ?
                 (<span>“Although it’s a universal script, the math behind reflecting energetic material is quite complex.”<br />--Luminova, X-Ray Naturalist</span>)
                 : charClass === 'Commander' ? (
-                  <span>“...That's 'cause I got people with me, people who trust each other, who do for each other and ain&apos;t always looking for the advantage.” --Mal, Human Captain of Serenity</span>
+                  <span>“...That's 'cause I got people with me, people who trust each other, who do for each other and ain't always looking for the advantage.” --Mal, Human Captain of Serenity</span>
                 ) : charClass === 'Contemplative' ? (
                   <span>“One must always be responsive at a moment’s notice to fight not only another day, but another instant.” --Master Li Ren, Felid Contemplative</span>
                 ) : charClass === 'Elementalist' ? (
@@ -588,6 +611,8 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
                   <span>Aim at your target without distractions. Focus on one target. Hit your goal and move on to the next one. Focus is your friend.</span>
                 ) : charClass === 'Gunslinger' ? (
                   <span>“I always keep my finger on the trigger, right at the brink of firing. Don’t even blink at me wrong or you’ll get a hole in ya.” --Anonymous</span>
+                ) : charClass === 'Technician' ? (
+                  <span>“Really changes the meaning of ‘trip-mine’ when it causes psychedelic visions to anyone who steps on it.” --Jackdaw Nightswain, Corvid Technician</span>
                 ) : 'Flavor text.'}
             </div>
             </div>
