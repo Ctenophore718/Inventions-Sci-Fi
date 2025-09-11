@@ -3,6 +3,8 @@ import { useState } from "react";
 import type { CharacterSheet } from "../types/CharacterSheet";
 import { saveCharacterSheet, loadSheetById } from "../utils/storage";
 import styles from "./CharacterEditor.module.css";
+import LevelUpSubclassChemist from "./LevelUpSubclassChemist";
+import { generateChemicalReactionJSX } from "../utils/chemistFeatures";
 
 
 type LevelUpProps = {
@@ -27,6 +29,20 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
   // Auto-save helper function
   const handleAutoSave = (fieldUpdates: Partial<CharacterSheet>) => {
     onAutoSave(fieldUpdates);
+  };
+
+  // Handler for Anatomist XP/SP changes (independent from other systems)
+  const handleAnatomistXpSpChange = (xpDelta: number, spDelta: number) => {
+    const newXpSpent = xpSpent + xpDelta;
+    const newSpSpent = spSpent + spDelta;
+    
+    setXpSpent(newXpSpent);
+    setSpSpent(newSpSpent);
+    
+    handleAutoSave({ 
+      xpSpent: newXpSpent, 
+      spSpent: newSpSpent 
+    });
   };
 
   // Local state for XP/SP totals (mirroring CharacterEditor)
@@ -844,16 +860,18 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
             
             {/* Feature information when Chemist is selected */}
             {charClass === "Chemist" && (
-              <div style={{ width: '100%', marginTop: '1rem', textAlign: 'left', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
-                {/* Feature header */}
-                <div style={{ color: '#0b5394', fontWeight: 'bold', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '8px' }}>
-                  <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32, fontFamily: 'Arial, Helvetica, sans-serif' }}>
-                    <div style={{ fontWeight: 'bold', color: '#0b5394', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Feature</u></div>
-                    <span style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
-                      <b><i style={{ color: '#721131', fontSize: '1em' }}>Chemical Reaction.</i></b> <span style={{ fontSize: '1em', fontWeight: 400 }}>At the start of each round, you gain 1 <i>Chem Token</i>, up to a maximum of 3 <i>Chem Tokens</i>. While you have at least 1 <i>Chem Token</i>, your <b><i><span style={{ color: '#000' }}>Primary</span> <span style={{ color: '#990000' }}>Attack</span></i></b> deals +1 Damage die.</span>
-                    </span>
-                  </span>
-                </div>
+              (() => {
+                return (
+                  <div style={{ width: '100%', marginTop: '1rem', textAlign: 'left', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
+                    {/* Feature header */}
+                    <div style={{ color: '#0b5394', fontWeight: 'bold', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '8px' }}>
+                      <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+                        <div style={{ fontWeight: 'bold', color: '#0b5394', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Feature</u></div>
+                        <span style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
+                          {generateChemicalReactionJSX(sheet?.classCardDots)}
+                        </span>
+                      </span>
+                    </div>
                 {/* XP progression table - interactive dots */}
                 <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px' }}>
                   <div style={{
@@ -1462,6 +1480,8 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                   </div>
                 </div>
               </div>
+                );
+              })()
             )}
             
             {/* Feature information when Contemplative is selected */}
@@ -7023,292 +7043,12 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
               </select>
             </div>
 
-            {/* Anatomist Subclass Content */}
-            {subclass === 'Anatomist' && (
-              <div style={{ width: '100%', marginTop: '1rem', textAlign: 'left', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
-                {/* Feature header - Chemist style */}
-                <div style={{ color: '#0b5394', fontWeight: 'bold', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '8px' }}>
-                  <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32, fontFamily: 'Arial, Helvetica, sans-serif' }}>
-                    <div style={{ fontWeight: 'bold', color: '#0b5394', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Feature</u></div>
-                    <span style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
-                      <b><i style={{ color: '#66cf00', fontSize: '1em' }}>Anatomical Precision.</i></b> <span style={{ fontSize: '1em', fontWeight: 400 }}>You and all allies within 3hx of you ignore any Damage Resistances and/or Immunities.</span>
-                    </span>
-                  </span>
-                </div>
-                {/* Feature XP progression table - unchanged */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto auto', gap: '8px', alignItems: 'center', marginBottom: '1rem' }}>
-                  <span></span>
-                  <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>6xp</span>
-                  <span></span>
-                  <span></span>
-                  <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>Ignore condition Immunities</span>
-                  <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                    <span
-                      style={{
-                        width: '15px',
-                        height: '15px',
-                        border: '2px solid #000',
-                        borderRadius: '50%',
-                        display: 'block',
-                        background: '#fff',
-                        cursor: 'pointer'
-                      }}
-                    ></span>
-                  </span>
-                  <span></span>
-                  <span></span>
-                </div>
-
-                {/* Technique Section - Chemist style */}
-                <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
-                  <div style={{ fontWeight: 'bold', color: '#bf9000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Technique</u></div>
-                  <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
-                    <b><i style={{ color: '#66cf00', fontSize: '1em' }}>The "Good Stuff"</i></b> <i style={{ color: '#66cf00', fontSize: '1em' }}>(Cooldown 4).</i> You spend any number of <i>Chem Tokens</i>. After doing so, you and allies within 1hx of you gain +1d6 Strike Damage and can Move +2hx for each Chem Token spent until the start of the next round.
-                  </div>
-                  
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto auto', gap: '8px', alignItems: 'center', marginBottom: '0.5rem' }}>
-                    <span></span>
-                    <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>5xp</span>
-                    <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>9xp</span>
-                    <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>14xp</span>
-                    
-                    <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1hx</span>
-                    {[0,1,2].map(idx => (
-                      <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                        <span
-                          style={{
-                            width: '15px',
-                            height: '15px',
-                            border: '2px solid #000',
-                            borderRadius: '50%',
-                            display: 'block',
-                            background: '#fff',
-                            cursor: 'pointer'
-                          }}
-                        ></span>
-                      </span>
-                    ))}
-                  </div>
-                  
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto auto auto', gap: '8px', alignItems: 'center', marginBottom: '0.5rem' }}>
-                    <span></span>
-                    <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>18xp</span>
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                    <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1d6 Strike Damage per Token</span>
-                    <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                      <span
-                        style={{
-                          width: '15px',
-                          height: '15px',
-                          border: '2px solid #000',
-                          borderRadius: '50%',
-                          display: 'block',
-                          background: '#fff',
-                          cursor: 'pointer'
-                        }}
-                      ></span>
-                    </span>
-                    <span></span>
-                    <span></span>
-                  </div>
-                  
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto auto auto', gap: '8px', alignItems: 'center', marginBottom: '0.5rem' }}>
-                    <span></span>
-                    <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>18xp</span>
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                    
-                    <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1 Strike per Token</span>
-                    <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                      <span
-                        style={{
-                          width: '15px',
-                          height: '15px',
-                          border: '2px solid #000',
-                          borderRadius: '50%',
-                          display: 'block',
-                          background: '#fff',
-                          cursor: 'pointer'
-                        }}
-                      ></span>
-                    </span>
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                  </div>
-                  
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto', gap: '8px', alignItems: 'center', marginBottom: '1rem' }}>
-                    <span></span>
-                    <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>4xp</span>
-                    <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>7xp</span>
-                    
-                    <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>-1 Cooldown</span>
-                    {[0,1].map(idx => (
-                      <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                        <span
-                          style={{
-                            width: '15px',
-                            height: '15px',
-                            border: '2px solid #000',
-                            borderRadius: '50%',
-                            display: 'block',
-                            background: '#fff',
-                            cursor: 'pointer'
-                          }}
-                        ></span>
-                      </span>
-                    ))}
-                  </div>
-                </div>
-                
-                {/* Attack Section */}
-                <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
-                  <div style={{ fontWeight: 'bold', color: '#990000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Attack</u></div>
-                  <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
-                    <b><i>Secondary <span style={{ color: '#990000' }}>Attack.</span></i></b> <br /> <i>Super Serum.</i> 1hx Range, Single Target, 18+ Crit, 1d8 Damage, Auto <b><i>Confuse</i></b>, <i>Chem Token</i>
-                  </div>
-                  
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto auto', gap: '8px', alignItems: 'center', marginBottom: '0.5rem' }}>
-                    <span></span>
-                    <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>4xp</span>
-                    <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>6xp</span>
-                    <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>9xp</span>
-                    
-                    <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1 Damage die</span>
-                    {[0,1,2].map(idx => (
-                      <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                        <span
-                          style={{
-                            width: '15px',
-                            height: '15px',
-                            border: '2px solid #000',
-                            borderRadius: '50%',
-                            display: 'block',
-                            background: '#fff',
-                            cursor: 'pointer'
-                          }}
-                        ></span>
-                      </span>
-                    ))}
-                  </div>
-                  
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto auto', gap: '8px', alignItems: 'center', marginBottom: '0.5rem' }}>
-                    <span></span>
-                    <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>2xp</span>
-                    <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>4xp</span>
-                    <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>6xp</span>
-                    
-                    <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1 Crit</span>
-                    {[0,1,2].map(idx => (
-                      <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                        <span
-                          style={{
-                            width: '15px',
-                            height: '15px',
-                            border: '2px solid #000',
-                            borderRadius: '50%',
-                            display: 'block',
-                            background: '#fff',
-                            cursor: 'pointer'
-                          }}
-                        ></span>
-                      </span>
-                    ))}
-                  </div>
-                  
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto', gap: '8px', alignItems: 'center', marginBottom: '1rem' }}>
-                    <span></span>
-                    <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>3xp</span>
-                    <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>5xp</span>
-                    <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>-1 Cooldown</span>
-                    {[0,1].map(idx => (
-                      <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                        <span
-                          style={{
-                            width: '15px',
-                            height: '15px',
-                            border: '2px solid #000',
-                            borderRadius: '50%',
-                            display: 'block',
-                            background: '#fff',
-                            cursor: 'pointer'
-                          }}
-                        ></span>
-                      </span>
-                      
-                    ))}
-                  </div>
-                </div>
-                
-                
-                {/* Strike Section */}
-                <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
-                  <div style={{ fontWeight: 'bold', color: '#351c75', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Strike</u></div>
-                  <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
-                    <b><i>Enhanced <span style={{ color: '#351c75' }}>Strike</span> Effects.</i></b>
-                  </div>
-                  
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '8px', alignItems: 'center', marginBottom: '1rem' }}>
-                    <span></span>
-                    <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>14xp</span>
-
-                    <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>Can choose to heal <i><b><span style={{ color: '#351c75' }}>Strike</span></b></i> amount</span>
-                    <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                      <span
-                        style={{
-                          width: '15px',
-                          height: '15px',
-                          border: '2px solid #000',
-                          borderRadius: '50%',
-                          display: 'block',
-                          background: '#fff',
-                          cursor: 'pointer'
-                        }}
-                      ></span>
-                    </span>
-                  </div>
-                </div>
-                
-                {/* Perks Section */}
-                <div>
-                  <div style={{ fontSize: '1em', color: '#000', fontWeight: 'bold', marginBottom: '0.5rem' }}>Perks</div>
-                  <div style={{ marginBottom: '1rem', fontSize: '0.9em', lineHeight: 1.4 }}>
-                    <i><b>Skills.</b> Medicine</i> +2
-                  </div>
-                  <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
-                    <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', gap: '12px' }}>
-                      <span style={{ display: 'inline-block', maxWidth: 'calc(100% - 40px)' }}>
-                        <b><i style={{ color: '#66cf00' }}>Surgeon.</i></b> You can perform surgery and potentially save a life on the brink of death or otherwise ensure an enemy will be incapacitated for life in a way of your choice. Gain an advantage on related skill rolls to perform the surgery.
-                      </span>
-                      <div style={{
-                        display: 'grid',
-                        gridTemplateColumns: '24px',
-                        gridTemplateRows: 'repeat(1, auto)',
-                        alignItems: 'start',
-                        marginLeft: '4px'
-                      }}>
-                        <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>8sp</span>
-                        <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
-                          <span
-                            style={{
-                              width: '15px',
-                              height: '15px',
-                              border: '2px solid #000',
-                              borderRadius: '50%',
-                              display: 'block',
-                              background: '#fff',
-                              cursor: 'pointer'
-                            }}
-                          ></span>
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+            {/* Chemist Subclass Content */}
+            {charClass === "Chemist" && subclass && (
+              <LevelUpSubclassChemist 
+                subclass={subclass} 
+                onXpSpChange={handleAnatomistXpSpChange}
+              />
             )}
         </div>
         {/* Species Card */}

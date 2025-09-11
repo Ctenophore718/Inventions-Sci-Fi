@@ -3,6 +3,7 @@ import styles from './CharacterEditor.module.css';
 
 import type { CharacterSheet } from "../types/CharacterSheet";
 import { saveCharacterSheet, loadSheetById } from "../utils/storage";
+import { generateChemicalReactionJSX } from "../utils/chemistFeatures";
 
 
 type Props = {
@@ -153,18 +154,8 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
   }, [charClass]);
 
   // Rich JSX for Chemist, Coder, Commander, Contemplative, Devout
-  // Dynamically show Crit bonus as [2] if '+2 Crit' dot is selected in classCardDots
-  const chemCritBonus = sheet?.classCardDots?.[1]?.[0] ? 2 : 0;
-  // Dynamically show Chem Token max as [4] or [5] if '+1 Chem Token max' dots are selected
-  const chemTokenDots = sheet?.classCardDots?.[0] || [];
-  let chemTokenMax = 3;
-  if (chemTokenDots[0]) chemTokenMax = 4;
-  if (chemTokenDots[0] && chemTokenDots[1]) chemTokenMax = 5;
-  const chemistFeatureJSX = (
-    <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#721131' }}>Chemical Reaction.</i></b> At the start of each round, you gain 1 <i>Chem Token</i>, up to a maximum of <b>[{chemTokenMax}]</b> <i>Chem Token</i>s. While you have at least 1 <i>Chem Token</i>, your <b><i><span style={{ color: '#000' }}>Primary</span> <span style={{ color: '#990000' }}>Attack</span></i></b> gains a +<b>[{chemCritBonus}]</b> Crit and deals +1 Damage die.
-    </span>
-  );
+  // Use shared function for Chemical Reaction feature
+  const chemistFeatureJSX = generateChemicalReactionJSX(sheet?.classCardDots);
   // Show [100] if Coder's Ignore 100% Cover dot is selected (classCardDots[0][0])
   const coderIgnore100 = charClass === "Coder" && sheet?.classCardDots?.[0]?.[0];
   // Show Crit bonus as [1], [2], [3] if +1 Crit dots are selected (classCardDots[1])
