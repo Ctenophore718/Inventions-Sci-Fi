@@ -3,7 +3,7 @@ import { useState } from "react";
 import type { CharacterSheet } from "../types/CharacterSheet";
 import { saveCharacterSheet, loadSheetById } from "../utils/storage";
 import styles from "./CharacterEditor.module.css";
-import LevelUpSubclassChemist from "./LevelUpSubclassChemist";
+import LevelUpChemist from "./LevelUpChemist";
 import { generateChemicalReactionJSX } from "../utils/chemistFeatures";
 
 
@@ -292,6 +292,62 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
     }
   }, [xpTotal, spTotal, sheet]);
 
+  // Sync classCardDots state when sheet or charClass changes
+  React.useEffect(() => {
+    if (!sheet?.classCardDots || !Array.isArray(sheet.classCardDots) || sheet.classCardDots.length === 0) {
+      return; // No saved dots to sync
+    }
+
+    // Helper to normalize loaded dots to match the default structure
+    function normalizeDots(loaded: boolean[][], def: boolean[][]) {
+      const result: boolean[][] = [];
+      for (let i = 0; i < def.length; ++i) {
+        if (Array.isArray(loaded?.[i]) && loaded[i].length === def[i].length) {
+          result.push([...loaded[i]]);
+        } else {
+          // If missing or wrong length, use default
+          result.push([...def[i]]);
+        }
+      }
+      return result;
+    }
+
+    // Get the appropriate default dots for the current class
+    let defaultDots: boolean[][] = [];
+    if (charClass === "Contemplative") {
+      defaultDots = [
+        [false], // Feature: Neural immunity (1 dot)
+        [false], // Feature: +1 Strike (1 dot)
+        [false], // Technique: Healing (1 dot)
+        [false], // Technique: +1 Target (1 dot)
+        [false], // Technique: +1 Range (1 dot)
+        [false], // Attack: Increase die size (1 dot)
+        [false], // Attack: +1 Crit (1 dot)
+        [false, false, false], // Strike: +1 Damage die (3 dots)
+        [false] // Perks: Relaxation (1 dot)
+      ];
+    } else if (charClass === "Chemist") {
+      defaultDots = [
+        [false, false], // Feature: +1 Chem Token max (2 dots)
+        [false, false, false], // Feature: +2 Crit (3 dots)
+        [false, false, false], // Technique: +1hx (3 dots)
+        [false], // Technique: +1d6 Chemical per Token (1 dot)
+        [false], // Technique: +1hx Range per Token (1 dot)
+        [false, false], // Technique: -1 Cooldown (2 dots)
+        [false, false, false], // Attack: Increase die size (3 dots)
+        [false, false, false], // Attack: +1 Crit (3 dots)
+        [false, false, false], // Strike: +1 Damage die (3 dots)
+        [false] // Perks: Chemical Concoctions (1 dot)
+      ];
+    }
+    // Add other classes as needed...
+
+    if (defaultDots.length > 0) {
+      const normalizedDots = normalizeDots(sheet.classCardDots, defaultDots);
+      setClassCardDots(normalizedDots);
+    }
+  }, [sheet?.classCardDots, charClass]);
+
   // Persistent state for class card dots
   const defaultChemistDots = [ 
     [false, false], // Feature: +1 Chem Token max (2 dots)
@@ -492,6 +548,8 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
     if (charClass === "Chemist") {
       return defaultChemistDots.map(row => [...row]);
     }
+    // Default fallback - return empty array if no class matches
+    return [];
   });
 
   // Helper function to safely access classCardDots array
@@ -7045,9 +7103,17 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
 
             {/* Chemist Subclass Content */}
             {charClass === "Chemist" && subclass && (
-              <LevelUpSubclassChemist 
+              <LevelUpChemist 
+                sheet={sheet}
                 subclass={subclass} 
                 onXpSpChange={handleAnatomistXpSpChange}
+                xpTotal={xpTotal}
+                spTotal={spTotal}
+                xpSpent={xpSpent}
+                spSpent={spSpent}
+                setXpSpent={setXpSpent}
+                setSpSpent={setSpSpent}
+                setNotice={setNotice}
               />
             )}
         </div>
