@@ -972,6 +972,13 @@
   color: white !important;
 }
 
+/* Credits Button Styles */
+.creditsButton {
+  background-color: #bf9000 !important;
+  background: #bf9000 !important;
+  color: white !important;
+}
+
 .redMinusButton {
   background-color: #ff4444 !important;
   background: #ff4444 !important;

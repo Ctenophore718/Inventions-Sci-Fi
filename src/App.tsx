@@ -91,6 +91,7 @@ const App = () => {
       strikeDamage: "",
       maxHitPoints: 0,
       deathCount: 0,
+      credits: 0,
       deathDots: new Array(10).fill(false),
       
       // Strike section

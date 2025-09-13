@@ -3,7 +3,8 @@ import styles from './CharacterEditor.module.css';
 
 import type { CharacterSheet } from "../types/CharacterSheet";
 import { saveCharacterSheet, loadSheetById } from "../utils/storage";
-import { generateChemicalReactionJSX } from "../utils/chemistFeatures";
+import { generateChemicalReactionJSX } from "../utils/chemistFeature";
+import { generateChemistStrikeJSX } from "../utils/chemistStrike";
 
 
 type Props = {
@@ -40,12 +41,15 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
   const [isNavExpanded, setIsNavExpanded] = useState(false);
   const [isXpSpMenuExpanded, setIsXpSpMenuExpanded] = useState(false);
   const [isHpMenuExpanded, setIsHpMenuExpanded] = useState(false);
+  const [isCreditsMenuExpanded, setIsCreditsMenuExpanded] = useState(false);
   const menuRef = React.useRef<HTMLDivElement>(null);
   const waffleRef = React.useRef<HTMLButtonElement>(null);
   const xpSpMenuRef = React.useRef<HTMLDivElement>(null);
   const xpSpButtonRef = React.useRef<HTMLButtonElement>(null);
   const hpMenuRef = React.useRef<HTMLDivElement>(null);
   const hpButtonRef = React.useRef<HTMLButtonElement>(null);
+  const creditsMenuRef = React.useRef<HTMLDivElement>(null);
+  const creditsButtonRef = React.useRef<HTMLButtonElement>(null);
   React.useEffect(() => {
     if (!isNavExpanded) return;
     function handleClick(e: MouseEvent) {
@@ -88,6 +92,20 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
     return () => document.removeEventListener('mousedown', handleClick);
   }, [isHpMenuExpanded]);
 
+  React.useEffect(() => {
+    if (!isCreditsMenuExpanded) return;
+    function handleClick(e: MouseEvent) {
+      if (
+        creditsMenuRef.current && !creditsMenuRef.current.contains(e.target as Node) &&
+        creditsButtonRef.current && !creditsButtonRef.current.contains(e.target as Node)
+      ) {
+        setIsCreditsMenuExpanded(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [isCreditsMenuExpanded]);
+
   // Identity fields
   const [playerName, setPlayerName] = useState(sheet?.playerName || "");
   const [name, setName] = useState(sheet?.name || "");
@@ -111,6 +129,7 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
       setSpTotal(sheet.spTotal || 0);
       setPortraitUrl(sheet.portrait || null);
       setCurrentHitPoints(sheet.currentHitPoints || 0);
+      setCredits(sheet.credits || 0);
       setDeathCount(sheet.deathCount || 0);
       setClassFeature(sheet.classFeature || "");
       setSubclassFeature(sheet.subclassFeature || "");
@@ -531,6 +550,10 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
   // Current Hit Points state (local only)
   const [currentHitPoints, setCurrentHitPoints] = useState<number>(sheet?.currentHitPoints ?? sheet?.maxHitPoints ?? 0);
   const [hpDelta, setHpDelta] = useState<number>(0);
+  
+  // Credits state
+  const [credits, setCredits] = useState<number>(sheet?.credits ?? 0);
+  const [creditsDelta, setCreditsDelta] = useState<number>(0);
 
   const classOptions = [
     { label: "Chemist", value: "Chemist", color: "#721131" },
@@ -1289,7 +1312,7 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
                     background: 'white'
                   }}
                 >
-                  <option value="" style={{ color: 'black', backgroundColor: 'white' }}>Select Background</option>
+                  <option value="" style={{ color: 'black', backgroundColor: 'white',  }}>Select Background</option>
                   {backgroundOptions.map(opt => (
                     <option 
                       key={opt.value} 
@@ -1899,19 +1922,9 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
                 );
               })()
             ) : charClass === 'Chemist' ? (
-              (() => {
-                const damageDots = sheet?.classCardDots?.[8] || [];
-                const numDice = 1 + damageDots.filter(Boolean).length;
-                return (
-                  <span style={{ fontWeight: 'bold', fontFamily: 'inherit', color: '#000', marginLeft: 4, display: 'flex', alignItems: 'center' }}>
-                    {numDice}d6&nbsp;
-                    <span style={{ color: '#de7204', textDecoration: 'underline', fontWeight: 'bold', fontFamily: 'inherit', display: 'inline-flex', alignItems: 'center' }}>
-                      Chemical
-                      <img src="/Chemical.png" alt="Chemical" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
-                    </span>
-                  </span>
-                );
-              })()
+              <span style={{ fontFamily: 'inherit', color: '#000', marginLeft: 4, display: 'flex', alignItems: 'center' }}>
+                {generateChemistStrikeJSX(sheet?.classCardDots, 'charactersheet')}
+              </span>
             ) : charClass === 'Commander' ? (
               (() => {
                 const damageDots = sheet?.classCardDots?.[8] || [];
@@ -2705,6 +2718,159 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
           }}
         >
           xp: {xpTotal - (sheet?.xpSpent ?? 0)}/{xpTotal} | sp: {spTotal - spSpent}/{spTotal}
+        </button>
+      </div>
+
+      {/* Credits Summary Button */}
+      <div style={{
+        position: 'fixed',
+        bottom: '20px',
+        left: '130px',
+        zIndex: 999
+      }}>
+        {/* Credits Menu (expanded state) */}
+        {isCreditsMenuExpanded && (
+          <div ref={creditsMenuRef} style={{
+            position: 'absolute',
+            bottom: '50px',
+            left: '0px',
+            background: 'white',
+            border: '2px solid #ccc',
+            borderRadius: '12px',
+            padding: '12px',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+            minWidth: '280px',
+            maxWidth: 'calc(100vw - 40px)',
+            animation: 'fadeIn 0.2s ease-out'
+          }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {/* Current Credits Section */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                <span style={{ fontWeight: 'bold', minWidth: '80px', fontSize: '16px' }}>Credits:</span>
+                <button
+                  className={styles.redMinusButton}
+                  style={{ width: '26px', height: '26px', fontSize: '14px' }}
+                  onClick={() => {
+                    const newValue = Math.max(0, credits - 1);
+                    setCredits(newValue);
+                    handleAutoSave({ credits: newValue });
+                  }}
+                >
+                  −
+                </button>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  value={credits}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/[^0-9]/g, '');
+                    const newValue = Math.max(0, parseInt(val) || 0);
+                    setCredits(newValue);
+                    handleAutoSave({ credits: newValue });
+                  }}
+                  style={{
+                    width: '50px',
+                    textAlign: 'center',
+                    border: '1px solid #ccc',
+                    borderRadius: '4px',
+                    padding: '4px 6px',
+                    fontSize: '14px',
+                    fontWeight: 'bold'
+                  }}
+                />
+                <button
+                  className={styles.greenPlusButton}
+                  style={{ width: '26px', height: '26px', fontSize: '14px' }}
+                  onClick={() => {
+                    const newValue = credits + 1;
+                    setCredits(newValue);
+                    handleAutoSave({ credits: newValue });
+                  }}
+                >
+                  +
+                </button>
+              </div>
+
+              <hr style={{ margin: '8px 0', border: '1px solid #eee' }} />
+
+              {/* Bulk Credits Section */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ fontWeight: 'bold', minWidth: '80px' }}>Add/Subtract:</span>
+                <button
+                  className={styles.redMinusButton}
+                  style={{ width: '48px', height: '24px', fontSize: '12px', padding: '0' }}
+                  onClick={() => {
+                    if (!creditsDelta) return;
+                    const newValue = Math.max(0, credits - creditsDelta);
+                    setCredits(newValue);
+                    handleAutoSave({ credits: newValue });
+                  }}
+                  title="Subtract from Credits"
+                >
+                  -
+                </button>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  min="1"
+                  max="999"
+                  value={creditsDelta || ''}
+                  onChange={e => {
+                    const val = e.target.value.replace(/[^0-9]/g, '');
+                    setCreditsDelta(val ? parseInt(val) : 0);
+                  }}
+                  style={{ width: '40px', textAlign: 'center', border: '1px solid #ccc', borderRadius: '4px', padding: '2px 4px' }}
+                  placeholder="#"
+                />
+                <button
+                  className={styles.greenPlusButton}
+                  style={{ width: '48px', height: '24px', fontSize: '12px', padding: '0' }}
+                  onClick={() => {
+                    if (!creditsDelta) return;
+                    const newValue = credits + creditsDelta;
+                    setCredits(newValue);
+                    handleAutoSave({ credits: newValue });
+                  }}
+                  title="Add to Credits"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <button
+          ref={creditsButtonRef}
+          className={styles.creditsButton}
+          onClick={() => setIsCreditsMenuExpanded((open) => !open)}
+          style={{
+            padding: '8px 16px',
+            borderRadius: '20px',
+            border: 'none',
+            cursor: 'pointer',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+            fontSize: '14px',
+            fontWeight: 'bold',
+            transition: 'all 0.3s ease',
+            transform: isCreditsMenuExpanded ? 'scale(1.05)' : 'scale(1)'
+          }}
+          onMouseEnter={(e) => {
+            if (!isCreditsMenuExpanded) {
+              e.currentTarget.style.transform = 'scale(1.05)';
+              e.currentTarget.style.boxShadow = '0 6px 16px rgba(0,0,0,0.2)';
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (!isCreditsMenuExpanded) {
+              e.currentTarget.style.transform = 'scale(1)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+            }
+          }}
+        >
+          c: {credits}
         </button>
       </div>
 

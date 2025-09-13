@@ -2,6 +2,7 @@ import React from "react";
 import type { CharacterSheet } from "../types/CharacterSheet";
 import { loadSheetById, saveCharacterSheet } from "../utils/storage";
 import styles from "./CharacterEditor.module.css";
+import { generateVolatileExperimentsDescriptionJSX, calculateChemistTechniqueData } from "../utils/chemistTechnique";
 
 type CardsProps = {
   sheet: CharacterSheet | null;
@@ -16,11 +17,14 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
   const [isNavExpanded, setIsNavExpanded] = React.useState(false);
   const [isXpSpMenuExpanded, setIsXpSpMenuExpanded] = React.useState(false);
   const [isHpMenuExpanded, setIsHpMenuExpanded] = React.useState(false);
+  const [isCreditsMenuExpanded, setIsCreditsMenuExpanded] = React.useState(false);
   const menuRef = React.useRef<HTMLDivElement>(null);
   const waffleRef = React.useRef<HTMLButtonElement>(null);
   const xpSpMenuRef = React.useRef<HTMLDivElement>(null);
   const hpMenuRef = React.useRef<HTMLDivElement>(null);
   const hpButtonRef = React.useRef<HTMLButtonElement>(null);
+  const creditsMenuRef = React.useRef<HTMLDivElement>(null);
+  const creditsButtonRef = React.useRef<HTMLButtonElement>(null);
   React.useEffect(() => {
     if (!isNavExpanded) return;
     function handleClick(e: MouseEvent) {
@@ -62,10 +66,27 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
     return () => document.removeEventListener('mousedown', handleClick);
   }, [isHpMenuExpanded]);
 
+  React.useEffect(() => {
+    if (!isCreditsMenuExpanded) return;
+    function handleClick(e: MouseEvent) {
+      if (
+        creditsMenuRef.current && !creditsMenuRef.current.contains(e.target as Node) &&
+        creditsButtonRef.current && !creditsButtonRef.current.contains(e.target as Node)
+      ) {
+        setIsCreditsMenuExpanded(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [isCreditsMenuExpanded]);
+
   // Local state for HP/XP/SP management
   const [currentHitPoints, setCurrentHitPoints] = React.useState<number>(localSheet?.currentHitPoints ?? localSheet?.maxHitPoints ?? 0);
   // For add/subtract HP section
   const [hpDelta, setHpDelta] = React.useState<number>(0);
+  // Credits management
+  const [credits, setCredits] = React.useState<number>(localSheet?.credits ?? 0);
+  const [creditsDelta, setCreditsDelta] = React.useState<number>(0);
   const [deathCount, setDeathCount] = React.useState(localSheet?.deathCount || 0);
   const [xpTotal, setXpTotal] = React.useState(localSheet?.xpTotal || 0);
   const [spTotal, setSpTotal] = React.useState(localSheet?.spTotal || 0);
@@ -331,11 +352,7 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
                 })() : (
                   <>Cooldown <span style={{ fontWeight: 'bold', fontStyle: 'normal' }}>
                     [{charClass === 'Chemist' ? (() => {
-                      let cooldown = 4;
-                      if (localSheet && Array.isArray(localSheet.classCardDots) && Array.isArray(localSheet.classCardDots[5])) {
-                        cooldown = 4 - localSheet.classCardDots[5].filter(Boolean).length;
-                        if (cooldown < 1) cooldown = 1;
-                      }
+                      const { cooldown } = calculateChemistTechniqueData(localSheet?.classCardDots);
                       return cooldown;
                     })() : charClass === 'Coder' ? (() => {
                       let cooldown = 4;
@@ -461,28 +478,12 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
                         </>
                       );
                   })()) 
-                  : charClass === 'Chemist' ? (() => {
-                    // Chemist: +1hx dots are in classCardDots[2], +1d6 Chemical per Token (classCardDots[3]), +1hx Range per Token (classCardDots[4])
-                    let chemHx = 3;
-                    let chemD6 = 0;
-                    let chemHxRng = 0;
-                    if (localSheet && Array.isArray(localSheet.classCardDots)) {
-                        if (Array.isArray(localSheet.classCardDots[2])) {
-                        chemHx += localSheet.classCardDots[2].filter(Boolean).length;
-                      }
-                      if (Array.isArray(localSheet.classCardDots[3]) && localSheet.classCardDots[3][0]) {
-                        chemD6 = 1;
-                      }
-                      if (Array.isArray(localSheet.classCardDots[4]) && localSheet.classCardDots[4][0]) {
-                        chemHxRng = 1;
-                      }
-                    }
-                    return (
-                      <>
-                        You spend any number of <i>Chem Tokens</i>. After doing so, you and allies within <b>[{chemHx}]</b>hx of you gain +2 to Crit rolls, +<b>[{chemD6}]</b>d6 <br /><u><b style ={{ color: '#de7204' }}>Chemical</b></u><img src="/Chemical.png" alt="Chemical" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /> and/or +<b>[{chemHxRng}]</b>hx Range to <b><i style={{ color: '#990000' }}>Attacks</i></b> for each <i>Token</i> spent until the start of the next round.
-                      </>
-                    );
-                  })() : charClass === 'Coder' ? (() => {
+                  : charClass === 'Chemist' ? (
+                    <div style={{ display: 'flex', alignItems: 'flex-start', flexWrap: 'wrap' }}>
+                      {generateVolatileExperimentsDescriptionJSX(localSheet?.classCardDots)}
+                      <img src="/Chemical.png" alt="Chemical" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} />
+                    </div>
+                  ) : charClass === 'Coder' ? (() => {
                     // Row 2: +1d6 Damage dots (3 dots)
                     let dmg = 1;
                     let resistText = '[ - ]';
@@ -1896,6 +1897,159 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
           }}
         >
           xp: {xpTotal - (localSheet?.xpSpent ?? 0)}/{xpTotal} | sp: {spTotal - (localSheet?.spSpent ?? 0)}/{spTotal}
+        </button>
+      </div>
+
+      {/* Credits Summary Button */}
+      <div style={{
+        position: 'fixed',
+        bottom: '20px',
+        left: '130px',
+        zIndex: 999
+      }}>
+        {/* Credits Menu (expanded state) */}
+        {isCreditsMenuExpanded && (
+          <div ref={creditsMenuRef} style={{
+            position: 'absolute',
+            bottom: '50px',
+            left: '0px',
+            background: 'white',
+            border: '2px solid #ccc',
+            borderRadius: '12px',
+            padding: '12px',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+            minWidth: '280px',
+            maxWidth: 'calc(100vw - 40px)',
+            animation: 'fadeIn 0.2s ease-out'
+          }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {/* Current Credits Section */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                <span style={{ fontWeight: 'bold', minWidth: '80px', fontSize: '16px' }}>Credits:</span>
+                <button
+                  className={styles.redMinusButton}
+                  style={{ width: '26px', height: '26px', fontSize: '14px' }}
+                  onClick={() => {
+                    const newValue = Math.max(0, credits - 1);
+                    setCredits(newValue);
+                    handleAutoSave({ credits: newValue });
+                  }}
+                >
+                  −
+                </button>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  value={credits}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/[^0-9]/g, '');
+                    const newValue = Math.max(0, parseInt(val) || 0);
+                    setCredits(newValue);
+                    handleAutoSave({ credits: newValue });
+                  }}
+                  style={{
+                    width: '50px',
+                    textAlign: 'center',
+                    border: '1px solid #ccc',
+                    borderRadius: '4px',
+                    padding: '4px 6px',
+                    fontSize: '14px',
+                    fontWeight: 'bold'
+                  }}
+                />
+                <button
+                  className={styles.greenPlusButton}
+                  style={{ width: '26px', height: '26px', fontSize: '14px' }}
+                  onClick={() => {
+                    const newValue = credits + 1;
+                    setCredits(newValue);
+                    handleAutoSave({ credits: newValue });
+                  }}
+                >
+                  +
+                </button>
+              </div>
+
+              <hr style={{ margin: '8px 0', border: '1px solid #eee' }} />
+
+              {/* Bulk Credits Section */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontWeight: 'bold', minWidth: '80px' }}>Add/Subtract:</span>
+                <button
+                  className={styles.redMinusButton}
+                  style={{ width: '24px', height: '24px', fontSize: '12px', padding: '0' }}
+                  onClick={() => {
+                    if (!creditsDelta) return;
+                    const newValue = Math.max(0, credits - creditsDelta);
+                    setCredits(newValue);
+                    handleAutoSave({ credits: newValue });
+                  }}
+                  title="Subtract from Credits"
+                >
+                  -
+                </button>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  min="1"
+                  max="999"
+                  value={creditsDelta || ''}
+                  onChange={e => {
+                    const val = e.target.value.replace(/[^0-9]/g, '');
+                    setCreditsDelta(val ? parseInt(val) : 0);
+                  }}
+                  style={{ width: '40px', textAlign: 'center', border: '1px solid #ccc', borderRadius: '4px', padding: '2px 4px' }}
+                  placeholder="#"
+                />
+                <button
+                  className={styles.greenPlusButton}
+                  style={{ width: '24px', height: '24px', fontSize: '12px', padding: '0' }}
+                  onClick={() => {
+                    if (!creditsDelta) return;
+                    const newValue = credits + creditsDelta;
+                    setCredits(newValue);
+                    handleAutoSave({ credits: newValue });
+                  }}
+                  title="Add to Credits"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <button
+          ref={creditsButtonRef}
+          className={styles.creditsButton}
+          onClick={() => setIsCreditsMenuExpanded((open) => !open)}
+          style={{
+            padding: '8px 16px',
+            borderRadius: '20px',
+            border: 'none',
+            cursor: 'pointer',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+            fontSize: '14px',
+            fontWeight: 'bold',
+            transition: 'all 0.3s ease',
+            transform: isCreditsMenuExpanded ? 'scale(1.05)' : 'scale(1)'
+          }}
+          onMouseEnter={(e) => {
+            if (!isCreditsMenuExpanded) {
+              e.currentTarget.style.transform = 'scale(1.05)';
+              e.currentTarget.style.boxShadow = '0 6px 16px rgba(0,0,0,0.2)';
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (!isCreditsMenuExpanded) {
+              e.currentTarget.style.transform = 'scale(1)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+            }
+          }}
+        >
+          c: {credits}
         </button>
       </div>
 

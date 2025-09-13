@@ -36,6 +36,7 @@ export type CharacterSheet = {
   strikeDamage: string;
   maxHitPoints: number;
   deathCount: number;
+  credits: number;
   // Hit Points UI
   deathDots: boolean[]; // 10 elements, true if selected
 
