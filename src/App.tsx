@@ -264,16 +264,18 @@ const App = () => {
 
   const handleLevelUp = () => {
     console.log('handleLevelUp called, currentSheet before:', currentSheet ? `ID: ${currentSheet.id}` : 'NULL');
-    // Auto-save before navigation
+    // Auto-save before navigation - but reload current sheet from storage first to get latest changes
     if (currentSheet) {
+      // Load the latest version from storage to get any changes made in other components
+      const latestSheet = loadSheetById(currentSheet.id);
       const updatedSheet = { 
-        ...currentSheet, 
+        ...(latestSheet || currentSheet), // Use latest from storage if available
         charClass, 
         subclass, 
         species, 
         subspecies 
       };
-      console.log('handleLevelUp - saving sheet:', updatedSheet.id);
+      console.log('handleLevelUp - saving sheet with latest data:', updatedSheet.id);
       setCurrentSheet(updatedSheet);
       saveCharacterSheet(updatedSheet);
     }
@@ -283,16 +285,18 @@ const App = () => {
 
   const handleCards = () => {
     console.log('handleCards called, currentSheet before:', currentSheet ? `ID: ${currentSheet.id}` : 'NULL');
-    // Auto-save before navigation
+    // Auto-save before navigation - but reload current sheet from storage first to get latest changes
     if (currentSheet) {
+      // Load the latest version from storage to get any changes made in LevelUp
+      const latestSheet = loadSheetById(currentSheet.id);
       const updatedSheet = { 
-        ...currentSheet, 
+        ...(latestSheet || currentSheet), // Use latest from storage if available
         charClass, 
         subclass, 
         species, 
         subspecies 
       };
-      console.log('handleCards - saving sheet:', updatedSheet.id);
+      console.log('handleCards - saving sheet with latest data:', updatedSheet.id, 'dartGuns:', updatedSheet.dartGuns);
       setCurrentSheet(updatedSheet);
       saveCharacterSheet(updatedSheet);
     }
@@ -356,13 +360,13 @@ const App = () => {
       <div className="headerRowResponsive" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1em' }}>
         <h1 style={{ fontFamily: 'Arial, Helvetica, sans-serif', margin: 0 }}>Inventions Sci-Fi</h1>
         {view === "editor" && (
-          <span className="pageHeader" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '2.0em', fontWeight: 600, marginLeft: 'auto', textAlign: 'right' }}>Character Sheet</span>
+          <span className="pageHeader" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '2.0em', fontWeight: 600, margin: '0 auto', display: 'block', textAlign: 'center' }}>Character Sheet</span>
         )}
         {view === "levelup" && (
-          <span className="pageHeader" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '2.0em', fontWeight: 600, marginLeft: 'auto', textAlign: 'right' }}>Level Up</span>
+          <span className="pageHeader" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '2.0em', fontWeight: 600, margin: '0 auto', display: 'block', textAlign: 'center' }}>Level Up</span>
         )}
         {view === "cards" && (
-          <span className="pageHeader" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '2.0em', fontWeight: 600, marginLeft: 'auto', textAlign: 'right' }}>Cards</span>
+          <span className="pageHeader" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '2.0em', fontWeight: 600, margin: '0 auto', display: 'block', textAlign: 'center' }}>Cards</span>
         )}
       </div>
 

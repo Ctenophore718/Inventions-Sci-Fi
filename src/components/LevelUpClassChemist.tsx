@@ -10,10 +10,12 @@ type LevelUpClassChemistProps = {
   charClass: string;
   subclass: string;
   onXpSpChange?: (xpDelta: number, spDelta: number) => void;
+  onCreditsChange?: (creditsDelta: number) => void;
   xpTotal: number;
   spTotal: number;
   xpSpent: number;
   spSpent: number;
+  credits: number;
   setXpSpent: (xp: number) => void;
   setSpSpent: (sp: number) => void;
   setNotice: (notice: string) => void;
@@ -24,10 +26,12 @@ const LevelUpClassChemist: React.FC<LevelUpClassChemistProps> = ({
   charClass,
   subclass, 
   onXpSpChange,
+  onCreditsChange,
   xpTotal,
   spTotal, 
   xpSpent,
   spSpent,
+  credits,
   setXpSpent,
   setSpSpent,
   setNotice
@@ -55,8 +59,12 @@ const LevelUpClassChemist: React.FC<LevelUpClassChemistProps> = ({
       return defaultChemistDots.map(row => [...row]);
     });
   
-    // Local state for selected dart guns
-    const [selectedDartGuns, setSelectedDartGuns] = useState<string[]>([]);
+  // Local state for selected dart guns
+  const [selectedDartGuns, setSelectedDartGuns] = useState<string[]>(() => {
+    return sheet?.dartGuns || [];
+  });
+  // Local state for pending dart gun selection
+  const [pendingDartGun, setPendingDartGun] = useState<string>("");
   
     // Helper function to safely access classCardDots array
     const safeGetDotsArray = (index: number): boolean[] => {
@@ -93,7 +101,25 @@ const LevelUpClassChemist: React.FC<LevelUpClassChemistProps> = ({
       setSpSpent(newSpSpent);
       setXpSpent(newXpSpent);
       if (sheet) {
-        const updatedSheet = { ...sheet, classCardDots: newDots, spSpent: newSpSpent, xpSpent: newXpSpent };
+        // Use current selectedDartGuns state, not captured closure value
+        setSelectedDartGuns(currentDartGuns => {
+          const updatedSheet = { ...sheet, classCardDots: newDots, spSpent: newSpSpent, xpSpent: newXpSpent, dartGuns: currentDartGuns };
+          saveCharacterSheet(updatedSheet);
+          return currentDartGuns; // Don't change the state, just use current value
+        });
+      }
+    };
+
+    // Save dart guns to sheet
+    const saveDartGuns = (newDartGuns: string[]) => {
+      setSelectedDartGuns(newDartGuns);
+      if (sheet) {
+        const updatedSheet = { 
+          ...sheet, 
+          dartGuns: newDartGuns,
+          // Preserve current credits to avoid race conditions
+          credits: credits
+        };
         saveCharacterSheet(updatedSheet);
       }
     };
@@ -533,10 +559,10 @@ const LevelUpClassChemist: React.FC<LevelUpClassChemistProps> = ({
                     <div style={{ marginTop: '12px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
                       <div style={{ fontWeight: 'bold', color: '#990000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Attack</u></div>
                       <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                          <span>
-                            <b><i><span style={{ color: '#000' }}>Primary</span> <span style={{ color: '#990000' }}>Attack</span></i></b>.
-                          </span>
+                        <div style={{ marginBottom: '4px' }}>
+                          <b><i><span style={{ color: '#000' }}>Primary</span> <span style={{ color: '#990000' }}>Attack</span></i></b>.
+                        </div>
+                        <div style={{ marginBottom: '4px', textAlign: 'left' }}>
                           <select 
                             style={{ 
                               fontSize: '1em', 
@@ -545,42 +571,146 @@ const LevelUpClassChemist: React.FC<LevelUpClassChemistProps> = ({
                               border: '1px solid #ccc', 
                               background: '#fff', 
                               color: '#222',
-                              fontWeight: 'bold'
+                              fontWeight: 'bold',
+                              marginBottom: '4px',
+                              textAlign: 'left',
+                              minWidth: '180px'
                             }} 
-                            defaultValue="Buy Dart Gun"
+                            defaultValue="Dart Guns"
                             onChange={(e) => {
-                              if (e.target.value !== "Buy Dart Gun") {
-                                setSelectedDartGuns(prev => [...prev, e.target.value]);
-                                e.target.value = "Buy Dart Gun"; // Reset dropdown
+                              const value = e.target.value;
+                              if (value !== "Dart Guns") {
+                                setPendingDartGun(value);
+                                e.target.value = "Dart Guns"; // Reset dropdown
                               }
                             }}
                           >
-                            <option disabled style={{ fontWeight: 'bold' }}>Buy Dart Gun</option>
+                            <option disabled style={{ fontWeight: 'bold' }}>Dart Guns</option>
                             <option style={{ fontWeight: 'bold' }}>Chem Gun</option>
                             <option style={{ fontWeight: 'bold' }}>Happy Pill Pusher</option>
                             <option style={{ fontWeight: 'bold' }}>Sour Juicer</option>
                             <option style={{ fontWeight: 'bold' }}>Prickly Goo</option>
                           </select>
-                        </div>
-                        <div style={{ marginBottom: '4px' }}>
-                          <i>Dart Guns.</i> 
-                          {selectedDartGuns.length > 0 && (
-                            <span style={{ fontWeight: 'bold', marginLeft: '8px' }}>
-                              {selectedDartGuns.join(', ')}
-                            </span>
+                          {/* Buy/Add dialog for Dart Gun selection */}
+                          {pendingDartGun && (
+                            <div style={{ marginTop: '4px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                              <div style={{ fontWeight: 'bold' }}>
+                                {pendingDartGun}
+                                <span style={{ color: '#bf9000', fontWeight: 'bold', marginLeft: '8px' }}>
+                                  {pendingDartGun === 'Chem Gun' && '150c'}
+                                  {pendingDartGun === 'Happy Pill Pusher' && '160c'}
+                                  {pendingDartGun === 'Sour Juicer' && '160c'}
+                                  {pendingDartGun === 'Prickly Goo' && '175c'}
+                                </span>
+                              </div>
+                              <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                                <button
+                                style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #1976d2', background: '#1976d2', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}
+                                onClick={() => {
+                                  // Determine cost
+                                  let cost = 0;
+                                  if (pendingDartGun === 'Chem Gun') cost = 150;
+                                  else if (pendingDartGun === 'Happy Pill Pusher') cost = 160;
+                                  else if (pendingDartGun === 'Sour Juicer') cost = 160;
+                                  else if (pendingDartGun === 'Prickly Goo') cost = 175;
+                                  // Check credits
+                                  if (credits < cost) {
+                                    setNotice('Not enough credits!');
+                                    return;
+                                  }
+                                  // Atomic operation: update both dart guns and credits
+                                  const newDartGuns = [...selectedDartGuns, pendingDartGun];
+                                  const newCredits = credits - cost;
+                                  setSelectedDartGuns(newDartGuns);
+                                  
+                                  if (sheet) {
+                                    const updatedSheet = { 
+                                      ...sheet, 
+                                      dartGuns: newDartGuns,
+                                      credits: newCredits
+                                    };
+                                    saveCharacterSheet(updatedSheet);
+                                  }
+                                  
+                                  // Update the LevelUp component's credits state (no auto-save)
+                                  onCreditsChange?.(-cost);
+                                  setPendingDartGun("");
+                                }}
+                              >Buy</button>
+                              <button
+                                style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #28a745', background: '#28a745', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}
+                                onClick={() => {
+                                  const newDartGuns = [...selectedDartGuns, pendingDartGun];
+                                  setSelectedDartGuns(newDartGuns);
+                                  
+                                  if (sheet) {
+                                    const updatedSheet = { 
+                                      ...sheet, 
+                                      dartGuns: newDartGuns,
+                                      credits: credits // Preserve current credits
+                                    };
+                                    saveCharacterSheet(updatedSheet);
+                                  }
+                                  
+                                  setPendingDartGun("");
+                                }}
+                              >Add</button>
+                              <button
+                                style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #aaa', background: '#eee', color: '#333', fontWeight: 'bold', cursor: 'pointer' }}
+                                onClick={() => setPendingDartGun("")}
+                              >Cancel</button>
+                              </div>
+                            </div>
                           )}
+                          <div style={{ marginTop: '2px' }}>
+                            {selectedDartGuns.length > 0 && (
+                              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginLeft: '8px' }}>
+                                {selectedDartGuns.map((gun, idx) => (
+                                  <span key={gun + idx} style={{ fontStyle: 'italic', display: 'flex', alignItems: 'center', background: '#f5f5f5', borderRadius: '6px', padding: '2px 8px' }}>
+                                    {gun}
+                                    <button
+                                      style={{ marginLeft: '6px', padding: '0 6px', borderRadius: '50%', border: 'none', background: '#d32f2f', color: 'white', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.9em' }}
+                                      title={`Remove ${gun}`}
+                                      onClick={() => {
+                                        const newDartGuns = selectedDartGuns.filter((_, i) => i !== idx);
+                                        setSelectedDartGuns(newDartGuns);
+                                        
+                                        if (sheet) {
+                                          const updatedSheet = { 
+                                            ...sheet, 
+                                            dartGuns: newDartGuns,
+                                            credits: credits // Preserve current credits
+                                          };
+                                          saveCharacterSheet(updatedSheet);
+                                        }
+                                      }}
+                                    >×</button>
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                          </div>
                         </div>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
                           <span>
                             <b><u>Range</u></b> 8hx
                           </span>
                           <span style={{ textAlign: 'right', minWidth: '80px' }}>
-                            <b><u>Crit</u></b> <b>[18]</b>+
+                            <b><u>Crit</u></b> <b>[{(() => {
+                              const critDots = safeGetDotsArray(7).filter(Boolean).length;
+                              return 18 - critDots;
+                            })()}]</b>+
                           </span>
                         </div>
                         <b><u>Target</u></b> Single <br />
-                        <b><u>Damage</u></b> 1d<b>[6]</b> <br />
-                        <b><u>Crit Effect</u></b> 1d<b>[6]</b>
+                        <b><u>Damage</u></b> 1d<b>[{(() => {
+                          const dieSizeDots = safeGetDotsArray(6).filter(Boolean).length;
+                          return dieSizeDots === 0 ? 6 : dieSizeDots === 1 ? 8 : dieSizeDots === 2 ? 10 : 12;
+                        })()}]</b> <br />
+                        <b><u>Crit Effect</u></b> 1d<b>[{(() => {
+                          const dieSizeDots = safeGetDotsArray(6).filter(Boolean).length;
+                          return dieSizeDots === 0 ? 6 : dieSizeDots === 1 ? 8 : dieSizeDots === 2 ? 10 : 12;
+                        })()}]</b>
                       </div>
                       <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif' }}>
                         <div style={{

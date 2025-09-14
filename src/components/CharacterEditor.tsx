@@ -2390,7 +2390,7 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
       {/* Floating Navigation Button */}
       <div style={{
         position: 'fixed',
-        bottom: '20px',
+        top: '20px',
         right: '20px',
         zIndex: 1000
       }}>
@@ -2398,7 +2398,7 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
         {isNavExpanded && (
           <div ref={menuRef} style={{
             position: 'absolute',
-            bottom: '60px',
+            top: '60px',
             right: '0px',
             display: 'flex',
             flexDirection: 'column',
@@ -2725,7 +2725,7 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
       <div style={{
         position: 'fixed',
         bottom: '20px',
-        left: '130px',
+        left: '20px',
         zIndex: 999
       }}>
         {/* Credits Menu (expanded state) */}
@@ -2878,7 +2878,7 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
       <div style={{
         position: 'fixed',
         bottom: '20px',
-        left: '20px',
+        right: '20px',
         zIndex: 999
       }}>
         {/* HP Menu (expanded state) */}
@@ -2886,14 +2886,13 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
           <div ref={hpMenuRef} style={{
             position: 'absolute',
             bottom: '50px',
-            left: '0px',
+            right: '0px',
             background: 'white',
             border: '2px solid #ccc',
             borderRadius: '12px',
-            padding: '12px',
+            padding: '16px',
             boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
             minWidth: '280px',
-            maxWidth: 'calc(100vw - 40px)',
             animation: 'fadeIn 0.2s ease-out'
           }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
@@ -2998,46 +2997,46 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
 
               <hr style={{ margin: '8px 0', border: '1px solid #eee' }} />
 
-              {/* Death Count Section - Centered, in black bar, white font, dots turn black when selected */}
-              <div style={{
-                backgroundColor: 'black',
-                borderRadius: '12px',
-                padding: '12px 8px 8px 8px',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                marginTop: '8px',
-                marginBottom: '8px'
-              }}>
-                <span style={{
-                  color: 'white',
-                  fontWeight: 'bold',
-                  fontSize: '1.1em',
-                  textAlign: 'center',
-                  marginBottom: '4px',
-                  letterSpacing: '0.3px'
-                }}>Death Count</span>
-                <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginTop: '2px', flexWrap: 'wrap', justifyContent: 'center' }}>
-                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((dotNumber) => (
-                    <div key={dotNumber} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1px' }}>
-                      <span style={{ color: 'white', fontSize: '10px', fontWeight: 'bold', marginBottom: '1px' }}>
-                        {dotNumber}+
-                      </span>
-                      <div
-                        style={{
-                          width: '16px',
-                          height: '16px',
-                          borderRadius: '50%',
-                          backgroundColor: deathCount >= dotNumber ? 'black' : 'white',
-                          border: '2px solid white',
-                          cursor: 'pointer',
-                          transition: 'all 0.2s ease'
-                        }}
-                        onClick={() => {
-                          const newValue = deathCount >= dotNumber ? dotNumber - 1 : dotNumber;
-                          setDeathCount(newValue);
-                          handleAutoSave({ deathCount: newValue });
-                        }}
+            {/* Death Count Section - Centered, in black bar, white font, dots turn black when selected */}
+            <div style={{
+              backgroundColor: 'black',
+              borderRadius: '16px',
+              padding: '16px 12px 12px 12px',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              marginTop: '8px',
+              marginBottom: '8px'
+            }}>
+              <span style={{
+                color: 'white',
+                fontWeight: 'bold',
+                fontSize: '1.2em',
+                textAlign: 'center',
+                marginBottom: '4px',
+                letterSpacing: '0.5px'
+              }}>Death Count</span>
+              <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginTop: '2px' }}>
+                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((dotNumber) => (
+                  <div key={dotNumber} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px' }}>
+                    <span style={{ color: 'white', fontSize: '12px', fontWeight: 'bold', marginBottom: '2px' }}>
+                      {dotNumber}+
+                    </span>
+                    <div
+                      style={{
+                        width: '18px',
+                        height: '18px',
+                        borderRadius: '50%',
+                        backgroundColor: deathCount >= dotNumber ? 'black' : 'white',
+                        border: '2px solid white',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease'
+                      }}
+                      onClick={() => {
+                        const newValue = deathCount >= dotNumber ? dotNumber - 1 : dotNumber;
+                        setDeathCount(newValue);
+                        handleAutoSave({ deathCount: newValue });
+                      }}
                       />
                     </div>
                   ))}

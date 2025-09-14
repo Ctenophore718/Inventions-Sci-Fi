@@ -53,6 +53,29 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
     });
   };
 
+  // Handler for Credits changes (similar to XP/SP)
+  const handleCreditsChange = (creditsDelta: number) => {
+    const newCredits = credits + creditsDelta;
+    
+    setCredits(newCredits);
+    setCreditsDelta(prev => prev + creditsDelta);
+    
+    handleAutoSave({ 
+      credits: newCredits,
+      // Preserve dart guns when credits change
+      dartGuns: sheet?.dartGuns || []
+    });
+  };
+
+  // Handler for Credits changes without auto-save (for atomic operations)
+  const handleCreditsChangeNoSave = (creditsDelta: number) => {
+    const newCredits = credits + creditsDelta;
+    
+    setCredits(newCredits);
+    setCreditsDelta(prev => prev + creditsDelta);
+    // Don't call handleAutoSave - let the caller handle persistence
+  };
+
   // Local state for XP/SP totals (mirroring CharacterEditor)
   const [xpTotal, setXpTotal] = useState(sheet?.xpTotal ?? 0);
   const [spTotal, setSpTotal] = useState(sheet?.spTotal ?? 0);
@@ -956,10 +979,12 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                     charClass={charClass}
                     subclass={subclass}
                     onXpSpChange={handleAnatomistXpSpChange}
+                    onCreditsChange={handleCreditsChangeNoSave}
                     xpTotal={xpTotal}
                     spTotal={spTotal}
                     xpSpent={xpSpent}
                     spSpent={spSpent}
+                    credits={credits}
                     setXpSpent={setXpSpent}
                     setSpSpent={setSpSpent}
                     setNotice={setNotice}
@@ -1068,21 +1093,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                     setSpSpent={setSpSpent}
                     setNotice={setNotice}
                   />
-                ) : (
-                  <LevelUpClasses
-                    sheet={sheet}
-                    charClass={charClass}
-                    subclass={subclass}
-                    onXpSpChange={handleAnatomistXpSpChange}
-                    xpTotal={xpTotal}
-                    spTotal={spTotal}
-                    xpSpent={xpSpent}
-                    spSpent={spSpent}
-                    setXpSpent={setXpSpent}
-                    setSpSpent={setSpSpent}
-                    setNotice={setNotice}
-                  />
-                )}
+                ) : null}
               </>
             )}
         </div>
@@ -1451,7 +1462,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
     {/* Floating Navigation Button */}
     <div style={{
       position: 'fixed',
-      bottom: '20px',
+      top: '20px',
       right: '20px',
       zIndex: 1000
     }}>
@@ -1459,7 +1470,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
       {isNavExpanded && (
         <div ref={menuRef} style={{
           position: 'absolute',
-          bottom: '60px',
+          top: '60px',
           right: '0px',
           display: 'flex',
           flexDirection: 'column',
@@ -1786,7 +1797,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
     <div style={{
       position: 'fixed',
       bottom: '20px',
-      left: '130px',
+      left: '20px',
       zIndex: 999
     }}>
       {/* Credits Menu (expanded state) */}
@@ -1939,7 +1950,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
     <div style={{
       position: 'fixed',
       bottom: '20px',
-      left: '20px',
+      right: '20px',
       zIndex: 999
     }}>
       {/* HP Menu (expanded state) */}
@@ -1947,7 +1958,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
         <div ref={hpMenuRef} style={{
           position: 'absolute',
           bottom: '50px',
-          left: '0px',
+          right: '0px',
           background: 'white',
           border: '2px solid #ccc',
           borderRadius: '12px',

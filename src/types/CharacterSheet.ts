@@ -62,4 +62,7 @@ export type CharacterSheet = {
 
   // Persistent state for Level Up Class Card dots (rows of booleans)
   classCardDots?: boolean[][];
+
+  // Dart guns for Chemist class
+  dartGuns?: string[];
 };
