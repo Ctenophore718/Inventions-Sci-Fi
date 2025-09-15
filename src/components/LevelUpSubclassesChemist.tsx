@@ -701,11 +701,11 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
           </div>
           
           {/* Perks Section */}
-          <div>
-            <div style={{ fontSize: '1em', color: '#000', fontWeight: 'bold', marginBottom: '0.5rem' }}>Perks</div>
-            <div style={{ marginBottom: '1rem', fontSize: '0.9em', lineHeight: 1.4 }}>
-              <i><b>Skills.</b> Medicine</i> +2
-            </div>
+            <div style={{ marginTop: '12px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+                <div style={{ fontWeight: 'bold', color: '#000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Perks</u></div>
+                <div style={{ fontSize: '1em', color: '#000', marginBottom: '6px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+                  <i><b>Skills.</b> Medicine</i> +2
+                </div>
             <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
               <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', gap: '12px' }}>
                 <span style={{ display: 'inline-block', maxWidth: 'calc(100% - 40px)' }}>

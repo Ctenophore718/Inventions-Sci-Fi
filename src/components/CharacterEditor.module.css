@@ -59,7 +59,7 @@
   }
 }
 /* iPad specific layout (3 columns) */
-@media (min-width: 768px) and (max-width: 1024px) {
+@media (min-width: 768px) and (max-width: 899px) {
   .characterSheetGrid {
     grid-template-columns: 1fr 1fr 1fr !important;
     gap: 16px !important;
@@ -80,7 +80,7 @@
     grid-row: 2 !important;
   }
   
-  .customCard {
+  .customCard, .skillsCard {
     grid-column: 1 / span 2 !important;
     grid-row: 3 / span 2 !important;
   }
@@ -444,6 +444,8 @@
   min-width: 0;
   max-width: 100%;
   box-sizing: border-box;
+  position: relative;
+  z-index: 1;
 }
 
 /* Languages & Perks Card - Rows 5 and 6, column 2 */
@@ -609,6 +611,12 @@
   background: #fff;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  position: relative;
+  z-index: 2;
+  contain: layout;
 }
 
 .movementStrikeCard h3 {
@@ -646,6 +654,12 @@
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   font-size: 0.92em;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
+  contain: layout;
 }
 
 .skillsCard h3 {
@@ -885,6 +899,119 @@
   }
 }
 
+/* Medium-tablet range: Fix overlap between Movement and Skills cards */
+@media (min-width: 900px) and (max-width: 1024px) {
+  .characterSheetGrid {
+    grid-template-columns: 1fr 1fr 1fr !important;
+    gap: 12px !important;
+  }
+  
+  .identityCard {
+    grid-column: 1 / span 3 !important;
+    grid-row: 1 !important;
+  }
+  
+  .featuresCard {
+    grid-column: 1 / span 2 !important;
+    grid-row: 2 !important;
+  }
+  
+  .movementStrikeCard {
+    grid-column: 3 !important;
+    grid-row: 2 !important;
+  }
+  
+  .customCard, .skillsCard {
+    grid-column: 1 / span 2 !important;
+    grid-row: 3 / span 2 !important;
+  }
+  
+  .strikeCard {
+    grid-column: 3 !important;
+    grid-row: 3 !important;
+  }
+  
+  .damageInteractionsCard {
+    grid-column: 3 !important;
+    grid-row: 4 !important;
+  }
+  
+  .inventoryCard {
+    grid-column: 1 !important;
+    grid-row: 5 / span 2 !important;
+  }
+  
+  .perksCard {
+    grid-column: 2 !important;
+    grid-row: 5 / span 2 !important;
+  }
+  
+  .portraitCard {
+    grid-column: 3 !important;
+    grid-row: 5 / span 2 !important;
+  }
+  
+  .backgroundCard {
+    grid-column: 1 / span 2 !important;
+    grid-row: 7 !important;
+  }
+}
+
+/* Large desktop with manual resize - prevent overlap when manually shrinking */
+@media (min-width: 1201px) and (max-width: 1400px) {
+  .characterSheetGrid {
+    grid-template-columns: 1fr 1fr 1fr !important;
+    gap: 14px !important;
+  }
+  
+  .movementStrikeCard {
+    grid-column: 3 !important;
+    grid-row: 2 !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+  
+  .skillsCard, .customCard {
+    grid-column: 1 / span 2 !important;
+    grid-row: 3 / span 2 !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+}
+
+/* Very large desktop with manual resize - tighter spacing */
+@media (min-width: 1401px) {
+  .characterSheetGrid {
+    gap: 16px;
+  }
+  
+  .movementStrikeCard, .skillsCard, .customCard {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+  }
+}
+
+/* Catch-all: Prevent any card overlap regardless of screen size */
+@media screen {
+  .movementStrikeCard {
+    box-sizing: border-box !important;
+  }
+  
+  .skillsCard, .customCard {
+    box-sizing: border-box !important;
+  }
+  
+  /* Force proper grid behavior at all sizes */
+  .characterSheetGrid {
+    grid-auto-flow: row !important;
+  }
+  
+  .characterSheetGrid > * {
+    contain: layout !important;
+  }
+}
+
 /* Medium screens: 2-column layout */
 @media (min-width: 1025px) and (max-width: 1200px) {
   .characterSheetGrid {
@@ -1020,4 +1147,10 @@
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(25,118,210,0.08);
   min-height: 120px;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
+  contain: layout;
 }
