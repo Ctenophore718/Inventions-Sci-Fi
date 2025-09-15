@@ -7,10 +7,13 @@ type LevelUpSubclassesChemistProps = {
   charClass: string;
   subclass: string;
   onXpSpChange?: (xpDelta: number, spDelta: number) => void;
+  onCreditsChange?: (creditsDelta: number) => void;
+  onAutoSave?: (fieldUpdates: Partial<CharacterSheet>) => void;
   xpTotal: number;
   spTotal: number;
   xpSpent: number;
   spSpent: number;
+  credits: number;
   setXpSpent: (xp: number) => void;
   setSpSpent: (sp: number) => void;
   setNotice: (notice: string) => void;
@@ -20,10 +23,13 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
   sheet, 
   subclass, 
   onXpSpChange,
+  onCreditsChange,
+  onAutoSave,
   xpTotal,
   spTotal, 
   xpSpent,
   spSpent,
+  credits,
   setXpSpent,
   setSpSpent,
   setNotice
@@ -92,23 +98,68 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
   };
   
   // Independent state for Anatomist dots - completely separate from any other component
-  const [anatomistFeatureDots, setAnatomistFeatureDots] = useState<boolean[]>([false]); // 1 dot for Feature
-  const [anatomistTechniqueRangeDots, setAnatomistTechniqueRangeDots] = useState<boolean[]>([false, false, false]); // 3 dots for +1hx
-  const [anatomistTechniqueStrikeDamageDots, setAnatomistTechniqueStrikeDamageDots] = useState<boolean[]>([false]); // 1 dot for +1d6 Strike Damage per Token
-  const [anatomistTechniqueStrikeDots, setAnatomistTechniqueStrikeDots] = useState<boolean[]>([false]); // 1 dot for +1 Strike per Token
-  const [anatomistTechniqueCooldownDots, setAnatomistTechniqueCooldownDots] = useState<boolean[]>([false, false]); // 2 dots for -1 Cooldown
-  const [anatomistAttackDamageDots, setAnatomistAttackDamageDots] = useState<boolean[]>([false, false, false]); // 3 dots for +1 Damage die
-  const [anatomistAttackCritDots, setAnatomistAttackCritDots] = useState<boolean[]>([false, false, false]); // 3 dots for +1 Crit
-  const [anatomistAttackCooldownDots, setAnatomistAttackCooldownDots] = useState<boolean[]>([false, false]); // 2 dots for -1 Cooldown
-  const [anatomistStrikeDots, setAnatomistStrikeDots] = useState<boolean[]>([false]); // 1 dot for heal Strike amount
-  const [anatomistSurgeonDots, setAnatomistSurgeonDots] = useState<boolean[]>([false]); // 1 dot for Surgeon perk
+  const [anatomistFeatureDots, setAnatomistFeatureDots] = useState<boolean[]>(
+    sheet?.subclassProgressionDots?.anatomistFeatureDots || [false]
+  );
+  const [anatomistPrecisionHxDots, setAnatomistPrecisionHxDots] = useState<boolean[]>(
+    sheet?.subclassProgressionDots?.anatomistPrecisionHxDots || [false, false, false]
+  );
+  const [anatomistTechniqueRangeDots, setAnatomistTechniqueRangeDots] = useState<boolean[]>(
+    sheet?.subclassProgressionDots?.anatomistTechniqueRangeDots || [false, false, false]
+  );
+  const [anatomistTechniqueStrikeDamageDots, setAnatomistTechniqueStrikeDamageDots] = useState<boolean[]>(
+    sheet?.subclassProgressionDots?.anatomistTechniqueStrikeDamageDots || [false]
+  );
+  const [anatomistTechniqueStrikeDots, setAnatomistTechniqueStrikeDots] = useState<boolean[]>(
+    sheet?.subclassProgressionDots?.anatomistTechniqueStrikeDots || [false]
+  );
+  const [anatomistTechniqueCooldownDots, setAnatomistTechniqueCooldownDots] = useState<boolean[]>(
+    sheet?.subclassProgressionDots?.anatomistTechniqueCooldownDots || [false, false]
+  );
+  const [anatomistAttackDamageDots, setAnatomistAttackDamageDots] = useState<boolean[]>(
+    sheet?.subclassProgressionDots?.anatomistAttackDamageDots || [false, false, false]
+  );
+  const [anatomistAttackCritDots, setAnatomistAttackCritDots] = useState<boolean[]>(
+    sheet?.subclassProgressionDots?.anatomistAttackCritDots || [false, false, false]
+  );
+  const [anatomistAttackCooldownDots, setAnatomistAttackCooldownDots] = useState<boolean[]>(
+    sheet?.subclassProgressionDots?.anatomistAttackCooldownDots || [false, false]
+  );
+  const [anatomistStrikeDots, setAnatomistStrikeDots] = useState<boolean[]>(
+    sheet?.subclassProgressionDots?.anatomistStrikeDots || [false]
+  );
+  const [anatomistSurgeonDots, setAnatomistSurgeonDots] = useState<boolean[]>(
+    sheet?.subclassProgressionDots?.anatomistSurgeonDots || [false]
+  );
+
+  // Local state for selected super serums (Anatomist only)
+  const [selectedSuperSerums, setSelectedSuperSerums] = useState<string[]>(() => {
+    return sheet?.superSerums || [];
+  });
+  // Local state for pending super serum selection (Anatomist only)
+  const [pendingSuperSerum, setPendingSuperSerum] = useState<string>("");
+
+  // Save super serums to sheet (Anatomist only)
+  const saveSuperSerums = (newSuperSerums: string[]) => {
+    setSelectedSuperSerums(newSuperSerums);
+    if (sheet) {
+      const updatedSheet = { 
+        ...sheet, 
+        superSerums: newSuperSerums,
+        // Preserve current credits to avoid race conditions
+        credits: credits
+      };
+      saveCharacterSheet(updatedSheet);
+    }
+  };
 
   // Helper function to handle dot clicking with sequential requirement
   const handleDotClick = (
     currentArray: boolean[], 
     setArray: React.Dispatch<React.SetStateAction<boolean[]>>, 
     index: number, 
-    xpCosts: number[]
+    xpCosts: number[],
+    dotType?: string
   ) => {
     const newArray = [...currentArray];
     const rightmostChecked = currentArray.lastIndexOf(true);
@@ -136,8 +187,34 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
     }
     
     if (xpDelta !== 0) {
+      // Check if spending would exceed totals
+      const newXpSpent = xpSpent + xpDelta;
+      if (newXpSpent > xpTotal) {
+        setNotice("Not enough xp!");
+        return;
+      }
+      
       setArray(newArray);
-      onXpSpChange?.(xpDelta, 0);
+      
+      // Include progression dots in the XP change communication to prevent race conditions
+      if (dotType && onAutoSave) {
+        const progressionDots = {
+          ...sheet?.subclassProgressionDots,
+          [dotType]: newArray
+        };
+        // Save both XP change AND progression dots in one operation
+        const newXpSpent = xpSpent + xpDelta;
+        const newSpSpent = spSpent;
+        setXpSpent(newXpSpent);
+        setSpSpent(newSpSpent);
+        onAutoSave({
+          xpSpent: newXpSpent,
+          spSpent: newSpSpent,
+          subclassProgressionDots: progressionDots
+        });
+      } else {
+        onXpSpChange?.(xpDelta, 0);
+      }
     }
   };
 
@@ -146,7 +223,8 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
     currentArray: boolean[], 
     setArray: React.Dispatch<React.SetStateAction<boolean[]>>, 
     index: number, 
-    spCosts: number[]
+    spCosts: number[],
+    dotType?: string
   ) => {
     const newArray = [...currentArray];
     let spDelta = 0;
@@ -159,8 +237,34 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
       spDelta -= spCosts[index] || 0;
     }
     
+    // Check if spending would exceed totals
+    const newSpSpent = spSpent + spDelta;
+    if (newSpSpent > spTotal) {
+      setNotice("Not enough sp!");
+      return;
+    }
+    
     setArray(newArray);
-    onXpSpChange?.(0, spDelta);
+    
+    // Include progression dots in the SP change communication to prevent race conditions
+    if (dotType && onAutoSave) {
+      const progressionDots = {
+        ...sheet?.subclassProgressionDots,
+        [dotType]: newArray
+      };
+      // Save both SP change AND progression dots in one operation
+      const newXpSpent = xpSpent;
+      const newSpSpent = spSpent + spDelta;
+      setXpSpent(newXpSpent);
+      setSpSpent(newSpSpent);
+      onAutoSave({
+        xpSpent: newXpSpent,
+        spSpent: newSpSpent,
+        subclassProgressionDots: progressionDots
+      });
+    } else {
+      onXpSpChange?.(0, spDelta);
+    }
   };
     
   return (
@@ -175,9 +279,9 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
           <div style={{ color: '#0b5394', fontWeight: 'bold', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '8px' }}>
             <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32, fontFamily: 'Arial, Helvetica, sans-serif' }}>
               <div style={{ fontWeight: 'bold', color: '#0b5394', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Feature</u></div>
-              <span style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
-                <b><i style={{ color: '#66cf00', fontSize: '1em' }}>Anatomical Precision.</i></b> <span style={{ fontSize: '1em', fontWeight: 400 }}>You and all allies within 3hx of you ignore any Damage Resistances and/or Immunities.</span>
-              </span>
+                <span style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
+                  <b><i style={{ color: '#66cf00', fontSize: '1em' }}>Anatomical Precision.</i></b> <span style={{ fontSize: '1em', fontWeight: 400 }}>You and all allies within <b>[{3 + anatomistPrecisionHxDots.filter(Boolean).length}]</b>hx of you ignore any Damage and <b>[{anatomistFeatureDots[0] ? 'condition' : ' - '}]</b> <i>Resistances</i> and/or <i>Immunities</i>.</span>
+                </span>
             </span>
           </div>
           {/* Feature XP progression table - now interactive */}
@@ -189,7 +293,7 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
             <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>Ignore condition Immunities</span>
             <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
               <span
-                onClick={() => handleDotClick(anatomistFeatureDots, setAnatomistFeatureDots, 0, [6])}
+                onClick={() => handleDotClick(anatomistFeatureDots, setAnatomistFeatureDots, 0, [6], 'anatomistFeatureDots')}
                 style={{
                   width: '15px',
                   height: '15px',
@@ -204,13 +308,36 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
             </span>
             <span></span>
             <span></span>
+            {/* New row for +1hx dots */}
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>5xp</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>9xp</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>14xp</span>
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1hx</span>
+            {[0,1,2].map(idx => (
+              <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <span
+                  onClick={() => handleDotClick(anatomistPrecisionHxDots, setAnatomistPrecisionHxDots, idx, [5, 9, 14], 'anatomistPrecisionHxDots')}
+                  style={{
+                    width: '15px',
+                    height: '15px',
+                    border: '2px solid #000',
+                    borderRadius: '50%',
+                    display: 'block',
+                    background: anatomistPrecisionHxDots[idx] ? '#000' : '#fff',
+                    cursor: 'pointer',
+                    transition: 'background 0.2s'
+                  }}
+                ></span>
+              </span>
+            ))}
           </div>
 
           {/* Technique Section - Chemist style */}
           <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
             <div style={{ fontWeight: 'bold', color: '#bf9000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Technique</u></div>
             <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
-              <b><i style={{ color: '#66cf00', fontSize: '1em' }}>The "Good Stuff"</i></b> <i style={{ color: '#66cf00', fontSize: '1em' }}>(Cooldown 4).</i> You spend any number of <i>Chem Tokens</i>. After doing so, you and allies within 1hx of you gain +1d6 Strike Damage and can Move +2hx for each Chem Token spent until the start of the next round.
+              <b><i style={{ color: '#66cf00', fontSize: '1em' }}>The "Good Stuff"</i></b> <i style={{ color: '#66cf00', fontSize: '1em' }}>(Cooldown <b style={{ color: '#000', fontStyle: 'normal' }}>[{4 - anatomistTechniqueCooldownDots.filter(Boolean).length}]</b>).</i> You spend any number of <i>Chem Tokens</i>. After doing so, you and allies within <b>[{1 + anatomistTechniqueRangeDots.filter(Boolean).length}]</b>hx of you gain +<b>[{1 + anatomistTechniqueStrikeDamageDots.filter(Boolean).length}]</b>d6 <b><i style={{ color: '#351c75' }}>Strike</i></b> Damage, +<b>[{0 + anatomistTechniqueStrikeDots.filter(Boolean).length}]</b> <b><i style={{ color: '#351c75' }}>Strikes</i></b> and can <b><i style={{ color: '#38761d' }}>Move</i></b> +2hx for each <i>Chem Token</i> spent until the start of the next round.
             </div>
             
             <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto auto', gap: '8px', alignItems: 'center', marginBottom: '0.5rem' }}>
@@ -223,7 +350,7 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
               {[0,1,2].map(idx => (
                 <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                   <span
-                    onClick={() => handleDotClick(anatomistTechniqueRangeDots, setAnatomistTechniqueRangeDots, idx, [5, 9, 14])}
+                    onClick={() => handleDotClick(anatomistTechniqueRangeDots, setAnatomistTechniqueRangeDots, idx, [5, 9, 14], 'anatomistTechniqueRangeDots')}
                     style={{
                       width: '15px',
                       height: '15px',
@@ -245,10 +372,10 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
               <span></span>
               <span></span>
               <span></span>
-              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1d6 Strike Damage per Token</span>
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1d6 <b><i style={{ color: '#351c75' }}>Strike</i></b> Damage per <i>Token</i></span>
               <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                 <span
-                  onClick={() => handleDotClick(anatomistTechniqueStrikeDamageDots, setAnatomistTechniqueStrikeDamageDots, 0, [18])}
+                  onClick={() => handleDotClick(anatomistTechniqueStrikeDamageDots, setAnatomistTechniqueStrikeDamageDots, 0, [18], 'anatomistTechniqueStrikeDamageDots')}
                   style={{
                     width: '15px',
                     height: '15px',
@@ -272,10 +399,10 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
               <span></span>
               <span></span>
               
-              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1 Strike per Token</span>
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1 <b><i style={{ color: '#351c75' }}>Strike</i></b> per <i>Token</i></span>
               <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                 <span
-                  onClick={() => handleDotClick(anatomistTechniqueStrikeDots, setAnatomistTechniqueStrikeDots, 0, [18])}
+                  onClick={() => handleDotClick(anatomistTechniqueStrikeDots, setAnatomistTechniqueStrikeDots, 0, [18], 'anatomistTechniqueStrikeDots')}
                   style={{
                     width: '15px',
                     height: '15px',
@@ -298,11 +425,11 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>4xp</span>
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>7xp</span>
               
-              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>-1 Cooldown</span>
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>-1 <i>Cooldown</i></span>
               {[0,1].map(idx => (
                 <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                   <span
-                    onClick={() => handleDotClick(anatomistTechniqueCooldownDots, setAnatomistTechniqueCooldownDots, idx, [4, 7])}
+                    onClick={() => handleDotClick(anatomistTechniqueCooldownDots, setAnatomistTechniqueCooldownDots, idx, [4, 7], 'anatomistTechniqueCooldownDots')}
                     style={{
                       width: '15px',
                       height: '15px',
@@ -320,10 +447,148 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
           </div>
           
           {/* Attack Section */}
+
           <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
             <div style={{ fontWeight: 'bold', color: '#990000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Attack</u></div>
             <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
-              <b><i>Secondary <span style={{ color: '#990000' }}>Attack.</span></i></b> <br /> <i>Super Serum.</i> 1hx Range, Single Target, 18+ Crit, 1d8 Damage, Auto <b><i>Confuse</i></b>, <i>Chem Token</i>
+              <div style={{ marginBottom: '4px' }}>
+                <b><i><span style={{ color: '#000' }}>Secondary</span> <span style={{ color: '#990000' }}>Attack</span></i></b> <i>(Cooldown</i> <b>[{4 - anatomistAttackCooldownDots.filter(Boolean).length}]</b><i>).</i>
+              </div>
+              <div style={{ marginBottom: '4px', textAlign: 'left' }}>
+                <select 
+                  style={{ 
+                    fontSize: '1em', 
+                    padding: '2px 8px', 
+                    borderRadius: '6px', 
+                    border: '1px solid #ccc', 
+                    background: '#fff', 
+                    color: '#222',
+                    fontWeight: 'bold',
+                    marginBottom: '4px',
+                    textAlign: 'left',
+                    minWidth: '180px'
+                  }} 
+                  defaultValue="Super Serums"
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (value !== "Super Serums") {
+                      setPendingSuperSerum(value);
+                      e.target.value = "Super Serums"; // Reset dropdown
+                    }
+                  }}
+                >
+                  <option disabled style={{ fontWeight: 'bold' }}>Super Serums</option>
+                  <option style={{ fontWeight: 'bold' }}>Jacob's Ladder</option>
+                  <option style={{ fontWeight: 'bold' }}>Vampirismagoria</option>
+                </select>
+                {/* Buy/Add dialog for Super Serum selection */}
+                {pendingSuperSerum && (
+                  <div style={{ marginTop: '4px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    <div style={{ fontWeight: 'bold' }}>
+                      {pendingSuperSerum}
+                      <span style={{ color: '#bf9000', fontWeight: 'bold', marginLeft: '8px' }}>
+                        {pendingSuperSerum === 'Jacob\'s Ladder' && '215c'}
+                        {pendingSuperSerum === 'Vampirismagoria' && '185c'}
+                      </span>
+                    </div>
+                    <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                      <button
+                      style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #1976d2', background: '#1976d2', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}
+                      onClick={() => {
+                        // Determine cost
+                        let cost = 0;
+                        if (pendingSuperSerum === 'Jacob\'s Ladder') cost = 215;
+                        else if (pendingSuperSerum === 'Vampirismagoria') cost = 185;
+                        // Check credits
+                        if (credits < cost) {
+                          setNotice('Not enough credits!');
+                          return;
+                        }
+                        // Atomic operation: update both super serums and credits
+                        const newSuperSerums = [...selectedSuperSerums, pendingSuperSerum];
+                        const newCredits = credits - cost;
+                        setSelectedSuperSerums(newSuperSerums);
+                        
+                        if (sheet) {
+                          const updatedSheet = { 
+                            ...sheet, 
+                            superSerums: newSuperSerums,
+                            credits: newCredits
+                          };
+                          saveCharacterSheet(updatedSheet);
+                        }
+                        
+                        // Update the LevelUp component's credits state (no auto-save)
+                        onCreditsChange?.(-cost);
+                        setPendingSuperSerum("");
+                      }}
+                    >Buy</button>
+                    <button
+                      style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #28a745', background: '#28a745', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}
+                      onClick={() => {
+                        const newSuperSerums = [...selectedSuperSerums, pendingSuperSerum];
+                        setSelectedSuperSerums(newSuperSerums);
+                        
+                        if (sheet) {
+                          const updatedSheet = { 
+                            ...sheet, 
+                            superSerums: newSuperSerums,
+                            credits: credits // Preserve current credits
+                          };
+                          saveCharacterSheet(updatedSheet);
+                        }
+                        
+                        setPendingSuperSerum("");
+                      }}
+                    >Add</button>
+                    <button
+                      style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #aaa', background: '#eee', color: '#333', fontWeight: 'bold', cursor: 'pointer' }}
+                      onClick={() => setPendingSuperSerum("")}
+                    >Cancel</button>
+                    </div>
+                  </div>
+                )}
+                <div style={{ marginTop: '2px' }}>
+                  {selectedSuperSerums.length > 0 && (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginLeft: '8px' }}>
+                      {selectedSuperSerums.map((serum, idx) => (
+                        <span key={serum + idx} style={{ fontStyle: 'italic', display: 'flex', alignItems: 'center', background: '#f5f5f5', borderRadius: '6px', padding: '2px 8px' }}>
+                          {serum}
+                          <button
+                            style={{ marginLeft: '6px', padding: '0 6px', borderRadius: '50%', border: 'none', background: '#d32f2f', color: 'white', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.9em' }}
+                            title={`Remove ${serum}`}
+                            onClick={() => {
+                              const newSuperSerums = selectedSuperSerums.filter((_, i) => i !== idx);
+                              setSelectedSuperSerums(newSuperSerums);
+                              
+                              if (sheet) {
+                                const updatedSheet = { 
+                                  ...sheet, 
+                                  superSerums: newSuperSerums,
+                                  credits: credits // Preserve current credits
+                                };
+                                saveCharacterSheet(updatedSheet);
+                              }
+                            }}
+                          >×</button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+                <span>
+                  <b><u>Range</u></b> 1hx
+                </span>
+                  <span style={{ textAlign: 'right', minWidth: '80px' }}>
+                    <b><u>Crit</u></b> <b>[{18 - anatomistAttackCritDots.filter(Boolean).length}]</b>+
+                  </span>
+              </div>
+              <b><u>Target</u></b> Single <br />
+              <b><u>Chem Token</u></b> <br />
+              <b><u>Damage</u></b> <b>[{1 + anatomistAttackDamageDots.filter(Boolean).length}]</b>d8, <b><i>Confuse</i></b> <br />
+              <b><u>Crit Effect</u></b> <b>[{1 + anatomistAttackDamageDots.filter(Boolean).length}]</b>d8
             </div>
             
             <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto auto', gap: '8px', alignItems: 'center', marginBottom: '0.5rem' }}>
@@ -336,7 +601,7 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
               {[0,1,2].map(idx => (
                 <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                   <span
-                    onClick={() => handleDotClick(anatomistAttackDamageDots, setAnatomistAttackDamageDots, idx, [4, 6, 9])}
+                    onClick={() => handleDotClick(anatomistAttackDamageDots, setAnatomistAttackDamageDots, idx, [4, 6, 9], 'anatomistAttackDamageDots')}
                     style={{
                       width: '15px',
                       height: '15px',
@@ -362,7 +627,7 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
               {[0,1,2].map(idx => (
                 <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                   <span
-                    onClick={() => handleDotClick(anatomistAttackCritDots, setAnatomistAttackCritDots, idx, [2, 4, 6])}
+                    onClick={() => handleDotClick(anatomistAttackCritDots, setAnatomistAttackCritDots, idx, [2, 4, 6], 'anatomistAttackCritDots')}
                     style={{
                       width: '15px',
                       height: '15px',
@@ -386,7 +651,7 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
               {[0,1].map(idx => (
                 <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                   <span
-                    onClick={() => handleDotClick(anatomistAttackCooldownDots, setAnatomistAttackCooldownDots, idx, [3, 5])}
+                    onClick={() => handleDotClick(anatomistAttackCooldownDots, setAnatomistAttackCooldownDots, idx, [3, 5], 'anatomistAttackCooldownDots')}
                     style={{
                       width: '15px',
                       height: '15px',
@@ -419,7 +684,7 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
               <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>Can choose to heal <i><b><span style={{ color: '#351c75' }}>Strike</span></b></i> amount</span>
               <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                 <span
-                  onClick={() => handleDotClick(anatomistStrikeDots, setAnatomistStrikeDots, 0, [14])}
+                  onClick={() => handleDotClick(anatomistStrikeDots, setAnatomistStrikeDots, 0, [14], 'anatomistStrikeDots')}
                   style={{
                     width: '15px',
                     height: '15px',
@@ -456,7 +721,7 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
                   <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>8sp</span>
                   <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
                     <span
-                      onClick={() => handleSpDotClick(anatomistSurgeonDots, setAnatomistSurgeonDots, 0, [8])}
+                      onClick={() => handleSpDotClick(anatomistSurgeonDots, setAnatomistSurgeonDots, 0, [8], 'anatomistSurgeonDots')}
                       style={{
                         width: '15px',
                         height: '15px',

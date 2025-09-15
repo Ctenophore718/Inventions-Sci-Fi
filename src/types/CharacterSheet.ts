@@ -65,4 +65,24 @@ export type CharacterSheet = {
 
   // Dart guns for Chemist class
   dartGuns?: string[];
+
+  // Super Serums for Chemist class
+  superSerums?: string[];
+
+  // Subclass progression dots (specific to each subclass)
+  subclassProgressionDots?: {
+    // Anatomist subclass progression
+    anatomistFeatureDots?: boolean[];
+    anatomistPrecisionHxDots?: boolean[];
+    anatomistTechniqueRangeDots?: boolean[];
+    anatomistTechniqueStrikeDamageDots?: boolean[];
+    anatomistTechniqueStrikeDots?: boolean[];
+    anatomistTechniqueCooldownDots?: boolean[];
+    anatomistAttackDamageDots?: boolean[];
+    anatomistAttackCritDots?: boolean[];
+    anatomistAttackCooldownDots?: boolean[];
+    anatomistStrikeDots?: boolean[];
+    anatomistSurgeonDots?: boolean[];
+    // Add other subclasses as needed
+  };
 };

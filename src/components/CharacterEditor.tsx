@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import styles from './CharacterEditor.module.css';
 
 import type { CharacterSheet } from "../types/CharacterSheet";
 import { saveCharacterSheet, loadSheetById } from "../utils/storage";
 import { generateChemicalReactionJSX } from "../utils/chemistFeature";
 import { generateChemistStrikeJSX } from "../utils/chemistStrike";
+import { generateAnatomicalPrecisionJSX } from "../utils/anatomistFeature";
 
 
 type Props = {
@@ -292,60 +293,6 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
   // Attributes
   // Removed unused attribute fields
 
-  // Skills
-  const skillList = [
-    "Acrobatics",
-    "Athletics",
-    "Awareness",
-    "Computers",
-    "Culture",
-    "Deception",
-    "Diplomacy",
-    "Intimidation",
-    "Investigation",
-    "Medicine",
-    "Oikomagic",
-    "Performance",
-    "Piloting",
-    "Stealth",
-    "Survival",
-    "Technology",
-    "Thievery",
-    "Xenomagic"
-  ];
-  
-  console.log('CharacterEditor skillList defined:', skillList);
-  
-  const [skillDots, setSkillDots] = useState<{ [key: string]: boolean[] }>(() => {
-    if (sheet?.skillDots) {
-      return sheet.skillDots;
-    } else {
-      // Default empty state - will be initialized properly in useEffect
-      return Object.fromEntries(skillList.map(skill => [skill, Array(10).fill(false)]));
-    }
-  });
-
-  // Initialize skillDots for new characters with starter dots
-  useEffect(() => {
-    if (isNewCharacter && !sheet?.skillDots && (!sheet?.spSpent || sheet.spSpent === 0)) {
-      const newSkillDots = Object.fromEntries(skillList.map(skill => {
-        // For new characters, automatically fill first two columns
-        const dots = Array(10).fill(false);
-        dots[0] = true; // First column
-        dots[1] = true; // Second column
-        return [skill, dots];
-      }));
-      setSkillDots(newSkillDots);
-      
-      // Immediately mark this character as having free starter dots AND set the skillDots in one auto-save
-      // This ensures the flag is set before any SP calculations happen
-      handleAutoSave({ 
-        hasFreeSkillStarterDots: true,
-        skillDots: newSkillDots,
-        spSpent: 0 // Explicitly set SP spent to 0 for new characters only
-      });
-    }
-  }, [isNewCharacter, sheet?.skillDots, sheet?.spSpent]);
   // Track SP spent for skills
   const [spSpent, setSpSpent] = useState(() => {
     if (sheet?.spSpent !== undefined) {
@@ -354,15 +301,6 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
     // For new characters, SP spent should start at 0 (will be recalculated in useEffect)
     return 0;
   });
-  const [spNotice, setSpNotice] = useState("");
-
-  // Auto-dismiss SP notice bubble after 2.5 seconds
-  useEffect(() => {
-    if (spNotice) {
-      const timeout = setTimeout(() => setSpNotice("") , 2500);
-      return () => clearTimeout(timeout);
-    }
-  }, [spNotice]);
 
   // Cross-window synchronization for this character
   React.useEffect(() => {
@@ -482,64 +420,6 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
       return () => clearTimeout(timeoutId);
     }
   }, [playerName, name, background, classFeature, resistances, immunities, absorptions, movement, strike, xpTotal, spTotal, portraitUrl, sheet, spSpent]);
-
-  // SP cost per column in the skills grid
-  const skillSpCosts = [1,1,2,2,3,4,5,6,8,10];
-
-  // Calculate SP spent on skills only (preserve class card dot SP costs)
-  useEffect(() => {
-    let skillSpTotal = 0;
-    const hasFreeDots = sheet?.hasFreeSkillStarterDots;
-    Object.entries(skillDots).forEach(([skillName, dotsArr]) => {
-      dotsArr.forEach((dot, idx) => {
-        if (dot) {
-          // Check if this is a booster dot (should not cost SP)
-          const isBoosterDot = (charClass === "Chemist" && skillName === "Investigation" && idx === 2) ||
-                              (charClass === "Coder" && skillName === "Oikomagic" && idx === 2) ||
-                              (charClass === "Commander" && skillName === "Diplomacy" && idx === 2) ||
-                              (charClass === "Exospecialist" && skillName === "Athletics" && idx === 2);
-          
-          // For characters with free starter dots, first two columns are free
-          if (hasFreeDots && (idx === 0 || idx === 1)) {
-            // Don't add cost for first two columns on characters with free starter dots
-          } else if (!isBoosterDot) {
-            // Don't add cost for booster dots
-            skillSpTotal += skillSpCosts[idx];
-          }
-        }
-      });
-    });
-    
-    // Calculate SP spent on class card dots
-    let classCardSpTotal = 0;
-    if (sheet?.classCardDots && charClass === "Coder") {
-      // Code Reader perk costs 8sp if checked
-      if (sheet.classCardDots[12]?.[0]) {
-        classCardSpTotal += 8;
-      }
-    }
-    // Add similar calculations for other classes if they have SP-costing perks
-    
-    // Only update spSpent if we have a valid sheet to preserve existing class card costs
-    // or if this is the initial calculation for a new character
-    if (sheet) {
-      // Use existing spSpent if it's higher than our skill calculation
-      // This preserves class card costs that were set in LevelUp
-      const existingSpSpent = sheet.spSpent || 0;
-      const calculatedTotal = skillSpTotal + classCardSpTotal;
-      
-      // Only override if our calculation matches or if this seems like a fresh character
-      if (existingSpSpent === 0 || calculatedTotal >= existingSpSpent || !sheet.classCardDots) {
-        setSpSpent(calculatedTotal);
-      } else {
-        // Preserve the existing spSpent value that includes class card costs
-        setSpSpent(existingSpSpent);
-      }
-    } else {
-      setSpSpent(skillSpTotal);
-    }
-  }, [skillDots, sheet?.hasFreeSkillStarterDots, charClass, sheet?.classCardDots, sheet?.spSpent]); // Recalculate when relevant data changes
-
 
   // Hit Points UI state
   const [deathDots, setDeathDots] = useState<boolean[]>(sheet?.deathDots || Array(10).fill(false));
@@ -772,10 +652,9 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
   ];
 
   // Add this after the other feature JSX constants
-  const anatomistFeatureJSX = (
-    <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#66cf00' }}>Anatomical Precision.</i></b> You and all allies within <b>[3]</b>hx of you ignore any Damage <i>Resistances</i> and/or <i>Immunities</i>.
-    </span>
+  const anatomistFeatureJSX = generateAnatomicalPrecisionJSX(
+    sheet?.subclassProgressionDots?.anatomistFeatureDots,
+    sheet?.subclassProgressionDots?.anatomistPrecisionHxDots
   );
 
   // Add after anatomistFeatureJSX
@@ -1272,6 +1151,73 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
     }}>
   {/* Character Sheet header moved to App.tsx for right alignment */}
       <div className={styles.characterSheetGrid}>
+        {/* Custom Card: Column 1, Rows 3 & 4 (span 2) */}
+        <div className={styles.customCard}>
+          <h3 style={{ marginTop: 0, textDecoration: 'underline', fontFamily: 'Arial, sans-serif' }}>Skills</h3>
+          <div style={{ fontSize: '1em', color: '#333', fontFamily: 'Arial, sans-serif', marginTop: 8 }}>
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+              {(() => {
+                const skillList = [
+                  "Acrobatics", "Athletics", "Awareness", "Computers", "Culture", "Deception", "Diplomacy", "Intimidation", "Investigation", "Medicine", "Oikomagic", "Performance", "Piloting", "Stealth", "Survival", "Technology", "Thievery", "Xenomagic"
+                ];
+                const skillColumnValues = [20, 18, 16, 14, 12, 10, 8, 6, 4, 2];
+                
+                // Check if this is a new character without skill dots initialized
+                const isNewCharacter = !sheet || !sheet.hasFreeSkillStarterDots || !sheet.skillDots;
+                
+                return skillList.map(skill => {
+                  const dots = sheet?.skillDots?.[skill] || [];
+                  
+                  let value;
+                  if (isNewCharacter) {
+                    // For new characters, check if they have a class that gives a booster dot for this skill
+                    const hasClassBooster = (charClass === "Chemist" && skill === "Investigation") ||
+                                          (charClass === "Coder" && skill === "Oikomagic") ||
+                                          (charClass === "Commander" && skill === "Diplomacy") ||
+                                          (charClass === "Contemplative" && skill === "Awareness") ||
+                                          (charClass === "Devout" && skill === "Xenomagic") ||
+                                          (charClass === "Elementalist" && skill === "Xenomagic") ||
+                                          (charClass === "Exospecialist" && skill === "Athletics") ||
+                                          (charClass === "Gunslinger" && skill === "Deception") ||
+                                          (charClass === "Technician" && skill === "Technology");
+                    
+                    // New characters default to 18+ (first two columns), but class boosters add a third column (16+)
+                    value = hasClassBooster ? "16+" : "18+";
+                  } else {
+                    // For existing characters, find the rightmost selected dot
+                    let idx = dots.lastIndexOf(true);
+                    
+                    // Check if this skill should have a class booster dot that might not be in the saved data
+                    const hasClassBooster = (charClass === "Chemist" && skill === "Investigation") ||
+                                          (charClass === "Coder" && skill === "Oikomagic") ||
+                                          (charClass === "Commander" && skill === "Diplomacy") ||
+                                          (charClass === "Contemplative" && skill === "Awareness") ||
+                                          (charClass === "Devout" && skill === "Xenomagic") ||
+                                          (charClass === "Elementalist" && skill === "Xenomagic") ||
+                                          (charClass === "Exospecialist" && skill === "Athletics") ||
+                                          (charClass === "Gunslinger" && skill === "Deception") ||
+                                          (charClass === "Technician" && skill === "Technology");
+                    
+                    // If class booster exists and we have at least the first two dots, ensure minimum of index 2 (16+)
+                    if (hasClassBooster && idx >= 1) {
+                      idx = Math.max(idx, 2);
+                    }
+                    
+                    // If no dots, show "-"
+                    value = idx >= 0 ? skillColumnValues[idx] + "+" : "-";
+                  }
+                  
+                  return (
+                    <li key={skill} style={{ display: 'flex', alignItems: 'center', marginBottom: 2, fontFamily: 'Arial, sans-serif', fontSize: '1em' }}>
+                      <span style={{ fontWeight: 'bold', minWidth: 120 }}>{skill}</span>
+                      <span style={{ marginLeft: 8, fontWeight: 'bold', color: '#000', fontSize: '1em' }}>{value}</span>
+                    </li>
+                  );
+                });
+              })()}
+            </ul>
+          </div>
+        </div>
       <div className={styles.identityCard}>
   <h3 style={{ fontFamily: 'Arial, sans-serif' }}>Identity</h3>
         <div className={styles.cardContent}>
@@ -1939,9 +1885,13 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
           </div>
           <div className={styles.horizontalLabel} style={{ color: '#351c75', fontWeight: 'bold' }}>Multi Strike <span style={{ color: '#000' }}>{charClass === 'Contemplative' ? (2 + (sheet?.classCardDots?.[1]?.[0] ? 1 : 0)) : (multiStrike > 0 ? multiStrike : <span style={{ visibility: 'hidden' }}>0</span>)}</span></div>
           <div className={styles.horizontalLabel} style={{ color: '#351c75', fontWeight: 'bold' }}>
-            Strike Effects {charClass === 'Contemplative' && sheet?.classCardDots?.[2]?.[0]
-              ? <span style={{ color: '#000', fontWeight: 'normal' }}>Can <span style={{ color: '#351c75' }}><b><i>Strike</i></b></span> a single target multiple times</span>
-              : strikeEffects}
+              Strike Effects {
+                charClass === 'Contemplative' && sheet?.classCardDots?.[2]?.[0]
+                  ? <span style={{ color: '#000', fontWeight: 'normal' }}>Can <span style={{ color: '#351c75' }}><b><i>Strike</i></b></span> a single target multiple times</span>
+                  : (subclass === 'Anatomist' && sheet?.subclassProgressionDots?.anatomistStrikeDots?.[0])
+                    ? <span style={{ color: '#000', fontWeight: 'normal' }}>Can choose to heal <span style={{ color: '#351c75' }}><b><i>Strike</i></b></span> amount</span>
+                    : strikeEffects
+              }
           </div>
         </div>
       </div>
@@ -1981,206 +1931,6 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
           <div style={{ fontWeight: 'bold', marginBottom: 2, fontFamily: 'Arial, sans-serif', color: '#666666', wordBreak: 'break-word', overflowWrap: 'break-word' }}>Absorptions</div>
         </div>
       </div>
-
-
-      <div className={styles.skillsCard} style={{ position: 'relative' }}>
-        <h3 style={{ fontFamily: 'Arial, sans-serif', color: '#000' }}>Skills</h3>
-        <div className={styles.cardContent}>
-          {/* SP Notice Bubble */}
-          {spNotice && (
-            <div className={styles.spNoticeBubble}>
-              {spNotice}
-            </div>
-          )}
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ borderCollapse: 'collapse', width: '100%' }}>
-              <thead>
-                <tr>
-                  <th style={{ textAlign: 'left', fontWeight: 'bold', padding: '4px 8px', fontFamily: 'Arial, sans-serif' }}></th>
-                  {[20, 18, 16, 14, 12, 10, 8, 6, 4,  2].map((val) => (
-                    <th key={val} style={{ textAlign: 'center', fontWeight: 'bold', padding: '4px 8px', fontFamily: 'Arial, sans-serif' }}>{val}+</th>
-                  ))}
-                </tr>
-                <tr>
-                  <th style={{ fontFamily: 'Arial, sans-serif' }}></th>
-                  {[1,1,2,2,3,4,5,6,8,10].map((sp, idx) => (
-                    <th key={idx} style={{ textAlign: 'center', fontSize: '0.9em', color: '#888', padding: '2px 8px', fontFamily: 'Arial, sans-serif' }}>{sp}sp</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {skillList && skillList.map(skill => (
-                  <tr key={skill}>
-                    <td style={{ fontSize: '1.15em', fontWeight: 'bold', padding: '4px 8px', whiteSpace: 'nowrap', fontFamily: 'Arial, sans-serif' }}>{skill}</td>
-                    {(skillDots[skill] || Array(10).fill(false)).map((checked, i) => {
-                      const skillDotsForSkill = skillDots[skill] || Array(10).fill(false);
-                      
-                      // Check for class-based automatic skill dots
-                      const isChemistInvestigation = charClass === "Chemist" && skill === "Investigation" && i === 2;
-                      const isCoderOikomagic = charClass === "Coder" && skill === "Oikomagic" && i === 2;
-                      const isContemplativeAwareness = charClass === "Contemplative" && skill === "Awareness" && i === 2;
-                      const isDevoutXenomagic = charClass === "Devout" && skill === "Xenomagic" && i === 2;
-                      const isElementalistXenomagic = charClass === "Elementalist" && skill === "Xenomagic" && i === 2;
-                      const isExospecialistAthletics = charClass === "Exospecialist" && skill === "Athletics" && i === 2;
-                      const isGunslingerDeception = charClass === "Gunslinger" && skill === "Deception" && i === 2;
-                      const isCommanderDiplomacy = charClass === "Commander" && skill === "Diplomacy" && i === 2;
-                      const isTechnicianTechnology = charClass === "Technician" && skill === "Technology" && i === 2;
-                      if (isChemistInvestigation || isCoderOikomagic || isCommanderDiplomacy || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isGunslingerDeception || isTechnicianTechnology) {
-                        checked = true; // Force third dot to be filled for class booster dots
-                      }
-
-                      // Define class-specific colors for automatic skill dots
-                      const getClassBoostColor = () => {
-                        if (isChemistInvestigation) return "rgba(114,17,49,0.5)";
-                        if (isCoderOikomagic) return "rgba(17,33,114,0.5)";
-                        if (isCommanderDiplomacy) return "rgba(113,114,17,0.5)";
-                        if (isContemplativeAwareness) return "rgba(17,99,114,0.5)";
-                        if (isDevoutXenomagic) return "rgba(107,17,114,0.5)";
-                        if (isElementalistXenomagic) return "rgba(35,17,114,0.5)";
-                        if (isExospecialistAthletics) return "rgba(17,114,51,0.5)";
-                        if (isGunslingerDeception) return "rgba(78,114,17,0.5)";
-                        if (isTechnicianTechnology) return "rgba(114,72,17,0.5)";
-                        // Add other class colors here in the future
-                        return "#d0d0d0"; // fallback color
-                      };
-                      const classBoostColor = getClassBoostColor();
-                      
-                      // Account for booster dots when checking if previous dots are filled
-                      const canCheck = i === 0 || skillDotsForSkill.slice(0, i).every((dotFilled, dotIndex) => {
-                        // Check if this position has a booster dot
-                        const isBoosterDot = (charClass === "Chemist" && skill === "Investigation" && dotIndex === 2) ||
-                                           (charClass === "Coder" && skill === "Oikomagic" && dotIndex === 2) ||
-                                           (charClass === "Exospecialist" && skill === "Athletics" && dotIndex === 2) ||
-                                           (charClass === "Commander" && skill === "Diplomacy" && dotIndex === 2) ||
-                                           (charClass === "Contemplative" && skill === "Awareness" && dotIndex === 2) ||
-                                           (charClass === "Devout" && skill === "Xenomagic" && dotIndex === 2) ||
-                                           (charClass === "Elementalist" && skill === "Xenomagic" && dotIndex === 2) ||
-                                           (charClass === "Gunslinger" && skill === "Deception" && dotIndex === 2) ||
-                                           (charClass === "Technician" && skill === "Technology" && dotIndex === 2);
-                        return dotFilled || isBoosterDot;
-                      });
-                      const rightmostChecked = skillDotsForSkill.lastIndexOf(true);
-                      const canUncheck = checked && i === rightmostChecked;
-                      const isFirstTwoColumns = i === 0 || i === 1;
-                      const hasFreeDots = sheet?.hasFreeSkillStarterDots;
-                      const isLockedColumn = hasFreeDots && isFirstTwoColumns;
-                      
-                      return (
-                        <td key={i} style={{ textAlign: 'center', padding: '2px 4px' }}>
-                          <span
-                            onClick={() => {
-                              // Prevent clicking on locked columns for new characters
-                              if (isLockedColumn) return;
-                              
-                              // Prevent clicking on class-based automatic skill dots
-                              if (isChemistInvestigation || isCoderOikomagic || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isCommanderDiplomacy || isGunslingerDeception || isTechnicianTechnology) return;
-
-                              setSkillDots(prev => {
-                                setSpNotice("");
-                                const arr = (prev[skill] || Array(10).fill(false)).slice();
-                                let tempArr = arr.slice();
-                                if (!arr[i] && canCheck) {
-                                  for (let j = 0; j <= i; ++j) tempArr[j] = true;
-                                } else if (arr[i] && canUncheck) {
-                                  for (let j = i; j < arr.length; ++j) tempArr[j] = false;
-                                } else {
-                                  return prev;
-                                }
-                                
-                                // Calculate current SP spent
-                                let currentTotal = 0;
-                                const hasFreeDots = sheet?.hasFreeSkillStarterDots;
-                                Object.entries(prev).forEach(([skillName, dotsArr]) => {
-                                  dotsArr.forEach((dot, idx) => {
-                                    if (dot) {
-                                      // Check if this is a booster dot (should not cost SP)
-                                      const isBoosterDot = (charClass === "Chemist" && skillName === "Investigation" && idx === 2) ||
-                                                          (charClass === "Coder" && skillName === "Oikomagic" && idx === 2) ||
-                                                          (charClass === "Contemplative" && skillName === "Awareness" && idx === 2) ||
-                                                          (charClass === "Devout" && skillName === "Xenomagic" && idx === 2) ||
-                                                          (charClass === "Elementalist" && skillName === "Xenomagic" && idx === 2) ||
-                                                          (charClass === "Exospecialist" && skillName === "Athletics" && idx === 2) ||
-                                                          (charClass === "Commander" && skillName === "Diplomacy" && idx === 2) ||
-                                                          (charClass === "Gunslinger" && skillName === "Deception" && idx === 2) ||
-                                                          (charClass === "Technician" && skillName === "Technology" && idx === 2);
-
-                                      // For characters with free starter dots, first two columns are free
-                                      if (hasFreeDots && (idx === 0 || idx === 1)) {
-                                        // Don't add cost for first two columns
-                                      } else if (!isBoosterDot) {
-                                        // Don't add cost for booster dots
-                                        currentTotal += skillSpCosts[idx];
-                                      }
-                                    }
-                                  });
-                                });
-                                
-                                // Calculate what the new total would be
-                                let newTotal = 0;
-                                const newSkillDots = { ...prev, [skill]: tempArr };
-                                Object.entries(newSkillDots).forEach(([skillName, dotsArr]) => {
-                                  dotsArr.forEach((dot, idx) => {
-                                    if (dot) {
-                                      // Check if this is a booster dot (should not cost SP)
-                                      const isBoosterDot = (charClass === "Chemist" && skillName === "Investigation" && idx === 2) ||
-                                                          (charClass === "Coder" && skillName === "Oikomagic" && idx === 2) ||
-                                                          (charClass === "Contemplative" && skillName === "Awareness" && idx === 2) ||
-                                                          (charClass === "Devout" && skillName === "Xenomagic" && idx === 2) ||
-                                                          (charClass === "Elementalist" && skillName === "Xenomagic" && idx === 2) ||
-                                                          (charClass === "Exospecialist" && skillName === "Athletics" && idx === 2) ||
-                                                          (charClass === "Commander" && skillName === "Diplomacy" && idx === 2) ||
-                                                          (charClass === "Gunslinger" && skillName === "Deception" && idx === 2) ||
-                                                          (charClass === "Technician" && skillName === "Technology" && idx === 2);
-
-                                      // For characters with free starter dots, first two columns are free
-                                      if (hasFreeDots && (idx === 0 || idx === 1)) {
-                                        // Don't add cost for first two columns
-                                      } else if (!isBoosterDot) {
-                                        // Don't add cost for booster dots
-                                        newTotal += skillSpCosts[idx];
-                                      }
-                                    }
-                                  });
-                                });
-                                if (newTotal > spTotal) {
-                                  setSpNotice("Not enough sp!");
-                                  return prev;
-                                }
-                                setSpSpent(newTotal);
-                                return newSkillDots;
-                              });
-                            }}
-                            style={{
-                              display: 'inline-block',
-                              width: 18,
-                              height: 18,
-                              borderRadius: '50%',
-                              border: (isChemistInvestigation || isCoderOikomagic || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isCommanderDiplomacy || isGunslingerDeception || isTechnicianTechnology) ? `2px solid ${classBoostColor}` : (isLockedColumn ? '2px solid #666' : '2px solid #000'),
-                              background: checked ? ((isChemistInvestigation || isCoderOikomagic || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isCommanderDiplomacy || isGunslingerDeception || isTechnicianTechnology) ? classBoostColor : (isLockedColumn ? '#666' : '#000')) : '#fff',
-                              cursor: (isLockedColumn || isChemistInvestigation || isCoderOikomagic || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isCommanderDiplomacy || isGunslingerDeception || isTechnicianTechnology) ? 'not-allowed' : ((canCheck && !checked) || canUncheck ? 'pointer' : 'not-allowed'),
-                              opacity: (isLockedColumn || isChemistInvestigation || isCoderOikomagic || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isCommanderDiplomacy || isGunslingerDeception || isTechnicianTechnology) ? 0.6 : ((canCheck && !checked) || canUncheck ? 1 : 0.4),
-                            }}
-                            title={
-                              isChemistInvestigation || isCoderOikomagic || isCommanderDiplomacy || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isGunslingerDeception || isTechnicianTechnology
-                                ? 'Class bonus skill dot (cannot be changed)'
-                                : isLockedColumn 
-                                ? 'Starting skill dots (cannot be changed)'
-                                : (!checked && canCheck)
-                                ? `Toggle`
-                                : (canUncheck ? `Uncheck rightmost first` : `Must uncheck rightmost first`)
-                            }
-                          />
-                        </td>
-                      );
-                    })}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-      
 
 
       {/* Perks card */}

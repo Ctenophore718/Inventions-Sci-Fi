@@ -65,6 +65,8 @@ const LevelUpClassChemist: React.FC<LevelUpClassChemistProps> = ({
   });
   // Local state for pending dart gun selection
   const [pendingDartGun, setPendingDartGun] = useState<string>("");
+
+
   
     // Helper function to safely access classCardDots array
     const safeGetDotsArray = (index: number): boolean[] => {
@@ -123,6 +125,8 @@ const LevelUpClassChemist: React.FC<LevelUpClassChemistProps> = ({
         saveCharacterSheet(updatedSheet);
       }
     };
+
+
     
     // Helper function to handle dot clicking with sequential requirement
     const handleDotClick = (
@@ -823,6 +827,7 @@ const LevelUpClassChemist: React.FC<LevelUpClassChemistProps> = ({
                         </div>
                       </div>
                     </div>
+
                     {/* Strike section */}
                     <div style={{ marginTop: '12px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
                       <div style={{ fontWeight: 'bold', color: '#351c75', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Strike</u></div>

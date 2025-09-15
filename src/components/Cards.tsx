@@ -3,6 +3,7 @@ import type { CharacterSheet } from "../types/CharacterSheet";
 import { loadSheetById, saveCharacterSheet } from "../utils/storage";
 import styles from "./CharacterEditor.module.css";
 import { generateVolatileExperimentsDescriptionJSX, calculateChemistTechniqueData } from "../utils/chemistTechnique";
+import { generateTheGoodStuffDescriptionJSX, calculateAnatomistTechniqueData } from "../utils/anatomistTechnique";
 import { CardsChemistAttacks } from "./CardsChemistAttacks";
 
 type CardsProps = {
@@ -651,7 +652,7 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
                 fontFamily: 'Arial, Helvetica, sans-serif',
                 fontWeight: 'bold',
                 fontSize: 'clamp(0.8em, 4vw, 1.25em)',
-                color: 'black',
+                color: localSheet?.subclass === 'Anatomist' ? '#66cf00' : 'black',
                 lineHeight: 1,
                 textAlign: 'left',
                 whiteSpace: 'nowrap',
@@ -660,13 +661,13 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
                 flexShrink: 1,
                 marginRight: '5px'
               }}>
-                Subclass Card Name
+                {localSheet?.subclass === 'Anatomist' ? 'The "Good Stuff"' : 'Subclass Card Name'}
               </span>
               <span style={{
                 fontFamily: 'Arial, Helvetica, sans-serif',
                 fontStyle: 'italic',
                 fontSize: '0.75em',
-                color: 'black',
+                color: '#66cf00',
                 lineHeight: 1,
                 whiteSpace: 'normal',
                 wordBreak: 'keep-all',
@@ -674,11 +675,11 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
                 maxWidth: '72px',
                 display: 'inline-block',
                 textAlign: 'right'
-              }}>Subclass</span>
+              }}>{localSheet?.subclass === 'Anatomist' ? 'Anatomist' : 'Subclass'}</span>
             </div>
             <img 
-              src="/Blank Card.png"
-              alt="Blank Card"
+              src={localSheet?.subclass === 'Anatomist' ? "/The Good Stuff.png" : "/Blank Card.png"}
+              alt={localSheet?.subclass === 'Anatomist' ? "The Good Stuff" : "Blank Card"}
               style={{
                 position: 'absolute',
                 top: 35,
@@ -706,7 +707,7 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
             }}>
               <span style={{ color: '#bf9000', fontFamily: 'Arial, Helvetica, sans-serif', fontWeight: 'bold', fontSize: '1.1em', textAlign: 'left' }}>Technique</span>
               <span style={{ color: '#bf9000', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '0.875em', fontStyle: 'italic', marginRight: 22, whiteSpace: 'nowrap', maxWidth: 'calc(100% - 120px)', overflow: 'hidden', textOverflow: 'ellipsis', textAlign: 'right' }}>
-                Cooldown <span style={{ fontWeight: 'bold', fontStyle: 'normal' }}>[#]</span>
+                Cooldown <span style={{ fontWeight: 'bold', fontStyle: 'normal' }}>[{localSheet?.subclass === 'Anatomist' ? calculateAnatomistTechniqueData(localSheet?.subclassProgressionDots).cooldown : '#'}]</span>
               </span>
             </div>
             
@@ -733,7 +734,7 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
                 maxHeight: '100%',
                 overflow: 'hidden'
               }}>
-                Card stats.
+                {localSheet?.subclass === 'Anatomist' ? generateTheGoodStuffDescriptionJSX(localSheet?.subclassProgressionDots) : 'Card stats.'}
               </div>
             </div>
             <div style={{
@@ -745,12 +746,12 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
               color: '#000',
               fontFamily: 'Arial, Helvetica, sans-serif',
               fontStyle: 'italic',
-              fontSize: '0.70em',
+              fontSize: localSheet?.subclass === 'Anatomist' ? '0.69em' : '0.70em',
               fontWeight: 400,
               zIndex: 3,
               textAlign: 'left'
             }}>
-              Flavor text.
+              {localSheet?.subclass === 'Anatomist' ? '"Every organism is capable of performing well beyond its natural limit, if you simply inject it with the right components." --Rezz, Radiofrequent Anatomist' : 'Flavor text.'}
             </div>
         </div>
         

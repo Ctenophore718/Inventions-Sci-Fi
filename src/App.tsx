@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import './responsive-headers.css';
 import SheetManager from "./components/SheetManager";
@@ -142,6 +141,24 @@ const App = () => {
       return;
     }
     
+    if (!currentSheet && newCharacterCreated) {
+      // Handle the case where we've marked a character as created but currentSheet is still null
+      // This can happen during the initial creation process
+      console.log('Creating character sheet for newCharacterCreated case with updates:', updates);
+      const newSheet = createNewCharacterSheet(updates);
+      console.log('Created new sheet for newCharacterCreated case:', newSheet);
+      setCurrentSheet(newSheet);
+      
+      // Immediately sync the App-level state with the new sheet
+      setCharClass(newSheet.charClass || "");
+      setSubclass(newSheet.subclass || "");
+      setSpecies(newSheet.species || "");
+      setSubspecies(newSheet.subspecies || "");
+      
+      performAutoSave(newSheet);
+      return;
+    }
+    
     if (currentSheet) {
       const updatedSheet = { ...currentSheet, ...updates };
       console.log('Updating existing sheet:', updatedSheet);
@@ -153,15 +170,8 @@ const App = () => {
       if (updates.subspecies !== undefined) setSubspecies(updates.subspecies);
       
       performAutoSave(updatedSheet);
-    } else if (newCharacterCreated && (updates.hasFreeSkillStarterDots || updates.skillDots)) {
-      // Allow critical initialization updates even if currentSheet isn't set yet
-      console.log('Allowing critical initialization update:', updates);
-      const newSheet = createNewCharacterSheet(updates);
-      console.log('Created sheet with critical updates:', newSheet);
-      setCurrentSheet(newSheet);
-      performAutoSave(newSheet);
     } else {
-      console.log('Ignoring update - no current sheet and already created character this session');
+      console.log('Error: Unexpected state - no current sheet available');
     }
   }, [currentSheet, performAutoSave, newCharacterCreated, charClass, subclass, species, subspecies]);
 
@@ -224,12 +234,18 @@ const App = () => {
   };
 
   const handleNew = () => {
-    setCurrentSheet(null);
+    // Reset state
     setCharClass("");
     setSubclass("");
     setSpecies("");
     setSubspecies("");
-    setNewCharacterCreated(true); // Set the flag when starting new character
+    setNewCharacterCreated(true);
+    
+    // Create and immediately save a new character
+    const newSheet = createNewCharacterSheet();
+    setCurrentSheet(newSheet);
+    performAutoSave(newSheet);
+    
     setView("editor");
   };
 
@@ -358,7 +374,7 @@ const App = () => {
   return (
     <div style={{ padding: "2rem" }}>
       <div className="headerRowResponsive" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1em' }}>
-        <h1 style={{ fontFamily: 'Arial, Helvetica, sans-serif', margin: 0 }}>Inventions Sci-Fi</h1>
+        <h1 style={{ fontFamily: 'Arial, Helvetica, sans-serif', margin: 0, fontSize: '2.45em' }}>Inventions Sci-Fi</h1>
         {view === "editor" && (
           <span className="pageHeader" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '2.0em', fontWeight: 600, margin: '0 auto', display: 'block', textAlign: 'center' }}>Character Sheet</span>
         )}

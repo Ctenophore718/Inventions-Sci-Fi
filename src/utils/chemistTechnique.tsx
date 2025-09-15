@@ -36,7 +36,7 @@ export function generateVolatileExperimentsJSX(classCardDots?: boolean[][]): Rea
 
   return (
     <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#721131', fontSize: '1em' }}>Volatile Experiments</i></b> <span style={{ color: '#721131', fontSize: '1em' }}>(Cooldown <b style={{ color: '#000', fontStyle: 'normal' }}>[{cooldown}]</b>).</span> You spend any number of <i>Chem Tokens</i>. After doing so, you and allies within <b>[{hxDots}]</b>hx of you gain +2 to Crit rolls, +<b>[{chemBonus}]</b>d6 <b><u style={{ color: '#de7204', display: 'inline-flex', alignItems: 'center' }}>
+      <b><i style={{ color: '#721131', fontSize: '1em' }}>Volatile Experiments</i></b> <span style={{ color: '#721131', fontSize: '1em' }}><i>(Cooldown <b style={{ color: '#000', fontStyle: 'normal' }}>[{cooldown}]</b>).</i></span> You spend any number of <i>Chem Tokens</i>. After doing so, you and allies within <b>[{hxDots}]</b>hx of you gain +2 to Crit rolls, +<b>[{chemBonus}]</b>d6 <b><u style={{ color: '#de7204', display: 'inline-flex', alignItems: 'center' }}>
                             Chemical
                             <img src="/Chemical.png" alt="Chemical" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} />
                           </u></b> and/or +<b>[{hxRangeBonus}]</b>hx Range to <b><i><span style={{ color: '#990000' }}>Attacks</span></i></b> for each Token spent until the start of the next round.
