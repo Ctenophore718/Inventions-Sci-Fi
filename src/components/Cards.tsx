@@ -2280,12 +2280,12 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
       </div>
 
       {/* Chem Tokens Button (only for Chemist class) */}
-      {charClass === 'Chemist' && (
-        <div style={{
-          position: 'fixed',
-          bottom: '80px',
-          right: '20px',
-          zIndex: 999
+    {charClass === 'Chemist' && (
+      <div style={{
+        position: 'fixed',
+        bottom: '60px',
+        right: '20px',
+        zIndex: 999
         }}>
           {/* Chem Tokens Menu (expanded state) */}
           {isChemTokensMenuExpanded && (
@@ -2353,6 +2353,7 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
 
           <button
             ref={chemTokensButtonRef}
+            className={styles.chemTokensButton}
             onClick={() => setIsChemTokensMenuExpanded((open) => !open)}
             style={{
               padding: '8px 16px',
@@ -2380,7 +2381,7 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
               }
             }}
           >
-            Chem Tokens: {chemTokens}
+          <img src="/Chem Token.png" alt="Chem Token" style={{ height: '1.2em', verticalAlign: 'top', marginLeft: '0px', marginRight: '0px' }}/>: {chemTokens}
           </button>
         </div>
       )}

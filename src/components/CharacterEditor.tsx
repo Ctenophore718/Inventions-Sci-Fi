@@ -3075,7 +3075,7 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
       {charClass === 'Chemist' && (
         <div style={{
           position: 'fixed',
-          bottom: '80px',
+          bottom: '60px',
           right: '20px',
           zIndex: 999
         }}>
@@ -3145,6 +3145,7 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
 
           <button
             ref={chemTokensButtonRef}
+            className={styles.chemTokensButton}
             onClick={() => setIsChemTokensMenuExpanded((open) => !open)}
             style={{
               padding: '8px 16px',
@@ -3172,7 +3173,7 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
               }
             }}
           >
-            Chem Tokens: {chemTokens}
+          <img src="/Chem Token.png" alt="Chem Token" style={{ height: '1.2em', verticalAlign: 'top', marginLeft: '0px', marginRight: '0px' }}/>: {chemTokens}
           </button>
         </div>
       )}

@@ -1083,6 +1083,13 @@
   color: white !important;
 }
 
+/* Chem Tokens Button Styles */
+.chemTokensButton {
+  background-color: #721131 !important;
+  background: #721131 !important;
+  color: white !important;
+}
+
 .redMinusButton {
   background-color: #ff4444 !important;
   background: #ff4444 !important;

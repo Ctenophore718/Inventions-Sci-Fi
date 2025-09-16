@@ -2463,7 +2463,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
     {charClass === 'Chemist' && (
       <div style={{
         position: 'fixed',
-        bottom: '80px',
+        bottom: '60px',
         right: '20px',
         zIndex: 999
       }}>
@@ -2533,6 +2533,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
 
         <button
           ref={chemTokensButtonRef}
+          className={styles.chemTokensButton}
           onClick={() => setIsChemTokensMenuExpanded((open) => !open)}
           style={{
             padding: '8px 16px',
@@ -2544,8 +2545,6 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
             fontWeight: 'bold',
             transition: 'all 0.3s ease',
             transform: isChemTokensMenuExpanded ? 'scale(1.05)' : 'scale(1)',
-            background: '#721131',
-            color: 'white'
           }}
           onMouseEnter={(e) => {
             if (!isChemTokensMenuExpanded) {
@@ -2560,7 +2559,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
             }
           }}
         >
-          Chem Tokens: {chemTokens}
+          <img src="/Chem Token.png" alt="Chem Token" style={{ height: '1.2em', verticalAlign: 'top', marginLeft: '0px', marginRight: '0px' }}/>: {chemTokens}
         </button>
       </div>
     )}
