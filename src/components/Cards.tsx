@@ -20,6 +20,7 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
   const [isXpSpMenuExpanded, setIsXpSpMenuExpanded] = React.useState(false);
   const [isHpMenuExpanded, setIsHpMenuExpanded] = React.useState(false);
   const [isCreditsMenuExpanded, setIsCreditsMenuExpanded] = React.useState(false);
+  const [isChemTokensMenuExpanded, setIsChemTokensMenuExpanded] = React.useState(false);
   const menuRef = React.useRef<HTMLDivElement>(null);
   const waffleRef = React.useRef<HTMLButtonElement>(null);
   const xpSpMenuRef = React.useRef<HTMLDivElement>(null);
@@ -27,6 +28,8 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
   const hpButtonRef = React.useRef<HTMLButtonElement>(null);
   const creditsMenuRef = React.useRef<HTMLDivElement>(null);
   const creditsButtonRef = React.useRef<HTMLButtonElement>(null);
+  const chemTokensMenuRef = React.useRef<HTMLDivElement>(null);
+  const chemTokensButtonRef = React.useRef<HTMLButtonElement>(null);
   React.useEffect(() => {
     if (!isNavExpanded) return;
     function handleClick(e: MouseEvent) {
@@ -82,6 +85,20 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
     return () => document.removeEventListener('mousedown', handleClick);
   }, [isCreditsMenuExpanded]);
 
+  React.useEffect(() => {
+    if (!isChemTokensMenuExpanded) return;
+    function handleClick(e: MouseEvent) {
+      if (
+        chemTokensMenuRef.current && !chemTokensMenuRef.current.contains(e.target as Node) &&
+        chemTokensButtonRef.current && !chemTokensButtonRef.current.contains(e.target as Node)
+      ) {
+        setIsChemTokensMenuExpanded(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [isChemTokensMenuExpanded]);
+
   // Local state for HP/XP/SP management
   const [currentHitPoints, setCurrentHitPoints] = React.useState<number>(localSheet?.currentHitPoints ?? localSheet?.maxHitPoints ?? 0);
   // For add/subtract HP section
@@ -89,6 +106,8 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
   // Credits management
   const [credits, setCredits] = React.useState<number>(localSheet?.credits ?? 0);
   const [creditsDelta, setCreditsDelta] = React.useState<number>(0);
+  // Chem Tokens management (for Chemist class)
+  const [chemTokens, setChemTokens] = React.useState<number>(localSheet?.chemTokens ?? 0);
   const [deathCount, setDeathCount] = React.useState(localSheet?.deathCount || 0);
   const [xpTotal, setXpTotal] = React.useState(localSheet?.xpTotal || 0);
   const [spTotal, setSpTotal] = React.useState(localSheet?.spTotal || 0);
@@ -2259,6 +2278,112 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
           hp: {currentHitPoints}/{effectiveMaxHP}
         </button>
       </div>
+
+      {/* Chem Tokens Button (only for Chemist class) */}
+      {charClass === 'Chemist' && (
+        <div style={{
+          position: 'fixed',
+          bottom: '80px',
+          right: '20px',
+          zIndex: 999
+        }}>
+          {/* Chem Tokens Menu (expanded state) */}
+          {isChemTokensMenuExpanded && (
+            <div ref={chemTokensMenuRef} style={{
+              position: 'absolute',
+              bottom: '50px',
+              right: '0px',
+              background: 'white',
+              border: '2px solid #721131',
+              borderRadius: '12px',
+              padding: '16px',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+              minWidth: '260px',
+              animation: 'fadeIn 0.2s ease-out'
+            }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ fontWeight: 'bold', minWidth: '120px', fontSize: '16px' }}>Chem Tokens:</span>
+                  <button
+                    className={styles.redMinusButton}
+                    style={{ width: '26px', height: '26px', fontSize: '14px' }}
+                    onClick={() => {
+                      const newValue = Math.max(0, chemTokens - 1);
+                      setChemTokens(newValue);
+                      handleAutoSave({ chemTokens: newValue });
+                    }}
+                  >
+                    −
+                  </button>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    value={chemTokens}
+                    onChange={(e) => {
+                      const val = e.target.value.replace(/[^0-9]/g, '');
+                      const newValue = val ? Math.max(0, parseInt(val)) : 0;
+                      setChemTokens(newValue);
+                      handleAutoSave({ chemTokens: newValue });
+                    }}
+                    style={{
+                      width: '60px',
+                      textAlign: 'center',
+                      border: '1px solid #ccc',
+                      borderRadius: '4px',
+                      padding: '4px 8px',
+                      fontSize: '16px'
+                    }}
+                  />
+                  <button
+                    className={styles.greenPlusButton}
+                    style={{ width: '26px', height: '26px', fontSize: '14px' }}
+                    onClick={() => {
+                      const newValue = chemTokens + 1;
+                      setChemTokens(newValue);
+                      handleAutoSave({ chemTokens: newValue });
+                    }}
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <button
+            ref={chemTokensButtonRef}
+            onClick={() => setIsChemTokensMenuExpanded((open) => !open)}
+            style={{
+              padding: '8px 16px',
+              borderRadius: '20px',
+              border: 'none',
+              cursor: 'pointer',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+              fontSize: '14px',
+              fontWeight: 'bold',
+              transition: 'all 0.3s ease',
+              transform: isChemTokensMenuExpanded ? 'scale(1.05)' : 'scale(1)',
+              background: '#721131',
+              color: 'white'
+            }}
+            onMouseEnter={(e) => {
+              if (!isChemTokensMenuExpanded) {
+                e.currentTarget.style.transform = 'scale(1.05)';
+                e.currentTarget.style.boxShadow = '0 6px 16px rgba(0,0,0,0.2)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!isChemTokensMenuExpanded) {
+                e.currentTarget.style.transform = 'scale(1)';
+                e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+              }
+            }}
+          >
+            Chem Tokens: {chemTokens}
+          </button>
+        </div>
+      )}
 
   {/* Character Card Management System section removed as requested */}
       </div>

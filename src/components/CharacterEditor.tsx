@@ -43,6 +43,7 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
   const [isXpSpMenuExpanded, setIsXpSpMenuExpanded] = useState(false);
   const [isHpMenuExpanded, setIsHpMenuExpanded] = useState(false);
   const [isCreditsMenuExpanded, setIsCreditsMenuExpanded] = useState(false);
+  const [isChemTokensMenuExpanded, setIsChemTokensMenuExpanded] = useState(false);
   const menuRef = React.useRef<HTMLDivElement>(null);
   const waffleRef = React.useRef<HTMLButtonElement>(null);
   const xpSpMenuRef = React.useRef<HTMLDivElement>(null);
@@ -51,6 +52,8 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
   const hpButtonRef = React.useRef<HTMLButtonElement>(null);
   const creditsMenuRef = React.useRef<HTMLDivElement>(null);
   const creditsButtonRef = React.useRef<HTMLButtonElement>(null);
+  const chemTokensMenuRef = React.useRef<HTMLDivElement>(null);
+  const chemTokensButtonRef = React.useRef<HTMLButtonElement>(null);
   React.useEffect(() => {
     if (!isNavExpanded) return;
     function handleClick(e: MouseEvent) {
@@ -107,6 +110,20 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
     return () => document.removeEventListener('mousedown', handleClick);
   }, [isCreditsMenuExpanded]);
 
+  React.useEffect(() => {
+    if (!isChemTokensMenuExpanded) return;
+    function handleClick(e: MouseEvent) {
+      if (
+        chemTokensMenuRef.current && !chemTokensMenuRef.current.contains(e.target as Node) &&
+        chemTokensButtonRef.current && !chemTokensButtonRef.current.contains(e.target as Node)
+      ) {
+        setIsChemTokensMenuExpanded(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [isChemTokensMenuExpanded]);
+
   // Identity fields
   const [playerName, setPlayerName] = useState(sheet?.playerName || "");
   const [name, setName] = useState(sheet?.name || "");
@@ -131,6 +148,7 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
       setPortraitUrl(sheet.portrait || null);
       setCurrentHitPoints(sheet.currentHitPoints || 0);
       setCredits(sheet.credits || 0);
+      setChemTokens(sheet.chemTokens || 0);
       setDeathCount(sheet.deathCount || 0);
       setClassFeature(sheet.classFeature || "");
       setSubclassFeature(sheet.subclassFeature || "");
@@ -427,6 +445,9 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
   const [multiStrike, setMultiStrike] = useState<number>(sheet?.multiStrike || 0);
   const [strikeEffects, setStrikeEffects] = useState<string>(sheet?.strikeEffects || "");
 
+  // Inventory state for Attack Weapons/Spells dropdown
+  const [pendingAttack, setPendingAttack] = useState<string>("");
+
   // Current Hit Points state (local only)
   const [currentHitPoints, setCurrentHitPoints] = useState<number>(sheet?.currentHitPoints ?? sheet?.maxHitPoints ?? 0);
   const [hpDelta, setHpDelta] = useState<number>(0);
@@ -434,6 +455,8 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
   // Credits state
   const [credits, setCredits] = useState<number>(sheet?.credits ?? 0);
   const [creditsDelta, setCreditsDelta] = useState<number>(0);
+  // Chem Tokens state (for Chemist class)
+  const [chemTokens, setChemTokens] = useState<number>(sheet?.chemTokens ?? 0);
 
   const classOptions = [
     { label: "Chemist", value: "Chemist", color: "#721131" },
@@ -1139,6 +1162,86 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
       <b><i style={{ color: '#9026b1' }}>Natural Insulation.</i></b> You <i>Resist</i> <b><u style={{ color: '#3ebbff', display: 'inline-flex', alignItems: 'center' }}>Cold<img src="/Cold.png" alt="Cold" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> and <b><u style={{ color: '#915927', display: 'inline-flex', alignItems: 'center' }}>Bludgeoning<img src="/Bludgeoning.png" alt="Bludgeoning" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> and are <i>Immune</i> to the <b><i>Restrain</i></b> condition. Your size is 3hx.
     </span>
   );
+
+  // Helper functions for Attack Weapons/Spells dropdown
+  const getAvailableAttacks = () => {
+    const attacks: { name: string; type: string; cost: number }[] = [];
+    
+    // Add Dart Guns for Chemist class
+    if (charClass === 'Chemist') {
+      attacks.push(
+        { name: 'Chem Gun', type: 'Dart Gun', cost: 150 },
+        { name: 'Happy Pill Pusher', type: 'Dart Gun', cost: 160 },
+        { name: 'Sour Juicer', type: 'Dart Gun', cost: 160 },
+        { name: 'Prickly Goo', type: 'Dart Gun', cost: 175 }
+      );
+    }
+    
+    // Add Super Serums for Anatomist subclass
+    if (subclass === 'Anatomist') {
+      attacks.push(
+        { name: 'Jacob\'s Ladder', type: 'Super Serum', cost: 215 },
+        { name: 'Vampirismagoria', type: 'Super Serum', cost: 185 }
+      );
+    }
+    
+    return attacks;
+  };
+
+  const handleAttackPurchase = (attackName: string, cost: number, type: string) => {
+    if (credits < cost) {
+      // You could add a notice system here similar to the Level Up page
+      return;
+    }
+    
+    if (sheet) {
+      let updatedSheet: CharacterSheet;
+      if (type === 'Dart Gun') {
+        const newDartGuns = [...(sheet.dartGuns || []), attackName];
+        updatedSheet = { 
+          ...sheet, 
+          dartGuns: newDartGuns,
+          credits: credits - cost
+        };
+      } else if (type === 'Super Serum') {
+        const newSuperSerums = [...(sheet.superSerums || []), attackName];
+        updatedSheet = { 
+          ...sheet, 
+          superSerums: newSuperSerums,
+          credits: credits - cost
+        };
+      } else {
+        return;
+      }
+      
+      handleAutoSave(updatedSheet);
+    }
+    setPendingAttack("");
+  };
+
+  const handleAttackAdd = (attackName: string, type: string) => {
+    if (sheet) {
+      let updatedSheet: CharacterSheet;
+      if (type === 'Dart Gun') {
+        const newDartGuns = [...(sheet.dartGuns || []), attackName];
+        updatedSheet = { 
+          ...sheet, 
+          dartGuns: newDartGuns
+        };
+      } else if (type === 'Super Serum') {
+        const newSuperSerums = [...(sheet.superSerums || []), attackName];
+        updatedSheet = { 
+          ...sheet, 
+          superSerums: newSuperSerums
+        };
+      } else {
+        return;
+      }
+      
+      handleAutoSave(updatedSheet);
+    }
+    setPendingAttack("");
+  };
 
   return (
     <div className="character-editor" style={{ 
@@ -2025,7 +2128,147 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
       {/* Inventory card: rows 3-4, column 3 */}
       <div className={styles.inventoryCard}>
   <h3 style={{ marginTop: 0, textDecoration: 'underline', color: '#bf9000', fontFamily: 'Arial, sans-serif' }}>Inventory</h3>
-        <div className={styles.cardContent}></div>
+        <div className={styles.cardContent}>
+          <div style={{ marginBottom: '16px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <div style={{ fontWeight: 'bold', color: '#990000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <u>Attack Weapons/Spells</u>
+            </div>
+            <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <div style={{ marginBottom: '4px', textAlign: 'left' }}>
+                <select
+                  style={{
+                    fontSize: '1em',
+                    padding: '2px 8px',
+                    borderRadius: '6px',
+                    border: '1px solid #ccc',
+                    background: '#fff',
+                    color: '#222',
+                    fontWeight: 'bold',
+                    marginBottom: '4px',
+                    textAlign: 'left',
+                    minWidth: '180px'
+                  }}
+                  value={pendingAttack || (charClass === 'Chemist' ? 'Dart Guns' : subclass === 'Anatomist' ? 'Super Serums' : 'Select Attack Type')}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (value !== 'Dart Guns' && value !== 'Super Serums' && value !== 'Select Attack Type') {
+                      setPendingAttack(value);
+                    }
+                  }}
+                >
+                  {charClass === 'Chemist' && (
+                    <>
+                      <option disabled style={{ fontWeight: 'bold' }}>Dart Guns</option>
+                      <option style={{ fontWeight: 'bold' }}>Chem Gun</option>
+                      <option style={{ fontWeight: 'bold' }}>Happy Pill Pusher</option>
+                      <option style={{ fontWeight: 'bold' }}>Sour Juicer</option>
+                      <option style={{ fontWeight: 'bold' }}>Prickly Goo</option>
+                    </>
+                  )}
+                  {subclass === 'Anatomist' && (
+                    <>
+                      <option disabled style={{ fontWeight: 'bold' }}>Super Serums</option>
+                      <option style={{ fontWeight: 'bold' }}>Jacob's Ladder</option>
+                      <option style={{ fontWeight: 'bold' }}>Vampirismagoria</option>
+                    </>
+                  )}
+                  {charClass !== 'Chemist' && subclass !== 'Anatomist' && (
+                    <option disabled style={{ fontWeight: 'bold' }}>Select Attack Type</option>
+                  )}
+                </select>
+                
+                {pendingAttack && (
+                  <div style={{ marginTop: '4px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    <div style={{ fontWeight: 'bold' }}>
+                      {pendingAttack}
+                      <span style={{ color: '#bf9000', fontWeight: 'bold', marginLeft: '8px' }}>
+                        {(() => {
+                          const selectedAttack = getAvailableAttacks().find(attack => attack.name === pendingAttack);
+                          return selectedAttack ? `${selectedAttack.cost}c` : '';
+                        })()}
+                      </span>
+                    </div>
+                    <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                      <button
+                        style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #1976d2', background: '#1976d2', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}
+                        onClick={() => {
+                          const selectedAttack = getAvailableAttacks().find(attack => attack.name === pendingAttack);
+                          if (selectedAttack) {
+                            handleAttackPurchase(selectedAttack.name, selectedAttack.cost, selectedAttack.type);
+                          }
+                        }}
+                      >
+                        Buy
+                      </button>
+                      <button
+                        style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #28a745', background: '#28a745', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}
+                        onClick={() => {
+                          const selectedAttack = getAvailableAttacks().find(attack => attack.name === pendingAttack);
+                          if (selectedAttack) {
+                            handleAttackAdd(selectedAttack.name, selectedAttack.type);
+                          }
+                        }}
+                      >
+                        Add
+                      </button>
+                      <button
+                        style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #aaa', background: '#eee', color: '#333', fontWeight: 'bold', cursor: 'pointer' }}
+                        onClick={() => setPendingAttack("")}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                )}
+                
+                <div style={{ marginTop: '2px' }}>
+                  {((sheet?.dartGuns && sheet.dartGuns.length > 0) || (sheet?.superSerums && sheet.superSerums.length > 0)) && (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginLeft: '8px' }}>
+                      {sheet?.dartGuns?.map((gun, idx) => (
+                        <span key={gun + idx + 'dart'} style={{ fontStyle: 'italic', display: 'flex', alignItems: 'center', background: '#f5f5f5', borderRadius: '6px', padding: '2px 8px' }}>
+                          {gun}
+                          <button
+                            style={{ marginLeft: '6px', padding: '0 6px', borderRadius: '50%', border: 'none', background: '#d32f2f', color: 'white', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.9em' }}
+                            title={`Remove ${gun}`}
+                            onClick={() => {
+                              if (sheet) {
+                                const newDartGuns = sheet.dartGuns?.filter((_, i) => i !== idx) || [];
+                                const updatedSheet = { 
+                                  ...sheet, 
+                                  dartGuns: newDartGuns
+                                };
+                                handleAutoSave(updatedSheet);
+                              }
+                            }}
+                          >×</button>
+                        </span>
+                      ))}
+                      {sheet?.superSerums?.map((serum, idx) => (
+                        <span key={serum + idx + 'serum'} style={{ fontStyle: 'italic', display: 'flex', alignItems: 'center', background: '#f5f5f5', borderRadius: '6px', padding: '2px 8px' }}>
+                          {serum}
+                          <button
+                            style={{ marginLeft: '6px', padding: '0 6px', borderRadius: '50%', border: 'none', background: '#d32f2f', color: 'white', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.9em' }}
+                            title={`Remove ${serum}`}
+                            onClick={() => {
+                              if (sheet) {
+                                const newSuperSerums = sheet.superSerums?.filter((_, i) => i !== idx) || [];
+                                const updatedSheet = { 
+                                  ...sheet, 
+                                  superSerums: newSuperSerums
+                                };
+                                handleAutoSave(updatedSheet);
+                              }
+                            }}
+                          >×</button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Background card: row 4, column 4 */}
@@ -2827,6 +3070,112 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
           hp: {currentHitPoints}/{charClass === "Exospecialist" ? maxHitPoints + 20 : maxHitPoints}
         </button>
       </div>
+
+      {/* Chem Tokens Button (only for Chemist class) */}
+      {charClass === 'Chemist' && (
+        <div style={{
+          position: 'fixed',
+          bottom: '80px',
+          right: '20px',
+          zIndex: 999
+        }}>
+          {/* Chem Tokens Menu (expanded state) */}
+          {isChemTokensMenuExpanded && (
+            <div ref={chemTokensMenuRef} style={{
+              position: 'absolute',
+              bottom: '50px',
+              right: '0px',
+              background: 'white',
+              border: '2px solid #721131',
+              borderRadius: '12px',
+              padding: '16px',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+              minWidth: '260px',
+              animation: 'fadeIn 0.2s ease-out'
+            }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ fontWeight: 'bold', minWidth: '120px', fontSize: '16px' }}>Chem Tokens:</span>
+                  <button
+                    className={styles.redMinusButton}
+                    style={{ width: '26px', height: '26px', fontSize: '14px' }}
+                    onClick={() => {
+                      const newValue = Math.max(0, chemTokens - 1);
+                      setChemTokens(newValue);
+                      handleAutoSave({ chemTokens: newValue });
+                    }}
+                  >
+                    −
+                  </button>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    value={chemTokens}
+                    onChange={(e) => {
+                      const val = e.target.value.replace(/[^0-9]/g, '');
+                      const newValue = val ? Math.max(0, parseInt(val)) : 0;
+                      setChemTokens(newValue);
+                      handleAutoSave({ chemTokens: newValue });
+                    }}
+                    style={{
+                      width: '60px',
+                      textAlign: 'center',
+                      border: '1px solid #ccc',
+                      borderRadius: '4px',
+                      padding: '4px 8px',
+                      fontSize: '16px'
+                    }}
+                  />
+                  <button
+                    className={styles.greenPlusButton}
+                    style={{ width: '26px', height: '26px', fontSize: '14px' }}
+                    onClick={() => {
+                      const newValue = chemTokens + 1;
+                      setChemTokens(newValue);
+                      handleAutoSave({ chemTokens: newValue });
+                    }}
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <button
+            ref={chemTokensButtonRef}
+            onClick={() => setIsChemTokensMenuExpanded((open) => !open)}
+            style={{
+              padding: '8px 16px',
+              borderRadius: '20px',
+              border: 'none',
+              cursor: 'pointer',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+              fontSize: '14px',
+              fontWeight: 'bold',
+              transition: 'all 0.3s ease',
+              transform: isChemTokensMenuExpanded ? 'scale(1.05)' : 'scale(1)',
+              background: '#721131',
+              color: 'white'
+            }}
+            onMouseEnter={(e) => {
+              if (!isChemTokensMenuExpanded) {
+                e.currentTarget.style.transform = 'scale(1.05)';
+                e.currentTarget.style.boxShadow = '0 6px 16px rgba(0,0,0,0.2)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!isChemTokensMenuExpanded) {
+                e.currentTarget.style.transform = 'scale(1)';
+                e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+              }
+            }}
+          >
+            Chem Tokens: {chemTokens}
+          </button>
+        </div>
+      )}
 
     </div>
   );

@@ -37,6 +37,7 @@ export type CharacterSheet = {
   maxHitPoints: number;
   deathCount: number;
   credits: number;
+  chemTokens?: number; // For Chemist class
   // Hit Points UI
   deathDots: boolean[]; // 10 elements, true if selected
 
