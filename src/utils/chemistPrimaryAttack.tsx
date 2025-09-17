@@ -1,4 +1,5 @@
 import React from 'react';
+import { calculateChemistFeatureData } from './chemistFeature';
 
 export interface ChemistPrimaryAttackData {
   dieSizeDots: number;
@@ -31,54 +32,60 @@ export function calculateChemistPrimaryAttackData(classCardDots?: boolean[][]): 
 export function generateChemistPrimaryAttackStatsJSX(
   classCardDots?: boolean[][],
   cost?: number,
-  dartGunName?: string
+  dartGunName?: string,
+  chemTokens?: number
 ): React.ReactElement {
   const { dieSize, critThreshold } = calculateChemistPrimaryAttackData(classCardDots);
-  
+  // Get critBonus from chemistFeature
+  const { critBonus } = calculateChemistFeatureData(classCardDots);
+  // Calculate dynamic damage dice based on Chem Tokens
+  const damageDice = (chemTokens || 0) > 0 ? 2 : 1;
+  // Calculate dynamic crit threshold
+  const dynamicCritThreshold = (chemTokens || 0) > 0 ? critThreshold - critBonus : critThreshold;
   return (
     <div style={{ fontSize: '0.875em', width: '100%', height: 'fit-content', maxHeight: '100%', overflow: 'hidden' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
         <span><b><u>Range</u></b> 8hx</span>
-        <span style={{ textAlign: 'right', minWidth: '80px' }}><b><u>Crit</u></b> <b>[{critThreshold}]</b>+</span>
+        <span style={{ textAlign: 'right', minWidth: '80px' }}><b><u>Crit</u></b> <b>[{dynamicCritThreshold}]</b>+</span>
       </div>
       <div>
         <b><u>Target</u></b> Single <br />
         {dartGunName === 'Chem Gun' ? (
           <>
-            <b><u>Damage</u></b> 1d<b>[{dieSize}]</b> <b><u style={{ color: '#a6965f', display: 'inline-flex', alignItems: 'center' }}>
+            <b><u>Damage</u></b> <b>[{damageDice}]</b>d<b>[{dieSize}]</b> <b><u style={{ color: '#a6965f', display: 'inline-flex', alignItems: 'center' }}>
             Piercing<img src="/Piercing.png" alt="Piercing" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b><br />
-            <b><u>Crit Effect</u></b> 1d<b>[{dieSize}]</b> <b><u style={{ color: '#de7204', display: 'inline-flex', alignItems: 'center' }}>
+            <b><u>Crit Effect</u></b> <b>[{damageDice}]</b>d<b>[{dieSize}]</b> <b><u style={{ color: '#de7204', display: 'inline-flex', alignItems: 'center' }}>
             Chemical<img src="/Chemical.png" alt="Chemical" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} /></u></b>, <br />
             <div style={{ textAlign: 'right', width: '100%' }}><b><i>Spike</i></b> <b>(<u style={{ color: '#de7204', display: 'inline-flex', alignItems: 'center' }}>
             Chemical<img src="/Chemical.png" alt="Chemical" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} /></u>)</b></div>
           </>
         ) : dartGunName === 'Happy Pill Pusher' ? (
           <> 
-            <b><u>Damage</u></b> 1d<b>[{dieSize}]</b>: <b><u style={{ color: '#de7204', display: 'inline-flex', alignItems: 'center' }}>
+            <b><u>Damage</u></b> <b>[{damageDice}]</b>d<b>[{dieSize}]</b>: <b><u style={{ color: '#de7204', display: 'inline-flex', alignItems: 'center' }}>
             Chemical<img src="/Chemical.png" alt="Chemical" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} /></u></b><br />
-            <b><u>Crit Effect</u></b> 1d<b>[{dieSize}]</b>: <b><u style={{ color: '#de7204', display: 'inline-flex', alignItems: 'center' }}>
+            <b><u>Crit Effect</u></b> <b>[{damageDice}]</b>d<b>[{dieSize}]</b>: <b><u style={{ color: '#de7204', display: 'inline-flex', alignItems: 'center' }}>
             Chemical<img src="/Chemical.png" alt="Chemical" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} /></u></b>, <br />
             <div style={{ textAlign: 'right', width: '100%' }}><b><i>Mesmerize</i></b></div>   
           </>
         ) : dartGunName === 'Sour Juicer' ? (
           <> 
-            <b><u>Damage</u></b> 1d<b>[{dieSize}]</b>: <b><u style={{ color: '#de7204', display: 'inline-flex', alignItems: 'center' }}>
+            <b><u>Damage</u></b> <b>[{damageDice}]</b>d<b>[{dieSize}]</b>: <b><u style={{ color: '#de7204', display: 'inline-flex', alignItems: 'center' }}>
             Chemical<img src="/Chemical.png" alt="Chemical" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} /></u></b><br />
-            <b><u>Crit Effect</u></b> 1d<b>[{dieSize}]</b>: <b><u style={{ color: '#02b900', display: 'inline-flex', alignItems: 'center' }}>
+            <b><u>Crit Effect</u></b> <b>[{damageDice}]</b>d<b>[{dieSize}]</b>: <b><u style={{ color: '#02b900', display: 'inline-flex', alignItems: 'center' }}>
             Toxic<img src="/Toxic.png" alt="Toxic" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} /></u></b>, <b><i>Demoralize</i></b>    
           </>
         ) : dartGunName === 'Prickly Goo' ? (
           <> 
-            <b><u>Damage</u></b> 1d<b>[{dieSize}]</b>: <b><u style={{ color: '#808080', display: 'inline-flex', alignItems: 'center' }}>
+            <b><u>Damage</u></b> <b>[{damageDice}]</b>d<b>[{dieSize}]</b>: <b><u style={{ color: '#808080', display: 'inline-flex', alignItems: 'center' }}>
             Slashing<img src="/Slashing.png" alt="Slashing" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} /></u></b><br />
-            <b><u>Crit Effect</u></b> 1d<b>[{dieSize}]</b>: <b><u style={{ color: '#02b900', display: 'inline-flex', alignItems: 'center' }}>
+            <b><u>Crit Effect</u></b> <b>[{damageDice}]</b>d<b>[{dieSize}]</b>: <b><u style={{ color: '#02b900', display: 'inline-flex', alignItems: 'center' }}>
             Toxic<img src="/Toxic.png" alt="Toxic" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} /></u></b>, <b><i>Blind,</i></b> <br />
             <div style={{ textAlign: 'right', width: '100%' }}><b><i>Restrain</i></b></div> 
           </>
         ) : (
           <>
-            <b><u>Damage</u></b> 1d<b>[{dieSize}]</b> <br />
-            <b><u>Crit Effect</u></b> 1d<b>[{dieSize}]</b>
+            <b><u>Damage</u></b> <b>[{damageDice}]</b>d<b>[{dieSize}]</b> <br />
+            <b><u>Crit Effect</u></b> <b>[{damageDice}]</b>d<b>[{dieSize}]</b>
           </>
         )}
       </div>

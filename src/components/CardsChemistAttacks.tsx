@@ -165,7 +165,7 @@ export const CardsChemistAttacks: React.FC<CardsChemistAttacksProps> = ({ sheet 
             zIndex: 2,
             lineHeight: 1.2
           }}>
-            {generateChemistPrimaryAttackStatsJSX(sheet?.classCardDots, undefined, dartGun)}
+            {generateChemistPrimaryAttackStatsJSX(sheet?.classCardDots, undefined, dartGun, sheet?.chemTokens)}
           </div>
           
           {/* Flavor Text */}

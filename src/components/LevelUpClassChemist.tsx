@@ -206,6 +206,7 @@ const LevelUpClassChemist: React.FC<LevelUpClassChemistProps> = ({
                           </span>
                         </div>
                     {/* XP progression table - interactive dots */}
+                    
                     <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px' }}>
                       <div style={{
                         display: 'grid',
@@ -707,11 +708,17 @@ const LevelUpClassChemist: React.FC<LevelUpClassChemistProps> = ({
                           </span>
                         </div>
                         <b><u>Target</u></b> Single <br />
-                        <b><u>Damage</u></b> 1d<b>[{(() => {
+                        <b><u>Damage</u></b> <b>[{(() => {
+                          const chemTokens = sheet?.chemTokens || 0;
+                          return chemTokens > 0 ? 1 + 1 : 1;
+                        })()}]</b>d<b>[{(() => {
                           const dieSizeDots = safeGetDotsArray(6).filter(Boolean).length;
                           return dieSizeDots === 0 ? 6 : dieSizeDots === 1 ? 8 : dieSizeDots === 2 ? 10 : 12;
                         })()}]</b> <br />
-                        <b><u>Crit Effect</u></b> 1d<b>[{(() => {
+                        <b><u>Crit Effect</u></b> <b>[{(() => {
+                          const chemTokens = sheet?.chemTokens || 0;
+                          return chemTokens > 0 ? 1 + 1 : 1;
+                        })()}]</b>d<b>[{(() => {
                           const dieSizeDots = safeGetDotsArray(6).filter(Boolean).length;
                           return dieSizeDots === 0 ? 6 : dieSizeDots === 1 ? 8 : dieSizeDots === 2 ? 10 : 12;
                         })()}]</b>

@@ -5,6 +5,7 @@ import styles from "./CharacterEditor.module.css";
 import { generateVolatileExperimentsDescriptionJSX, calculateChemistTechniqueData } from "../utils/chemistTechnique";
 import { generateTheGoodStuffDescriptionJSX, calculateAnatomistTechniqueData } from "../utils/anatomistTechnique";
 import { CardsChemistAttacks } from "./CardsChemistAttacks";
+import { calculateChemistFeatureData } from "../utils/chemistFeature";
 
 type CardsProps = {
   sheet: CharacterSheet | null;
@@ -21,6 +22,7 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
   const [isHpMenuExpanded, setIsHpMenuExpanded] = React.useState(false);
   const [isCreditsMenuExpanded, setIsCreditsMenuExpanded] = React.useState(false);
   const [isChemTokensMenuExpanded, setIsChemTokensMenuExpanded] = React.useState(false);
+  const [notice, setNotice] = React.useState("");
   const menuRef = React.useRef<HTMLDivElement>(null);
   const waffleRef = React.useRef<HTMLButtonElement>(null);
   const xpSpMenuRef = React.useRef<HTMLDivElement>(null);
@@ -98,6 +100,14 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
     document.addEventListener('mousedown', handleClick);
     return () => document.removeEventListener('mousedown', handleClick);
   }, [isChemTokensMenuExpanded]);
+
+  // Auto-dismiss notice after 2.5 seconds
+  React.useEffect(() => {
+    if (notice) {
+      const timeout = setTimeout(() => setNotice(""), 2500);
+      return () => clearTimeout(timeout);
+    }
+  }, [notice]);
 
   // Local state for HP/XP/SP management
   const [currentHitPoints, setCurrentHitPoints] = React.useState<number>(localSheet?.currentHitPoints ?? localSheet?.maxHitPoints ?? 0);
@@ -1782,7 +1792,8 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
                     value={chemTokens}
                     onChange={(e) => {
                       const val = e.target.value.replace(/[^0-9]/g, '');
-                      const newValue = val ? Math.max(0, parseInt(val)) : 0;
+                      const { chemTokenMax } = calculateChemistFeatureData(localSheet?.classCardDots);
+                      const newValue = val ? Math.max(0, Math.min(chemTokenMax, parseInt(val))) : 0;
                       setChemTokens(newValue);
                       handleAutoSave({ chemTokens: newValue });
                     }}
@@ -1799,7 +1810,12 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
                     className={styles.greenPlusButton}
                     style={{ width: '26px', height: '26px', fontSize: '14px' }}
                     onClick={() => {
-                      const newValue = chemTokens + 1;
+                      const { chemTokenMax } = calculateChemistFeatureData(localSheet?.classCardDots);
+                      if (chemTokens >= chemTokenMax) {
+                        setNotice("Chem Token maximum reached!");
+                        return;
+                      }
+                      const newValue = Math.min(chemTokenMax, chemTokens + 1);
                       setChemTokens(newValue);
                       handleAutoSave({ chemTokens: newValue });
                     }}
@@ -1843,6 +1859,13 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
           >
           <img src="/Chem Token.png" alt="Chem Token" style={{ height: '1.2em', verticalAlign: 'top', marginLeft: '0px', marginRight: '2px' }}/>: {chemTokens}
           </button>
+        </div>
+      )}
+
+      {/* Notice Display */}
+      {notice && (
+        <div className={styles.standardNotice}>
+          {notice}
         </div>
       )}
 

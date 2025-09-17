@@ -13,6 +13,7 @@ import LevelUpClassExospecialist from "./LevelUpClassExospecialist";
 import LevelUpClassGunslinger from "./LevelUpClassGunslinger";
 import LevelUpClassTechnician from "./LevelUpClassTechnician";
 import LevelUpSubclassesChemist from "./LevelUpSubclassesChemist";
+import { calculateChemistFeatureData } from "../utils/chemistFeature";
 
 
 type LevelUpProps = {
@@ -2502,7 +2503,8 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                   value={chemTokens}
                   onChange={(e) => {
                     const val = e.target.value.replace(/[^0-9]/g, '');
-                    const newValue = val ? Math.max(0, parseInt(val)) : 0;
+                    const { chemTokenMax } = calculateChemistFeatureData(sheet?.classCardDots);
+                    const newValue = val ? Math.max(0, Math.min(chemTokenMax, parseInt(val))) : 0;
                     setChemTokens(newValue);
                     handleAutoSave({ chemTokens: newValue });
                   }}
@@ -2519,7 +2521,12 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                   className={styles.greenPlusButton}
                   style={{ width: '26px', height: '26px', fontSize: '14px' }}
                   onClick={() => {
-                    const newValue = chemTokens + 1;
+                    const { chemTokenMax } = calculateChemistFeatureData(sheet?.classCardDots);
+                    if (chemTokens >= chemTokenMax) {
+                      setNotice("Chem Token maximum reached!");
+                      return;
+                    }
+                    const newValue = Math.min(chemTokenMax, chemTokens + 1);
                     setChemTokens(newValue);
                     handleAutoSave({ chemTokens: newValue });
                   }}

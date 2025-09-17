@@ -347,9 +347,21 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
             </span>
           </div>
           {/* Feature XP progression table - now interactive */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto auto', gap: '8px', alignItems: 'center', marginBottom: '1rem' }}>
+
+        <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px' }}>
+          <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: '1fr 24px 24px 24px', 
+            gridTemplateRows: 'repeat(5, auto)',  
+            columnGap: '6px', 
+            rowGap: '2px', 
+            alignItems: 'start',  
+            marginBottom: '2px',
+            width: '100%',
+            paddingLeft: '4px'
+          }}>
             <span></span>
-            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>6xp</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>6xp</span>
             <span></span>
             <span></span>
             <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>Ignore condition Immunities</span>
@@ -394,6 +406,7 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
               </span>
             ))}
           </div>
+        </div>
 
           {/* Technique Section - Chemist style */}
           <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>

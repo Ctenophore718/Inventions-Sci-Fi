@@ -3,7 +3,7 @@ import styles from './CharacterEditor.module.css';
 
 import type { CharacterSheet } from "../types/CharacterSheet";
 import { saveCharacterSheet, loadSheetById } from "../utils/storage";
-import { generateChemicalReactionJSX } from "../utils/chemistFeature";
+import { generateChemicalReactionJSX, calculateChemistFeatureData } from "../utils/chemistFeature";
 import { generateChemistStrikeJSX } from "../utils/chemistStrike";
 import { generateAnatomicalPrecisionJSX } from "../utils/anatomistFeature";
 
@@ -123,6 +123,14 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
     document.addEventListener('mousedown', handleClick);
     return () => document.removeEventListener('mousedown', handleClick);
   }, [isChemTokensMenuExpanded]);
+  // Auto-dismiss notice after 2.5 seconds
+  React.useEffect(() => {
+    if (notice) {
+      const timeout = setTimeout(() => setNotice(""), 2500);
+      return () => clearTimeout(timeout);
+    }
+  });
+
 
   // Identity fields
   const [playerName, setPlayerName] = useState(sheet?.playerName || "");
@@ -458,6 +466,9 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
   const [creditsDelta, setCreditsDelta] = useState<number>(0);
   // Chem Tokens state (for Chemist class)
   const [chemTokens, setChemTokens] = useState<number>(sheet?.chemTokens ?? 0);
+  
+  // Notice state
+  const [notice, setNotice] = useState<string>("");
 
   const classOptions = [
     { label: "Chemist", value: "Chemist", color: "#721131" },
@@ -2185,8 +2196,8 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
         <div className={styles.cardContent}>
           <div style={{ marginBottom: '16px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
             {/* Primary Attacks Section */}
-            <div style={{ fontWeight: 'bold', color: '#990000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}>
-              <u>Attack Weapons/Spells</u>
+            <div style={{ fontWeight: 'bold', color: '#990000', marginBottom: '6px', fontSize: '1.06em', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <u><span style={{ color: '#000' }}>Primary</span> Attacks</u>
             </div>
             <div style={{ fontSize: '1em', color: '#000', marginBottom: '16px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
               <div style={{ marginBottom: '4px', textAlign: 'left' }}>
@@ -2298,8 +2309,8 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
             </div>
 
             {/* Secondary Attacks Section */}
-            <div style={{ fontWeight: 'bold', color: '#990000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}>
-              <u>Secondary Attacks</u>
+            <div style={{ fontWeight: 'bold', color: '#990000', marginBottom: '6px', fontSize: '1.06em', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <u><span style={{ color: '#000' }}>Secondary</span> Attacks</u>
             </div>
             <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
               <div style={{ marginBottom: '4px', textAlign: 'left' }}>
@@ -3254,7 +3265,8 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
                     value={chemTokens}
                     onChange={(e) => {
                       const val = e.target.value.replace(/[^0-9]/g, '');
-                      const newValue = val ? Math.max(0, parseInt(val)) : 0;
+                      const { chemTokenMax } = calculateChemistFeatureData(sheet?.classCardDots);
+                      const newValue = val ? Math.max(0, Math.min(chemTokenMax, parseInt(val))) : 0;
                       setChemTokens(newValue);
                       handleAutoSave({ chemTokens: newValue });
                     }}
@@ -3271,7 +3283,12 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
                     className={styles.greenPlusButton}
                     style={{ width: '26px', height: '26px', fontSize: '14px' }}
                     onClick={() => {
-                      const newValue = chemTokens + 1;
+                      const { chemTokenMax } = calculateChemistFeatureData(sheet?.classCardDots);
+                      if (chemTokens >= chemTokenMax) {
+                        setNotice("Chem Token maximum reached!");
+                        return;
+                      }
+                      const newValue = Math.min(chemTokenMax, chemTokens + 1);
                       setChemTokens(newValue);
                       handleAutoSave({ chemTokens: newValue });
                     }}
@@ -3315,6 +3332,13 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
           >
           <img src="/Chem Token.png" alt="Chem Token" style={{ height: '1.2em', verticalAlign: 'top', marginLeft: '0px', marginRight: '2px' }}/>: {chemTokens}
           </button>
+        </div>
+      )}
+
+      {/* Notice Display */}
+      {notice && (
+        <div className={styles.standardNotice}>
+          {notice}
         </div>
       )}
 
