@@ -447,6 +447,7 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
 
   // Inventory state for Attack Weapons/Spells dropdown
   const [pendingAttack, setPendingAttack] = useState<string>("");
+  const [pendingSecondaryAttack, setPendingSecondaryAttack] = useState<string>("");
 
   // Current Hit Points state (local only)
   const [currentHitPoints, setCurrentHitPoints] = useState<number>(sheet?.currentHitPoints ?? sheet?.maxHitPoints ?? 0);
@@ -1164,7 +1165,7 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
   );
 
   // Helper functions for Attack Weapons/Spells dropdown
-  const getAvailableAttacks = () => {
+  const getAvailablePrimaryAttacks = () => {
     const attacks: { name: string; type: string; cost: number }[] = [];
     
     // Add Dart Guns for Chemist class
@@ -1177,6 +1178,12 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
       );
     }
     
+    return attacks;
+  };
+
+  const getAvailableSecondaryAttacks = () => {
+    const attacks: { name: string; type: string; cost: number }[] = [];
+    
     // Add Super Serums for Anatomist subclass
     if (subclass === 'Anatomist') {
       attacks.push(
@@ -1186,6 +1193,11 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
     }
     
     return attacks;
+  };
+
+  // Keep the original function for backward compatibility
+  const getAvailableAttacks = () => {
+    return [...getAvailablePrimaryAttacks(), ...getAvailableSecondaryAttacks()];
   };
 
   const handleAttackPurchase = (attackName: string, cost: number, type: string) => {
@@ -1241,6 +1253,48 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
       handleAutoSave(updatedSheet);
     }
     setPendingAttack("");
+  };
+
+  const handleSecondaryAttackPurchase = (attackName: string, cost: number, type: string) => {
+    if (credits < cost) {
+      // You could add a notice system here similar to the Level Up page
+      return;
+    }
+    
+    if (sheet) {
+      let updatedSheet: CharacterSheet;
+      if (type === 'Super Serum') {
+        const newSuperSerums = [...(sheet.superSerums || []), attackName];
+        updatedSheet = { 
+          ...sheet, 
+          superSerums: newSuperSerums,
+          credits: credits - cost
+        };
+      } else {
+        return;
+      }
+      
+      handleAutoSave(updatedSheet);
+    }
+    setPendingSecondaryAttack("");
+  };
+
+  const handleSecondaryAttackAdd = (attackName: string, type: string) => {
+    if (sheet) {
+      let updatedSheet: CharacterSheet;
+      if (type === 'Super Serum') {
+        const newSuperSerums = [...(sheet.superSerums || []), attackName];
+        updatedSheet = { 
+          ...sheet, 
+          superSerums: newSuperSerums
+        };
+      } else {
+        return;
+      }
+      
+      handleAutoSave(updatedSheet);
+    }
+    setPendingSecondaryAttack("");
   };
 
   return (
@@ -2130,10 +2184,11 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
   <h3 style={{ marginTop: 0, textDecoration: 'underline', color: '#bf9000', fontFamily: 'Arial, sans-serif' }}>Inventory</h3>
         <div className={styles.cardContent}>
           <div style={{ marginBottom: '16px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            {/* Primary Attacks Section */}
             <div style={{ fontWeight: 'bold', color: '#990000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}>
               <u>Attack Weapons/Spells</u>
             </div>
-            <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <div style={{ fontSize: '1em', color: '#000', marginBottom: '16px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
               <div style={{ marginBottom: '4px', textAlign: 'left' }}>
                 <select
                   style={{
@@ -2148,10 +2203,10 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
                     textAlign: 'left',
                     minWidth: '180px'
                   }}
-                  value={pendingAttack || (charClass === 'Chemist' ? 'Dart Guns' : subclass === 'Anatomist' ? 'Super Serums' : 'Select Attack Type')}
+                  value={pendingAttack || (charClass === 'Chemist' ? 'Dart Guns' : 'Select Primary Attack')}
                   onChange={(e) => {
                     const value = e.target.value;
-                    if (value !== 'Dart Guns' && value !== 'Super Serums' && value !== 'Select Attack Type') {
+                    if (value !== 'Dart Guns' && value !== 'Select Primary Attack') {
                       setPendingAttack(value);
                     }
                   }}
@@ -2165,15 +2220,8 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
                       <option style={{ fontWeight: 'bold' }}>Prickly Goo</option>
                     </>
                   )}
-                  {subclass === 'Anatomist' && (
-                    <>
-                      <option disabled style={{ fontWeight: 'bold' }}>Super Serums</option>
-                      <option style={{ fontWeight: 'bold' }}>Jacob's Ladder</option>
-                      <option style={{ fontWeight: 'bold' }}>Vampirismagoria</option>
-                    </>
-                  )}
-                  {charClass !== 'Chemist' && subclass !== 'Anatomist' && (
-                    <option disabled style={{ fontWeight: 'bold' }}>Select Attack Type</option>
+                  {charClass !== 'Chemist' && (
+                    <option disabled style={{ fontWeight: 'bold' }}>Select Primary Attack</option>
                   )}
                 </select>
                 
@@ -2183,7 +2231,7 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
                       {pendingAttack}
                       <span style={{ color: '#bf9000', fontWeight: 'bold', marginLeft: '8px' }}>
                         {(() => {
-                          const selectedAttack = getAvailableAttacks().find(attack => attack.name === pendingAttack);
+                          const selectedAttack = getAvailablePrimaryAttacks().find(attack => attack.name === pendingAttack);
                           return selectedAttack ? `${selectedAttack.cost}c` : '';
                         })()}
                       </span>
@@ -2192,7 +2240,7 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
                       <button
                         style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #1976d2', background: '#1976d2', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}
                         onClick={() => {
-                          const selectedAttack = getAvailableAttacks().find(attack => attack.name === pendingAttack);
+                          const selectedAttack = getAvailablePrimaryAttacks().find(attack => attack.name === pendingAttack);
                           if (selectedAttack) {
                             handleAttackPurchase(selectedAttack.name, selectedAttack.cost, selectedAttack.type);
                           }
@@ -2203,7 +2251,7 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
                       <button
                         style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #28a745', background: '#28a745', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}
                         onClick={() => {
-                          const selectedAttack = getAvailableAttacks().find(attack => attack.name === pendingAttack);
+                          const selectedAttack = getAvailablePrimaryAttacks().find(attack => attack.name === pendingAttack);
                           if (selectedAttack) {
                             handleAttackAdd(selectedAttack.name, selectedAttack.type);
                           }
@@ -2222,7 +2270,7 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
                 )}
                 
                 <div style={{ marginTop: '2px' }}>
-                  {((sheet?.dartGuns && sheet.dartGuns.length > 0) || (sheet?.superSerums && sheet.superSerums.length > 0)) && (
+                  {(sheet?.dartGuns && sheet.dartGuns.length > 0) && (
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginLeft: '8px' }}>
                       {sheet?.dartGuns?.map((gun, idx) => (
                         <span key={gun + idx + 'dart'} style={{ fontStyle: 'italic', display: 'flex', alignItems: 'center', background: '#f5f5f5', borderRadius: '6px', padding: '2px 8px' }}>
@@ -2243,6 +2291,98 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
                           >×</button>
                         </span>
                       ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Secondary Attacks Section */}
+            <div style={{ fontWeight: 'bold', color: '#990000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <u>Secondary Attacks</u>
+            </div>
+            <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <div style={{ marginBottom: '4px', textAlign: 'left' }}>
+                <select
+                  style={{
+                    fontSize: '1em',
+                    padding: '2px 8px',
+                    borderRadius: '6px',
+                    border: '1px solid #ccc',
+                    background: '#fff',
+                    color: '#222',
+                    fontWeight: 'bold',
+                    marginBottom: '4px',
+                    textAlign: 'left',
+                    minWidth: '180px'
+                  }}
+                  value={pendingSecondaryAttack || (subclass === 'Anatomist' ? 'Super Serums' : 'Select Secondary Attack')}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (value !== 'Super Serums' && value !== 'Select Secondary Attack') {
+                      setPendingSecondaryAttack(value);
+                    }
+                  }}
+                >
+                  {subclass === 'Anatomist' && (
+                    <>
+                      <option disabled style={{ fontWeight: 'bold' }}>Super Serums</option>
+                      <option style={{ fontWeight: 'bold' }}>Jacob's Ladder</option>
+                      <option style={{ fontWeight: 'bold' }}>Vampirismagoria</option>
+                    </>
+                  )}
+                  {subclass !== 'Anatomist' && (
+                    <option disabled style={{ fontWeight: 'bold' }}>Select Secondary Attack</option>
+                  )}
+                </select>
+                
+                {pendingSecondaryAttack && (
+                  <div style={{ marginTop: '4px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    <div style={{ fontWeight: 'bold' }}>
+                      {pendingSecondaryAttack}
+                      <span style={{ color: '#bf9000', fontWeight: 'bold', marginLeft: '8px' }}>
+                        {(() => {
+                          const selectedAttack = getAvailableSecondaryAttacks().find(attack => attack.name === pendingSecondaryAttack);
+                          return selectedAttack ? `${selectedAttack.cost}c` : '';
+                        })()}
+                      </span>
+                    </div>
+                    <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                      <button
+                        style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #1976d2', background: '#1976d2', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}
+                        onClick={() => {
+                          const selectedAttack = getAvailableSecondaryAttacks().find(attack => attack.name === pendingSecondaryAttack);
+                          if (selectedAttack) {
+                            handleSecondaryAttackPurchase(selectedAttack.name, selectedAttack.cost, selectedAttack.type);
+                          }
+                        }}
+                      >
+                        Buy
+                      </button>
+                      <button
+                        style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #28a745', background: '#28a745', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}
+                        onClick={() => {
+                          const selectedAttack = getAvailableSecondaryAttacks().find(attack => attack.name === pendingSecondaryAttack);
+                          if (selectedAttack) {
+                            handleSecondaryAttackAdd(selectedAttack.name, selectedAttack.type);
+                          }
+                        }}
+                      >
+                        Add
+                      </button>
+                      <button
+                        style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #aaa', background: '#eee', color: '#333', fontWeight: 'bold', cursor: 'pointer' }}
+                        onClick={() => setPendingSecondaryAttack("")}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                )}
+                
+                <div style={{ marginTop: '2px' }}>
+                  {(sheet?.superSerums && sheet.superSerums.length > 0) && (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginLeft: '8px' }}>
                       {sheet?.superSerums?.map((serum, idx) => (
                         <span key={serum + idx + 'serum'} style={{ fontStyle: 'italic', display: 'flex', alignItems: 'center', background: '#f5f5f5', borderRadius: '6px', padding: '2px 8px' }}>
                           {serum}
@@ -3173,7 +3313,7 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
               }
             }}
           >
-          <img src="/Chem Token.png" alt="Chem Token" style={{ height: '1.2em', verticalAlign: 'top', marginLeft: '0px', marginRight: '0px' }}/>: {chemTokens}
+          <img src="/Chem Token.png" alt="Chem Token" style={{ height: '1.2em', verticalAlign: 'top', marginLeft: '0px', marginRight: '2px' }}/>: {chemTokens}
           </button>
         </div>
       )}

@@ -70,6 +70,9 @@ export type CharacterSheet = {
   // Super Serums for Chemist class
   superSerums?: string[];
 
+  // Grenades for Grenadier subclass
+  grenades?: string[];
+
   // Subclass progression dots (specific to each subclass)
   subclassProgressionDots?: {
     // Anatomist subclass progression
@@ -84,6 +87,20 @@ export type CharacterSheet = {
     anatomistAttackCooldownDots?: boolean[];
     anatomistStrikeDots?: boolean[];
     anatomistSurgeonDots?: boolean[];
+    // Grenadier subclass progression
+    grenadierFeatureDots?: boolean[];
+    grenadierFeatureIncludesAlliesDots?: boolean[];
+    grenadierFeatureAoEDots?: boolean[];
+    grenadierFeatureImmunityDots?: boolean[];
+    grenadierTechniqueDieSizeDots?: boolean[];
+    grenadierTechniqueRangeDots?: boolean[];
+    grenadierTechniqueCooldownDots?: boolean[];
+    grenadierAttackAoEDots?: boolean[];
+    grenadierAttackDamageDots?: boolean[];
+    grenadierAttackCritDots?: boolean[];
+    grenadierAttackCooldownDots?: boolean[];
+    grenadierStrikeDots?: boolean[];
+    grenadierExplosiveTemperDots?: boolean[];
     // Add other subclasses as needed
   };
 };

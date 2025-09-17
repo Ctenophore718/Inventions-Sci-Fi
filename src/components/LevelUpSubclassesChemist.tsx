@@ -97,6 +97,68 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
     }
   };
   
+  // Independent state for Grenadier dots - completely separate from any other component
+  const [grenadierFeatureDots, setGrenadierFeatureDots] = useState<boolean[]>(
+    sheet?.subclassProgressionDots?.grenadierFeatureDots || [false]
+  );
+  const [grenadierFeatureIncludesAlliesDots, setGrenadierFeatureIncludesAlliesDots] = useState<boolean[]>(
+    sheet?.subclassProgressionDots?.grenadierFeatureIncludesAlliesDots || [false]
+  );
+  const [grenadierFeatureAoEDots, setGrenadierFeatureAoEDots] = useState<boolean[]>(
+    sheet?.subclassProgressionDots?.grenadierFeatureAoEDots || [false, false]
+  );
+  const [grenadierFeatureImmunityDots, setGrenadierFeatureImmunityDots] = useState<boolean[]>(
+    sheet?.subclassProgressionDots?.grenadierFeatureImmunityDots || [false]
+  );
+  const [grenadierTechniqueDieSizeDots, setGrenadierTechniqueDieSizeDots] = useState<boolean[]>(
+    sheet?.subclassProgressionDots?.grenadierTechniqueDieSizeDots || [false]
+  );
+  const [grenadierTechniqueRangeDots, setGrenadierTechniqueRangeDots] = useState<boolean[]>(
+    sheet?.subclassProgressionDots?.grenadierTechniqueRangeDots || [false]
+  );
+  const [grenadierTechniqueCooldownDots, setGrenadierTechniqueCooldownDots] = useState<boolean[]>(
+    sheet?.subclassProgressionDots?.grenadierTechniqueCooldownDots || [false, false]
+  );
+  const [grenadierAttackAoEDots, setGrenadierAttackAoEDots] = useState<boolean[]>(
+    sheet?.subclassProgressionDots?.grenadierAttackAoEDots || [false, false, false]
+  );
+  const [grenadierAttackDamageDots, setGrenadierAttackDamageDots] = useState<boolean[]>(
+    sheet?.subclassProgressionDots?.grenadierAttackDamageDots || [false, false, false]
+  );
+  const [grenadierAttackCritDots, setGrenadierAttackCritDots] = useState<boolean[]>(
+    sheet?.subclassProgressionDots?.grenadierAttackCritDots || [false, false, false]
+  );
+  const [grenadierAttackCooldownDots, setGrenadierAttackCooldownDots] = useState<boolean[]>(
+    sheet?.subclassProgressionDots?.grenadierAttackCooldownDots || [false, false]
+  );
+  const [grenadierStrikeDots, setGrenadierStrikeDots] = useState<boolean[]>(
+    sheet?.subclassProgressionDots?.grenadierStrikeDots || [false, false, false]
+  );
+  const [grenadierExplosiveTemperDots, setGrenadierExplosiveTemperDots] = useState<boolean[]>(
+    sheet?.subclassProgressionDots?.grenadierExplosiveTemperDots || [false]
+  );
+
+  // Local state for selected grenades (Grenadier only)
+  const [selectedGrenades, setSelectedGrenades] = useState<string[]>(() => {
+    return sheet?.grenades || [];
+  });
+  // Local state for pending grenade selection (Grenadier only)
+  const [pendingGrenade, setPendingGrenade] = useState<string>("");
+
+  // Save grenades to sheet (Grenadier only)
+  const saveGrenades = (newGrenades: string[]) => {
+    setSelectedGrenades(newGrenades);
+    if (sheet) {
+      const updatedSheet = { 
+        ...sheet, 
+        grenades: newGrenades,
+        // Preserve current credits to avoid race conditions
+        credits: credits
+      };
+      saveCharacterSheet(updatedSheet);
+    }
+  };
+
   // Independent state for Anatomist dots - completely separate from any other component
   const [anatomistFeatureDots, setAnatomistFeatureDots] = useState<boolean[]>(
     sheet?.subclassProgressionDots?.anatomistFeatureDots || [false]
@@ -741,11 +803,495 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
         </div>
       )}
       
-      {/* TODO: Add other Chemist subclasses (Grenadier, Necro, Poisoner) here */}
+      {/* Grenadier Subclass Content */}
       {subclass === 'Grenadier' && (
         <div style={{ width: '100%', marginTop: '1rem', textAlign: 'left', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
-          <div style={{ color: '#cf0000', fontSize: '1.2em', fontWeight: 'bold', textAlign: 'center', padding: '20px' }}>
-            Grenadier subclass content coming soon...
+          {/* Feature header - Chemist style */}
+          <div style={{ color: '#0b5394', fontWeight: 'bold', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '8px' }}>
+            <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <div style={{ fontWeight: 'bold', color: '#0b5394', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Feature</u></div>
+                <span style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
+                  <b><i style={{ color: '#66cf00', fontSize: '1em' }}>Blaster Master.</i></b> <span style={{ fontSize: '1em', fontWeight: 400 }}>You Resist all Damage from AoE Attacks. In addition, your Primary Attack Target becomes an AoE 1hx-Radius, and other AoE Attacks you make increase in size by 1hx.</span>
+                </span>
+            </span>
+          </div>
+          {/* Feature XP progression table - now interactive */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto auto auto', gap: '8px', alignItems: 'center', marginBottom: '0.5rem' }}>
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>7xp</span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>Includes allies within 3hx</span>
+            <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <span
+                onClick={() => handleDotClick(grenadierFeatureIncludesAlliesDots, setGrenadierFeatureIncludesAlliesDots, 0, [7], 'grenadierFeatureIncludesAlliesDots')}
+                style={{
+                  width: '15px',
+                  height: '15px',
+                  border: '2px solid #000',
+                  borderRadius: '50%',
+                  display: 'block',
+                  background: grenadierFeatureIncludesAlliesDots[0] ? '#000' : '#fff',
+                  cursor: 'pointer',
+                  transition: 'background 0.2s'
+                }}
+              ></span>
+            </span>
+            <span></span>
+            <span></span>
+            <span></span>
+            {/* New row for +1hx dots */}
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>6xp</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>10xp</span>
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'center' }}>+1hx</span>
+            <span></span>
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>⤷</span>
+            {[0,1].map(idx => (
+              <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <span
+                  onClick={() => handleDotClick(grenadierFeatureAoEDots, setGrenadierFeatureAoEDots, idx, [6, 10], 'grenadierFeatureAoEDots')}
+                  style={{
+                    width: '15px',
+                    height: '15px',
+                    border: '2px solid #000',
+                    borderRadius: '50%',
+                    display: 'block',
+                    background: grenadierFeatureAoEDots[idx] ? '#000' : '#fff',
+                    cursor: 'pointer',
+                    transition: 'background 0.2s'
+                  }}
+                ></span>
+              </span>
+            ))}
+            <span></span>
+            <span></span>
+            {/* New row for AoE Attack Immunity */}
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>22xp</span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>AoE Attack Immunity</span>
+            <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <span
+                onClick={() => handleDotClick(grenadierFeatureImmunityDots, setGrenadierFeatureImmunityDots, 0, [22], 'grenadierFeatureImmunityDots')}
+                style={{
+                  width: '15px',
+                  height: '15px',
+                  border: '2px solid #000',
+                  borderRadius: '50%',
+                  display: 'block',
+                  background: grenadierFeatureImmunityDots[0] ? '#000' : '#fff',
+                  cursor: 'pointer',
+                  transition: 'background 0.2s'
+                }}
+              ></span>
+            </span>
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+
+          {/* Technique Section - Chemist style */}
+          <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <div style={{ fontWeight: 'bold', color: '#bf9000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Technique</u></div>
+            <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <b><i style={{ color: '#66cf00', fontSize: '1em' }}>The "Big One"</i></b> <i style={{ color: '#66cf00', fontSize: '1em' }}>(Cooldown <b style={{ color: '#000', fontStyle: 'normal' }}>[{4 - grenadierTechniqueCooldownDots.filter(Boolean).length}]</b>).</i> You spend any number of Chem Tokens and choose yourself or an adjacent ally. The next Attack you or your ally makes gets a +1hx-Radius AoE and +1d{grenadierTechniqueDieSizeDots[0] ? '10' : '6'} Damage per Chem Token spent.
+            </div>
+            
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto auto auto', gap: '8px', alignItems: 'center', marginBottom: '0.5rem' }}>
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>10xp</span>
+              <span></span>
+              <span></span>
+              <span></span>
+              
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>Increase die size</span>
+              <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <span
+                  onClick={() => handleDotClick(grenadierTechniqueDieSizeDots, setGrenadierTechniqueDieSizeDots, 0, [10], 'grenadierTechniqueDieSizeDots')}
+                  style={{
+                    width: '15px',
+                    height: '15px',
+                    border: '2px solid #000',
+                    borderRadius: '50%',
+                    display: 'block',
+                    background: grenadierTechniqueDieSizeDots[0] ? '#000' : '#fff',
+                    cursor: 'pointer',
+                    transition: 'background 0.2s'
+                  }}
+                ></span>
+              </span>
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+            
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto auto auto', gap: '8px', alignItems: 'center', marginBottom: '0.5rem' }}>
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>8xp</span>
+              <span></span>
+              <span></span>
+              <span></span>
+              
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1hx Range</span>
+              <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <span
+                  onClick={() => handleDotClick(grenadierTechniqueRangeDots, setGrenadierTechniqueRangeDots, 0, [8], 'grenadierTechniqueRangeDots')}
+                  style={{
+                    width: '15px',
+                    height: '15px',
+                    border: '2px solid #000',
+                    borderRadius: '50%',
+                    display: 'block',
+                    background: grenadierTechniqueRangeDots[0] ? '#000' : '#fff',
+                    cursor: 'pointer',
+                    transition: 'background 0.2s'
+                  }}
+                ></span>
+              </span>
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+            
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto', gap: '8px', alignItems: 'center', marginBottom: '1rem' }}>
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>5xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>8xp</span>
+              
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>-1 Cooldown</span>
+              {[0,1].map(idx => (
+                <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                  <span
+                    onClick={() => handleDotClick(grenadierTechniqueCooldownDots, setGrenadierTechniqueCooldownDots, idx, [5, 8], 'grenadierTechniqueCooldownDots')}
+                    style={{
+                      width: '15px',
+                      height: '15px',
+                      border: '2px solid #000',
+                      borderRadius: '50%',
+                      display: 'block',
+                      background: grenadierTechniqueCooldownDots[idx] ? '#000' : '#fff',
+                      cursor: 'pointer',
+                      transition: 'background 0.2s'
+                    }}
+                  ></span>
+                </span>
+              ))}
+            </div>
+          </div>
+          
+          {/* Attack Section */}
+          <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <div style={{ fontWeight: 'bold', color: '#990000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Attack</u></div>
+            <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <div style={{ marginBottom: '4px' }}>
+                <b><i><span style={{ color: '#000' }}>Secondary</span> <span style={{ color: '#990000' }}>Attack</span></i></b> <i>(Cooldown</i> <b>[{4 - grenadierAttackCooldownDots.filter(Boolean).length}]</b><i>).</i>
+              </div>
+              <div style={{ marginBottom: '4px', textAlign: 'left' }}>
+                <select 
+                  style={{ 
+                    fontSize: '1em', 
+                    padding: '2px 8px', 
+                    borderRadius: '6px', 
+                    border: '1px solid #ccc', 
+                    background: '#fff', 
+                    color: '#222',
+                    fontWeight: 'bold',
+                    marginBottom: '4px',
+                    textAlign: 'left',
+                    minWidth: '180px'
+                  }} 
+                  defaultValue="Grenades"
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (value !== "Grenades") {
+                      setPendingGrenade(value);
+                      e.target.value = "Grenades"; // Reset dropdown
+                    }
+                  }}
+                >
+                  <option disabled style={{ fontWeight: 'bold' }}>Grenades</option>
+                  <option style={{ fontWeight: 'bold' }}>Amethyst Blast</option>
+                  <option style={{ fontWeight: 'bold' }}>Void Grenade</option>
+                </select>
+                {/* Buy/Add dialog for Grenade selection */}
+                {pendingGrenade && (
+                  <div style={{ marginTop: '4px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    <div style={{ fontWeight: 'bold' }}>
+                      {pendingGrenade}
+                      <span style={{ color: '#bf9000', fontWeight: 'bold', marginLeft: '8px' }}>
+                        {pendingGrenade === 'Amethyst Blast' && '190c'}
+                        {pendingGrenade === 'Void Grenade' && '210c'}
+                      </span>
+                    </div>
+                    <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                      <button
+                      style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #1976d2', background: '#1976d2', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}
+                      onClick={() => {
+                        // Determine cost
+                        let cost = 0;
+                        if (pendingGrenade === 'Amethyst Blast') cost = 190;
+                        else if (pendingGrenade === 'Void Grenade') cost = 210;
+                        // Check credits
+                        if (credits < cost) {
+                          setNotice('Not enough credits!');
+                          return;
+                        }
+                        // Atomic operation: update both grenades and credits
+                        const newGrenades = [...selectedGrenades, pendingGrenade];
+                        const newCredits = credits - cost;
+                        setSelectedGrenades(newGrenades);
+                        
+                        if (sheet) {
+                          const updatedSheet = { 
+                            ...sheet, 
+                            grenades: newGrenades,
+                            credits: newCredits
+                          };
+                          saveCharacterSheet(updatedSheet);
+                        }
+                        
+                        // Update the LevelUp component's credits state (no auto-save)
+                        onCreditsChange?.(-cost);
+                        setPendingGrenade("");
+                      }}
+                    >Buy</button>
+                    <button
+                      style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #28a745', background: '#28a745', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}
+                      onClick={() => {
+                        const newGrenades = [...selectedGrenades, pendingGrenade];
+                        setSelectedGrenades(newGrenades);
+                        
+                        if (sheet) {
+                          const updatedSheet = { 
+                            ...sheet, 
+                            grenades: newGrenades,
+                            credits: credits // Preserve current credits
+                          };
+                          saveCharacterSheet(updatedSheet);
+                        }
+                        
+                        setPendingGrenade("");
+                      }}
+                    >Add</button>
+                    <button
+                      style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #aaa', background: '#eee', color: '#333', fontWeight: 'bold', cursor: 'pointer' }}
+                      onClick={() => setPendingGrenade("")}
+                    >Cancel</button>
+                    </div>
+                  </div>
+                )}
+                <div style={{ marginTop: '2px' }}>
+                  {selectedGrenades.length > 0 && (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginLeft: '8px' }}>
+                      {selectedGrenades.map((grenade, idx) => (
+                        <span key={grenade + idx} style={{ fontStyle: 'italic', display: 'flex', alignItems: 'center', background: '#f5f5f5', borderRadius: '6px', padding: '2px 8px' }}>
+                          {grenade}
+                          <button
+                            style={{ marginLeft: '6px', padding: '0 6px', borderRadius: '50%', border: 'none', background: '#d32f2f', color: 'white', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.9em' }}
+                            title={`Remove ${grenade}`}
+                            onClick={() => {
+                              const newGrenades = selectedGrenades.filter((_, i) => i !== idx);
+                              setSelectedGrenades(newGrenades);
+                              
+                              if (sheet) {
+                                const updatedSheet = { 
+                                  ...sheet, 
+                                  grenades: newGrenades,
+                                  credits: credits // Preserve current credits
+                                };
+                                saveCharacterSheet(updatedSheet);
+                              }
+                            }}
+                          >×</button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+                <b>Grenades.</b> 6hx Range, AoE <b>[{1 + grenadierAttackAoEDots.filter(Boolean).length}]</b>hx-Radius, <b>[{18 - grenadierAttackCritDots.filter(Boolean).length}]</b>+ Crit, <b>[{1 + grenadierAttackDamageDots.filter(Boolean).length}]</b>d6 Damage, auto Slam 3hx.
+              </div>
+            </div>
+            
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto auto', gap: '8px', alignItems: 'center', marginBottom: '0.5rem' }}>
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>6xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>12xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>18xp</span>
+              
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1hx-radius AoE</span>
+              {[0,1,2].map(idx => (
+                <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                  <span
+                    onClick={() => handleDotClick(grenadierAttackAoEDots, setGrenadierAttackAoEDots, idx, [6, 12, 18], 'grenadierAttackAoEDots')}
+                    style={{
+                      width: '15px',
+                      height: '15px',
+                      border: '2px solid #000',
+                      borderRadius: '50%',
+                      display: 'block',
+                      background: grenadierAttackAoEDots[idx] ? '#000' : '#fff',
+                      cursor: 'pointer',
+                      transition: 'background 0.2s'
+                    }}
+                  ></span>
+                </span>
+              ))}
+            </div>
+            
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto auto', gap: '8px', alignItems: 'center', marginBottom: '0.5rem' }}>
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>5xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>8xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>15xp</span>
+              
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>Increase die size</span>
+              {[0,1,2].map(idx => (
+                <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                  <span
+                    onClick={() => handleDotClick(grenadierAttackDamageDots, setGrenadierAttackDamageDots, idx, [5, 8, 15], 'grenadierAttackDamageDots')}
+                    style={{
+                      width: '15px',
+                      height: '15px',
+                      border: '2px solid #000',
+                      borderRadius: '50%',
+                      display: 'block',
+                      background: grenadierAttackDamageDots[idx] ? '#000' : '#fff',
+                      cursor: 'pointer',
+                      transition: 'background 0.2s'
+                    }}
+                  ></span>
+                </span>
+              ))}
+            </div>
+            
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto auto', gap: '8px', alignItems: 'center', marginBottom: '0.5rem' }}>
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>3xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>5xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>8xp</span>
+              
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1 Crit</span>
+              {[0,1,2].map(idx => (
+                <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                  <span
+                    onClick={() => handleDotClick(grenadierAttackCritDots, setGrenadierAttackCritDots, idx, [3, 5, 8], 'grenadierAttackCritDots')}
+                    style={{
+                      width: '15px',
+                      height: '15px',
+                      border: '2px solid #000',
+                      borderRadius: '50%',
+                      display: 'block',
+                      background: grenadierAttackCritDots[idx] ? '#000' : '#fff',
+                      cursor: 'pointer',
+                      transition: 'background 0.2s'
+                    }}
+                  ></span>
+                </span>
+              ))}
+            </div>
+            
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto', gap: '8px', alignItems: 'center', marginBottom: '1rem' }}>
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>4xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>6xp</span>
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>-1 Cooldown</span>
+              {[0,1].map(idx => (
+                <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                  <span
+                    onClick={() => handleDotClick(grenadierAttackCooldownDots, setGrenadierAttackCooldownDots, idx, [4, 6], 'grenadierAttackCooldownDots')}
+                    style={{
+                      width: '15px',
+                      height: '15px',
+                      border: '2px solid #000',
+                      borderRadius: '50%',
+                      display: 'block',
+                      background: grenadierAttackCooldownDots[idx] ? '#000' : '#fff',
+                      cursor: 'pointer',
+                      transition: 'background 0.2s'
+                    }}
+                  ></span>
+                </span>
+              ))}
+            </div>
+          </div>
+          
+          {/* Strike Section */}
+          <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <div style={{ fontWeight: 'bold', color: '#351c75', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Strike</u></div>
+            <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <b><i>Enhanced <span style={{ color: '#351c75' }}>Strike</span> Effects.</i></b>
+            </div>
+            
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto auto', gap: '8px', alignItems: 'center', marginBottom: '1rem' }}>
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>8xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>13xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>18xp</span>
+
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1hx-Radius AoE</span>
+              {[0,1,2].map(idx => (
+                <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                  <span
+                    onClick={() => handleDotClick(grenadierStrikeDots, setGrenadierStrikeDots, idx, [8, 13, 18], 'grenadierStrikeDots')}
+                    style={{
+                      width: '15px',
+                      height: '15px',
+                      border: '2px solid #000',
+                      borderRadius: '50%',
+                      display: 'block',
+                      background: grenadierStrikeDots[idx] ? '#000' : '#fff',
+                      cursor: 'pointer',
+                      transition: 'background 0.2s'
+                    }}
+                  ></span>
+                </span>
+              ))}
+            </div>
+          </div>
+          
+          {/* Perks Section */}
+          <div style={{ marginTop: '12px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <div style={{ fontWeight: 'bold', color: '#000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Perks</u></div>
+            <div style={{ fontSize: '1em', color: '#000', marginBottom: '6px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <i><b>Skills.</b> Intimidation</i> +2
+            </div>
+            <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', gap: '12px' }}>
+                <span style={{ display: 'inline-block', maxWidth: 'calc(100% - 40px)' }}>
+                  <b><i style={{ color: '#66cf00' }}>Explosive Temper.</i></b> You are fearless to the point of recklessness, and are lucky enough to have survived so many explosions that were too close for comfort. Gain an advantage on related skill rolls when acting brash and impetuous.
+                </span>
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: '24px',
+                  gridTemplateRows: 'repeat(1, auto)',
+                  alignItems: 'start',
+                  marginLeft: '4px'
+                }}>
+                  <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>8sp</span>
+                  <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
+                    <span
+                      onClick={() => handleSpDotClick(grenadierExplosiveTemperDots, setGrenadierExplosiveTemperDots, 0, [8], 'grenadierExplosiveTemperDots')}
+                      style={{
+                        width: '15px',
+                        height: '15px',
+                        border: '2px solid #000',
+                        borderRadius: '50%',
+                        display: 'block',
+                        background: grenadierExplosiveTemperDots[0] ? '#000' : '#fff',
+                        cursor: 'pointer',
+                        transition: 'background 0.2s'
+                      }}
+                    ></span>
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       )}
