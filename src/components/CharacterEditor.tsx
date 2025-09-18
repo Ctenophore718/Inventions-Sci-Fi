@@ -6,6 +6,7 @@ import { saveCharacterSheet, loadSheetById } from "../utils/storage";
 import { generateChemicalReactionJSX, calculateChemistFeatureData } from "../utils/chemistFeature";
 import { generateChemistStrikeJSX } from "../utils/chemistStrike";
 import { generateAnatomicalPrecisionJSX } from "../utils/anatomistFeature";
+import { generateBlasterMasterJSX } from "../utils/grenadierFeature";
 
 
 type Props = {
@@ -693,11 +694,11 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
   );
 
   // Add after anatomistFeatureJSX
-  const grenadierFeatureJSX = (
-    <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#cf0000' }}>Blaster Master.</i></b> You <i>Resist</i> all Damage from <i>AoE</i> <b><i><span style={{ color: '#990000' }}>Attacks</span></i></b>. In addition, your <b><i><span style={{ color: '#000' }}>Primary</span> <span style={{ color: '#990000' }}>Attack</span></i></b> Target becomes an <i>AoE</i> 1hx-Radius, and other <i>AoE</i> <b><i><span style={{ color: '#990000' }}>Attacks</span></i></b> you make increase in size by <b>[1]</b>hx.
-    </span>
-  );
+  const grenadierFeatureJSX = generateBlasterMasterJSX({
+    grenadierFeatureIncludesAlliesDots: sheet?.subclassProgressionDots?.grenadierFeatureIncludesAlliesDots,
+    grenadierFeatureAoEDots: sheet?.subclassProgressionDots?.grenadierFeatureAoEDots,
+    grenadierFeatureImmunityDots: sheet?.subclassProgressionDots?.grenadierFeatureImmunityDots
+  });
 
   // Add after grenadierFeatureJSX
   const necroFeatureJSX = (

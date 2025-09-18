@@ -950,16 +950,27 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
           <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
             <div style={{ fontWeight: 'bold', color: '#bf9000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Technique</u></div>
             <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
-              <b><i style={{ color: '#66cf00', fontSize: '1em' }}>The "Big One"</i></b> <i style={{ color: '#66cf00', fontSize: '1em' }}>(Cooldown <b style={{ color: '#000', fontStyle: 'normal' }}>[{4 - grenadierTechniqueCooldownDots.filter(Boolean).length}]</b>).</i> You spend any number of Chem Tokens and choose yourself or an adjacent ally. The next Attack you or your ally makes gets a +1hx-Radius AoE and +1d{grenadierTechniqueDieSizeDots[0] ? '10' : '6'} Damage per Chem Token spent.
+              <b><i style={{ color: '#cf0000', fontSize: '1em' }}>The "Big One"</i></b> <i style={{ color: '#cf0000', fontSize: '1em' }}>(Cooldown <b style={{ color: '#000', fontStyle: 'normal' }}>[{4 - grenadierTechniqueCooldownDots.filter(Boolean).length}]</b>).</i> You spend any number of <i>Chem Tokens</i> and choose yourself or an adjacent ally. The next <b><i><span style={{ color: '#990000' }}>Attack</span></i></b> you or your ally makes gets a +1hx-radius <i>AoE</i> and +1d<b>[{grenadierTechniqueDieSizeDots[0] ? '8' : '6'}]</b> Damage and +<b>[{grenadierTechniqueRangeDots[0] ? 1 : 0}]</b>hx Range per <i>Chem Token</i> spent.
             </div>
             
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto auto auto', gap: '8px', alignItems: 'center', marginBottom: '0.5rem' }}>
-              <span></span>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 24px 24px 24px ',
+              gridTemplateRows: 'repeat(3, auto)',
+              columnGap: '6px',
+              rowGap: '2px',
+              alignItems: 'start',
+              marginBottom: '2px',
+              width: '100%',
+              paddingLeft: '4px'
+              }}>    
+              <span></span>          
+
+              
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>10xp</span>
               <span></span>
               <span></span>
-              <span></span>
-              
+
               <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>Increase die size</span>
               <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                 <span
@@ -981,10 +992,19 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
               <span></span>
             </div>
             
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto auto auto', gap: '8px', alignItems: 'center', marginBottom: '0.5rem' }}>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 24px 24px 24px ',
+              gridTemplateRows: 'repeat(3, auto)',
+              columnGap: '6px',
+              rowGap: '2px',
+              alignItems: 'start',
+              marginBottom: '2px',
+              width: '100%',
+              paddingLeft: '4px'
+              }}>                
               <span></span>
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>8xp</span>
-              <span></span>
               <span></span>
               <span></span>
               
@@ -1009,11 +1029,21 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
               <span></span>
             </div>
             
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto', gap: '8px', alignItems: 'center', marginBottom: '1rem' }}>
-              <span></span>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 24px 24px 24px ',
+              gridTemplateRows: 'repeat(3, auto)',
+              columnGap: '6px',
+              rowGap: '2px',
+              alignItems: 'start',
+              marginBottom: '2px',
+              width: '100%',
+              paddingLeft: '4px'
+              }}>                <span></span>
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>5xp</span>
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>8xp</span>
-              
+              <span></span>
+
               <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>-1 Cooldown</span>
               {[0,1].map(idx => {
                 const arr = grenadierTechniqueCooldownDots;

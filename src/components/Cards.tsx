@@ -4,6 +4,7 @@ import { loadSheetById, saveCharacterSheet } from "../utils/storage";
 import styles from "./CharacterEditor.module.css";
 import { generateVolatileExperimentsDescriptionJSX, calculateChemistTechniqueData } from "../utils/chemistTechnique";
 import { generateTheGoodStuffDescriptionJSX, calculateAnatomistTechniqueData } from "../utils/anatomistTechnique";
+import { generateTheBigOneDescriptionJSX, calculateGrenadierTechniqueData } from "../utils/grenadierTechnique";
 import { CardsChemistAttacks } from "./CardsChemistAttacks";
 import { calculateChemistFeatureData } from "../utils/chemistFeature";
 
