@@ -333,7 +333,7 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
 
 
     
-    <div style={{ width: '100%', marginTop: '1rem', textAlign: 'left', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
+    <div style={{ width: '100%', textAlign: 'left', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
       {/* Anatomist Subclass Content */}
       {subclass === 'Anatomist' && (
         <div style={{ width: '100%', marginTop: '1rem', textAlign: 'left', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
@@ -347,21 +347,9 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
             </span>
           </div>
           {/* Feature XP progression table - now interactive */}
-
-        <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px' }}>
-          <div style={{ 
-            display: 'grid', 
-            gridTemplateColumns: '1fr 24px 24px 24px', 
-            gridTemplateRows: 'repeat(5, auto)',  
-            columnGap: '6px', 
-            rowGap: '2px', 
-            alignItems: 'start',  
-            marginBottom: '2px',
-            width: '100%',
-            paddingLeft: '4px'
-          }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto auto', gap: '8px', alignItems: 'center', marginBottom: '1rem' }}>
             <span></span>
-            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>6xp</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>6xp</span>
             <span></span>
             <span></span>
             <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>Ignore condition Immunities</span>
@@ -406,7 +394,6 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
               </span>
             ))}
           </div>
-        </div>
 
           {/* Technique Section - Chemist style */}
           <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
@@ -415,11 +402,22 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
               <b><i style={{ color: '#66cf00', fontSize: '1em' }}>The "Good Stuff"</i></b> <i style={{ color: '#66cf00', fontSize: '1em' }}>(Cooldown <b style={{ color: '#000', fontStyle: 'normal' }}>[{4 - anatomistTechniqueCooldownDots.filter(Boolean).length}]</b>).</i> You spend any number of <i>Chem Tokens</i>. After doing so, you and allies within <b>[{1 + anatomistTechniqueRangeDots.filter(Boolean).length}]</b>hx of you gain +<b>[{1 + anatomistTechniqueStrikeDamageDots.filter(Boolean).length}]</b>d6 <b><i style={{ color: '#351c75' }}>Strike</i></b> Damage, +<b>[{0 + anatomistTechniqueStrikeDots.filter(Boolean).length}]</b> <b><i style={{ color: '#351c75' }}>Strikes</i></b> and can <b><i style={{ color: '#38761d' }}>Move</i></b> +2hx for each <i>Chem Token</i> spent until the start of the next round.
             </div>
             
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto auto', gap: '8px', alignItems: 'center', marginBottom: '0.5rem' }}>
-              <span></span>
-              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>5xp</span>
-              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>9xp</span>
-              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>14xp</span>
+                    <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px' }}>
+                      <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: '1fr 24px 24px 24px',
+                        gridTemplateRows: 'repeat(5, auto)',
+                        columnGap: '6px',
+                        rowGap: '2px',
+                        alignItems: 'start',
+                        marginBottom: '2px',
+                        width: '100%',
+                        paddingLeft: '4px'
+                      }}>
+                <span></span>
+                <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>5xp</span>
+                <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>9xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>14xp</span>
               
               <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1hx</span>
               {[0,1,2].map(idx => (
@@ -440,40 +438,55 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
                 </span>
               ))}
             </div>
-            
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto auto auto', gap: '8px', alignItems: 'center', marginBottom: '0.5rem' }}>
-              <span></span>
-              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>18xp</span>
-              <span></span>
-              <span></span>
-              <span></span>
-              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1d6 <b><i style={{ color: '#351c75' }}>Strike</i></b> Damage per <i>Token</i></span>
-              <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                <span
-                  onClick={() => handleDotClick(anatomistTechniqueStrikeDamageDots, setAnatomistTechniqueStrikeDamageDots, 0, [18], 'anatomistTechniqueStrikeDamageDots')}
-                  style={{
-                    width: '15px',
-                    height: '15px',
-                    border: '2px solid #000',
-                    borderRadius: '50%',
-                    display: 'block',
-                    background: anatomistTechniqueStrikeDamageDots[0] ? '#000' : '#fff',
-                    cursor: 'pointer',
-                    transition: 'background 0.2s'
-                  }}
-                ></span>
-              </span>
-              <span></span>
-              <span></span>
             </div>
+                      <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: '1fr 24px 24px 24px',
+                        columnGap: '6px',
+                        rowGap: '2px',
+                        alignItems: 'start',
+                        marginBottom: '2px',
+                        width: '100%',
+                        paddingLeft: '4px'
+                      }}>
+                        <span></span>
+                        <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>18xp</span>
+                        <span></span>
+                        <span></span>
+                        <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1d6 <b><i style={{ color: '#351c75' }}>Strike</i></b> Damage per <i>Token</i></span>
+                        <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                          <span
+                            onClick={() => handleDotClick(anatomistTechniqueStrikeDamageDots, setAnatomistTechniqueStrikeDamageDots, 0, [18], 'anatomistTechniqueStrikeDamageDots')}
+                            style={{
+                              width: '15px',
+                              height: '15px',
+                              border: '2px solid #000',
+                              borderRadius: '50%',
+                              display: 'block',
+                              background: anatomistTechniqueStrikeDamageDots[0] ? '#000' : '#fff',
+                              cursor: 'pointer',
+                              transition: 'background 0.2s'
+                            }}
+                          ></span>
+                        </span>
+                        <span></span>
+                      </div>
             
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto auto auto', gap: '8px', alignItems: 'center', marginBottom: '0.5rem' }}>
-              <span></span>
-              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>18xp</span>
-              <span></span>
-              <span></span>
-              <span></span>
-              
+                      <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: '1fr 24px 24px 24px',
+                        columnGap: '6px',
+                        rowGap: '2px',
+                        alignItems: 'start',
+                        marginBottom: '2px',
+                        width: '100%',
+                        paddingLeft: '4px'
+                      }}>
+                        <span></span>
+                <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>18xp</span>
+                <span></span>
+                <span></span>
+
               <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1 <b><i style={{ color: '#351c75' }}>Strike</i></b> per <i>Token</i></span>
               <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                 <span
@@ -495,11 +508,19 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
               <span></span>
             </div>
             
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto', gap: '8px', alignItems: 'center', marginBottom: '1rem' }}>
+                      <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: '1fr 24px 24px 24px',
+                        columnGap: '6px',
+                        rowGap: '2px',
+                        alignItems: 'start',
+                        marginBottom: '2px',
+                        width: '100%',
+                        paddingLeft: '4px'
+                      }}>              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>4xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>7xp</span>
               <span></span>
-              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>4xp</span>
-              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>7xp</span>
-              
               <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>-1 <i>Cooldown</i></span>
               {[0,1].map(idx => (
                 <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
@@ -824,15 +845,24 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
             <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32, fontFamily: 'Arial, Helvetica, sans-serif' }}>
               <div style={{ fontWeight: 'bold', color: '#0b5394', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Feature</u></div>
                 <span style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
-                  <b><i style={{ color: '#66cf00', fontSize: '1em' }}>Blaster Master.</i></b> <span style={{ fontSize: '1em', fontWeight: 400 }}>You Resist all Damage from AoE Attacks. In addition, your Primary Attack Target becomes an AoE 1hx-Radius, and other AoE Attacks you make increase in size by 1hx.</span>
+                  <b><i style={{ color: '#cf0000', fontSize: '1em' }}>Blaster Master.</i></b> <span style={{ fontSize: '1em', fontWeight: 400 }}>You and all allies within <b>[{grenadierFeatureIncludesAlliesDots[0] ? 3 + grenadierFeatureAoEDots.filter(Boolean).length : 0}]</b>hx are <b>[</b><i>{grenadierFeatureImmunityDots[0] ? 'Immune' : 'Resistant'}</i><b>]</b> to all Damage from <i>AoE</i> <b><i><span style={{ color: '#990000' }}>Attacks</span></i></b>. In addition, your <b><i>Primary</i></b> <b><i><span style={{ color: '#990000' }}>Attack</span></i></b> Target becomes an <i>AoE</i> 1hx-radius, and other <i>AoE</i> <b><i><span style={{ color: '#990000' }}>Attacks</span></i></b> you make increase in size by 1hx.</span>
                 </span>
             </span>
           </div>
           {/* Feature XP progression table - now interactive */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto auto auto', gap: '8px', alignItems: 'center', marginBottom: '0.5rem' }}>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 24px 24px 24px',
+              gridTemplateRows: 'repeat(4, auto)',
+              columnGap: '6px',
+              rowGap: '2px',
+              alignItems: 'start',
+              marginBottom: '2px',
+              width: '100%',
+              paddingLeft: '4px'
+              }}>            
             <span></span>
             <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>7xp</span>
-            <span></span>
             <span></span>
             <span></span>
             <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>Includes allies within 3hx</span>
@@ -852,41 +882,50 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
               ></span>
             </span>
             <span></span>
-            <span></span>
-            <span></span>
             {/* New row for +1hx dots */}
             <span></span>
+            <span></span>
+                        <span></span>
+
             <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>6xp</span>
             <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>10xp</span>
-            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'center' }}>+1hx</span>
-            <span></span>
+            
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right' }}>+1hx</span>
             <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>⤷</span>
-            {[0,1].map(idx => (
-              <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                <span
-                  onClick={() => handleDotClick(grenadierFeatureAoEDots, setGrenadierFeatureAoEDots, idx, [6, 10], 'grenadierFeatureAoEDots')}
-                  style={{
-                    width: '15px',
-                    height: '15px',
-                    border: '2px solid #000',
-                    borderRadius: '50%',
-                    display: 'block',
-                    background: grenadierFeatureAoEDots[idx] ? '#000' : '#fff',
-                    cursor: 'pointer',
-                    transition: 'background 0.2s'
-                  }}
-                ></span>
-              </span>
-            ))}
-            <span></span>
+            {[0,1].map(idx => {
+              const arr = grenadierFeatureAoEDots;
+              const rightmostChecked = arr.lastIndexOf(true);
+              // Special dependency: +1hx dots require "Includes allies within 3hx" to be selected first
+              const includesAlliesSelected = grenadierFeatureIncludesAlliesDots[0];
+              const canCheck = includesAlliesSelected && (idx === 0 || arr.slice(0, idx).every(Boolean));
+              const canUncheck = arr[idx] && idx === rightmostChecked;
+              
+              return (
+                <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                  <span
+                    onClick={() => handleDotClick(grenadierFeatureAoEDots, setGrenadierFeatureAoEDots, idx, [6, 10], 'grenadierFeatureAoEDots')}
+                    style={{
+                      width: '15px',
+                      height: '15px',
+                      border: '2px solid #000',
+                      borderRadius: '50%',
+                      display: 'block',
+                      background: grenadierFeatureAoEDots[idx] ? '#000' : '#fff',
+                      cursor: (canCheck && !arr[idx]) || canUncheck ? 'pointer' : 'not-allowed',
+                      transition: 'background 0.2s'
+                    }}
+                  ></span>
+                </span>
+              );
+            })}
             <span></span>
             {/* New row for AoE Attack Immunity */}
-            <span></span>
             <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>22xp</span>
             <span></span>
+
             <span></span>
-            <span></span>
-            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>AoE Attack Immunity</span>
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}><i>AoE</i> <b><i><span style={{ color: '#990000' }}>Attack</span></i></b> <i>Immunity</i></span>
+            
             <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
               <span
                 onClick={() => handleDotClick(grenadierFeatureImmunityDots, setGrenadierFeatureImmunityDots, 0, [22], 'grenadierFeatureImmunityDots')}
@@ -976,23 +1015,30 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>8xp</span>
               
               <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>-1 Cooldown</span>
-              {[0,1].map(idx => (
-                <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                  <span
-                    onClick={() => handleDotClick(grenadierTechniqueCooldownDots, setGrenadierTechniqueCooldownDots, idx, [5, 8], 'grenadierTechniqueCooldownDots')}
-                    style={{
-                      width: '15px',
-                      height: '15px',
-                      border: '2px solid #000',
-                      borderRadius: '50%',
-                      display: 'block',
-                      background: grenadierTechniqueCooldownDots[idx] ? '#000' : '#fff',
-                      cursor: 'pointer',
-                      transition: 'background 0.2s'
-                    }}
-                  ></span>
-                </span>
-              ))}
+              {[0,1].map(idx => {
+                const arr = grenadierTechniqueCooldownDots;
+                const rightmostChecked = arr.lastIndexOf(true);
+                const canCheck = idx === 0 || arr.slice(0, idx).every(Boolean);
+                const canUncheck = arr[idx] && idx === rightmostChecked;
+                
+                return (
+                  <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                    <span
+                      onClick={() => handleDotClick(grenadierTechniqueCooldownDots, setGrenadierTechniqueCooldownDots, idx, [5, 8], 'grenadierTechniqueCooldownDots')}
+                      style={{
+                        width: '15px',
+                        height: '15px',
+                        border: '2px solid #000',
+                        borderRadius: '50%',
+                        display: 'block',
+                        background: grenadierTechniqueCooldownDots[idx] ? '#000' : '#fff',
+                        cursor: (canCheck && !arr[idx]) || canUncheck ? 'pointer' : 'not-allowed',
+                        transition: 'background 0.2s'
+                      }}
+                    ></span>
+                  </span>
+                );
+              })}
             </div>
           </div>
           
@@ -1138,23 +1184,30 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>18xp</span>
               
               <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1hx-radius AoE</span>
-              {[0,1,2].map(idx => (
-                <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                  <span
-                    onClick={() => handleDotClick(grenadierAttackAoEDots, setGrenadierAttackAoEDots, idx, [6, 12, 18], 'grenadierAttackAoEDots')}
-                    style={{
-                      width: '15px',
-                      height: '15px',
-                      border: '2px solid #000',
-                      borderRadius: '50%',
-                      display: 'block',
-                      background: grenadierAttackAoEDots[idx] ? '#000' : '#fff',
-                      cursor: 'pointer',
-                      transition: 'background 0.2s'
-                    }}
-                  ></span>
-                </span>
-              ))}
+              {[0,1,2].map(idx => {
+                const arr = grenadierAttackAoEDots;
+                const rightmostChecked = arr.lastIndexOf(true);
+                const canCheck = idx === 0 || arr.slice(0, idx).every(Boolean);
+                const canUncheck = arr[idx] && idx === rightmostChecked;
+                
+                return (
+                  <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                    <span
+                      onClick={() => handleDotClick(grenadierAttackAoEDots, setGrenadierAttackAoEDots, idx, [6, 12, 18], 'grenadierAttackAoEDots')}
+                      style={{
+                        width: '15px',
+                        height: '15px',
+                        border: '2px solid #000',
+                        borderRadius: '50%',
+                        display: 'block',
+                        background: grenadierAttackAoEDots[idx] ? '#000' : '#fff',
+                        cursor: (canCheck && !arr[idx]) || canUncheck ? 'pointer' : 'not-allowed',
+                        transition: 'background 0.2s'
+                      }}
+                    ></span>
+                  </span>
+                );
+              })}
             </div>
             
             <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto auto', gap: '8px', alignItems: 'center', marginBottom: '0.5rem' }}>
@@ -1164,23 +1217,30 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>15xp</span>
               
               <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>Increase die size</span>
-              {[0,1,2].map(idx => (
-                <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                  <span
-                    onClick={() => handleDotClick(grenadierAttackDamageDots, setGrenadierAttackDamageDots, idx, [5, 8, 15], 'grenadierAttackDamageDots')}
-                    style={{
-                      width: '15px',
-                      height: '15px',
-                      border: '2px solid #000',
-                      borderRadius: '50%',
-                      display: 'block',
-                      background: grenadierAttackDamageDots[idx] ? '#000' : '#fff',
-                      cursor: 'pointer',
-                      transition: 'background 0.2s'
-                    }}
-                  ></span>
-                </span>
-              ))}
+              {[0,1,2].map(idx => {
+                const arr = grenadierAttackDamageDots;
+                const rightmostChecked = arr.lastIndexOf(true);
+                const canCheck = idx === 0 || arr.slice(0, idx).every(Boolean);
+                const canUncheck = arr[idx] && idx === rightmostChecked;
+                
+                return (
+                  <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                    <span
+                      onClick={() => handleDotClick(grenadierAttackDamageDots, setGrenadierAttackDamageDots, idx, [5, 8, 15], 'grenadierAttackDamageDots')}
+                      style={{
+                        width: '15px',
+                        height: '15px',
+                        border: '2px solid #000',
+                        borderRadius: '50%',
+                        display: 'block',
+                        background: grenadierAttackDamageDots[idx] ? '#000' : '#fff',
+                        cursor: (canCheck && !arr[idx]) || canUncheck ? 'pointer' : 'not-allowed',
+                        transition: 'background 0.2s'
+                      }}
+                    ></span>
+                  </span>
+                );
+              })}
             </div>
             
             <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto auto', gap: '8px', alignItems: 'center', marginBottom: '0.5rem' }}>
@@ -1190,23 +1250,30 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>8xp</span>
               
               <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1 Crit</span>
-              {[0,1,2].map(idx => (
-                <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                  <span
-                    onClick={() => handleDotClick(grenadierAttackCritDots, setGrenadierAttackCritDots, idx, [3, 5, 8], 'grenadierAttackCritDots')}
-                    style={{
-                      width: '15px',
-                      height: '15px',
-                      border: '2px solid #000',
-                      borderRadius: '50%',
-                      display: 'block',
-                      background: grenadierAttackCritDots[idx] ? '#000' : '#fff',
-                      cursor: 'pointer',
-                      transition: 'background 0.2s'
-                    }}
-                  ></span>
-                </span>
-              ))}
+              {[0,1,2].map(idx => {
+                const arr = grenadierAttackCritDots;
+                const rightmostChecked = arr.lastIndexOf(true);
+                const canCheck = idx === 0 || arr.slice(0, idx).every(Boolean);
+                const canUncheck = arr[idx] && idx === rightmostChecked;
+                
+                return (
+                  <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                    <span
+                      onClick={() => handleDotClick(grenadierAttackCritDots, setGrenadierAttackCritDots, idx, [3, 5, 8], 'grenadierAttackCritDots')}
+                      style={{
+                        width: '15px',
+                        height: '15px',
+                        border: '2px solid #000',
+                        borderRadius: '50%',
+                        display: 'block',
+                        background: grenadierAttackCritDots[idx] ? '#000' : '#fff',
+                        cursor: (canCheck && !arr[idx]) || canUncheck ? 'pointer' : 'not-allowed',
+                        transition: 'background 0.2s'
+                      }}
+                    ></span>
+                  </span>
+                );
+              })}
             </div>
             
             <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto', gap: '8px', alignItems: 'center', marginBottom: '1rem' }}>
@@ -1214,23 +1281,30 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>4xp</span>
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>6xp</span>
               <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>-1 Cooldown</span>
-              {[0,1].map(idx => (
-                <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                  <span
-                    onClick={() => handleDotClick(grenadierAttackCooldownDots, setGrenadierAttackCooldownDots, idx, [4, 6], 'grenadierAttackCooldownDots')}
-                    style={{
-                      width: '15px',
-                      height: '15px',
-                      border: '2px solid #000',
-                      borderRadius: '50%',
-                      display: 'block',
-                      background: grenadierAttackCooldownDots[idx] ? '#000' : '#fff',
-                      cursor: 'pointer',
-                      transition: 'background 0.2s'
-                    }}
-                  ></span>
-                </span>
-              ))}
+              {[0,1].map(idx => {
+                const arr = grenadierAttackCooldownDots;
+                const rightmostChecked = arr.lastIndexOf(true);
+                const canCheck = idx === 0 || arr.slice(0, idx).every(Boolean);
+                const canUncheck = arr[idx] && idx === rightmostChecked;
+                
+                return (
+                  <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                    <span
+                      onClick={() => handleDotClick(grenadierAttackCooldownDots, setGrenadierAttackCooldownDots, idx, [4, 6], 'grenadierAttackCooldownDots')}
+                      style={{
+                        width: '15px',
+                        height: '15px',
+                        border: '2px solid #000',
+                        borderRadius: '50%',
+                        display: 'block',
+                        background: grenadierAttackCooldownDots[idx] ? '#000' : '#fff',
+                        cursor: (canCheck && !arr[idx]) || canUncheck ? 'pointer' : 'not-allowed',
+                        transition: 'background 0.2s'
+                      }}
+                    ></span>
+                  </span>
+                );
+              })}
             </div>
           </div>
           
@@ -1248,23 +1322,30 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>18xp</span>
 
               <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1hx-Radius AoE</span>
-              {[0,1,2].map(idx => (
-                <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                  <span
-                    onClick={() => handleDotClick(grenadierStrikeDots, setGrenadierStrikeDots, idx, [8, 13, 18], 'grenadierStrikeDots')}
-                    style={{
-                      width: '15px',
-                      height: '15px',
-                      border: '2px solid #000',
-                      borderRadius: '50%',
-                      display: 'block',
-                      background: grenadierStrikeDots[idx] ? '#000' : '#fff',
-                      cursor: 'pointer',
-                      transition: 'background 0.2s'
-                    }}
-                  ></span>
-                </span>
-              ))}
+              {[0,1,2].map(idx => {
+                const arr = grenadierStrikeDots;
+                const rightmostChecked = arr.lastIndexOf(true);
+                const canCheck = idx === 0 || arr.slice(0, idx).every(Boolean);
+                const canUncheck = arr[idx] && idx === rightmostChecked;
+                
+                return (
+                  <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                    <span
+                      onClick={() => handleDotClick(grenadierStrikeDots, setGrenadierStrikeDots, idx, [8, 13, 18], 'grenadierStrikeDots')}
+                      style={{
+                        width: '15px',
+                        height: '15px',
+                        border: '2px solid #000',
+                        borderRadius: '50%',
+                        display: 'block',
+                        background: grenadierStrikeDots[idx] ? '#000' : '#fff',
+                        cursor: (canCheck && !arr[idx]) || canUncheck ? 'pointer' : 'not-allowed',
+                        transition: 'background 0.2s'
+                      }}
+                    ></span>
+                  </span>
+                );
+              })}
             </div>
           </div>
           

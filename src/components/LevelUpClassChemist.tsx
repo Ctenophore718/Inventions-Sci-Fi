@@ -918,16 +918,14 @@ const LevelUpClassChemist: React.FC<LevelUpClassChemistProps> = ({
                           <div style={{
                             display: 'grid',
                             gridTemplateColumns: '24px',
-                            gridTemplateRows: 'repeat(2, auto)',
+                            gridTemplateRows: 'repeat(1, auto)',
                             alignItems: 'start',
-                            justifyItems: 'center',
-                            minWidth: '24px',
                             marginLeft: '4px'
                           }}>
                             {/* Row 1: 10sp */}
                             <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>10sp</span>
                             {/* Row 2: dot (interactive) */}
-                            <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px', width: '100%' }}>
+                            <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
                               {(() => {
                                 const arr = safeGetDotsArray(9);
                                 const idx = 0;
