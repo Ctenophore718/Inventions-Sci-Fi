@@ -950,7 +950,7 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
           <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
             <div style={{ fontWeight: 'bold', color: '#bf9000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Technique</u></div>
             <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
-              <b><i style={{ color: '#cf0000', fontSize: '1em' }}>The "Big One"</i></b> <i style={{ color: '#cf0000', fontSize: '1em' }}>(Cooldown <b style={{ color: '#000', fontStyle: 'normal' }}>[{4 - grenadierTechniqueCooldownDots.filter(Boolean).length}]</b>).</i> You spend any number of <i>Chem Tokens</i> and choose yourself or an adjacent ally. The next <b><i><span style={{ color: '#990000' }}>Attack</span></i></b> you or your ally makes gets a +1hx-radius <i>AoE</i> and +1d<b>[{grenadierTechniqueDieSizeDots[0] ? '8' : '6'}]</b> Damage and +<b>[{grenadierTechniqueRangeDots[0] ? 1 : 0}]</b>hx Range per <i>Chem Token</i> spent.
+              <b><i style={{ color: '#cf0000', fontSize: '1em' }}>The "Big One"</i></b> <i style={{ color: '#cf0000', fontSize: '1em' }}>(Cooldown <b style={{ color: '#000', fontStyle: 'normal' }}>[{4 - grenadierTechniqueCooldownDots.filter(Boolean).length}]</b>).</i> You spend any number of <i>Chem Tokens</i> and choose yourself or an adjacent ally. The next <b><i><span style={{ color: '#990000' }}>Attack</span></i></b> you or your ally makes gets a +1hx-radius <i>AoE</i> and +1d<b>[{10 + 2 * grenadierTechniqueDieSizeDots.filter(Boolean).length}]</b> Damage and +<b>[{grenadierTechniqueRangeDots[0] ? 1 : 0}]</b>hx Range per <i>Chem Token</i> spent.
             </div>
             
             <div style={{
@@ -1112,8 +1112,8 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
                     <div style={{ fontWeight: 'bold' }}>
                       {pendingGrenade}
                       <span style={{ color: '#bf9000', fontWeight: 'bold', marginLeft: '8px' }}>
-                        {pendingGrenade === 'Amethyst Blast' && '190c'}
-                        {pendingGrenade === 'Void Grenade' && '210c'}
+                        {pendingGrenade === 'Amethyst Blast' && '220c'}
+                        {pendingGrenade === 'Void Grenade' && '200c'}
                       </span>
                     </div>
                     <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
@@ -1122,8 +1122,8 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
                       onClick={() => {
                         // Determine cost
                         let cost = 0;
-                        if (pendingGrenade === 'Amethyst Blast') cost = 190;
-                        else if (pendingGrenade === 'Void Grenade') cost = 210;
+                        if (pendingGrenade === 'Amethyst Blast') cost = 220;
+                        else if (pendingGrenade === 'Void Grenade') cost = 200;
                         // Check credits
                         if (credits < cost) {
                           setNotice('Not enough credits!');
@@ -1203,7 +1203,18 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
                 </div>
               </div>
               <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
-                <b>Grenades.</b> 6hx Range, AoE <b>[{1 + grenadierAttackAoEDots.filter(Boolean).length}]</b>hx-Radius, <b>[{18 - grenadierAttackCritDots.filter(Boolean).length}]</b>+ Crit, <b>[{1 + grenadierAttackDamageDots.filter(Boolean).length}]</b>d6 Damage, auto Slam 3hx.
+
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+                <span>
+                  <b><u>Range</u></b> 6hx
+                </span>
+                  <span style={{ textAlign: 'right', minWidth: '80px' }}>
+                    <b><u>Crit</u></b> <b>[{18 - grenadierAttackCritDots.filter(Boolean).length}]</b>+
+                  </span>
+              </div>
+              <b><u>Target</u></b> <i>AoE</i> <b>[{1 + grenadierAttackAoEDots.filter(Boolean).length}]</b>hx-radius <br />
+              <b><u>Damage</u></b> 1d<b>[{6 + 2 * grenadierAttackDamageDots.filter(Boolean).length}]</b>, <b><i>Slam</i></b> 3hx <br />
+              <b><u>Crit Effect</u></b> 1d<b>[{6 + 2 * grenadierAttackDamageDots.filter(Boolean).length}]</b>
               </div>
             </div>
             

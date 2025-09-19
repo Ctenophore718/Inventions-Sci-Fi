@@ -4,7 +4,7 @@ import { loadSheetById, saveCharacterSheet } from "../utils/storage";
 import styles from "./CharacterEditor.module.css";
 import { generateVolatileExperimentsDescriptionJSX, calculateChemistTechniqueData } from "../utils/chemistTechnique";
 import { generateTheGoodStuffDescriptionJSX, calculateAnatomistTechniqueData } from "../utils/anatomistTechnique";
-import { generateTheBigOneDescriptionJSX, calculateGrenadierTechniqueData } from "../utils/grenadierTechnique";
+import { generateTheBigOneJSX } from "../utils/grenadierTechnique";
 import { CardsChemistAttacks } from "./CardsChemistAttacks";
 import { calculateChemistFeatureData } from "../utils/chemistFeature";
 
@@ -513,7 +513,6 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
                   : charClass === 'Chemist' ? (
                     <div style={{ display: 'flex', alignItems: 'flex-start', flexWrap: 'wrap' }}>
                       {generateVolatileExperimentsDescriptionJSX(localSheet?.classCardDots)}
-                      <img src="/Chemical.png" alt="Chemical" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} />
                     </div>
                   ) : charClass === 'Coder' ? (() => {
                     // Row 2: +1d6 Damage dots (3 dots)
@@ -682,7 +681,7 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
                 fontFamily: 'Arial, Helvetica, sans-serif',
                 fontWeight: 'bold',
                 fontSize: 'clamp(0.8em, 4vw, 1.25em)',
-                color: localSheet?.subclass === 'Anatomist' ? '#66cf00' : 'black',
+                color: localSheet?.subclass === 'Anatomist' ? '#66cf00' : localSheet?.subclass === 'Grenadier' ? '#cf0000' : 'black',
                 lineHeight: 1,
                 textAlign: 'left',
                 whiteSpace: 'nowrap',
@@ -691,13 +690,13 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
                 flexShrink: 1,
                 marginRight: '5px'
               }}>
-                {localSheet?.subclass === 'Anatomist' ? 'The "Good Stuff"' : 'Subclass Card Name'}
+                {localSheet?.subclass === 'Anatomist' ? 'The "Good Stuff"' : localSheet?.subclass === 'Grenadier' ? 'The "Big One"' : 'Subclass Card Name'}
               </span>
               <span style={{
                 fontFamily: 'Arial, Helvetica, sans-serif',
                 fontStyle: 'italic',
                 fontSize: '0.75em',
-                color: '#66cf00',
+                color: localSheet?.subclass === 'Anatomist' ? '#66cf00' : localSheet?.subclass === 'Grenadier' ? '#cf0000' : 'black',
                 lineHeight: 1,
                 whiteSpace: 'normal',
                 wordBreak: 'keep-all',
@@ -705,11 +704,11 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
                 maxWidth: '72px',
                 display: 'inline-block',
                 textAlign: 'right'
-              }}>{localSheet?.subclass === 'Anatomist' ? 'Anatomist' : 'Subclass'}</span>
+              }}>{localSheet?.subclass === 'Anatomist' ? 'Anatomist' : localSheet?.subclass === 'Grenadier' ? 'Grenadier' : 'Subclass'}</span>
             </div>
             <img 
-              src={localSheet?.subclass === 'Anatomist' ? "/The Good Stuff.png" : "/Blank Card.png"}
-              alt={localSheet?.subclass === 'Anatomist' ? "The Good Stuff" : "Blank Card"}
+              src={localSheet?.subclass === 'Anatomist' ? "/The Good Stuff.png" : localSheet?.subclass === 'Grenadier' ? "/The Big One.png" : "/Blank Card.png"}
+              alt={localSheet?.subclass === 'Anatomist' ? "The Good Stuff" : localSheet?.subclass === 'Grenadier' ? "The Big One" : "Blank Card"}
               style={{
                 position: 'absolute',
                 top: 35,
@@ -735,9 +734,11 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
               paddingRight: 10,
               zIndex: 3
             }}>
-              <span style={{ color: '#bf9000', fontFamily: 'Arial, Helvetica, sans-serif', fontWeight: 'bold', fontSize: '1.1em', textAlign: 'left' }}>Technique</span>
-              <span style={{ color: '#bf9000', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '0.875em', fontStyle: 'italic', marginRight: 22, whiteSpace: 'nowrap', maxWidth: 'calc(100% - 120px)', overflow: 'hidden', textOverflow: 'ellipsis', textAlign: 'right' }}>
-                Cooldown <span style={{ fontWeight: 'bold', fontStyle: 'normal' }}>[{localSheet?.subclass === 'Anatomist' ? calculateAnatomistTechniqueData(localSheet?.subclassProgressionDots).cooldown : '#'}]</span>
+              <span style={{ color: localSheet?.subclass === 'Grenadier' ? '#bf9000' : '#bf9000', fontFamily: 'Arial, Helvetica, sans-serif', fontWeight: 'bold', fontSize: '1.1em', textAlign: 'left' }}>Technique</span>
+              <span style={{ color: localSheet?.subclass === 'Grenadier' ? '#bf9000' : '#bf9000', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '0.875em', fontStyle: 'italic', marginRight: 22, whiteSpace: 'nowrap', maxWidth: 'calc(100% - 120px)', overflow: 'hidden', textOverflow: 'ellipsis', textAlign: 'right' }}>
+                {localSheet?.subclass === 'Grenadier'
+                  ? <>Cooldown <span style={{ fontWeight: 'bold', fontStyle: 'normal' }}>[{4 - (localSheet?.subclassProgressionDots?.grenadierTechniqueCooldownDots?.filter(Boolean).length || 0)}]</span></>
+                  : <>Cooldown <span style={{ fontWeight: 'bold', fontStyle: 'normal' }}>[{localSheet?.subclass === 'Anatomist' ? calculateAnatomistTechniqueData(localSheet?.subclassProgressionDots).cooldown : '#'}]</span></>}
               </span>
             </div>
             
@@ -764,7 +765,15 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
                 maxHeight: '100%',
                 overflow: 'hidden'
               }}>
-                {localSheet?.subclass === 'Anatomist' ? generateTheGoodStuffDescriptionJSX(localSheet?.subclassProgressionDots) : 'Card stats.'}
+                {localSheet?.subclass === 'Grenadier'
+                  ? generateTheBigOneJSX({
+                      grenadierTechniqueCooldownDots: localSheet?.subclassProgressionDots?.grenadierTechniqueCooldownDots,
+                      grenadierTechniqueDieSizeDots: localSheet?.subclassProgressionDots?.grenadierTechniqueDieSizeDots,
+                      grenadierTechniqueRangeDots: localSheet?.subclassProgressionDots?.grenadierTechniqueRangeDots,
+                    })
+                  : localSheet?.subclass === 'Anatomist'
+                  ? generateTheGoodStuffDescriptionJSX(localSheet?.subclassProgressionDots)
+                  : 'Card stats.'}
               </div>
             </div>
             <div style={{
@@ -776,12 +785,16 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
               color: '#000',
               fontFamily: 'Arial, Helvetica, sans-serif',
               fontStyle: 'italic',
-              fontSize: localSheet?.subclass === 'Anatomist' ? '0.69em' : '0.70em',
+              fontSize: localSheet?.subclass === 'Grenadier' ? '0.69em' : localSheet?.subclass === 'Anatomist' ? '0.69em' : '0.70em',
               fontWeight: 400,
               zIndex: 3,
               textAlign: 'left'
             }}>
-              {localSheet?.subclass === 'Anatomist' ? '"Every organism is capable of performing well beyond its natural limit, if you simply inject it with the right components." --Rezz, Radiofrequent Anatomist' : 'Flavor text.'}
+              {localSheet?.subclass === 'Grenadier'
+                ? '“I thought it would be a good idea to give all my friends some bombing capabilities and boy, oh boy… was I right!” --Thed Explomb, Apocritan Grenadier'
+                : localSheet?.subclass === 'Anatomist'
+                ? '"Every organism is capable of performing well beyond its natural limit, if you simply inject it with the right components." --Rezz, Radiofrequent Anatomist'
+                : 'Flavor text.'}
             </div>
         </div>
         

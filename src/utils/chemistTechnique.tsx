@@ -52,7 +52,7 @@ export function generateVolatileExperimentsDescriptionJSX(classCardDots?: boolea
 
   return (
     <span style={{ color: '#000', fontWeight: 400 }}>
-      You spend any number of <i>Chem Tokens</i>. After doing so, you and allies within <b>[{hxDots}]</b>hx of you gain +2 to Crit rolls, +<b>[{chemBonus}]</b>d6 <b><u style={{ color: '#de7204' }}>Chemical</u></b> and/or +<b>[{hxRangeBonus}]</b>hx Range to <b><i><span style={{ color: '#990000' }}>Attacks</span></i></b> for each <i>Token</i> spent until the start of the next round.
+      You spend any number of <i>Chem Tokens</i>. After doing so, you and allies within <b>[{hxDots}]</b>hx of you gain +2 to Crit rolls, +<b>[{chemBonus}]</b>d6 <b><u style={{ color: '#de7204' }}>Chemical</u></b><img src="/Chemical.png" alt="Chemical" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /> and/or +<b>[{hxRangeBonus}]</b>hx Range to <b><i><span style={{ color: '#990000' }}>Attacks</span></i></b> for each <i>Token</i> spent until the start of the next round.
     </span>
   );
 }

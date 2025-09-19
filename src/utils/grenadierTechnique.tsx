@@ -8,11 +8,11 @@ export function generateTheBigOneJSX({
     grenadierTechniqueRangeDots?: boolean[];
 }) {
     const cooldown = 4 - (grenadierTechniqueCooldownDots?.filter(Boolean).length || 0);
-    const dieSize = grenadierTechniqueDieSizeDots[0] ? 8 : 6;
+    const dieSize = grenadierTechniqueDieSizeDots[0] ? 12 : 10;
     const range = grenadierTechniqueRangeDots[0] ? 1 : 0;
     return (
         <span style={{ fontSize: '1em', color: '#000', fontFamily: 'Arial, Helvetica, sans-serif' }}>
-            <b><i style={{ color: '#cf0000', fontSize: '1em' }}>The "Big One"</i></b> <i style={{ color: '#cf0000', fontSize: '1em' }}>(Cooldown <b style={{ color: '#000', fontStyle: 'normal' }}>[{cooldown}]</b>).</i> You spend any number of <i>Chem Tokens</i> and choose yourself or an adjacent ally. The next <b><i><span style={{ color: '#990000' }}>Attack</span></i></b> you or your ally makes gets a +1hx-radius <i>AoE</i> and +1d<b>[{dieSize}]</b> Damage and +<b>[{range}]</b>hx Range per <i>Chem Token</i> spent.
+            You spend any number of <i>Chem Tokens</i> and choose yourself or an adjacent ally. The next <b><i><span style={{ color: '#990000' }}>Attack</span></i></b> you or your ally makes gets a +1hx-radius <i>AoE</i> and +1d<b>[{dieSize}]</b> Damage and +<b>[{range}]</b>hx Range per <i>Chem Token</i> spent.
         </span>
     );
 }
