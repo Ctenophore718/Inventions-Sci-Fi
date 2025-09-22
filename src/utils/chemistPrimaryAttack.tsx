@@ -33,7 +33,8 @@ export function generateChemistPrimaryAttackStatsJSX(
   classCardDots?: boolean[][],
   cost?: number,
   dartGunName?: string,
-  chemTokens?: number
+  chemTokens?: number,
+  subclass?: string
 ): React.ReactElement {
   const { dieSize, critThreshold } = calculateChemistPrimaryAttackData(classCardDots);
   // Get critBonus from chemistFeature
@@ -49,7 +50,7 @@ export function generateChemistPrimaryAttackStatsJSX(
         <span style={{ textAlign: 'right', minWidth: '80px' }}><b><u>Crit</u></b> <b>[{dynamicCritThreshold}]</b>+</span>
       </div>
       <div>
-        <b><u>Target</u></b> Single <br />
+        <b><u>Target</u></b> {subclass === 'Grenadier' ? <><i>AoE</i> 1hx-radius</> : 'Single'} <br />
         {dartGunName === 'Chem Gun' ? (
           <>
             <b><u>Damage</u></b> <b>[{damageDice}]</b>d<b>[{dieSize}]</b> <b><u style={{ color: '#a6965f', display: 'inline-flex', alignItems: 'center' }}>

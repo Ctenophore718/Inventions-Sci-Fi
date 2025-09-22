@@ -687,8 +687,17 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
               <b><u>Crit Effect</u></b> <b>[{1 + anatomistAttackDamageDots.filter(Boolean).length}]</b>d8
             </div>
             
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto auto', gap: '8px', alignItems: 'center', marginBottom: '0.5rem' }}>
-              <span></span>
+                      <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: '1fr 24px 24px 24px',
+                        columnGap: '6px',
+                        rowGap: '2px',
+                        alignItems: 'start',
+                        marginBottom: '2px',
+                        width: '100%',
+                        paddingLeft: '4px'
+                      }}>                 
+                      <span></span>
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>4xp</span>
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>6xp</span>
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>9xp</span>
@@ -713,8 +722,17 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
               ))}
             </div>
             
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto auto', gap: '8px', alignItems: 'center', marginBottom: '0.5rem' }}>
-              <span></span>
+                      <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: '1fr 24px 24px 24px',
+                        columnGap: '6px',
+                        rowGap: '2px',
+                        alignItems: 'start',
+                        marginBottom: '2px',
+                        width: '100%',
+                        paddingLeft: '4px'
+                      }}>   
+                                    <span></span>
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>2xp</span>
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>4xp</span>
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>6xp</span>
@@ -739,10 +757,20 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
               ))}
             </div>
             
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto', gap: '8px', alignItems: 'center', marginBottom: '1rem' }}>
-              <span></span>
+                      <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: '1fr 24px 24px 24px',
+                        columnGap: '6px',
+                        rowGap: '2px',
+                        alignItems: 'start',
+                        marginBottom: '2px',
+                        width: '100%',
+                        paddingLeft: '4px'
+                      }}>                
+                      <span></span>
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>3xp</span>
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>5xp</span>
+              <span></span>
               <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>-1 Cooldown</span>
               {[0,1].map(idx => (
                 <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
@@ -773,8 +801,16 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
               <b><i>Enhanced <span style={{ color: '#351c75' }}>Strike</span> Effects.</i></b>
             </div>
             
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '8px', alignItems: 'center', marginBottom: '1rem' }}>
-              <span></span>
+                      <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: '1fr 24px',
+                        columnGap: '6px',
+                        rowGap: '2px',
+                        alignItems: 'start',
+                        marginBottom: '2px',
+                        width: '100%',
+                        paddingLeft: '4px'
+                      }}>                 <span></span>
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>14xp</span>
 
               <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>Can choose to heal <i><b><span style={{ color: '#351c75' }}>Strike</span></b></i> amount</span>
@@ -845,7 +881,7 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
             <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32, fontFamily: 'Arial, Helvetica, sans-serif' }}>
               <div style={{ fontWeight: 'bold', color: '#0b5394', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Feature</u></div>
                 <span style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
-                  <b><i style={{ color: '#cf0000', fontSize: '1em' }}>Blaster Master.</i></b> <span style={{ fontSize: '1em', fontWeight: 400 }}>You and all allies within <b>[{grenadierFeatureIncludesAlliesDots[0] ? 3 + grenadierFeatureAoEDots.filter(Boolean).length : 0}]</b>hx are <b>[</b><i>{grenadierFeatureImmunityDots[0] ? 'Immune' : 'Resistant'}</i><b>]</b> to all Damage from <i>AoE</i> <b><i><span style={{ color: '#990000' }}>Attacks</span></i></b>. In addition, your <b><i>Primary</i></b> <b><i><span style={{ color: '#990000' }}>Attack</span></i></b> Target becomes an <i>AoE</i> 1hx-radius, and other <i>AoE</i> <b><i><span style={{ color: '#990000' }}>Attacks</span></i></b> you make increase in size by 1hx.</span>
+                  <b><i style={{ color: '#cf0000', fontSize: '1em' }}>Blaster Master.</i></b> <span style={{ fontSize: '1em', fontWeight: 400 }}>You and all allies within <b>[{grenadierFeatureIncludesAlliesDots[0] ? 3 + grenadierFeatureAoEDots.filter(Boolean).length : 0}]</b>hx are <b>[</b><i>{grenadierFeatureImmunityDots[0] ? 'Immune' : 'Resistant'}</i><b>]</b> to all Damage from <i>AoE</i> <b><i><span style={{ color: '#990000' }}>Attacks</span></i></b>. In addition, your <b><i>Primary</i></b> <b><i><span style={{ color: '#990000' }}>Attack</span></i></b> Target becomes an <i>AoE</i> 1hx-radius.</span>
                 </span>
             </span>
           </div>
@@ -1212,14 +1248,23 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
                     <b><u>Crit</u></b> <b>[{18 - grenadierAttackCritDots.filter(Boolean).length}]</b>+
                   </span>
               </div>
-              <b><u>Target</u></b> <i>AoE</i> <b>[{1 + grenadierAttackAoEDots.filter(Boolean).length}]</b>hx-radius <br />
+              <b><u>Target</u></b> <i>AoE</i> <b>[{2 + grenadierAttackAoEDots.filter(Boolean).length}]</b>hx-radius <br />
               <b><u>Damage</u></b> 1d<b>[{6 + 2 * grenadierAttackDamageDots.filter(Boolean).length}]</b>, <b><i>Slam</i></b> 3hx <br />
               <b><u>Crit Effect</u></b> 1d<b>[{6 + 2 * grenadierAttackDamageDots.filter(Boolean).length}]</b>
               </div>
             </div>
             
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto auto', gap: '8px', alignItems: 'center', marginBottom: '0.5rem' }}>
-              <span></span>
+                      <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: '1fr 24px 24px 24px',
+                        columnGap: '6px',
+                        rowGap: '2px',
+                        alignItems: 'start',
+                        marginBottom: '2px',
+                        width: '100%',
+                        paddingLeft: '4px'
+                      }}>              
+                      <span></span>
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>6xp</span>
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>12xp</span>
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>18xp</span>
@@ -1251,8 +1296,16 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
               })}
             </div>
             
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto auto', gap: '8px', alignItems: 'center', marginBottom: '0.5rem' }}>
-              <span></span>
+                      <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: '1fr 24px 24px 24px',
+                        columnGap: '6px',
+                        rowGap: '2px',
+                        alignItems: 'start',
+                        marginBottom: '2px',
+                        width: '100%',
+                        paddingLeft: '4px'
+                      }}>              <span></span>
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>5xp</span>
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>8xp</span>
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>15xp</span>
@@ -1284,8 +1337,16 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
               })}
             </div>
             
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto auto', gap: '8px', alignItems: 'center', marginBottom: '0.5rem' }}>
-              <span></span>
+                      <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: '1fr 24px 24px 24px',
+                        columnGap: '6px',
+                        rowGap: '2px',
+                        alignItems: 'start',
+                        marginBottom: '2px',
+                        width: '100%',
+                        paddingLeft: '4px'
+                      }}>              <span></span>
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>3xp</span>
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>5xp</span>
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>8xp</span>
@@ -1317,10 +1378,21 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
               })}
             </div>
             
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto', gap: '8px', alignItems: 'center', marginBottom: '1rem' }}>
-              <span></span>
+                      <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: '1fr 24px 24px 24px',
+                        columnGap: '6px',
+                        rowGap: '2px',
+                        alignItems: 'start',
+                        marginBottom: '2px',
+                        width: '100%',
+                        paddingLeft: '4px'
+                      }}>              
+                      <span></span>
+                      
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>4xp</span>
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>6xp</span>
+              <span></span>
               <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>-1 Cooldown</span>
               {[0,1].map(idx => {
                 const arr = grenadierAttackCooldownDots;
@@ -1353,16 +1425,29 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
           <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
             <div style={{ fontWeight: 'bold', color: '#351c75', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Strike</u></div>
             <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
-              <b><i>Enhanced <span style={{ color: '#351c75' }}>Strike</span> Effects.</i></b>
+              <b><i>Enhanced <span style={{ color: '#351c75' }}>Strike</span> Effects.</i></b> {grenadierStrikeDots.filter(Boolean).length > 0 && (
+                <>
+                  <b>[{grenadierStrikeDots.filter(Boolean).length}]</b>hx-radius <i>AoE</i>
+                </>
+              )}
             </div>
             
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto auto', gap: '8px', alignItems: 'center', marginBottom: '1rem' }}>
-              <span></span>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 24px 24px 24px ',
+              gridTemplateRows: 'repeat(3, auto)',
+              columnGap: '6px',
+              rowGap: '2px',
+              alignItems: 'start',
+              marginBottom: '2px',
+              width: '100%',
+              paddingLeft: '4px'
+              }}>                  <span></span>
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>8xp</span>
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>13xp</span>
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>18xp</span>
 
-              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1hx-Radius AoE</span>
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1hx-radius <i>AoE</i></span>
               {[0,1,2].map(idx => {
                 const arr = grenadierStrikeDots;
                 const rightmostChecked = arr.lastIndexOf(true);
@@ -1399,7 +1484,7 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
             <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
               <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', gap: '12px' }}>
                 <span style={{ display: 'inline-block', maxWidth: 'calc(100% - 40px)' }}>
-                  <b><i style={{ color: '#66cf00' }}>Explosive Temper.</i></b> You are fearless to the point of recklessness, and are lucky enough to have survived so many explosions that were too close for comfort. Gain an advantage on related skill rolls when acting brash and impetuous.
+                  <b><i style={{ color: '#cf0000' }}>Explosive Temper.</i></b> You are fearless to the point of recklessness, and are lucky enough to have survived so many explosions that were too close for comfort. Gain an advantage on related skill rolls when acting brash and impetuous.
                 </span>
                 <div style={{
                   display: 'grid',

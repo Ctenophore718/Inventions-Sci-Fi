@@ -707,7 +707,7 @@ const LevelUpClassChemist: React.FC<LevelUpClassChemistProps> = ({
                             })()}]</b>+
                           </span>
                         </div>
-                        <b><u>Target</u></b> Single <br />
+                        <b><u>Target</u></b> {subclass === 'Grenadier' ? <><i>AoE</i> 1hx-radius</> : 'Single'} <br />
                         <b><u>Damage</u></b> <b>[{(() => {
                           const chemTokens = sheet?.chemTokens || 0;
                           return chemTokens > 0 ? 1 + 1 : 1;

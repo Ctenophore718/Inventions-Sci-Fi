@@ -1071,6 +1071,7 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
         {/* Attack Cards */}
         {/* Chemist Attack Cards */}
         {charClass === 'Chemist' && <CardsChemistAttacks sheet={localSheet} />}
+
       </div>
       
       {/* Floating Navigation Button */}

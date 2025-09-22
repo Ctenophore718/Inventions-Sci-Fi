@@ -332,6 +332,308 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
     }
   }, [notice]);
 
+  // Helper function to get clean subclass progression dots
+  const getCleanSubclassProgressionDots = () => ({
+    anatomistFeatureDots: Array(10).fill(false),
+    anatomistPrecisionHxDots: Array(10).fill(false),
+    anatomistTechniqueRangeDots: Array(10).fill(false),
+    anatomistTechniqueStrikeDamageDots: Array(10).fill(false),
+    anatomistTechniqueStrikeDots: Array(10).fill(false),
+    anatomistTechniqueCooldownDots: Array(10).fill(false),
+    anatomistAttackDamageDots: Array(10).fill(false),
+    anatomistAttackCritDots: Array(10).fill(false),
+    anatomistAttackCooldownDots: Array(10).fill(false),
+    anatomistStrikeDots: Array(10).fill(false),
+    anatomistSurgeonDots: Array(10).fill(false),
+    grenadierFeatureDots: Array(10).fill(false),
+    grenadierFeatureIncludesAlliesDots: Array(10).fill(false),
+    grenadierFeatureAoEDots: Array(10).fill(false),
+    grenadierFeatureImmunityDots: Array(10).fill(false),
+    grenadierTechniqueDieSizeDots: Array(10).fill(false),
+    grenadierTechniqueRangeDots: Array(10).fill(false),
+    grenadierTechniqueCooldownDots: Array(10).fill(false),
+    grenadierAttackAoEDots: Array(10).fill(false),
+    grenadierAttackDamageDots: Array(10).fill(false),
+    grenadierAttackCritDots: Array(10).fill(false),
+    grenadierAttackCooldownDots: Array(10).fill(false),
+    grenadierStrikeDots: Array(10).fill(false),
+    grenadierExplosiveTemperDots: Array(10).fill(false),
+  });
+
+  // Function to reset all XP/SP expenditures when foundational choices change
+  const resetAllExpenditures = () => {
+    if (!sheet) return null;
+
+    // Reset all dot arrays to empty/false
+    const resetSheet = {
+      ...sheet,
+      // Reset XP/SP spending
+      xpSpent: 0,
+      spSpent: 0,
+      xpRemaining: sheet.xpTotal || 0,
+      spRemaining: sheet.spTotal || 0,
+      
+      // Reset all progression dots
+      classCardDots: Array(10).fill(false),
+      chemistProgressionDots: Array(10).fill(false),
+      coderProgressionDots: Array(10).fill(false),
+      commanderProgressionDots: Array(10).fill(false),
+      contemplativeProgressionDots: Array(10).fill(false),
+      devoutProgressionDots: Array(10).fill(false),
+      elementalistProgressionDots: Array(10).fill(false),
+      exospecialistProgressionDots: Array(10).fill(false),
+      gunslingerProgressionDots: Array(10).fill(false),
+      technicianProgressionDots: Array(10).fill(false),
+      
+      // Reset subclass-specific progression dots
+      subclassProgressionDots: getCleanSubclassProgressionDots(),
+      
+      // Clear subclass-specific features and data
+      subclassFeature: "",
+      classFeature: "", // Also reset class feature to allow auto-fill
+      
+      // Clear subclass-specific equipment/items
+      dartGuns: [],
+      superSerums: [],
+      grenades: [],
+      
+      // Reset skill dots (keep only free starter dots)
+      skillDots: sheet.hasFreeSkillStarterDots ? 
+        Object.keys(sheet.skillDots || {}).reduce((acc, skill) => {
+          acc[skill] = [true, true, ...Array(8).fill(false)]; // Only first two dots
+          return acc;
+        }, {} as { [key: string]: boolean[] }) : 
+        {},
+        
+      // Reset any other progression systems that cost XP/SP
+      // (Add more fields here as needed based on your character sheet structure)
+    };
+
+    return resetSheet;
+  };
+
+  // Wrapper functions for foundational choice changes with confirmation
+  const handleCharClassChange = (newClass: string) => {
+    if (!newClass || newClass === charClass) {
+      setCharClass(newClass);
+      return;
+    }
+
+    // Only show confirmation if XP or SP has been spent
+    const hasExpenditures = (xpSpent > 0) || (spSpent > 0);
+    
+    if (hasExpenditures) {
+      const confirmed = window.confirm(
+        `Are you sure you want to change your class? Doing so will remove all selections that cost xp/sp!`
+      );
+      
+      if (!confirmed) {
+        return; // User cancelled, don't make the change
+      }
+    }
+
+    // Make the change (with reset if there were expenditures)
+    if (hasExpenditures) {
+      const resetSheet = resetAllExpenditures();
+      if (resetSheet) {
+        const updatedSheet = { ...resetSheet, charClass: newClass, subclass: "" }; // Reset subclass too
+        saveCharacterSheet(updatedSheet);
+        
+        // Update local state
+        setXpSpent(0);
+        setSpSpent(0);
+        setClassCardDots(Array(10).fill(false));
+        setSkillDots(resetSheet.skillDots);
+        setSubclass("");
+      }
+    } else {
+      // No expenditures, but still need to clear subclass-specific data when changing class
+      if (sheet) {
+        const cleanedSheet = {
+          ...sheet,
+          charClass: newClass,
+          subclass: "",
+          // Clear subclass-specific features and data
+          subclassFeature: "",
+          classFeature: "", // Also reset class feature to allow auto-fill
+          dartGuns: [],
+          superSerums: [],
+          grenades: [],
+          // Reset subclass progression dots
+          subclassProgressionDots: getCleanSubclassProgressionDots()
+        };
+        saveCharacterSheet(cleanedSheet);
+        setSubclass(""); // Reset subclass when class changes
+      }
+    }
+    
+    setCharClass(newClass);
+  };
+
+  const handleSubclassChange = (newSubclass: string) => {
+    if (!newSubclass || newSubclass === subclass) {
+      setSubclass(newSubclass);
+      return;
+    }
+
+    // Only show confirmation if XP or SP has been spent
+    const hasExpenditures = (xpSpent > 0) || (spSpent > 0);
+    
+    if (hasExpenditures) {
+      const confirmed = window.confirm(
+        `Are you sure you want to change your subclass? Doing so will remove all selections that cost xp/sp!`
+      );
+      
+      if (!confirmed) {
+        return; // User cancelled, don't make the change
+      }
+    }
+
+    // Make the change (with reset if there were expenditures)
+    if (hasExpenditures) {
+      const resetSheet = resetAllExpenditures();
+      if (resetSheet) {
+        const updatedSheet = { ...resetSheet, subclass: newSubclass };
+        saveCharacterSheet(updatedSheet);
+        
+        // Update local state
+        setXpSpent(0);
+        setSpSpent(0);
+        setClassCardDots(Array(10).fill(false));
+        setSkillDots(resetSheet.skillDots);
+      }
+    } else {
+      // No expenditures, just update the subclass
+      handleAutoSave({ subclass: newSubclass });
+    }
+    
+    setSubclass(newSubclass);
+  };
+
+  const handleSpeciesChange = (newSpecies: string) => {
+    if (!newSpecies || newSpecies === species) {
+      setSpecies(newSpecies);
+      if (newSpecies !== species) setSubspecies(""); // Reset subspecies when species changes
+      return;
+    }
+
+    // Only show confirmation if XP or SP has been spent
+    const hasExpenditures = (xpSpent > 0) || (spSpent > 0);
+    
+    if (hasExpenditures) {
+      const confirmed = window.confirm(
+        `Are you sure you want to change your species? Doing so will remove all selections that cost xp/sp!`
+      );
+      
+      if (!confirmed) {
+        return; // User cancelled, don't make the change
+      }
+    }
+
+    // Make the change (with reset if there were expenditures)
+    if (hasExpenditures) {
+      const resetSheet = resetAllExpenditures();
+      if (resetSheet) {
+        const updatedSheet = { ...resetSheet, species: newSpecies, subspecies: "" }; // Reset subspecies too
+        saveCharacterSheet(updatedSheet);
+        
+        // Update local state
+        setXpSpent(0);
+        setSpSpent(0);
+        setClassCardDots(Array(10).fill(false));
+        setSkillDots(resetSheet.skillDots);
+        setSubspecies("");
+      }
+    } else {
+      // No expenditures, just update the species and reset subspecies
+      setSubspecies(""); // Reset subspecies when species changes
+      handleAutoSave({ species: newSpecies, subspecies: "" });
+    }
+    
+    setSpecies(newSpecies);
+    setSubspecies("");
+  };
+
+  const handleSubspeciesChange = (newSubspecies: string) => {
+    if (!newSubspecies || newSubspecies === subspecies) {
+      setSubspecies(newSubspecies);
+      return;
+    }
+
+    // Only show confirmation if XP or SP has been spent
+    const hasExpenditures = (xpSpent > 0) || (spSpent > 0);
+    
+    if (hasExpenditures) {
+      const confirmed = window.confirm(
+        `Are you sure you want to change your subspecies? Doing so will remove all selections that cost xp/sp!`
+      );
+      
+      if (!confirmed) {
+        return; // User cancelled, don't make the change
+      }
+    }
+
+    // Make the change (with reset if there were expenditures)
+    if (hasExpenditures) {
+      const resetSheet = resetAllExpenditures();
+      if (resetSheet) {
+        const updatedSheet = { ...resetSheet, subspecies: newSubspecies };
+        saveCharacterSheet(updatedSheet);
+        
+        // Update local state
+        setXpSpent(0);
+        setSpSpent(0);
+        setClassCardDots(Array(10).fill(false));
+        setSkillDots(resetSheet.skillDots);
+      }
+    } else {
+      // No expenditures, just update the subspecies
+      handleAutoSave({ subspecies: newSubspecies });
+    }
+    
+    setSubspecies(newSubspecies);
+  };
+
+  const handleBackgroundChange = (newBackground: string) => {
+    if (!newBackground || newBackground === background) {
+      setBackground(newBackground);
+      return;
+    }
+
+    // Only show confirmation if XP or SP has been spent
+    const hasExpenditures = (xpSpent > 0) || (spSpent > 0);
+    
+    if (hasExpenditures) {
+      const confirmed = window.confirm(
+        `Are you sure you want to change your background? Doing so will remove all selections that cost xp/sp!`
+      );
+      
+      if (!confirmed) {
+        return; // User cancelled, don't make the change
+      }
+    }
+
+    // Make the change (with reset if there were expenditures)
+    if (hasExpenditures) {
+      const resetSheet = resetAllExpenditures();
+      if (resetSheet) {
+        const updatedSheet = { ...resetSheet, background: newBackground };
+        saveCharacterSheet(updatedSheet);
+        
+        // Update local state
+        setXpSpent(0);
+        setSpSpent(0);
+        setClassCardDots(Array(10).fill(false));
+        setSkillDots(resetSheet.skillDots);
+      }
+    } else {
+      // No expenditures, just update the background
+      handleAutoSave({ background: newBackground });
+    }
+    
+    setBackground(newBackground);
+  };
+
   // Cross-window synchronization for this character (optimized)
   React.useEffect(() => {
     const handleStorageChange = (e: StorageEvent) => {
@@ -1028,7 +1330,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
               <select
                 value={charClass}
                 onChange={e => {
-                  setCharClass(e.target.value);
+                  handleCharClassChange(e.target.value);
                   handleAutoSave({ charClass: e.target.value });
                 }}
                 className={styles.colorSelect + ' ' + styles.selectedClassColor}
@@ -1252,11 +1554,11 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                 value={subclass}
                 onChange={e => {
                   const val = e.target.value;
-                  setSubclass(val);
+                  handleSubclassChange(val);
                   if (!charClass && val) {
                     const found = allSubclassOptions.find(opt => opt.value === val);
                     if (found) {
-                      setCharClass(found.class);
+                      handleCharClassChange(found.class);
                       handleAutoSave({ subclass: val, charClass: found.class });
                     } else {
                       handleAutoSave({ subclass: val });
@@ -1346,8 +1648,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
               <select
                 value={species}
                 onChange={e => {
-                  setSpecies(e.target.value);
-                  setSubspecies("");
+                  handleSpeciesChange(e.target.value);
                   handleAutoSave({ species: e.target.value, subspecies: "" });
                 }}
                 className={styles.colorSelect + ' ' + styles.selectedSpeciesColor}
@@ -1390,11 +1691,11 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                 value={subspecies}
                 onChange={e => {
                   const val = e.target.value;
-                  setSubspecies(val);
+                  handleSubspeciesChange(val);
                   if (!species && val) {
                     const found = allSubspeciesOptions.find(opt => opt.value === val);
                     if (found) {
-                      setSpecies(found.species);
+                      handleSpeciesChange(found.species);
                       handleAutoSave({ subspecies: val, species: found.species });
                     } else {
                       handleAutoSave({ subspecies: val });
@@ -1485,7 +1786,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
             <select
               value={background}
               onChange={e => {
-                setBackground(e.target.value);
+                handleBackgroundChange(e.target.value);
                 handleAutoSave({ background: e.target.value });
               }}
               className={styles.colorSelect + ' ' + styles.selectedBackgroundColor}
@@ -1548,7 +1849,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
       borderRadius: 8, 
       boxShadow: '0 2px 4px rgba(0,0,0,0.1)', 
       minHeight: 80, 
-      padding: '1.2rem', 
+      padding: '0.5rem', 
       display: 'flex', 
       flexDirection: 'column', 
       alignItems: 'center', 
@@ -1566,16 +1867,54 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                 }}>
                   <thead>
                     <tr>
-                      <th style={{ textAlign: 'left', fontWeight: 'bold', padding: isMobile ? '2px 1px' : '4px 4px', fontFamily: 'Arial, sans-serif' }}></th>
-                      {[20, 18, 16, 14, 12, 10, 8, 6, 4,  2].map((val) => (
-                        <th key={val} style={{ textAlign: 'center', fontWeight: 'bold', padding: isMobile ? '2px 1px' : '4px 4px', fontFamily: 'Arial, sans-serif' }}>{val}+</th>
+                      <th style={{ 
+                        textAlign: 'left', 
+                        fontWeight: 'bold', 
+                        padding: isMobile ? '2px 1px' : '4px 4px', 
+                        fontFamily: 'Arial, sans-serif', 
+                        width: '20%'
+                      }}></th>
+                      {[20, 18, 16, 14, 12, 10, 8, 6, 4, 2].map((val) => (
+                        <th key={val} style={{ 
+                          textAlign: 'center', 
+                          fontWeight: 'bold', 
+                          textDecoration: 'underline',
+                          padding: isMobile ? '2px 1px' : '4px 4px', 
+                          fontFamily: 'Arial, sans-serif', 
+                          width: '8%',
+                          minWidth: isMobile ? '20px' : '8%',
+                          maxWidth: isMobile ? '20px' : '8%'
+                        }}>{val}+</th>
+                      ))}
+                    </tr>
+                    <tr>
+                      <th style={{ width: '20%' }}></th>
+                      {["1sp", "1sp", "2sp", "2sp", "3sp", "4sp", "5sp", "6sp", "8sp", "10sp"].map((sp, idx) => (
+                        <th key={sp + idx} style={{
+                          textAlign: 'center',
+                          fontWeight: 'bold',
+                          color: '#888',
+                          fontSize: isMobile ? '0.75em' : '0.85em',
+                          fontFamily: 'Arial, sans-serif',
+                          width: '8%',
+                          minWidth: isMobile ? '20px' : '8%',
+                          maxWidth: isMobile ? '20px' : '8%'
+                        }}>{sp}</th>
                       ))}
                     </tr>
                   </thead>
                   <tbody>
                     {skillList && skillList.map(skill => (
                       <tr key={skill}>
-                        <td style={{ fontSize: '0.92em', fontWeight: 'bold', padding: isMobile ? '2px 1px' : '4px 4px', whiteSpace: 'nowrap', fontFamily: 'Arial, sans-serif' }}>{skill}</td>
+                        <td style={{ 
+                          fontSize: '0.92em', 
+                          fontWeight: 'bold', 
+                          padding: isMobile ? '2px 1px' : '4px 4px', 
+                          whiteSpace: 'nowrap', 
+                          fontFamily: 'Arial, sans-serif', 
+                          width: '20%', 
+                          textAlign: 'right' 
+                          }}>{skill}</td>
                         {(skillDots[skill] || Array(10).fill(false)).map((checked, i) => {
                           const skillDotsForSkill = skillDots[skill] || Array(10).fill(false);
                           
@@ -1591,17 +1930,14 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                           const isTechnicianTechnology = charClass === "Technician" && skill === "Technology" && i === 2;
                           
                           // Check for subclass-based automatic skill dots (Anatomist Medicine booster)
-                          // Handle overlap: if Medicine column 2 is already occupied by a user dot, move to column 3
-                          const getAnatomistMedicineBoosterPosition = () => {
-                            if (subclass !== "Anatomist" || skill !== "Medicine") return -1;
-                            const medicineDots = skillDots["Medicine"] || Array(10).fill(false);
-                            // If column 2 (index 2) is already filled by user, use column 3 (index 3)
-                            return medicineDots[2] ? 3 : 2;
-                          };
-                          const anatomistMedicineBoosterPosition = getAnatomistMedicineBoosterPosition();
-                          const isAnatomistMedicine = anatomistMedicineBoosterPosition !== -1 && i === anatomistMedicineBoosterPosition;
+                          // Anatomist Medicine booster always goes at position 2, same as class boosters
+                          const isAnatomistMedicine = subclass === "Anatomist" && skill === "Medicine" && i === 2;
                           
-                          if (isChemistInvestigation || isCoderOikomagic || isCommanderDiplomacy || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine) {
+                          // Check for Grenadier Intimidation booster dot
+                          // Grenadier Intimidation booster always goes at position 2, same as class boosters
+                          const isGrenadierIntimidation = subclass === "Grenadier" && skill === "Intimidation" && i === 2;
+                          
+                          if (isChemistInvestigation || isCoderOikomagic || isCommanderDiplomacy || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine || isGrenadierIntimidation) {
                             checked = true; // Force third dot to be filled for class booster dots
                           }
 
@@ -1616,7 +1952,8 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                             if (isExospecialistAthletics) return "rgba(17,114,51,0.5)";
                             if (isGunslingerDeception) return "rgba(78,114,17,0.5)";
                             if (isTechnicianTechnology) return "rgba(114,72,17,0.5)";
-                            if (isAnatomistMedicine) return "#66cf00";
+                            if (isAnatomistMedicine) return "rgba(102,207,0,0.5)";
+                            if (isGrenadierIntimidation) return "rgba(207,0,0,0.5)";
                             // Add other class colors here in the future
                             return "#d0d0d0"; // fallback color
                           };
@@ -1634,7 +1971,8 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                                                (charClass === "Elementalist" && skill === "Xenomagic" && dotIndex === 2) ||
                                                (charClass === "Gunslinger" && skill === "Deception" && dotIndex === 2) ||
                                                (charClass === "Technician" && skill === "Technology" && dotIndex === 2) ||
-                                               (subclass === "Anatomist" && skill === "Medicine" && dotIndex === anatomistMedicineBoosterPosition);
+                                               (subclass === "Anatomist" && skill === "Medicine" && dotIndex === 2) ||
+                                               (subclass === "Grenadier" && skill === "Intimidation" && dotIndex === 2);
                             return dotFilled || isBoosterDot;
                           });
                           const rightmostChecked = skillDotsForSkill.lastIndexOf(true);
@@ -1644,14 +1982,75 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                           const isLockedColumn = hasFreeDots && isFirstTwoColumns;
                           
                           return (
-                            <td key={i} style={{ textAlign: 'center', padding: isMobile ? '1px 1px' : '2px 2px' }}>
+                            <td key={i} style={{
+                              textAlign: 'center',
+                              padding: isMobile ? '1px 1px' : '2px 2px',
+                              width: '8%',
+                              minWidth: isMobile ? '20px' : '8%',
+                              maxWidth: isMobile ? '20px' : '8%'
+                            }}>
                               <span
                                 onClick={() => {
                                   // Prevent clicking on locked columns for new characters
                                   if (isLockedColumn) return;
                                   
                                   // Prevent clicking on class-based automatic skill dots
-                                  if (isChemistInvestigation || isCoderOikomagic || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isCommanderDiplomacy || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine) return;
+                                  if (isChemistInvestigation || isCoderOikomagic || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isCommanderDiplomacy || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine || isGrenadierIntimidation) return;
+
+                                  // SP costs for each skill dot position: [1sp, 1sp, 2sp, 2sp, 3sp, 4sp, 5sp, 6sp, 8sp, 10sp]
+                                  const spCosts = [1, 1, 2, 2, 3, 4, 5, 6, 8, 10];
+                                  const currentSkillDots = skillDots[skill] || Array(10).fill(false);
+                                  
+                                  // Helper function to check if a position is a booster dot (free)
+                                  const isBoosterDot = (skillName: string, position: number) => {
+                                    // All booster dots are at position 2
+                                    if (position === 2) {
+                                      // Class booster dots
+                                      if (charClass === "Chemist" && skillName === "Investigation") return true;
+                                      if (charClass === "Coder" && skillName === "Oikomagic") return true;
+                                      if (charClass === "Contemplative" && skillName === "Awareness") return true;
+                                      if (charClass === "Devout" && skillName === "Xenomagic") return true;
+                                      if (charClass === "Elementalist" && skillName === "Xenomagic") return true;
+                                      if (charClass === "Exospecialist" && skillName === "Athletics") return true;
+                                      if (charClass === "Gunslinger" && skillName === "Deception") return true;
+                                      if (charClass === "Commander" && skillName === "Diplomacy") return true;
+                                      if (charClass === "Technician" && skillName === "Technology") return true;
+                                      
+                                      // Subclass booster dots
+                                      if (subclass === "Anatomist" && skillName === "Medicine") return true;
+                                      if (subclass === "Grenadier" && skillName === "Intimidation") return true;
+                                    }
+                                    
+                                    return false;
+                                  };
+                                  
+                                  let spDelta = 0;
+
+                                  // Calculate SP cost/refund before attempting changes
+                                  if (!currentSkillDots[i] && canCheck) {
+                                    // Filling dots: calculate SP cost for new dots being filled (excluding booster dots)
+                                    for (let j = 0; j <= i; j++) {
+                                      if (!currentSkillDots[j] && !isBoosterDot(skill, j)) {
+                                        spDelta += spCosts[j];
+                                      }
+                                    }
+                                    
+                                    // Check if user has enough SP
+                                    if (spSpent + spDelta > (sheet?.spTotal || 0)) {
+                                      setNotice("Not enough sp!");
+                                      return;
+                                    }
+                                  } else if (currentSkillDots[i] && canUncheck) {
+                                    // Unfilling dots: calculate SP to be refunded (excluding booster dots)
+                                    for (let j = i; j < currentSkillDots.length; j++) {
+                                      if (currentSkillDots[j] && !isBoosterDot(skill, j)) {
+                                        spDelta -= spCosts[j];
+                                      }
+                                    }
+                                  } else {
+                                    // No valid action
+                                    return;
+                                  }
 
                                   setSkillDots(prev => {
                                     const currentSkillDots = prev[skill] || Array(10).fill(false);
@@ -1659,12 +2058,12 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                                     
                                     // Handle dot clicking logic
                                     if (!currentSkillDots[i] && canCheck) {
-                                      // Filling dots: fill from left to right up to and including clicked position
+                                      // Fill dots from left to right up to and including clicked position
                                       for (let j = 0; j <= i; j++) {
                                         newSkillDots[j] = true;
                                       }
                                     } else if (currentSkillDots[i] && canUncheck) {
-                                      // Unfilling dots: unfill from clicked position to the right
+                                      // Unfill dots from clicked position to the right
                                       for (let j = i; j < newSkillDots.length; j++) {
                                         newSkillDots[j] = false;
                                       }
@@ -1676,38 +2075,61 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                                     // Create the updated skill dots object
                                     const updatedSkillDots = { ...prev, [skill]: newSkillDots };
                                     
-                                    console.log(`Skill dots updated for ${skill}:`, newSkillDots);
-                                    
-                                    // Auto-save the changes
-                                    if (sheet) {
-                                      const updatedSheet = {
-                                        ...sheet,
-                                        skillDots: updatedSkillDots
-                                      };
-                                      saveCharacterSheet(updatedSheet);
-                                    }
+                                    console.log(`Skill dots updated for ${skill}:`, newSkillDots, `SP change: ${spDelta}, New SP spent: ${spSpent + spDelta}`);
                                     
                                     return updatedSkillDots;
                                   });
+
+                                  // Update SP spent after skill dots are updated
+                                  const newSpSpent = spSpent + spDelta;
+                                  setSpSpent(newSpSpent);
+                                  
+                                  // Auto-save the changes
+                                  if (sheet) {
+                                    const updatedSkillDots = { ...skillDots, [skill]: (() => {
+                                      const currentSkillDots = skillDots[skill] || Array(10).fill(false);
+                                      let newSkillDots = [...currentSkillDots];
+                                      
+                                      if (!currentSkillDots[i] && canCheck) {
+                                        for (let j = 0; j <= i; j++) {
+                                          newSkillDots[j] = true;
+                                        }
+                                      } else if (currentSkillDots[i] && canUncheck) {
+                                        for (let j = i; j < newSkillDots.length; j++) {
+                                          newSkillDots[j] = false;
+                                        }
+                                      }
+                                      
+                                      return newSkillDots;
+                                    })() };
+                                    
+                                    const updatedSheet = {
+                                      ...sheet,
+                                      skillDots: updatedSkillDots,
+                                      spSpent: newSpSpent,
+                                      spRemaining: (sheet.spTotal || 0) - newSpSpent
+                                    };
+                                    saveCharacterSheet(updatedSheet);
+                                  }
                                 }}
                                 style={{
                                   display: 'inline-block',
                                   width: isMobile ? 14 : 18,
                                   height: isMobile ? 14 : 18,
                                   borderRadius: '50%',
-                                  border: (isChemistInvestigation || isCoderOikomagic || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isCommanderDiplomacy || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine) ? `2px solid ${classBoostColor}` : (isLockedColumn ? '2px solid #666' : '2px solid #000'),
-                                  background: checked ? ((isChemistInvestigation || isCoderOikomagic || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isCommanderDiplomacy || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine) ? classBoostColor : (isLockedColumn ? '#666' : '#000')) : '#fff',
-                                  cursor: (isLockedColumn || isChemistInvestigation || isCoderOikomagic || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isCommanderDiplomacy || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine) ? 'not-allowed' : ((canCheck && !checked) || canUncheck ? 'pointer' : 'not-allowed'),
-                                  opacity: (isLockedColumn || isChemistInvestigation || isCoderOikomagic || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isCommanderDiplomacy || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine) ? 0.6 : ((canCheck && !checked) || canUncheck ? 1 : 0.4),
+                                  border: (isChemistInvestigation || isCoderOikomagic || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isCommanderDiplomacy || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine || isGrenadierIntimidation) ? `2px solid ${classBoostColor}` : (isLockedColumn ? '2px solid #666' : '2px solid #000'),
+                                  background: checked ? ((isChemistInvestigation || isCoderOikomagic || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isCommanderDiplomacy || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine || isGrenadierIntimidation) ? classBoostColor : (isLockedColumn ? '#666' : '#000')) : '#fff',
+                                  cursor: (isLockedColumn || isChemistInvestigation || isCoderOikomagic || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isCommanderDiplomacy || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine || isGrenadierIntimidation) ? 'not-allowed' : ((canCheck && !checked) || canUncheck ? 'pointer' : 'not-allowed'),
+                                  opacity: (isLockedColumn || isChemistInvestigation || isCoderOikomagic || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isCommanderDiplomacy || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine || isGrenadierIntimidation) ? 0.6 : ((canCheck && !checked) || canUncheck ? 1 : 0.4),
                                 }}
                                 title={
-                                  isChemistInvestigation || isCoderOikomagic || isCommanderDiplomacy || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine
+                                  isChemistInvestigation || isCoderOikomagic || isCommanderDiplomacy || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine || isGrenadierIntimidation
                                     ? 'Class bonus skill dot (cannot be changed)'
                                     : isLockedColumn 
                                     ? 'Starting skill dots (cannot be changed)'
                                     : (!checked && canCheck)
-                                    ? `Toggle`
-                                    : (canUncheck ? `Uncheck rightmost first` : `Must uncheck rightmost first`)
+                                    ? `Click to fill (Cost: ${[1, 1, 2, 2, 3, 4, 5, 6, 8, 10][i]}sp)`
+                                    : (canUncheck ? `Click to unfill (Refund: ${[1, 1, 2, 2, 3, 4, 5, 6, 8, 10][i]}sp)` : `Must uncheck rightmost first`)
                                 }
                               />
                             </td>

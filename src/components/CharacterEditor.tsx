@@ -2059,7 +2059,9 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
                   ? <span style={{ color: '#000', fontWeight: 'normal' }}>Can <span style={{ color: '#351c75' }}><b><i>Strike</i></b></span> a single target multiple times</span>
                   : (subclass === 'Anatomist' && sheet?.subclassProgressionDots?.anatomistStrikeDots?.[0])
                     ? <span style={{ color: '#000', fontWeight: 'normal' }}>Can choose to heal <span style={{ color: '#351c75' }}><b><i>Strike</i></b></span> amount</span>
-                    : strikeEffects
+                    : (subclass === 'Grenadier' && sheet?.subclassProgressionDots?.grenadierStrikeDots?.filter(Boolean).length > 0)
+                      ? <span style={{ color: '#000', fontWeight: 'normal' }}><b>[{sheet?.subclassProgressionDots?.grenadierStrikeDots?.filter(Boolean).length}]</b>hx-radius <i>AoE</i></span>
+                      : strikeEffects
               }
           </div>
         </div>
@@ -2185,6 +2187,22 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
             <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
               <span>
                 <b><i style={{ color: '#724811' }}>Machinist.</i></b> <span style={{ color: '#000' }}>You are a whiz when it comes to machinery of all kinds. While repairing, rewiring, reprogramming, building or dismantling various machines, gain an advantage on related skill rolls.</span>
+              </span>
+            </div>
+          )}
+          
+          {/* Subclass Perks */}
+          {subclass === 'Anatomist' && sheet?.subclassProgressionDots?.anatomistSurgeonDots?.[0] && (
+            <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <span>
+                <b><i style={{ color: '#66cf00' }}>Surgeon.</i></b> <span style={{ color: '#000' }}>You can perform surgery and potentially save a life on the brink of death or otherwise ensure an enemy will be incapacitated for life in a way of your choice. Gain an advantage on related skill rolls to perform the surgery.</span>
+              </span>
+            </div>
+          )}
+          {subclass === 'Grenadier' && sheet?.subclassProgressionDots?.grenadierExplosiveTemperDots?.[0] && (
+            <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <span>
+                <b><i style={{ color: '#cf0000' }}>Explosive Temper.</i></b> <span style={{ color: '#000' }}>You are fearless to the point of recklessness, and are lucky enough to have survived so many explosions that were too close for comfort. Gain an advantage on related skill rolls when acting brash and impetuous.</span>
               </span>
             </div>
           )}
