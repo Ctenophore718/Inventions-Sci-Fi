@@ -101,6 +101,17 @@ export type CharacterSheet = {
     grenadierAttackCooldownDots?: boolean[];
     grenadierStrikeDots?: boolean[];
     grenadierExplosiveTemperDots?: boolean[];
+    // Necro subclass progression
+    necroFeatureDots?: boolean[];
+    necroIgnoreDamageDots?: boolean[];
+    necroTechniqueRangeDots?: boolean[];
+    necroTechniqueInflictBlindDots?: boolean[];
+    necroTechniqueCooldownDots?: boolean[];
+    necroAttackSpeedDots?: boolean[];
+    necroAttackDamageDots?: boolean[];
+    necroAttackCritDots?: boolean[];
+    necroAttackCooldownDots?: boolean[];
+    necroPerksSkillsDots?: boolean[];
     // Add other subclasses as needed
   };
 };

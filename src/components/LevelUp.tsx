@@ -332,34 +332,6 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
     }
   }, [notice]);
 
-  // Helper function to get clean subclass progression dots
-  const getCleanSubclassProgressionDots = () => ({
-    anatomistFeatureDots: Array(10).fill(false),
-    anatomistPrecisionHxDots: Array(10).fill(false),
-    anatomistTechniqueRangeDots: Array(10).fill(false),
-    anatomistTechniqueStrikeDamageDots: Array(10).fill(false),
-    anatomistTechniqueStrikeDots: Array(10).fill(false),
-    anatomistTechniqueCooldownDots: Array(10).fill(false),
-    anatomistAttackDamageDots: Array(10).fill(false),
-    anatomistAttackCritDots: Array(10).fill(false),
-    anatomistAttackCooldownDots: Array(10).fill(false),
-    anatomistStrikeDots: Array(10).fill(false),
-    anatomistSurgeonDots: Array(10).fill(false),
-    grenadierFeatureDots: Array(10).fill(false),
-    grenadierFeatureIncludesAlliesDots: Array(10).fill(false),
-    grenadierFeatureAoEDots: Array(10).fill(false),
-    grenadierFeatureImmunityDots: Array(10).fill(false),
-    grenadierTechniqueDieSizeDots: Array(10).fill(false),
-    grenadierTechniqueRangeDots: Array(10).fill(false),
-    grenadierTechniqueCooldownDots: Array(10).fill(false),
-    grenadierAttackAoEDots: Array(10).fill(false),
-    grenadierAttackDamageDots: Array(10).fill(false),
-    grenadierAttackCritDots: Array(10).fill(false),
-    grenadierAttackCooldownDots: Array(10).fill(false),
-    grenadierStrikeDots: Array(10).fill(false),
-    grenadierExplosiveTemperDots: Array(10).fill(false),
-  });
-
   // Function to reset all XP/SP expenditures when foundational choices change
   const resetAllExpenditures = () => {
     if (!sheet) return null;
@@ -386,16 +358,45 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
       technicianProgressionDots: Array(10).fill(false),
       
       // Reset subclass-specific progression dots
-      subclassProgressionDots: getCleanSubclassProgressionDots(),
-      
-      // Clear subclass-specific features and data
-      subclassFeature: "",
-      classFeature: "", // Also reset class feature to allow auto-fill
-      
-      // Clear subclass-specific equipment/items
-      dartGuns: [],
-      superSerums: [],
-      grenades: [],
+      subclassProgressionDots: {
+        // Anatomist subclass progression
+        anatomistFeatureDots: Array(10).fill(false),
+        anatomistPrecisionHxDots: Array(10).fill(false),
+        anatomistTechniqueRangeDots: Array(10).fill(false),
+        anatomistTechniqueStrikeDamageDots: Array(10).fill(false),
+        anatomistTechniqueStrikeDots: Array(10).fill(false),
+        anatomistTechniqueCooldownDots: Array(10).fill(false),
+        anatomistAttackDamageDots: Array(10).fill(false),
+        anatomistAttackCritDots: Array(10).fill(false),
+        anatomistAttackCooldownDots: Array(10).fill(false),
+        anatomistStrikeDots: Array(10).fill(false),
+        anatomistSurgeonDots: Array(10).fill(false),
+        // Grenadier subclass progression
+        grenadierFeatureDots: Array(10).fill(false),
+        grenadierFeatureIncludesAlliesDots: Array(10).fill(false),
+        grenadierFeatureAoEDots: Array(10).fill(false),
+        grenadierFeatureImmunityDots: Array(10).fill(false),
+        grenadierTechniqueDieSizeDots: Array(10).fill(false),
+        grenadierTechniqueRangeDots: Array(10).fill(false),
+        grenadierTechniqueCooldownDots: Array(10).fill(false),
+        grenadierAttackAoEDots: Array(10).fill(false),
+        grenadierAttackDamageDots: Array(10).fill(false),
+        grenadierAttackCritDots: Array(10).fill(false),
+        grenadierAttackCooldownDots: Array(10).fill(false),
+        grenadierStrikeDots: Array(10).fill(false),
+        grenadierExplosiveTemperDots: Array(10).fill(false),
+        // Necro subclass progression
+        necroFeatureDots: Array(10).fill(false),
+        necroIgnoreDamageDots: Array(10).fill(false),
+        necroTechniqueRangeDots: Array(10).fill(false),
+        necroTechniqueInflictBlindDots: Array(10).fill(false),
+        necroTechniqueCooldownDots: Array(10).fill(false),
+        necroAttackSpeedDots: Array(10).fill(false),
+        necroAttackDamageDots: Array(10).fill(false),
+        necroAttackCritDots: Array(10).fill(false),
+        necroAttackCooldownDots: Array(10).fill(false),
+        necroPerksSkillsDots: Array(10).fill(false),
+      },
       
       // Reset skill dots (keep only free starter dots)
       skillDots: sheet.hasFreeSkillStarterDots ? 
@@ -447,24 +448,9 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
         setSubclass("");
       }
     } else {
-      // No expenditures, but still need to clear subclass-specific data when changing class
-      if (sheet) {
-        const cleanedSheet = {
-          ...sheet,
-          charClass: newClass,
-          subclass: "",
-          // Clear subclass-specific features and data
-          subclassFeature: "",
-          classFeature: "", // Also reset class feature to allow auto-fill
-          dartGuns: [],
-          superSerums: [],
-          grenades: [],
-          // Reset subclass progression dots
-          subclassProgressionDots: getCleanSubclassProgressionDots()
-        };
-        saveCharacterSheet(cleanedSheet);
-        setSubclass(""); // Reset subclass when class changes
-      }
+      // No expenditures, just update the class and reset subclass
+      setSubclass(""); // Reset subclass when class changes
+      handleAutoSave({ charClass: newClass, subclass: "" });
     }
     
     setCharClass(newClass);
