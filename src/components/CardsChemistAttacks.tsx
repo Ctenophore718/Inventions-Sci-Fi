@@ -51,6 +51,7 @@ export const CardsChemistAttacks: React.FC<CardsChemistAttacksProps> = ({ sheet 
   const dartGuns = sheet?.dartGuns || [];
   const superSerums = sheet?.superSerums || [];
   const chemZombies = sheet?.chemZombies || [];
+  const grenades = sheet?.grenades || [];
   
   // Debug logging for chemZombies
   console.log('CardsChemistAttacks Debug:', {
@@ -60,7 +61,7 @@ export const CardsChemistAttacks: React.FC<CardsChemistAttacksProps> = ({ sheet 
     isArray: Array.isArray(sheet?.chemZombies)
   });
   
-  if (dartGuns.length === 0 && superSerums.length === 0 && chemZombies.length === 0) {
+  if (dartGuns.length === 0 && superSerums.length === 0 && chemZombies.length === 0 && grenades.length === 0) {
     return null;
   }
 

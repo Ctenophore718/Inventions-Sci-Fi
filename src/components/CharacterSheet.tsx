@@ -458,6 +458,7 @@ const CharacterSheet: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, on
   // Inventory state for Attack Weapons/Spells dropdown
   const [pendingAttack, setPendingAttack] = useState<string>("");
   const [pendingSecondaryAttack, setPendingSecondaryAttack] = useState<string>("");
+  const [pendingGrenade, setPendingGrenade] = useState<string>("");
 
   // Current Hit Points state (local only)
   const [currentHitPoints, setCurrentHitPoints] = useState<number>(sheet?.currentHitPoints ?? sheet?.maxHitPoints ?? 0);
@@ -1204,6 +1205,21 @@ const CharacterSheet: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, on
       );
     }
     
+    // Add Grenades for Grenadier subclass
+    if (subclass === 'Grenadier') {
+      attacks.push(
+        { name: 'Amethyst Blast', type: 'Grenade', cost: 220 },
+        { name: 'Void Grenade', type: 'Grenade', cost: 200 }
+      );
+    }
+    
+    // Add Chem Zombies for Necro subclass
+    if (subclass === 'Necro') {
+      attacks.push(
+        { name: 'Synthetic Corpse', type: 'Chem Zombie', cost: 200 }
+      );
+    }
+    
     return attacks;
   };
 
@@ -1282,11 +1298,26 @@ const CharacterSheet: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, on
           superSerums: newSuperSerums,
           credits: credits - cost
         };
+      } else if (type === 'Grenade') {
+        const newGrenades = [...(sheet.grenades || []), attackName];
+        updatedSheet = { 
+          ...sheet, 
+          grenades: newGrenades,
+          credits: credits - cost
+        };
+      } else if (type === 'Chem Zombie') {
+        const newChemZombies = [...(sheet.chemZombies || []), attackName];
+        updatedSheet = { 
+          ...sheet, 
+          chemZombies: newChemZombies,
+          credits: credits - cost
+        };
       } else {
         return;
       }
       
       handleAutoSave(updatedSheet);
+      setCredits(credits - cost);
     }
     setPendingSecondaryAttack("");
   };
@@ -1299,6 +1330,18 @@ const CharacterSheet: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, on
         updatedSheet = { 
           ...sheet, 
           superSerums: newSuperSerums
+        };
+      } else if (type === 'Grenade') {
+        const newGrenades = [...(sheet.grenades || []), attackName];
+        updatedSheet = { 
+          ...sheet, 
+          grenades: newGrenades
+        };
+      } else if (type === 'Chem Zombie') {
+        const newChemZombies = [...(sheet.chemZombies || []), attackName];
+        updatedSheet = { 
+          ...sheet, 
+          chemZombies: newChemZombies
         };
       } else {
         return;
@@ -2353,10 +2396,10 @@ const CharacterSheet: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, on
                     textAlign: 'left',
                     minWidth: '180px'
                   }}
-                  value={pendingSecondaryAttack || (subclass === 'Anatomist' ? 'Super Serums' : 'Select Secondary Attack')}
+                  value={pendingSecondaryAttack || (subclass === 'Anatomist' ? 'Super Serums' : subclass === 'Grenadier' ? 'Grenades' : subclass === 'Necro' ? 'Chem Zombies' : 'Select Secondary Attack')}
                   onChange={(e) => {
                     const value = e.target.value;
-                    if (value !== 'Super Serums' && value !== 'Select Secondary Attack') {
+                    if (value !== 'Super Serums' && value !== 'Grenades' && value !== 'Chem Zombies' && value !== 'Select Secondary Attack') {
                       setPendingSecondaryAttack(value);
                     }
                   }}
@@ -2368,7 +2411,20 @@ const CharacterSheet: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, on
                       <option style={{ fontWeight: 'bold' }}>Vampirismagoria</option>
                     </>
                   )}
-                  {subclass !== 'Anatomist' && (
+                  {subclass === 'Grenadier' && (
+                    <>
+                      <option disabled style={{ fontWeight: 'bold' }}>Grenades</option>
+                      <option style={{ fontWeight: 'bold' }}>Amethyst Blast</option>
+                      <option style={{ fontWeight: 'bold' }}>Void Grenade</option>
+                    </>
+                  )}
+                  {subclass === 'Necro' && (
+                    <>
+                      <option disabled style={{ fontWeight: 'bold' }}>Chem Zombies</option>
+                      <option style={{ fontWeight: 'bold' }}>Synthetic Corpse</option>
+                    </>
+                  )}
+                  {subclass !== 'Anatomist' && subclass !== 'Grenadier' && subclass !== 'Necro' && (
                     <option disabled style={{ fontWeight: 'bold' }}>Select Secondary Attack</option>
                   )}
                 </select>
@@ -2432,6 +2488,52 @@ const CharacterSheet: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, on
                                 const updatedSheet = { 
                                   ...sheet, 
                                   superSerums: newSuperSerums
+                                };
+                                handleAutoSave(updatedSheet);
+                              }
+                            }}
+                          >×</button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  {(sheet?.grenades && sheet.grenades.length > 0) && (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginLeft: '8px' }}>
+                      {sheet?.grenades?.map((grenade, idx) => (
+                        <span key={grenade + idx + 'grenade'} style={{ fontStyle: 'italic', display: 'flex', alignItems: 'center', background: '#f5f5f5', borderRadius: '6px', padding: '2px 8px' }}>
+                          {grenade}
+                          <button
+                            style={{ marginLeft: '6px', padding: '0 6px', borderRadius: '50%', border: 'none', background: '#d32f2f', color: 'white', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.9em' }}
+                            title={`Remove ${grenade}`}
+                            onClick={() => {
+                              if (sheet) {
+                                const newGrenades = sheet.grenades?.filter((_, i) => i !== idx) || [];
+                                const updatedSheet = { 
+                                  ...sheet, 
+                                  grenades: newGrenades
+                                };
+                                handleAutoSave(updatedSheet);
+                              }
+                            }}
+                          >×</button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  {(sheet?.chemZombies && sheet.chemZombies.length > 0) && (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginLeft: '8px' }}>
+                      {sheet?.chemZombies?.map((chemZombie, idx) => (
+                        <span key={chemZombie + idx + 'chemzombie'} style={{ fontStyle: 'italic', display: 'flex', alignItems: 'center', background: '#f5f5f5', borderRadius: '6px', padding: '2px 8px' }}>
+                          {chemZombie}
+                          <button
+                            style={{ marginLeft: '6px', padding: '0 6px', borderRadius: '50%', border: 'none', background: '#d32f2f', color: 'white', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.9em' }}
+                            title={`Remove ${chemZombie}`}
+                            onClick={() => {
+                              if (sheet) {
+                                const newChemZombies = sheet.chemZombies?.filter((_, i) => i !== idx) || [];
+                                const updatedSheet = { 
+                                  ...sheet, 
+                                  chemZombies: newChemZombies
                                 };
                                 handleAutoSave(updatedSheet);
                               }
