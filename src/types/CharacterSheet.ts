@@ -73,6 +73,9 @@ export type CharacterSheet = {
   // Grenades for Grenadier subclass
   grenades?: string[];
 
+  // Chem Zombies for Necro subclass
+  chemZombies?: string[];
+
   // Subclass progression dots (specific to each subclass)
   subclassProgressionDots?: {
     // Anatomist subclass progression

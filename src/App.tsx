@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import './responsive-headers.css';
 import SheetManager from "./components/SheetManager";
-import CharacterEditor from "./components/CharacterEditor";
+import CharacterSheetComponent from "./components/CharacterSheet";
 import LevelUp from "./components/LevelUp";
 import Cards from "./components/Cards";
 import type { CharacterSheet } from "./types/CharacterSheet";
@@ -13,7 +13,7 @@ const App = () => {
   const [view, setView] = useState<"manager" | "editor" | "levelup" | "cards">("manager");
   const [newCharacterCreated, setNewCharacterCreated] = useState(false); // Track if we've created a new character
 
-  // Shared state for syncing between CharacterEditor and LevelUp
+  // Shared state for syncing between CharacterSheet and LevelUp
   const [charClass, setCharClass] = useState<string>(currentSheet?.charClass || "");
   const [subclass, setSubclass] = useState<string>(currentSheet?.subclass || "");
   const [species, setSpecies] = useState<string>(currentSheet?.species || "");
@@ -396,7 +396,7 @@ const App = () => {
 
       {view === "editor" && (
         <div>
-          <CharacterEditor 
+          <CharacterSheetComponent 
             sheet={currentSheet} 
             onLevelUp={handleLevelUp}
             onCards={handleCards}

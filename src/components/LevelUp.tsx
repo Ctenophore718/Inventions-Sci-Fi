@@ -2,7 +2,7 @@ import React from "react";
 import { useState, useEffect } from "react";
 import type { CharacterSheet } from "../types/CharacterSheet";
 import { saveCharacterSheet, loadSheetById } from "../utils/storage";
-import styles from "./CharacterEditor.module.css";
+import styles from "./CharacterSheet.module.css";
 import LevelUpClassChemist from "./LevelUpClassChemist";
 import LevelUpClassCoder from "./LevelUpClassCoder";
 import LevelUpClassCommander from "./LevelUpClassCommander";
@@ -91,7 +91,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
     // Don't call handleAutoSave - let the caller handle persistence
   };
 
-  // Local state for XP/SP totals (mirroring CharacterEditor)
+  // Local state for XP/SP totals (mirroring CharacterSheet)
   const [xpTotal, setXpTotal] = useState(sheet?.xpTotal ?? 0);
   const [spTotal, setSpTotal] = useState(sheet?.spTotal ?? 0);
   // Optionally, update local state if sheet changes
@@ -101,7 +101,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
   // Skills-related state and constants
   const skillSpCosts = [1,1,2,2,3,4,5,6,8,10];
 
-  // Add skillDots state for LevelUp (mirroring CharacterEditor)
+  // Add skillDots state for LevelUp (mirroring CharacterSheet)
   const skillList = [
     "Acrobatics",
     "Athletics", 

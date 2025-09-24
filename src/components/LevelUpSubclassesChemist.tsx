@@ -226,6 +226,27 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
     sheet?.subclassProgressionDots?.necroPerksSkillsDots || [false]
   );
 
+  // Local state for selected chem zombies (Necro only)
+  const [selectedChemZombies, setSelectedChemZombies] = useState<string[]>(() => {
+    return sheet?.chemZombies || [];
+  });
+  // Local state for pending chem zombie selection (Necro only)
+  const [pendingChemZombie, setPendingChemZombie] = useState<string>("");
+
+  // Save chem zombies to sheet (Necro only)
+  const saveChemZombies = (newChemZombies: string[]) => {
+    setSelectedChemZombies(newChemZombies);
+    if (sheet) {
+      const updatedSheet = { 
+        ...sheet, 
+        chemZombies: newChemZombies,
+        // Preserve current credits to avoid race conditions
+        credits: credits
+      };
+      saveCharacterSheet(updatedSheet);
+    }
+  };
+
   // Local state for selected super serums (Anatomist only)
   const [selectedSuperSerums, setSelectedSuperSerums] = useState<string[]>(() => {
     return sheet?.superSerums || [];
@@ -1711,9 +1732,131 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
           {/* Attack Section */}
           <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
             <div style={{ fontWeight: 'bold', color: '#990000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Attack</u></div>
-            <div style={{ color: '#000', fontWeight: 400, fontSize: '1em', marginBottom: '8px' }}>
-              <b><i><span style={{ color: '#000' }}>Secondary</span> <span style={{ color: '#990000' }}>Attack</span></i></b> <i>(Cooldown</i> <b>[{4 - necroAttackCooldownDots.filter(Boolean).length}]</b><i>).</i><br />
-              <b><i style={{ color: '#990000', fontSize: '1em' }}>Chem Zombie.</i></b> 
+            <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <div style={{ marginBottom: '4px' }}>
+                <b><i><span style={{ color: '#000' }}>Secondary</span> <span style={{ color: '#990000' }}>Attack</span></i></b> <i>(Cooldown</i> <b>[{4 - necroAttackCooldownDots.filter(Boolean).length}]</b><i>).</i>
+              </div>
+              <div style={{ marginBottom: '4px', textAlign: 'left' }}>
+                <select 
+                  style={{ 
+                    fontSize: '1em', 
+                    padding: '2px 8px', 
+                    borderRadius: '6px', 
+                    border: '1px solid #ccc', 
+                    background: '#fff', 
+                    color: '#222',
+                    fontWeight: 'bold',
+                    marginBottom: '4px',
+                    textAlign: 'left',
+                    minWidth: '180px'
+                  }} 
+                  defaultValue="Chem Zombies"
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (value !== "Chem Zombies") {
+                      setPendingChemZombie(value);
+                      e.target.value = "Chem Zombies"; // Reset dropdown
+                    }
+                  }}
+                >
+                  <option disabled style={{ fontWeight: 'bold' }}>Chem Zombies</option>
+                  <option style={{ fontWeight: 'bold' }}>Synthetic Corpse</option>
+                </select>
+                {/* Buy/Add dialog for Chem Zombie selection */}
+                {pendingChemZombie && (
+                  <div style={{ marginTop: '4px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    <div style={{ fontWeight: 'bold' }}>
+                      {pendingChemZombie}
+                      <span style={{ color: '#bf9000', fontWeight: 'bold', marginLeft: '8px' }}>
+                        {pendingChemZombie === 'Synthetic Corpse' && '200c'}
+                      </span>
+                    </div>
+                    <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                      <button
+                      style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #1976d2', background: '#1976d2', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}
+                      onClick={() => {
+                        // Determine cost
+                        let cost = 0;
+                        if (pendingChemZombie === 'Synthetic Corpse') cost = 200;
+                        // Check credits
+                        if (credits < cost) {
+                          setNotice('Not enough credits!');
+                          return;
+                        }
+                        // Atomic operation: update both chem zombies and credits
+                        const newChemZombies = [...selectedChemZombies, pendingChemZombie];
+                        const newCredits = credits - cost;
+                        setSelectedChemZombies(newChemZombies);
+                        
+                        if (sheet) {
+                          const updatedSheet = { 
+                            ...sheet, 
+                            chemZombies: newChemZombies,
+                            credits: newCredits
+                          };
+                          saveCharacterSheet(updatedSheet);
+                        }
+                        
+                        // Update the LevelUp component's credits state (no auto-save)
+                        onCreditsChange?.(-cost);
+                        setPendingChemZombie("");
+                      }}
+                    >Buy</button>
+                    <button
+                      style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #28a745', background: '#28a745', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}
+                      onClick={() => {
+                        const newChemZombies = [...selectedChemZombies, pendingChemZombie];
+                        setSelectedChemZombies(newChemZombies);
+                        
+                        if (sheet) {
+                          const updatedSheet = { 
+                            ...sheet, 
+                            chemZombies: newChemZombies,
+                            credits: credits // Preserve current credits
+                          };
+                          saveCharacterSheet(updatedSheet);
+                        }
+                        
+                        setPendingChemZombie("");
+                      }}
+                    >Add</button>
+                    <button
+                      style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #aaa', background: '#eee', color: '#333', fontWeight: 'bold', cursor: 'pointer' }}
+                      onClick={() => setPendingChemZombie("")}
+                    >Cancel</button>
+                    </div>
+                  </div>
+                )}
+                <div style={{ marginTop: '2px' }}>
+                  {selectedChemZombies.length > 0 && (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginLeft: '8px' }}>
+                      {selectedChemZombies.map((chemZombie, idx) => (
+                        <span key={chemZombie + idx} style={{ fontStyle: 'italic', display: 'flex', alignItems: 'center', background: '#f5f5f5', borderRadius: '6px', padding: '2px 8px' }}>
+                          {chemZombie}
+                          <button
+                            style={{ marginLeft: '6px', padding: '0 6px', borderRadius: '50%', border: 'none', background: '#d32f2f', color: 'white', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.9em' }}
+                            title={`Remove ${chemZombie}`}
+                            onClick={() => {
+                              const newChemZombies = selectedChemZombies.filter((_, i) => i !== idx);
+                              setSelectedChemZombies(newChemZombies);
+                              
+                              if (sheet) {
+                                const updatedSheet = { 
+                                  ...sheet, 
+                                  chemZombies: newChemZombies,
+                                  credits: credits // Preserve current credits
+                                };
+                                saveCharacterSheet(updatedSheet);
+                              }
+                            }}
+                          >×</button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
             
               <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
 
@@ -1753,7 +1896,7 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>5xp</span>
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>8xp</span>
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>15xp</span>
-              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1hx Speed</span>
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1hx <b><i><span style={{ color: '#38761d' }}>Speed</span></i></b></span>
               {[0,1,2].map(idx => (
                 <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                   <span
@@ -1842,12 +1985,9 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
               ))}
               <span></span>
             </div>
-          </div>
 
           {/* Perks Section */}
-
-
-<div style={{ marginTop: '12px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+          <div style={{ marginTop: '12px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
             <div style={{ fontWeight: 'bold', color: '#000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Perks</u></div>
             <div style={{ fontSize: '1em', color: '#000', marginBottom: '6px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
               <i><b>Skills.</b> Survival</i> +2
@@ -1884,9 +2024,6 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
               </div>
             </div>
           </div>
-
-
-
         </div>
       )}
       

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import styles from './CharacterEditor.module.css';
+import styles from './CharacterSheet.module.css';
 
 import type { CharacterSheet } from "../types/CharacterSheet";
 import { saveCharacterSheet, loadSheetById } from "../utils/storage";
@@ -7,6 +7,7 @@ import { generateChemicalReactionJSX, calculateChemistFeatureData } from "../uti
 import { generateChemistStrikeJSX } from "../utils/chemistStrike";
 import { generateAnatomicalPrecisionJSX } from "../utils/anatomistFeature";
 import { generateBlasterMasterJSX } from "../utils/grenadierFeature";
+import { generateBodySnatcherJSX } from "../utils/necroFeature";
 
 
 type Props = {
@@ -27,9 +28,9 @@ type Props = {
 };
 
 
-const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, onAutoSave, charClass, setCharClass, subclass, setSubclass, species, setSpecies, subspecies, setSubspecies, isNewCharacter = false }) => {
+const CharacterSheet: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, onAutoSave, charClass, setCharClass, subclass, setSubclass, species, setSpecies, subspecies, setSubspecies, isNewCharacter = false }) => {
   
-  console.log('CharacterEditor render started, sheet:', sheet ? `ID: ${sheet.id}` : 'NULL');
+  console.log('CharacterSheet render started, sheet:', sheet ? `ID: ${sheet.id}` : 'NULL');
   
   // Auto-save helper function
   const handleAutoSave = (fieldUpdates: Partial<CharacterSheet>) => {
@@ -701,10 +702,9 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
   });
 
   // Add after grenadierFeatureJSX
-  const necroFeatureJSX = (
-    <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#0033cf' }}>Bodysnatcher.</i></b> Whenever a creature dies within <b>[5]</b>hx of you, you gain a <i>Chem Token</i>. Additionally, when you take Damage, you can spend a <i>Chem Token</i> to reduce that Damage by half.
-    </span>
+  const necroFeatureJSX = generateBodySnatcherJSX(
+    sheet?.subclassProgressionDots?.necroFeatureDots,
+    sheet?.subclassProgressionDots?.necroIgnoreDamageDots
   );
 
   // Add after necroFeatureJSX
@@ -2192,6 +2192,13 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
           )}
           
           {/* Subclass Perks */}
+          {subclass === 'Necro' && sheet?.subclassProgressionDots?.necroPerksSkillsDots?.[0] && (
+            <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <span>
+                <b><i style={{ color: '#0033cf' }}>Mortician.</i></b> <span style={{ color: '#000' }}>You have spent a lot of time around corpses and remains of the living. As such, you have a good intuition about the various causes of death and other topics that include the deceased. Gain an advantage on related skill rolls.</span>
+              </span>
+            </div>
+          )}
           {subclass === 'Anatomist' && sheet?.subclassProgressionDots?.anatomistSurgeonDots?.[0] && (
             <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
               <span>
@@ -3365,4 +3372,4 @@ const CharacterEditor: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, o
   );
 };
 
-export default CharacterEditor;
+export default CharacterSheet;

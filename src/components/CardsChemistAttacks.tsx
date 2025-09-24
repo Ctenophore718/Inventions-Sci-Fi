@@ -3,6 +3,7 @@ import type { CharacterSheet } from '../types/CharacterSheet';
 import { generateChemistPrimaryAttackStatsJSX, getDartGunCost } from '../utils/chemistPrimaryAttack';
 import { generateAnatomistSecondaryAttackStatsJSX } from '../utils/anatomistSecondaryAttack';
 import { generateGrenadierSecondaryAttackStatsJSX } from '../utils/grenadierSecondaryAttack';
+import { generateNecroSecondaryAttackStatsJSX } from '../utils/necroSecondaryAttack';
 
 
 interface CardsChemistAttacksProps {
@@ -49,8 +50,17 @@ function getSuperSerumFlavorText(superSerum: string): string {
 export const CardsChemistAttacks: React.FC<CardsChemistAttacksProps> = ({ sheet }) => {
   const dartGuns = sheet?.dartGuns || [];
   const superSerums = sheet?.superSerums || [];
+  const chemZombies = sheet?.chemZombies || [];
   
-  if (dartGuns.length === 0 && superSerums.length === 0) {
+  // Debug logging for chemZombies
+  console.log('CardsChemistAttacks Debug:', {
+    subclass: sheet?.subclass,
+    chemZombies: sheet?.chemZombies,
+    chemZombiesLength: sheet?.chemZombies?.length,
+    isArray: Array.isArray(sheet?.chemZombies)
+  });
+  
+  if (dartGuns.length === 0 && superSerums.length === 0 && chemZombies.length === 0) {
     return null;
   }
 
@@ -478,6 +488,148 @@ export const CardsChemistAttacks: React.FC<CardsChemistAttacksProps> = ({ sheet 
                 --Fretta di Boom, Secessionist Grenadier.
               </>
             ) : grenade === 'Void Grenade' ? '“These bad boys pack a gravitational pull that will suck you straight back into the void where you came from.” --Gerry Horseshoes, Defteran Grenadier' : 'Grenade effect.'}
+          </div>
+        </div>
+      ))}
+      {/* Necro Chem Zombie Secondary Attack Cards */}
+      {sheet?.subclass === 'Necro' && Array.isArray(sheet?.chemZombies) && sheet.chemZombies.length > 0 && sheet.chemZombies.map((chemZombie, idx) => (
+        <div key={chemZombie + idx} style={{
+          width: '240px',
+          height: '336px',
+          background: '#fff',
+          border: '5px solid #990000',
+          borderRadius: 8,
+          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+          padding: '1.2rem',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          flexShrink: 0,
+          position: 'relative',
+          overflow: 'hidden'
+        }}>
+          <div style={{
+            position: 'absolute',
+            top: -4,
+            left: 0,
+            width: '100%',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'flex-end',
+            padding: '0 10px',
+            boxSizing: 'border-box',
+            minHeight: '2.1em'
+          }}>
+            <span style={{
+              fontFamily: 'Arial, Helvetica, sans-serif',
+              fontWeight: 'bold',
+              fontSize: 'clamp(0.8em, 4vw, 1.25em)',
+              color: '#0033cf',
+              lineHeight: 1,
+              textAlign: 'left',
+              whiteSpace: 'nowrap',
+              maxWidth: 'calc(100% - 87px)',
+              minWidth: 0,
+              flexShrink: 1,
+              marginRight: '5px'
+            }}>{chemZombie}</span>
+            <span style={{
+              fontFamily: 'Arial, Helvetica, sans-serif',
+              fontStyle: 'italic',
+              fontSize: '0.75em',
+              color: '#0033cf',
+              lineHeight: 1,
+              whiteSpace: 'normal',
+              wordBreak: 'keep-all',
+              overflowWrap: 'anywhere',
+              maxWidth: '72px',
+              display: 'inline-block',
+              textAlign: 'right'
+            }}>Chem Zombie</span>
+          </div>
+          <img 
+            src={`/${chemZombie}.png`}
+            alt={chemZombie}
+            style={{
+              position: 'absolute',
+              top: 35,
+              left: 10,
+              right: 10,
+              width: 'calc(100% - 20px)',
+              height: 'calc(50% - 55px)',
+              objectFit: 'cover',
+              borderRadius: 6
+            }}
+          />
+          
+          {/* Secondary Attack Label and Cooldown */}
+          <div style={{
+            position: 'absolute',
+            top: 'calc(50% - 15px)',
+            left: 0,
+            width: '100%',
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            paddingLeft: 10,
+            paddingRight: 10,
+            zIndex: 3
+          }}>
+            <span style={{ color: '#990000', fontFamily: 'Arial, Helvetica, sans-serif', fontWeight: 'bold', fontSize: '1.1em', textAlign: 'left' }}>Secondary Attack</span>
+            <span style={{ color: '#990000', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '0.875em', fontStyle: 'italic', marginRight: 22, whiteSpace: 'nowrap', maxWidth: 'calc(100% - 120px)', overflow: 'hidden', textOverflow: 'ellipsis', textAlign: 'right' }}>
+              Cooldown <span style={{ fontWeight: 'bold', fontStyle: 'normal' }}>[{4 - (sheet?.subclassProgressionDots?.necroAttackCooldownDots?.filter(Boolean).length || 0)}]</span>
+            </span>
+          </div>
+          <div style={{
+            position: 'absolute',
+            top: 'calc(50% + 10px)',
+            left: 10,
+            right: 10,
+            bottom: 45,
+            color: '#000',
+            fontFamily: 'Arial, Helvetica, sans-serif',
+            fontWeight: 400,
+            overflow: 'auto',
+            wordWrap: 'break-word',
+            display: 'flex',
+            alignItems: 'flex-start',
+            zIndex: 2,
+            lineHeight: 1.2
+          }}>
+            <div style={{
+              fontSize: '1em',
+              width: '100%',
+              height: 'fit-content',
+              maxHeight: '100%',
+              overflow: 'hidden'
+            }}>
+              {generateNecroSecondaryAttackStatsJSX(
+                sheet?.subclassProgressionDots?.necroAttackSpeedDots,
+                sheet?.subclassProgressionDots?.necroAttackDamageDots,
+                sheet?.subclassProgressionDots?.necroAttackCritDots,
+                sheet?.subclassProgressionDots?.necroAttackCooldownDots,
+                chemZombie,
+                chemZombie === 'Synthetic Corpse' ? 200 : 0
+              )}
+            </div>
+          </div>
+          <div style={{
+            position: 'absolute',
+            top: 330,
+            bottom: 5,
+            left: 10,
+            right: 10,
+            color: '#000',
+            fontFamily: 'Arial, Helvetica, sans-serif',
+            fontStyle: 'italic',
+            fontSize: '0.69em',
+            fontWeight: 400,
+            zIndex: 3,
+            textAlign: 'left'
+          }}>
+            {chemZombie === 'Synthetic Corpse' ? '"Damn things just materialize out of the unholy chemical amalgamations the necro concocts. Stuff of nightmares, it is." --Vendrix, Human Lab Assistant' : 'Chem Zombie effect.'}
           </div>
         </div>
       ))}
