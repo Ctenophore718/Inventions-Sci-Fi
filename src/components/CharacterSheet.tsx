@@ -8,6 +8,7 @@ import { generateChemistStrikeJSX } from "../utils/chemistStrike";
 import { generateAnatomicalPrecisionJSX } from "../utils/anatomistFeature";
 import { generateBlasterMasterJSX } from "../utils/grenadierFeature";
 import { generateBodySnatcherJSX } from "../utils/necroFeature";
+import { generateBackstabberJSX } from "../utils/poisonerFeature";
 
 
 type Props = {
@@ -709,19 +710,6 @@ const CharacterSheet: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, on
   );
 
   // Add after necroFeatureJSX
-  const poisonerFeatureJSX = (
-    <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#cf7600' }}>Backstabber.</i></b> You <i>Resist</i> <b><u style={{ color: '#de7204', display: 'inline-flex', alignItems: 'center' }}>
-        Chemical
-        <img src="/Chemical.png" alt="Chemical" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
-      </u></b> and <b><u style={{ color: '#02b900', display: 'inline-flex', alignItems: 'center' }}>
-        Toxic
-        <img src="/Toxic.png" alt="Toxic" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
-      </u></b>. Additionally, when you <b><i style={{ color: '#351c75' }}>Strike</i></b> against a target's <i>Rear Arc</i>, you gain +1d6 Damage for each <i>Chem Token</i> you have.
-    </span>
-  );
-
-  // Add after poisonerFeatureJSX
   const coerciveFeatureJSX = (
     <span style={{ color: '#000', fontWeight: 400 }}>
       <b><i style={{ color: '#43c9ff' }}>Field of Coercion.</i></b> You and allies within <b>[5]</b>hx are <i>Immune</i> to <b><i>Confuse</i></b> and <b><i>Mesmerize</i></b>. Additionally, enemies within <b>[5]</b>hx cannot benefit from <b><i>Confuse</i></b> or <b><i>Mesmerize</i></b> <i>Immunity</i>.
@@ -1220,6 +1208,14 @@ const CharacterSheet: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, on
       );
     }
     
+    // Add Noxious Fumes for Poisoner subclass
+    if (subclass === 'Poisoner') {
+      attacks.push(
+        { name: 'Brainstorm', type: 'Noxious Fume', cost: 200 },
+        { name: 'Color Spray', type: 'Noxious Fume', cost: 220 }
+      );
+    }
+    
     return attacks;
   };
 
@@ -1312,6 +1308,13 @@ const CharacterSheet: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, on
           chemZombies: newChemZombies,
           credits: credits - cost
         };
+      } else if (type === 'Noxious Fume') {
+        const newNoxiousFumes = [...(sheet.noxiousFumes || []), attackName];
+        updatedSheet = { 
+          ...sheet, 
+          noxiousFumes: newNoxiousFumes,
+          credits: credits - cost
+        };
       } else {
         return;
       }
@@ -1342,6 +1345,12 @@ const CharacterSheet: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, on
         updatedSheet = { 
           ...sheet, 
           chemZombies: newChemZombies
+        };
+      } else if (type === 'Noxious Fume') {
+        const newNoxiousFumes = [...(sheet.noxiousFumes || []), attackName];
+        updatedSheet = { 
+          ...sheet, 
+          noxiousFumes: newNoxiousFumes
         };
       } else {
         return;
@@ -1730,7 +1739,11 @@ const CharacterSheet: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, on
                           : subclass === "Necro"
                             ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{necroFeatureJSX}</span>
                             : subclass === "Poisoner"
-                              ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{poisonerFeatureJSX}</span>
+                              ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{generateBackstabberJSX({
+                                  poisonerChemicalImmunityDots: sheet?.subclassProgressionDots?.poisonerChemicalImmunityDots || [false],
+                                  poisonerToxicImmunityDots: sheet?.subclassProgressionDots?.poisonerToxicImmunityDots || [false],
+                                  poisonerSpikeInflictToxicDots: sheet?.subclassProgressionDots?.poisonerSpikeInflictToxicDots || [false]
+                                })}</span>
                               : subclass === "Technologist"
                                 ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{technologistFeatureJSX}</span>
                                 : subclass === "Tactician"
@@ -2134,11 +2147,35 @@ const CharacterSheet: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, on
                   <u>Neural</u> <img src="/Neural.png" alt="Neural" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
                 </span>
               )}
+              {subclass === 'Poisoner' && (
+                <span style={{ marginLeft: 8, display: 'inline-flex', gap: 8, flexWrap: 'wrap' }}>
+                  {!sheet?.subclassProgressionDots?.poisonerChemicalImmunityDots?.[0] && (
+                    <span style={{ display: 'inline-flex', alignItems: 'center', color: '#de7204', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                      <u>Chemical</u> <img src="/Chemical.png" alt="Chemical" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+                    </span>
+                  )}
+                  {!sheet?.subclassProgressionDots?.poisonerToxicImmunityDots?.[0] && (
+                    <span style={{ display: 'inline-flex', alignItems: 'center', color: '#02b900', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                      <u>Toxic</u> <img src="/Toxic.png" alt="Toxic" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+                    </span>
+                  )}
+                </span>
+              )}
             </div>
           <div style={{ fontWeight: 'bold', marginBottom: 2, fontFamily: 'Arial, sans-serif', color: '#666666', wordBreak: 'break-word', overflowWrap: 'break-word' }}>Immunities
+            {subclass === 'Poisoner' && sheet?.subclassProgressionDots?.poisonerToxicImmunityDots?.[0] && (
+              <span style={{ marginLeft: 8, display: 'inline-flex', alignItems: 'center', color: '#02b900', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                <u>Toxic</u> <img src="/Toxic.png" alt="Toxic" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+              </span>
+            )}
             {charClass === 'Contemplative' && sheet?.classCardDots?.[0]?.[0] && (
               <span style={{ marginLeft: 8, display: 'inline-flex', alignItems: 'center', color: '#a929ff', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                 <u>Neural</u> <img src="/Neural.png" alt="Neural" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+              </span>
+            )}
+            {subclass === 'Poisoner' && sheet?.subclassProgressionDots?.poisonerChemicalImmunityDots?.[0] && (
+              <span style={{ marginLeft: 8, display: 'inline-flex', alignItems: 'center', color: '#de7204', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                <u>Chemical</u> <img src="/Chemical.png" alt="Chemical" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
               </span>
             )}
           </div>
@@ -2396,10 +2433,10 @@ const CharacterSheet: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, on
                     textAlign: 'left',
                     minWidth: '180px'
                   }}
-                  value={pendingSecondaryAttack || (subclass === 'Anatomist' ? 'Super Serums' : subclass === 'Grenadier' ? 'Grenades' : subclass === 'Necro' ? 'Chem Zombies' : 'Select Secondary Attack')}
+                  value={pendingSecondaryAttack || (subclass === 'Anatomist' ? 'Super Serums' : subclass === 'Grenadier' ? 'Grenades' : subclass === 'Necro' ? 'Chem Zombies' : subclass === 'Poisoner' ? 'Noxious Fumes' : 'Select Secondary Attack')}
                   onChange={(e) => {
                     const value = e.target.value;
-                    if (value !== 'Super Serums' && value !== 'Grenades' && value !== 'Chem Zombies' && value !== 'Select Secondary Attack') {
+                    if (value !== 'Super Serums' && value !== 'Grenades' && value !== 'Chem Zombies' && value !== 'Noxious Fumes' && value !== 'Select Secondary Attack') {
                       setPendingSecondaryAttack(value);
                     }
                   }}
@@ -2424,7 +2461,14 @@ const CharacterSheet: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, on
                       <option style={{ fontWeight: 'bold' }}>Synthetic Corpse</option>
                     </>
                   )}
-                  {subclass !== 'Anatomist' && subclass !== 'Grenadier' && subclass !== 'Necro' && (
+                  {subclass === 'Poisoner' && (
+                    <>
+                      <option disabled style={{ fontWeight: 'bold' }}>Noxious Fumes</option>
+                      <option style={{ fontWeight: 'bold' }}>Brainstorm</option>
+                      <option style={{ fontWeight: 'bold' }}>Color Spray</option>
+                    </>
+                  )}
+                  {subclass !== 'Anatomist' && subclass !== 'Grenadier' && subclass !== 'Necro' && subclass !== 'Poisoner' && (
                     <option disabled style={{ fontWeight: 'bold' }}>Select Secondary Attack</option>
                   )}
                 </select>
@@ -2534,6 +2578,29 @@ const CharacterSheet: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, on
                                 const updatedSheet = { 
                                   ...sheet, 
                                   chemZombies: newChemZombies
+                                };
+                                handleAutoSave(updatedSheet);
+                              }
+                            }}
+                          >×</button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  {(sheet?.noxiousFumes && sheet.noxiousFumes.length > 0) && (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginLeft: '8px' }}>
+                      {sheet?.noxiousFumes?.map((noxiousFume, idx) => (
+                        <span key={noxiousFume + idx + 'noxiousfume'} style={{ fontStyle: 'italic', display: 'flex', alignItems: 'center', background: '#f5f5f5', borderRadius: '6px', padding: '2px 8px' }}>
+                          {noxiousFume}
+                          <button
+                            style={{ marginLeft: '6px', padding: '0 6px', borderRadius: '50%', border: 'none', background: '#d32f2f', color: 'white', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.9em' }}
+                            title={`Remove ${noxiousFume}`}
+                            onClick={() => {
+                              if (sheet) {
+                                const newNoxiousFumes = sheet.noxiousFumes?.filter((_, i) => i !== idx) || [];
+                                const updatedSheet = { 
+                                  ...sheet, 
+                                  noxiousFumes: newNoxiousFumes
                                 };
                                 handleAutoSave(updatedSheet);
                               }

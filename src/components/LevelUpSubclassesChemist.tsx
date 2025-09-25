@@ -226,6 +226,50 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
     sheet?.subclassProgressionDots?.necroPerksSkillsDots || [false]
   );
 
+  // Independent state for Poisoner dots - completely separate from any other component
+  const [poisonerFeatureDots, setPoisonerFeatureDots] = useState<boolean[]>(
+    sheet?.subclassProgressionDots?.poisonerFeatureDots || [false]
+  );
+  const [poisonerSpikeInflictToxicDots, setPoisonerSpikeInflictToxicDots] = useState<boolean[]>(
+    sheet?.subclassProgressionDots?.poisonerSpikeInflictToxicDots || [false]
+  );
+  const [poisonerChemicalImmunityDots, setPoisonerChemicalImmunityDots] = useState<boolean[]>(
+    sheet?.subclassProgressionDots?.poisonerChemicalImmunityDots || [false]
+  );
+  const [poisonerToxicImmunityDots, setPoisonerToxicImmunityDots] = useState<boolean[]>(
+    sheet?.subclassProgressionDots?.poisonerToxicImmunityDots || [false]
+  );
+  const [poisonerTechniqueExtraSpikeReroll5Dots, setPoisonerTechniqueExtraSpikeReroll5Dots] = useState<boolean[]>(
+    sheet?.subclassProgressionDots?.poisonerTechniqueExtraSpikeReroll5Dots || [false]
+  );
+  const [poisonerTechniqueExtraSpikeReroll4Dots, setPoisonerTechniqueExtraSpikeReroll4Dots] = useState<boolean[]>(
+    sheet?.subclassProgressionDots?.poisonerTechniqueExtraSpikeReroll4Dots || [false]
+  );
+  const [poisonerTechniqueSameEffectMultipleDots, setPoisonerTechniqueSameEffectMultipleDots] = useState<boolean[]>(
+    sheet?.subclassProgressionDots?.poisonerTechniqueSameEffectMultipleDots || [false]
+  );
+  const [poisonerTechnique2EffectsPerTokenDots, setPoisonerTechnique2EffectsPerTokenDots] = useState<boolean[]>(
+    sheet?.subclassProgressionDots?.poisonerTechnique2EffectsPerTokenDots || [false]
+  );
+  const [poisonerTechniqueCooldownDots, setPoisonerTechniqueCooldownDots] = useState<boolean[]>(
+    sheet?.subclassProgressionDots?.poisonerTechniqueCooldownDots || [false, false]
+  );
+  const [poisonerAttackAoEDots, setPoisonerAttackAoEDots] = useState<boolean[]>(
+    sheet?.subclassProgressionDots?.poisonerAttackAoEDots || [false]
+  );
+  const [poisonerAttackDamageDots, setPoisonerAttackDamageDots] = useState<boolean[]>(
+    sheet?.subclassProgressionDots?.poisonerAttackDamageDots || [false, false]
+  );
+  const [poisonerAttackCritDots, setPoisonerAttackCritDots] = useState<boolean[]>(
+    sheet?.subclassProgressionDots?.poisonerAttackCritDots || [false, false, false]
+  );
+  const [poisonerAttackCooldownDots, setPoisonerAttackCooldownDots] = useState<boolean[]>(
+    sheet?.subclassProgressionDots?.poisonerAttackCooldownDots || [false, false]
+  );
+  const [poisonerPerksSkillsDots, setPoisonerPerksSkillsDots] = useState<boolean[]>(
+    sheet?.subclassProgressionDots?.poisonerPerksSkillsDots || [false]
+  );
+
   // Local state for selected chem zombies (Necro only)
   const [selectedChemZombies, setSelectedChemZombies] = useState<string[]>(() => {
     return sheet?.chemZombies || [];
@@ -261,6 +305,27 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
       const updatedSheet = { 
         ...sheet, 
         superSerums: newSuperSerums,
+        // Preserve current credits to avoid race conditions
+        credits: credits
+      };
+      saveCharacterSheet(updatedSheet);
+    }
+  };
+
+  // Local state for selected noxious fumes (Poisoner only)
+  const [selectedNoxiousFumes, setSelectedNoxiousFumes] = useState<string[]>(() => {
+    return sheet?.noxiousFumes || [];
+  });
+  // Local state for pending noxious fume selection (Poisoner only)
+  const [pendingNoxiousFume, setPendingNoxiousFume] = useState<string>("");
+
+  // Save noxious fumes to sheet (Poisoner only)
+  const saveNoxiousFumes = (newNoxiousFumes: string[]) => {
+    setSelectedNoxiousFumes(newNoxiousFumes);
+    if (sheet) {
+      const updatedSheet = { 
+        ...sheet, 
+        noxiousFumes: newNoxiousFumes,
         // Preserve current credits to avoid race conditions
         credits: credits
       };
@@ -2029,8 +2094,637 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
       
       {subclass === 'Poisoner' && (
         <div style={{ width: '100%', marginTop: '1rem', textAlign: 'left', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
-          <div style={{ color: '#cf7600', fontSize: '1.2em', fontWeight: 'bold', textAlign: 'center', padding: '20px' }}>
-            Poisoner subclass content coming soon...
+          {/* Feature Section */}
+          <div style={{ fontWeight: 'bold', color: '#0b5394', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Feature</u></div>
+          <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <span>
+              <b><i style={{ color: '#cf7600', fontSize: '1em' }}>Backstabber.</i></b> You are <b>[</b><i>{poisonerChemicalImmunityDots[0] ? 'Immune' : 'Resistant'}</i><b>]</b> to <b><u style={{ color: '#de7204', display: 'inline-flex', alignItems: 'center' }}>
+                Chemical<img src="/Chemical.png" alt="Chemical" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} />
+              </u></b> and <b>[</b><i>{poisonerToxicImmunityDots[0] ? 'Immune' : 'Resistant'}</i><b>]</b> to <b><u style={{ color: '#02b900', display: 'inline-flex', alignItems: 'center' }}> 
+                Toxic<img src="/Toxic.png" alt="Toxic" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} />
+              </u></b>. Additionally, when you <b><i style={{ color: '#351c75' }}>Strike</i></b> against a target's <i>Rear Arc</i>, you inflict <b>[</b>
+                {poisonerSpikeInflictToxicDots[0] ? (
+                  <span>
+                    <b><i>Spike</i></b> <b>(</b><b><u style={{ color: '#02b900', textDecoration: 'underline', display: 'inline-flex', alignItems: 'center' }}>
+                      Toxic<img src="/Toxic.png" alt="Toxic" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} />
+                    </u></b><b>)</b>
+                  </span>
+                ) : <b> - </b>}<b>] </b>
+                and gain +1d6 Damage for each <i>Chem Token</i> you have.
+            </span>
+          </div>
+          
+          {/* Feature XP progression table */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 24px 24px 24px ',
+              gridTemplateRows: 'repeat(3, auto)',
+              columnGap: '6px',
+              rowGap: '2px',
+              alignItems: 'start',
+              marginBottom: '2px',
+              width: '100%',
+              paddingLeft: '4px'
+              }}>              
+              <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>5xp</span>
+            <span></span>
+            <span></span>
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>Inflict <i><b>Spike</b></i> <b>(<u style={{ color: '#02b900', display: 'inline-flex', alignItems: 'center' }}>
+              Toxic<img src="/Toxic.png" alt="Toxic" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} />
+            </u>)</b></span>
+            <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <span
+                onClick={() => handleDotClick(poisonerSpikeInflictToxicDots, setPoisonerSpikeInflictToxicDots, 0, [5], 'poisonerSpikeInflictToxicDots')}
+                style={{
+                  width: '15px',
+                  height: '15px',
+                  border: '2px solid #000',
+                  borderRadius: '50%',
+                  display: 'block',
+                  background: poisonerSpikeInflictToxicDots[0] ? '#000' : '#fff',
+                  cursor: 'pointer',
+                  transition: 'background 0.2s'
+                }}
+              ></span>
+            </span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>5xp</span>
+            <span></span>
+            <span></span>
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}><b><u style={{ color: '#de7204', display: 'inline-flex', alignItems: 'center' }}>
+              Chemical<img src="/Chemical.png" alt="Chemical" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} />
+            </u></b> <i>Immunity</i></span>
+            <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <span
+                onClick={() => handleDotClick(poisonerChemicalImmunityDots, setPoisonerChemicalImmunityDots, 0, [5], 'poisonerChemicalImmunityDots')}
+                style={{
+                  width: '15px',
+                  height: '15px',
+                  border: '2px solid #000',
+                  borderRadius: '50%',
+                  display: 'block',
+                  background: poisonerChemicalImmunityDots[0] ? '#000' : '#fff',
+                  cursor: 'pointer',
+                  transition: 'background 0.2s'
+                }}
+              ></span>
+            </span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>5xp</span>
+            <span></span>
+            <span></span>
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}><b><u style={{ color: '#02b900', display: 'inline-flex', alignItems: 'center' }}>
+              Toxic<img src="/Toxic.png" alt="Toxic" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} />
+            </u></b> <i>Immunity</i></span>
+            
+            <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <span
+                onClick={() => handleDotClick(poisonerToxicImmunityDots, setPoisonerToxicImmunityDots, 0, [5], 'poisonerToxicImmunityDots')}
+                style={{
+                  width: '15px',
+                  height: '15px',
+                  border: '2px solid #000',
+                  borderRadius: '50%',
+                  display: 'block',
+                  background: poisonerToxicImmunityDots[0] ? '#000' : '#fff',
+                  cursor: 'pointer',
+                  transition: 'background 0.2s'
+                }}
+              ></span>
+            </span>
+          </div>
+
+          {/* Technique Section */}
+          <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <div style={{ fontWeight: 'bold', color: '#bf9000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Technique</u></div>
+            <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <b><i style={{ color: '#cf7600', fontSize: '1em' }}>Toxic Takedown</i></b> <i style={{ color: '#cf7600', fontSize: '1em' }}>(Cooldown <b style={{ color: '#000', fontStyle: 'normal' }}>[{4 - poisonerTechniqueCooldownDots.filter(Boolean).length}]</b>).</i> You spend any number of <i>Chem Tokens</i> and choose an adjacent creature. You inflict <b>[{poisonerTechnique2EffectsPerTokenDots[0] ? '2' : '1'}]</b> of the following conditions for each <i>Chem Token</i> spent: <b><i>Blind</i></b>, <i><b>Spike</b></i> <b>(</b><b><u style={{ color: '#02b900', display: 'inline-flex', alignItems: 'center' }}>
+                Toxic<img src="/Toxic.png" alt="Toxic" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} />
+              </u></b><b>)</b> <i>(reroll on a </i><b>[{poisonerTechniqueExtraSpikeReroll4Dots[0] ? '4' : poisonerTechniqueExtraSpikeReroll5Dots[0] ? '5' : '6'}]</b>+<i>)</i>, <i><b>Confuse</b></i>, <i><b>Mesmerize</b></i>, <i><b>Restrain</b></i>. You can choose the same effect <b>[{poisonerTechniqueSameEffectMultipleDots[0] ? 'multiple' : '1'}]</b> time(s).
+            </div>
+            
+            <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px' }}>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 24px 24px 24px ',
+              gridTemplateRows: 'repeat(3, auto)',
+              columnGap: '6px',
+              rowGap: '2px',
+              alignItems: 'start',
+              marginBottom: '2px',
+              width: '100%',
+              paddingLeft: '4px'
+              }}>  
+                <span></span>
+                <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>7xp</span>
+                <span></span>
+                <span></span>
+                <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>Extra <i><b>Spike</b></i> Damage reroll on 5+</span>
+                
+                <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                  <span
+                    onClick={() => {
+                      if (poisonerTechniqueExtraSpikeReroll5Dots[0] && poisonerTechniqueExtraSpikeReroll4Dots[0]) {
+                        setNotice("Cannot unselect reroll on 5+ while reroll on 4+ is selected!");
+                        return;
+                      }
+                      handleDotClick(poisonerTechniqueExtraSpikeReroll5Dots, setPoisonerTechniqueExtraSpikeReroll5Dots, 0, [7], 'poisonerTechniqueExtraSpikeReroll5Dots');
+                    }}
+                    style={{
+                      width: '15px',
+                      height: '15px',
+                      border: '2px solid #000',
+                      borderRadius: '50%',
+                      display: 'block',
+                      background: poisonerTechniqueExtraSpikeReroll5Dots[0] ? '#000' : '#fff',
+                      cursor: 'pointer',
+                      transition: 'background 0.2s'
+                    }}
+                  ></span>
+                </span>
+              </div>
+              
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 24px 24px 24px ',
+              gridTemplateRows: 'repeat(3, auto)',
+              columnGap: '6px',
+              rowGap: '2px',
+              alignItems: 'start',
+              marginBottom: '2px',
+              width: '100%',
+              paddingLeft: '4px'
+              }}>  
+              <span></span>
+              <span></span>
+                              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>12xp</span>
+<span></span>
+                <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', paddingLeft: '30px' }}> Extra <i><b>Spike</b></i> Damage reroll on 4+</span>            
+                <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>⤷</span>
+                <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                  <span
+                    onClick={() => {
+                      if (!poisonerTechniqueExtraSpikeReroll5Dots[0]) {
+                        setNotice("Must get reroll on 5+ first!");
+                        return;
+                      }
+                      handleDotClick(poisonerTechniqueExtraSpikeReroll4Dots, setPoisonerTechniqueExtraSpikeReroll4Dots, 0, [12], 'poisonerTechniqueExtraSpikeReroll4Dots');
+                    }}
+                    style={{
+                      width: '15px',
+                      height: '15px',
+                      border: '2px solid #000',
+                      borderRadius: '50%',
+                      display: 'block',
+                      background: poisonerTechniqueExtraSpikeReroll4Dots[0] ? '#000' : '#fff',
+                      cursor: poisonerTechniqueExtraSpikeReroll5Dots[0] ? 'pointer' : 'not-allowed',
+                      transition: 'background 0.2s'
+                    }}
+                  ></span>
+                </span>
+              </div>
+              
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 24px 24px 24px ',
+              gridTemplateRows: 'repeat(3, auto)',
+              columnGap: '6px',
+              rowGap: '2px',
+              alignItems: 'start',
+              marginBottom: '2px',
+              width: '100%',
+              paddingLeft: '4px'
+              }}>
+                <span></span>
+                <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>8xp</span>
+                <span></span>
+                <span></span>
+                <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>Same effect multiple times</span>
+                <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                  <span
+                    onClick={() => handleDotClick(poisonerTechniqueSameEffectMultipleDots, setPoisonerTechniqueSameEffectMultipleDots, 0, [8], 'poisonerTechniqueSameEffectMultipleDots')}
+                    style={{
+                      width: '15px',
+                      height: '15px',
+                      border: '2px solid #000',
+                      borderRadius: '50%',
+                      display: 'block',
+                      background: poisonerTechniqueSameEffectMultipleDots[0] ? '#000' : '#fff',
+                      cursor: 'pointer',
+                      transition: 'background 0.2s'
+                    }}
+                  ></span>
+                </span>
+              </div>
+              
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 24px 24px 24px ',
+              gridTemplateRows: 'repeat(3, auto)',
+              columnGap: '6px',
+              rowGap: '2px',
+              alignItems: 'start',
+              marginBottom: '2px',
+              width: '100%',
+              paddingLeft: '4px'
+              }}>
+                <span></span>
+                <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>18xp</span>
+                <span></span>
+                <span></span>
+                <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>2 effects per <i>Chem Token</i></span>
+                <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                  <span
+                    onClick={() => handleDotClick(poisonerTechnique2EffectsPerTokenDots, setPoisonerTechnique2EffectsPerTokenDots, 0, [18], 'poisonerTechnique2EffectsPerTokenDots')}
+                    style={{
+                      width: '15px',
+                      height: '15px',
+                      border: '2px solid #000',
+                      borderRadius: '50%',
+                      display: 'block',
+                      background: poisonerTechnique2EffectsPerTokenDots[0] ? '#000' : '#fff',
+                      cursor: 'pointer',
+                      transition: 'background 0.2s'
+                    }}
+                  ></span>
+                </span>
+              </div>
+              
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 24px 24px 24px ',
+              gridTemplateRows: 'repeat(3, auto)',
+              columnGap: '6px',
+              rowGap: '2px',
+              alignItems: 'start',
+              marginBottom: '2px',
+              width: '100%',
+              paddingLeft: '4px'
+              }}>
+                <span></span>
+                <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>5xp</span>
+                <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>8xp</span>
+                <span></span>
+                <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>-1 <i>Cooldown</i></span>
+                {[0,1].map(idx => (
+                  <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                    <span
+                      onClick={() => handleDotClick(poisonerTechniqueCooldownDots, setPoisonerTechniqueCooldownDots, idx, [5, 8], 'poisonerTechniqueCooldownDots')}
+                      style={{
+                        width: '15px',
+                        height: '15px',
+                        border: '2px solid #000',
+                        borderRadius: '50%',
+                        display: 'block',
+                        background: poisonerTechniqueCooldownDots[idx] ? '#000' : '#fff',
+                        cursor: (idx === 0 || poisonerTechniqueCooldownDots[0]) ? 'pointer' : 'not-allowed',
+                        transition: 'background 0.2s'
+                      }}
+                    ></span>
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+          
+          {/* Attack Section */}
+          <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <div style={{ fontWeight: 'bold', color: '#990000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Attack</u></div>
+            <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <div style={{ marginBottom: '4px' }}>
+                <b><i><span style={{ color: '#000' }}>Secondary</span> <span style={{ color: '#990000' }}>Attack</span></i></b> <i>(Cooldown</i> <b>[{4 - poisonerAttackCooldownDots.filter(Boolean).length}]</b><i>).</i>
+              </div>
+              <div style={{ marginBottom: '4px', textAlign: 'left' }}>
+                <select 
+                  style={{ 
+                    fontSize: '1em', 
+                    padding: '2px 8px', 
+                    borderRadius: '6px', 
+                    border: '1px solid #ccc', 
+                    background: '#fff', 
+                    color: '#222',
+                    fontWeight: 'bold',
+                    marginBottom: '4px',
+                    textAlign: 'left',
+                    minWidth: '180px'
+                  }} 
+                  defaultValue="Noxious Fumes"
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (value !== "Noxious Fumes") {
+                      setPendingNoxiousFume(value);
+                      e.target.value = "Noxious Fumes"; // Reset dropdown
+                    }
+                  }}
+                >
+                  <option disabled style={{ fontWeight: 'bold' }}>Noxious Fumes</option>
+                  <option style={{ fontWeight: 'bold' }}>Brainstorm</option>
+                  <option style={{ fontWeight: 'bold' }}>Color Spray</option>
+                </select>
+                {/* Buy/Add dialog for Noxious Fume selection */}
+                {pendingNoxiousFume && (
+                  <div style={{ marginTop: '4px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    <div style={{ fontWeight: 'bold' }}>
+                      {pendingNoxiousFume}
+                      <span style={{ color: '#bf9000', fontWeight: 'bold', marginLeft: '8px' }}>
+                        {pendingNoxiousFume === 'Brainstorm' && '200c'}
+                        {pendingNoxiousFume === 'Color Spray' && '220c'}
+                      </span>
+                    </div>
+                    <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                      <button
+                      style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #1976d2', background: '#1976d2', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}
+                      onClick={() => {
+                        // Determine cost
+                        let cost = 0;
+                        if (pendingNoxiousFume === 'Brainstorm') cost = 200;
+                        else if (pendingNoxiousFume === 'Color Spray') cost = 220;
+                        // Check credits
+                        if (credits < cost) {
+                          setNotice('Not enough credits!');
+                          return;
+                        }
+                        // Atomic operation: update both noxious fumes and credits
+                        const newNoxiousFumes = [...selectedNoxiousFumes, pendingNoxiousFume];
+                        const newCredits = credits - cost;
+                        setSelectedNoxiousFumes(newNoxiousFumes);
+                        
+                        if (sheet) {
+                          const updatedSheet = { 
+                            ...sheet, 
+                            noxiousFumes: newNoxiousFumes,
+                            credits: newCredits
+                          };
+                          saveCharacterSheet(updatedSheet);
+                        }
+                        
+                        // Update the LevelUp component's credits state (no auto-save)
+                        onCreditsChange?.(-cost);
+                        setPendingNoxiousFume("");
+                      }}
+                    >Buy</button>
+                    <button
+                      style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #28a745', background: '#28a745', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}
+                      onClick={() => {
+                        const newNoxiousFumes = [...selectedNoxiousFumes, pendingNoxiousFume];
+                        setSelectedNoxiousFumes(newNoxiousFumes);
+                        
+                        if (sheet) {
+                          const updatedSheet = { 
+                            ...sheet, 
+                            noxiousFumes: newNoxiousFumes,
+                            credits: credits // Preserve current credits
+                          };
+                          saveCharacterSheet(updatedSheet);
+                        }
+                        
+                        setPendingNoxiousFume("");
+                      }}
+                    >Add</button>
+                    <button
+                      style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #aaa', background: '#eee', color: '#333', fontWeight: 'bold', cursor: 'pointer' }}
+                      onClick={() => setPendingNoxiousFume("")}
+                    >Cancel</button>
+                    </div>
+                  </div>
+                )}
+                <div style={{ marginTop: '2px' }}>
+                  {selectedNoxiousFumes.length > 0 && (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginLeft: '8px' }}>
+                      {selectedNoxiousFumes.map((fume, index) => (
+                        <span key={fume + index} style={{ fontStyle: 'italic', display: 'flex', alignItems: 'center', background: '#f5f5f5', borderRadius: '6px', padding: '2px 8px' }}>
+                          {fume}
+                          <button
+                            onClick={() => {
+                              const newNoxiousFumes = selectedNoxiousFumes.filter((_, i) => i !== index);
+                              setSelectedNoxiousFumes(newNoxiousFumes);
+                              if (sheet) {
+                                const updatedSheet = { 
+                                  ...sheet, 
+                                  noxiousFumes: newNoxiousFumes,
+                                  credits: credits // Preserve current credits when removing
+                                };
+                                saveCharacterSheet(updatedSheet);
+                              }
+                            }}
+                            style={{ marginLeft: '6px', padding: '0 6px', borderRadius: '50%', border: 'none', background: '#d32f2f', color: 'white', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.9em' }}
+                            title={`Remove ${fume}`}
+                          >×</button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+
+              <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+                <span>
+                  <b><u>Range</u></b> Self <br />
+                </span>
+                  <span style={{ textAlign: 'right', minWidth: '80px' }}>
+                    <b><u>Crit</u></b> <b>[{18 - poisonerAttackCritDots.filter(Boolean).length}]</b>+
+                  </span>
+              </div>
+              <b><u>Target</u></b> <i>AoE</i> <b>[{2 + poisonerAttackAoEDots.filter(Boolean).length}]</b>hx-radius <br />
+              <b><u>Damage</u></b> <b>[{1 + poisonerAttackDamageDots.filter(Boolean).length}]</b>d4, <i>Dangerous Terrain</i> <i>(affects <b><span style={{ color: '#38761d' }}>Fly</span></b>)</i> <br />
+              <b><u>Crit Effect</u></b> <b>[{1 + poisonerAttackDamageDots.filter(Boolean).length}]</b>d4
+              </div>
+
+
+
+
+            </div>
+            
+            <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px' }}>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 24px 24px 24px ',
+              gridTemplateRows: 'repeat(3, auto)',
+              columnGap: '6px',
+              rowGap: '2px',
+              alignItems: 'start',
+              marginBottom: '2px',
+              width: '100%',
+              paddingLeft: '4px'
+              }}>
+                <span></span>
+                <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>6xp</span>
+                <span></span>
+                <span></span>
+                <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1hx-radius <i>AoE</i></span>
+                <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                  <span
+                    onClick={() => handleDotClick(poisonerAttackAoEDots, setPoisonerAttackAoEDots, 0, [6], 'poisonerAttackAoEDots')}
+                    style={{
+                      width: '15px',
+                      height: '15px',
+                      border: '2px solid #000',
+                      borderRadius: '50%',
+                      display: 'block',
+                      background: poisonerAttackAoEDots[0] ? '#000' : '#fff',
+                      cursor: 'pointer',
+                      transition: 'background 0.2s'
+                    }}
+                  ></span>
+                </span>
+              </div>
+              
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 24px 24px 24px ',
+              gridTemplateRows: 'repeat(3, auto)',
+              columnGap: '6px',
+              rowGap: '2px',
+              alignItems: 'start',
+              marginBottom: '2px',
+              width: '100%',
+              paddingLeft: '4px'
+              }}>
+                <span></span>
+                <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>5xp</span>
+                <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>8xp</span>
+                <span></span>
+                <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1 Damage die</span>
+                {[0,1].map(idx => (
+                  <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                    <span
+                      onClick={() => handleDotClick(poisonerAttackDamageDots, setPoisonerAttackDamageDots, idx, [5, 8], 'poisonerAttackDamageDots')}
+                      style={{
+                        width: '15px',
+                        height: '15px',
+                        border: '2px solid #000',
+                        borderRadius: '50%',
+                        display: 'block',
+                        background: poisonerAttackDamageDots[idx] ? '#000' : '#fff',
+                        cursor: (idx === 0 || poisonerAttackDamageDots[0]) ? 'pointer' : 'not-allowed',
+                        transition: 'background 0.2s'
+                      }}
+                    ></span>
+                  </span>
+                ))}
+              </div>
+              
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 24px 24px 24px ',
+              gridTemplateRows: 'repeat(3, auto)',
+              columnGap: '6px',
+              rowGap: '2px',
+              alignItems: 'start',
+              marginBottom: '2px',
+              width: '100%',
+              paddingLeft: '4px'
+              }}>
+                <span></span>
+                <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>3xp</span>
+                <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>5xp</span>
+                <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>8xp</span>
+                <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1 Crit</span>
+                {[0,1,2].map(idx => (
+                  <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                    <span
+                      onClick={() => handleDotClick(poisonerAttackCritDots, setPoisonerAttackCritDots, idx, [3, 5, 8], 'poisonerAttackCritDots')}
+                      style={{
+                        width: '15px',
+                        height: '15px',
+                        border: '2px solid #000',
+                        borderRadius: '50%',
+                        display: 'block',
+                        background: poisonerAttackCritDots[idx] ? '#000' : '#fff',
+                        cursor: (idx === 0 || (idx === 1 && poisonerAttackCritDots[0]) || (idx === 2 && poisonerAttackCritDots[1])) ? 'pointer' : 'not-allowed',
+                        transition: 'background 0.2s'
+                      }}
+                    ></span>
+                  </span>
+                ))}
+              </div>
+              
+           <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 24px 24px 24px ',
+              gridTemplateRows: 'repeat(3, auto)',
+              columnGap: '6px',
+              rowGap: '2px',
+              alignItems: 'start',
+              marginBottom: '2px',
+              width: '100%',
+              paddingLeft: '4px'
+              }}>
+                <span></span>
+                <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>4xp</span>
+                <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>6xp</span>
+                <span></span>
+                <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>-1 <i>Cooldown</i></span>
+                {[0,1].map(idx => (
+                  <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                    <span
+                      onClick={() => handleDotClick(poisonerAttackCooldownDots, setPoisonerAttackCooldownDots, idx, [4, 6], 'poisonerAttackCooldownDots')}
+                      style={{
+                        width: '15px',
+                        height: '15px',
+                        border: '2px solid #000',
+                        borderRadius: '50%',
+                        display: 'block',
+                        background: poisonerAttackCooldownDots[idx] ? '#000' : '#fff',
+                        cursor: (idx === 0 || poisonerAttackCooldownDots[0]) ? 'pointer' : 'not-allowed',
+                        transition: 'background 0.2s'
+                      }}
+                    ></span>
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+          
+          {/* Perks Section */}
+          <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <div style={{ fontWeight: 'bold', color: '#8e44ad', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Perks</u></div>
+            <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <div style={{ marginBottom: '8px' }}>
+                <b>Skills.</b> <i>Thievery</i> +2
+              </div>
+              <div style={{ marginBottom: '4px' }}>
+                <b><i style={{ color: '#cf7600', fontSize: '1em' }}>Venom Master.</i></b> You excel in the art of poisoning, and can create a multitude of poisons from the basic to the rare and exotic. Gain an <i>advantage</i> on skill rolls related to finding, identifying, creating and using poisons.
+              </div>
+            </div>
+            
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 24px',
+              columnGap: '6px',
+              rowGap: '2px',
+              alignItems: 'start',
+              marginBottom: '2px',
+              width: '100%',
+              paddingLeft: '4px'
+            }}>
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>9sp</span>
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}></span>
+              <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <span
+                  onClick={() => handleSpDotClick(poisonerPerksSkillsDots, setPoisonerPerksSkillsDots, 0, [9], 'poisonerPerksSkillsDots')}
+                  style={{
+                    width: '15px',
+                    height: '15px',
+                    border: '2px solid #000',
+                    borderRadius: '50%',
+                    display: 'block',
+                    background: poisonerPerksSkillsDots[0] ? '#000' : '#fff',
+                    cursor: 'pointer',
+                    transition: 'background 0.2s'
+                  }}
+                ></span>
+              </span>
+            </div>
           </div>
         </div>
       )}

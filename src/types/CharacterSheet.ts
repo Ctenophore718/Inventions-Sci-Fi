@@ -76,6 +76,9 @@ export type CharacterSheet = {
   // Chem Zombies for Necro subclass
   chemZombies?: string[];
 
+  // Noxious Fumes for Poisoner subclass
+  noxiousFumes?: string[];
+
   // Subclass progression dots (specific to each subclass)
   subclassProgressionDots?: {
     // Anatomist subclass progression
@@ -115,6 +118,21 @@ export type CharacterSheet = {
     necroAttackCritDots?: boolean[];
     necroAttackCooldownDots?: boolean[];
     necroPerksSkillsDots?: boolean[];
+    // Poisoner subclass progression
+    poisonerFeatureDots?: boolean[];
+    poisonerSpikeInflictToxicDots?: boolean[];
+    poisonerChemicalImmunityDots?: boolean[];
+    poisonerToxicImmunityDots?: boolean[];
+    poisonerTechniqueExtraSpikeReroll5Dots?: boolean[];
+    poisonerTechniqueExtraSpikeReroll4Dots?: boolean[];
+    poisonerTechniqueSameEffectMultipleDots?: boolean[];
+    poisonerTechnique2EffectsPerTokenDots?: boolean[];
+    poisonerTechniqueCooldownDots?: boolean[];
+    poisonerAttackAoEDots?: boolean[];
+    poisonerAttackDamageDots?: boolean[];
+    poisonerAttackCritDots?: boolean[];
+    poisonerAttackCooldownDots?: boolean[];
+    poisonerPerksSkillsDots?: boolean[];
     // Add other subclasses as needed
   };
 };
