@@ -331,78 +331,6 @@ const CharacterSheet: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, on
     return 0;
   });
 
-  // Cross-window synchronization for this character
-  React.useEffect(() => {
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === "rpg-character-sheets" && sheet?.id) {
-        // Reload the current character from storage
-        const updatedSheet = loadSheetById(sheet.id);
-        if (updatedSheet) {
-        // Update all local state to match the stored character (only if changed)
-        if (updatedSheet.playerName !== playerName) setPlayerName(updatedSheet.playerName || "");
-        if (updatedSheet.name !== name) setName(updatedSheet.name || "");
-        if (updatedSheet.background !== background) setBackground(updatedSheet.background || "");
-        if (updatedSheet.resistances !== resistances) setResistances(updatedSheet.resistances || "");
-        if (updatedSheet.immunities !== immunities) setImmunities(updatedSheet.immunities || "");
-        if (updatedSheet.absorptions !== absorptions) setAbsorptions(updatedSheet.absorptions || "");
-        if (updatedSheet.movement !== movement) setMovement(updatedSheet.movement || "");
-        if (updatedSheet.strike !== strike) setStrike(updatedSheet.strike || "");
-        if (updatedSheet.xpTotal !== xpTotal) setXpTotal(updatedSheet.xpTotal || 0);
-        if (updatedSheet.spTotal !== spTotal) setSpTotal(updatedSheet.spTotal || 0);
-        if (updatedSheet.classFeature !== classFeature) setClassFeature(updatedSheet.classFeature || "");
-        if (updatedSheet.portrait !== portraitUrl) setPortraitUrl(updatedSheet.portrait || null);
-        if (updatedSheet.spSpent !== spSpent) setSpSpent(updatedSheet.spSpent ?? 0);
-        if (JSON.stringify(updatedSheet.deathDots) !== JSON.stringify(deathDots)) setDeathDots(updatedSheet.deathDots || Array(10).fill(false));
-        if (updatedSheet.multiStrike !== multiStrike) setMultiStrike(updatedSheet.multiStrike || 0);
-        if (updatedSheet.strikeEffects !== strikeEffects) setStrikeEffects(updatedSheet.strikeEffects || "");          // Update character details if they've changed
-          if (updatedSheet.charClass !== charClass) setCharClass(updatedSheet.charClass || "");
-          if (updatedSheet.subclass !== subclass) setSubclass(updatedSheet.subclass || "");
-          if (updatedSheet.species !== species) setSpecies(updatedSheet.species || "");
-          if (updatedSheet.subspecies !== subspecies) setSubspecies(updatedSheet.subspecies || "");
-        }
-      }
-    };
-
-    const handleCharacterUpdate = (e: CustomEvent<{ sheet: CharacterSheet }>) => {
-      if (sheet?.id && e.detail.sheet.id === sheet.id) {
-        const updatedSheet = e.detail.sheet;
-        // Update all local state to match the updated character (only if changed)
-        if (updatedSheet.playerName !== playerName) setPlayerName(updatedSheet.playerName || "");
-        if (updatedSheet.name !== name) setName(updatedSheet.name || "");
-        if (updatedSheet.background !== background) setBackground(updatedSheet.background || "");
-        if (updatedSheet.resistances !== resistances) setResistances(updatedSheet.resistances || "");
-        if (updatedSheet.immunities !== immunities) setImmunities(updatedSheet.immunities || "");
-        if (updatedSheet.absorptions !== absorptions) setAbsorptions(updatedSheet.absorptions || "");
-        if (updatedSheet.movement !== movement) setMovement(updatedSheet.movement || "");
-        if (updatedSheet.strike !== strike) setStrike(updatedSheet.strike || "");
-        if (updatedSheet.xpTotal !== xpTotal) setXpTotal(updatedSheet.xpTotal || 0);
-        if (updatedSheet.spTotal !== spTotal) setSpTotal(updatedSheet.spTotal || 0);
-        if (updatedSheet.classFeature !== classFeature) setClassFeature(updatedSheet.classFeature || "");
-        if (updatedSheet.portrait !== portraitUrl) setPortraitUrl(updatedSheet.portrait || null);
-        if (updatedSheet.spSpent !== spSpent) setSpSpent(updatedSheet.spSpent ?? 0);
-        if (JSON.stringify(updatedSheet.deathDots) !== JSON.stringify(deathDots)) setDeathDots(updatedSheet.deathDots || Array(10).fill(false));
-        if (updatedSheet.multiStrike !== multiStrike) setMultiStrike(updatedSheet.multiStrike || 0);
-        if (updatedSheet.strikeEffects !== strikeEffects) setStrikeEffects(updatedSheet.strikeEffects || "");
-        
-        // Update character details if they've changed
-        if (updatedSheet.charClass !== charClass) setCharClass(updatedSheet.charClass || "");
-        if (updatedSheet.subclass !== subclass) setSubclass(updatedSheet.subclass || "");
-        if (updatedSheet.species !== species) setSpecies(updatedSheet.species || "");
-        if (updatedSheet.subspecies !== subspecies) setSubspecies(updatedSheet.subspecies || "");
-      }
-    };
-
-    // Listen for storage changes from other windows
-    window.addEventListener('storage', handleStorageChange);
-    // Listen for character updates from current window
-    window.addEventListener('character-updated', handleCharacterUpdate as EventListener);
-
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-      window.removeEventListener('character-updated', handleCharacterUpdate as EventListener);
-    };
-  }, [sheet?.id, charClass, subclass, species, subspecies]);
-
   // Auto-save when critical fields change (debounced for performance)
   React.useEffect(() => {
     if (!sheet || !sheet.id) return;
@@ -473,6 +401,82 @@ const CharacterSheet: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, on
   
   // Notice state
   const [notice, setNotice] = useState<string>("");
+
+  // Cross-window synchronization for this character
+  React.useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === "rpg-character-sheets" && sheet?.id) {
+        // Reload the current character from storage
+        const updatedSheet = loadSheetById(sheet.id);
+        if (updatedSheet) {
+        // Update all local state to match the stored character (only if changed)
+        if (updatedSheet.playerName !== playerName) setPlayerName(updatedSheet.playerName || "");
+        if (updatedSheet.name !== name) setName(updatedSheet.name || "");
+        if (updatedSheet.background !== background) setBackground(updatedSheet.background || "");
+        if (updatedSheet.resistances !== resistances) setResistances(updatedSheet.resistances || "");
+        if (updatedSheet.immunities !== immunities) setImmunities(updatedSheet.immunities || "");
+        if (updatedSheet.absorptions !== absorptions) setAbsorptions(updatedSheet.absorptions || "");
+        if (updatedSheet.movement !== movement) setMovement(updatedSheet.movement || "");
+        if (updatedSheet.strike !== strike) setStrike(updatedSheet.strike || "");
+        if (updatedSheet.xpTotal !== xpTotal) setXpTotal(updatedSheet.xpTotal || 0);
+        if (updatedSheet.spTotal !== spTotal) setSpTotal(updatedSheet.spTotal || 0);
+        if (updatedSheet.credits !== credits) setCredits(updatedSheet.credits ?? 0);
+        if (updatedSheet.chemTokens !== chemTokens) setChemTokens(updatedSheet.chemTokens ?? 0);
+        if (updatedSheet.classFeature !== classFeature) setClassFeature(updatedSheet.classFeature || "");
+        if (updatedSheet.portrait !== portraitUrl) setPortraitUrl(updatedSheet.portrait || null);
+        if (updatedSheet.spSpent !== spSpent) setSpSpent(updatedSheet.spSpent ?? 0);
+        if (JSON.stringify(updatedSheet.deathDots) !== JSON.stringify(deathDots)) setDeathDots(updatedSheet.deathDots || Array(10).fill(false));
+        if (updatedSheet.multiStrike !== multiStrike) setMultiStrike(updatedSheet.multiStrike || 0);
+        if (updatedSheet.strikeEffects !== strikeEffects) setStrikeEffects(updatedSheet.strikeEffects || "");          // Update character details if they've changed
+          if (updatedSheet.charClass !== charClass) setCharClass(updatedSheet.charClass || "");
+          if (updatedSheet.subclass !== subclass) setSubclass(updatedSheet.subclass || "");
+          if (updatedSheet.species !== species) setSpecies(updatedSheet.species || "");
+          if (updatedSheet.subspecies !== subspecies) setSubspecies(updatedSheet.subspecies || "");
+        }
+      }
+    };
+
+    const handleCharacterUpdate = (e: CustomEvent<{ sheet: CharacterSheet }>) => {
+      if (sheet?.id && e.detail.sheet.id === sheet.id) {
+        const updatedSheet = e.detail.sheet;
+        // Update all local state to match the updated character (only if changed)
+        if (updatedSheet.playerName !== playerName) setPlayerName(updatedSheet.playerName || "");
+        if (updatedSheet.name !== name) setName(updatedSheet.name || "");
+        if (updatedSheet.background !== background) setBackground(updatedSheet.background || "");
+        if (updatedSheet.resistances !== resistances) setResistances(updatedSheet.resistances || "");
+        if (updatedSheet.immunities !== immunities) setImmunities(updatedSheet.immunities || "");
+        if (updatedSheet.absorptions !== absorptions) setAbsorptions(updatedSheet.absorptions || "");
+        if (updatedSheet.movement !== movement) setMovement(updatedSheet.movement || "");
+        if (updatedSheet.strike !== strike) setStrike(updatedSheet.strike || "");
+        if (updatedSheet.xpTotal !== xpTotal) setXpTotal(updatedSheet.xpTotal || 0);
+        if (updatedSheet.spTotal !== spTotal) setSpTotal(updatedSheet.spTotal || 0);
+        if (updatedSheet.credits !== credits) setCredits(updatedSheet.credits ?? 0);
+        if (updatedSheet.chemTokens !== chemTokens) setChemTokens(updatedSheet.chemTokens ?? 0);
+        if (updatedSheet.classFeature !== classFeature) setClassFeature(updatedSheet.classFeature || "");
+        if (updatedSheet.portrait !== portraitUrl) setPortraitUrl(updatedSheet.portrait || null);
+        if (updatedSheet.spSpent !== spSpent) setSpSpent(updatedSheet.spSpent ?? 0);
+        if (JSON.stringify(updatedSheet.deathDots) !== JSON.stringify(deathDots)) setDeathDots(updatedSheet.deathDots || Array(10).fill(false));
+        if (updatedSheet.multiStrike !== multiStrike) setMultiStrike(updatedSheet.multiStrike || 0);
+        if (updatedSheet.strikeEffects !== strikeEffects) setStrikeEffects(updatedSheet.strikeEffects || "");
+        
+        // Update character details if they've changed
+        if (updatedSheet.charClass !== charClass) setCharClass(updatedSheet.charClass || "");
+        if (updatedSheet.subclass !== subclass) setSubclass(updatedSheet.subclass || "");
+        if (updatedSheet.species !== species) setSpecies(updatedSheet.species || "");
+        if (updatedSheet.subspecies !== subspecies) setSubspecies(updatedSheet.subspecies || "");
+      }
+    };
+
+    // Listen for storage changes from other windows
+    window.addEventListener('storage', handleStorageChange);
+    // Listen for character updates from current window
+    window.addEventListener('character-updated', handleCharacterUpdate as EventListener);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('character-updated', handleCharacterUpdate as EventListener);
+    };
+  }, [sheet?.id, charClass, subclass, species, subspecies, credits, chemTokens]);
 
   const classOptions = [
     { label: "Chemist", value: "Chemist", color: "#721131" },

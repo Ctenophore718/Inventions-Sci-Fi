@@ -4,6 +4,7 @@ import { generateChemistPrimaryAttackStatsJSX, getDartGunCost } from '../utils/c
 import { generateAnatomistSecondaryAttackStatsJSX } from '../utils/anatomistSecondaryAttack';
 import { generateGrenadierSecondaryAttackStatsJSX } from '../utils/grenadierSecondaryAttack';
 import { generateNecroSecondaryAttackStatsJSX } from '../utils/necroSecondaryAttack';
+import { generatePoisonerSecondaryAttackStatsJSX } from '../utils/poisonerSecondaryAttack';
 
 
 interface CardsChemistAttacksProps {
@@ -52,6 +53,7 @@ export const CardsChemistAttacks: React.FC<CardsChemistAttacksProps> = ({ sheet 
   const superSerums = sheet?.superSerums || [];
   const chemZombies = sheet?.chemZombies || [];
   const grenades = sheet?.grenades || [];
+  const noxiousFumes = sheet?.noxiousFumes || [];
   
   // Debug logging for chemZombies
   console.log('CardsChemistAttacks Debug:', {
@@ -61,7 +63,7 @@ export const CardsChemistAttacks: React.FC<CardsChemistAttacksProps> = ({ sheet 
     isArray: Array.isArray(sheet?.chemZombies)
   });
   
-  if (dartGuns.length === 0 && superSerums.length === 0 && chemZombies.length === 0 && grenades.length === 0) {
+  if (dartGuns.length === 0 && superSerums.length === 0 && chemZombies.length === 0 && grenades.length === 0 && noxiousFumes.length === 0) {
     return null;
   }
 
@@ -631,6 +633,151 @@ export const CardsChemistAttacks: React.FC<CardsChemistAttacksProps> = ({ sheet 
             textAlign: 'left'
           }}>
             {chemZombie === 'Synthetic Corpse' ? '"Damn things just materialize out of the unholy chemical amalgamations the necro concocts. Stuff of nightmares, it is." --Vendrix, Human Lab Assistant' : 'Chem Zombie effect.'}
+          </div>
+        </div>
+      ))}
+      {/* Poisoner Noxious Fumes Secondary Attack Cards */}
+      {sheet?.subclass === 'Poisoner' && Array.isArray(sheet?.noxiousFumes) && sheet.noxiousFumes.length > 0 && sheet.noxiousFumes.map((noxiousFume, idx) => (
+        <div key={noxiousFume + idx} style={{
+          width: '240px',
+          height: '336px',
+          background: '#fff',
+          border: '5px solid #990000',
+          borderRadius: 8,
+          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+          padding: '1.2rem',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          flexShrink: 0,
+          position: 'relative',
+          overflow: 'hidden'
+        }}>
+          <div style={{
+            position: 'absolute',
+            top: -4,
+            left: 0,
+            width: '100%',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'flex-end',
+            padding: '0 10px',
+            boxSizing: 'border-box',
+            minHeight: '2.1em'
+          }}>
+            <span style={{
+              fontFamily: 'Arial, Helvetica, sans-serif',
+              fontWeight: 'bold',
+              fontSize: 'clamp(0.8em, 4vw, 1.25em)',
+              color: '#cf7600',
+              lineHeight: 1,
+              textAlign: 'left',
+              whiteSpace: 'nowrap',
+              maxWidth: 'calc(100% - 87px)',
+              minWidth: 0,
+              flexShrink: 1,
+              marginRight: '5px'
+            }}>{noxiousFume}</span>
+            <span style={{
+              fontFamily: 'Arial, Helvetica, sans-serif',
+              fontStyle: 'italic',
+              fontSize: '0.75em',
+              color: '#cf7600',
+              lineHeight: 1,
+              whiteSpace: 'normal',
+              wordBreak: 'keep-all',
+              overflowWrap: 'anywhere',
+              maxWidth: '72px',
+              display: 'inline-block',
+              textAlign: 'right'
+              }}>Noxious Fumes</span>
+          </div>
+          <img 
+            src={noxiousFume === 'Brainstorm' ? '/Brainstorm.png' : noxiousFume === 'Color Spray' ? '/Color Spray.png' : '/Blank Card.png'}
+            alt={noxiousFume}
+            style={{
+              position: 'absolute',
+              top: 35,
+              left: 10,
+              right: 10,
+              width: 'calc(100% - 20px)',
+              height: 'calc(50% - 55px)',
+              objectFit: 'cover',
+              zIndex: 1,
+              borderRadius: 8
+            }}
+          />
+          <div style={{
+            position: 'absolute',
+            top: 'calc(50% - 15px)',
+            left: 0,
+            width: '100%',
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            paddingLeft: 10,
+            paddingRight: 10,
+            zIndex: 3
+          }}>
+            <span style={{ color: '#990000', fontFamily: 'Arial, Helvetica, sans-serif', fontWeight: 'bold', fontSize: '1.1em', textAlign: 'left' }}>Secondary Attack</span>
+            <span style={{ color: '#990000', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '0.875em', fontStyle: 'italic', marginRight: 22, whiteSpace: 'nowrap', maxWidth: 'calc(100% - 120px)', overflow: 'hidden', textOverflow: 'ellipsis', textAlign: 'right' }}>
+              Cooldown <span style={{ fontWeight: 'bold', fontStyle: 'normal' }}>[{4 - (sheet?.subclassProgressionDots?.poisonerAttackCooldownDots?.filter(Boolean).length || 0)}]</span>
+            </span>
+          </div>
+          <div style={{
+            position: 'absolute',
+            top: 'calc(50% + 10px)',
+            left: 10,
+            right: 10,
+            bottom: 45,
+            color: '#000',
+            fontFamily: 'Arial, Helvetica, sans-serif',
+            fontWeight: 400,
+            overflow: 'auto',
+            wordWrap: 'break-word',
+            display: 'flex',
+            alignItems: 'flex-start',
+            zIndex: 2,
+            lineHeight: 1.2
+          }}>
+            <div style={{
+              fontSize: '1em',
+              width: '100%',
+              height: 'fit-content',
+              maxHeight: '100%',
+              overflow: 'hidden'
+            }}>
+              {generatePoisonerSecondaryAttackStatsJSX(
+                sheet?.subclassProgressionDots?.poisonerAttackDamageDots,
+                sheet?.subclassProgressionDots?.poisonerAttackCritDots,
+                sheet?.subclassProgressionDots?.poisonerAttackCooldownDots,
+                sheet?.subclassProgressionDots?.poisonerAttackAoEDots,
+                noxiousFume,
+                noxiousFume === 'Brainstorm' ? 200 : noxiousFume === 'Color Spray' ? 220 : undefined
+              )}
+            </div>
+          </div>
+          <div style={{
+            position: 'absolute',
+            top: 330,
+            bottom: 5,
+            left: 10,
+            right: 10,
+            color: '#000',
+            fontFamily: 'Arial, Helvetica, sans-serif',
+            fontStyle: 'italic',
+            fontSize: '0.69em',
+            fontWeight: 400,
+            zIndex: 3,
+            textAlign: 'left'
+          }}>
+            {noxiousFume === 'Brainstorm' ? (
+              <>
+                "I saw him pull a string on his belt and suddenly a lightning cloud engulfed me, prompting me to shoot wildly…" --Ybbert Ranzo, Defteran Soldier
+              </>
+            ) : noxiousFume === 'Color Spray' ? 'A mesmerizing array of colors emanates from your belt canister, and the lucky target inhales a little bit of too much everything, promptly putting them to sleep.' : 'Noxious Fume effect.'}
           </div>
         </div>
       ))}

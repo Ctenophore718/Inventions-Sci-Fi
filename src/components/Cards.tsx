@@ -147,6 +147,8 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
   React.useEffect(() => {
     if (localSheet) {
       setCurrentHitPoints(localSheet.currentHitPoints ?? localSheet.maxHitPoints ?? 0);
+      setCredits(localSheet.credits ?? 0);
+      setChemTokens(localSheet.chemTokens ?? 0);
       setDeathCount(localSheet.deathCount || 0);
       setXpTotal(localSheet.xpTotal || 0);
       setSpTotal(localSheet.spTotal || 0);
