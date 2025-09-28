@@ -266,8 +266,8 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
   const [poisonerAttackCooldownDots, setPoisonerAttackCooldownDots] = useState<boolean[]>(
     sheet?.subclassProgressionDots?.poisonerAttackCooldownDots || [false, false]
   );
-  const [poisonerPerksSkillsDots, setPoisonerPerksSkillsDots] = useState<boolean[]>(
-    sheet?.subclassProgressionDots?.poisonerPerksSkillsDots || [false]
+  const [poisonerVenomMasterDots, setPoisonerVenomMasterDots] = useState<boolean[]>(
+    sheet?.subclassProgressionDots?.poisonerVenomMasterDots || [false]
   );
 
   // Local state for selected chem zombies (Necro only)
@@ -957,34 +957,49 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
                   <i><b>Skills.</b> Medicine</i> +2
                 </div>
             <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
-              <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', gap: '12px' }}>
-                <span style={{ display: 'inline-block', maxWidth: 'calc(100% - 40px)' }}>
-                  <b><i style={{ color: '#66cf00' }}>Surgeon.</i></b> You can perform surgery and potentially save a life on the brink of death or otherwise ensure an enemy will be incapacitated for life in a way of your choice. Gain an advantage on related skill rolls to perform the surgery.
-                </span>
-                <div style={{
-                  display: 'grid',
-                  gridTemplateColumns: '24px',
-                  gridTemplateRows: 'repeat(1, auto)',
-                  alignItems: 'start',
-                  marginLeft: '4px'
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 24px 24px 24px',
+                gridTemplateRows: 'auto auto',
+                columnGap: '6px',
+                rowGap: '2px',
+                alignItems: 'start',
+                marginTop: '-12px',
+                marginBottom: '2px',
+                width: '100%',
+                paddingLeft: '4px'
+              }}>
+                {/* Row 1: Empty cells and 8sp header */}
+                <span></span>
+                <span></span>
+                <span></span>
+                <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>8sp</span>
+                {/* Row 2: Surgeon text and dot */}
+                <div style={{ 
+                  fontSize: '1em', 
+                  fontFamily: 'Arial, Helvetica, sans-serif', 
+                  textAlign: 'left',
+                  paddingRight: '8px',
+                  lineHeight: '1.2',
+                  gridColumn: '1 / 4'
                 }}>
-                  <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>8sp</span>
-                  <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
-                    <span
-                      onClick={() => handleSpDotClick(anatomistSurgeonDots, setAnatomistSurgeonDots, 0, [8], 'anatomistSurgeonDots')}
-                      style={{
-                        width: '15px',
-                        height: '15px',
-                        border: '2px solid #000',
-                        borderRadius: '50%',
-                        display: 'block',
-                        background: anatomistSurgeonDots[0] ? '#000' : '#fff',
-                        cursor: 'pointer',
-                        transition: 'background 0.2s'
-                      }}
-                    ></span>
-                  </span>
+                  <b><i style={{ color: '#66cf00' }}>Surgeon.</i></b> You can perform surgery and potentially save a life on the brink of death or otherwise ensure an enemy will be incapacitated for life in a way of your choice. Gain an advantage on related skill rolls to perform the surgery.
                 </div>
+                <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start' }}>
+                  <span
+                    onClick={() => handleSpDotClick(anatomistSurgeonDots, setAnatomistSurgeonDots, 0, [8], 'anatomistSurgeonDots')}
+                    style={{
+                      width: '15px',
+                      height: '15px',
+                      border: '2px solid #000',
+                      borderRadius: '50%',
+                      display: 'block',
+                      background: anatomistSurgeonDots[0] ? '#000' : '#fff',
+                      cursor: 'pointer',
+                      transition: 'background 0.2s'
+                    }}
+                  ></span>
+                </span>
               </div>
             </div>
           </div>
@@ -1600,34 +1615,49 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
               <i><b>Skills.</b> Intimidation</i> +2
             </div>
             <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
-              <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', gap: '12px' }}>
-                <span style={{ display: 'inline-block', maxWidth: 'calc(100% - 40px)' }}>
-                  <b><i style={{ color: '#cf0000' }}>Explosive Temper.</i></b> You are fearless to the point of recklessness, and are lucky enough to have survived so many explosions that were too close for comfort. Gain an advantage on related skill rolls when acting brash and impetuous.
-                </span>
-                <div style={{
-                  display: 'grid',
-                  gridTemplateColumns: '24px',
-                  gridTemplateRows: 'repeat(1, auto)',
-                  alignItems: 'start',
-                  marginLeft: '4px'
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 24px 24px 24px',
+                gridTemplateRows: 'auto auto',
+                columnGap: '6px',
+                rowGap: '2px',
+                alignItems: 'start',
+                marginTop: '-12px',
+                marginBottom: '2px',
+                width: '100%',
+                paddingLeft: '4px'
+              }}>
+                {/* Row 1: Empty cells and 8sp header */}
+                <span></span>
+                <span></span>
+                <span></span>
+                <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>8sp</span>
+                {/* Row 2: Explosive Temper text and dot */}
+                <div style={{ 
+                  fontSize: '1em', 
+                  fontFamily: 'Arial, Helvetica, sans-serif', 
+                  textAlign: 'left',
+                  paddingRight: '8px',
+                  lineHeight: '1.2',
+                  gridColumn: '1 / 4'
                 }}>
-                  <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>8sp</span>
-                  <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
-                    <span
-                      onClick={() => handleSpDotClick(grenadierExplosiveTemperDots, setGrenadierExplosiveTemperDots, 0, [8], 'grenadierExplosiveTemperDots')}
-                      style={{
-                        width: '15px',
-                        height: '15px',
-                        border: '2px solid #000',
-                        borderRadius: '50%',
-                        display: 'block',
-                        background: grenadierExplosiveTemperDots[0] ? '#000' : '#fff',
-                        cursor: 'pointer',
-                        transition: 'background 0.2s'
-                      }}
-                    ></span>
-                  </span>
+                  <b><i style={{ color: '#cf0000' }}>Explosive Temper.</i></b> You are fearless to the point of recklessness, and are lucky enough to have survived so many explosions that were too close for comfort. Gain an advantage on related skill rolls when acting brash and impetuous.
                 </div>
+                <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start' }}>
+                  <span
+                    onClick={() => handleSpDotClick(grenadierExplosiveTemperDots, setGrenadierExplosiveTemperDots, 0, [8], 'grenadierExplosiveTemperDots')}
+                    style={{
+                      width: '15px',
+                      height: '15px',
+                      border: '2px solid #000',
+                      borderRadius: '50%',
+                      display: 'block',
+                      background: grenadierExplosiveTemperDots[0] ? '#000' : '#fff',
+                      cursor: 'pointer',
+                      transition: 'background 0.2s'
+                    }}
+                  ></span>
+                </span>
               </div>
             </div>
           </div>
@@ -2058,34 +2088,49 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
               <i><b>Skills.</b> Survival</i> +2
             </div>
             <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
-              <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', gap: '12px' }}>
-                <span style={{ display: 'inline-block', maxWidth: 'calc(100% - 40px)' }}>
-              <b><i style={{ color: '#0033cf', fontSize: '1em' }}>Mortician.</i></b> You have spent a lot of time around corpses and remains of the living. As such, you have a good intuition about the various causes of death and other topics that include the deceased. Gain an advantage on related skill rolls.
-                </span>
-                <div style={{
-                  display: 'grid',
-                  gridTemplateColumns: '24px',
-                  gridTemplateRows: 'repeat(1, auto)',
-                  alignItems: 'start',
-                  marginLeft: '4px'
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 24px 24px 24px',
+                gridTemplateRows: 'auto auto',
+                columnGap: '6px',
+                rowGap: '2px',
+                alignItems: 'start',
+                marginTop: '-12px',
+                marginBottom: '2px',
+                width: '100%',
+                paddingLeft: '4px'
+              }}>
+                {/* Row 1: Empty cells and 7sp header */}
+                <span></span>
+                <span></span>
+                <span></span>
+                <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>7sp</span>
+                {/* Row 2: Mortician text and dot */}
+                <div style={{ 
+                  fontSize: '1em', 
+                  fontFamily: 'Arial, Helvetica, sans-serif', 
+                  textAlign: 'left',
+                  paddingRight: '8px',
+                  lineHeight: '1.2',
+                  gridColumn: '1 / 4'
                 }}>
-                  <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>7sp</span>
-                  <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
-                    <span
-                  onClick={() => handleSpDotClick(necroPerksSkillsDots, setNecroPerksSkillsDots, 0, [7], 'necroPerksSkillsDots')}
-                      style={{
-                        width: '15px',
-                        height: '15px',
-                        border: '2px solid #000',
-                        borderRadius: '50%',
-                        display: 'block',
-                    background: necroPerksSkillsDots[0] ? '#000' : '#fff',
-                        cursor: 'pointer',
-                        transition: 'background 0.2s'
-                      }}
-                    ></span>
-                  </span>
+                  <b><i style={{ color: '#0033cf', fontSize: '1em' }}>Mortician.</i></b> You have spent a lot of time around corpses and remains of the living. As such, you have a good intuition about the various causes of death and other topics that include the deceased. Gain an advantage on related skill rolls.
                 </div>
+                <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start' }}>
+                  <span
+                    onClick={() => handleSpDotClick(necroPerksSkillsDots, setNecroPerksSkillsDots, 0, [7], 'necroPerksSkillsDots')}
+                    style={{
+                      width: '15px',
+                      height: '15px',
+                      border: '2px solid #000',
+                      borderRadius: '50%',
+                      display: 'block',
+                      background: necroPerksSkillsDots[0] ? '#000' : '#fff',
+                      cursor: 'pointer',
+                      transition: 'background 0.2s'
+                    }}
+                  ></span>
+                </span>
               </div>
             </div>
           </div>
@@ -2686,44 +2731,55 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
           
           {/* Perks Section */}
           <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
-            <div style={{ fontWeight: 'bold', color: '#8e44ad', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Perks</u></div>
+            <div style={{ fontWeight: 'bold', color: '#000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Perks</u></div>
             <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
               <div style={{ marginBottom: '8px' }}>
                 <b>Skills.</b> <i>Thievery</i> +2
               </div>
-              <div style={{ marginBottom: '4px' }}>
-                <b><i style={{ color: '#cf7600', fontSize: '1em' }}>Venom Master.</i></b> You excel in the art of poisoning, and can create a multitude of poisons from the basic to the rare and exotic. Gain an <i>advantage</i> on skill rolls related to finding, identifying, creating and using poisons.
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 24px 24px 24px',
+                gridTemplateRows: 'auto auto',
+                columnGap: '6px',
+                rowGap: '2px',
+                alignItems: 'start',
+                marginTop: '-12px',
+                marginBottom: '2px',
+                width: '100%',
+                paddingLeft: '4px'
+              }}>
+                {/* Row 1: Empty cells and 9sp header */}
+                <span></span>
+                <span></span>
+                <span></span>
+                <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>9sp</span>
+                {/* Row 2: Venom Master text and dot */}
+                <div style={{ 
+                  fontSize: '1em', 
+                  fontFamily: 'Arial, Helvetica, sans-serif', 
+                  textAlign: 'left',
+                  paddingRight: '8px',
+                  lineHeight: '1.2',
+                  gridColumn: '1 / 4'
+                }}>
+                  <b><i style={{ color: '#cf7600', fontSize: '1em' }}>Venom Master.</i></b> You excel in the art of poisoning, and can create a multitude of poisons from the basic to the rare and exotic. Gain an <i>advantage</i> on skill rolls related to finding, identifying, creating and using poisons.
+                </div>
+                <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start' }}>
+                  <span
+                    onClick={() => handleSpDotClick(poisonerVenomMasterDots, setPoisonerVenomMasterDots, 0, [9], 'poisonerVenomMasterDots')}
+                    style={{
+                      width: '15px',
+                      height: '15px',
+                      border: '2px solid #000',
+                      borderRadius: '50%',
+                      display: 'block',
+                      background: poisonerVenomMasterDots[0] ? '#000' : '#fff',
+                      cursor: 'pointer',
+                      transition: 'background 0.2s'
+                    }}
+                  ></span>
+                </span>
               </div>
-            </div>
-            
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: '1fr 24px',
-              columnGap: '6px',
-              rowGap: '2px',
-              alignItems: 'start',
-              marginBottom: '2px',
-              width: '100%',
-              paddingLeft: '4px'
-            }}>
-              <span></span>
-              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>9sp</span>
-              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}></span>
-              <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                <span
-                  onClick={() => handleSpDotClick(poisonerPerksSkillsDots, setPoisonerPerksSkillsDots, 0, [9], 'poisonerPerksSkillsDots')}
-                  style={{
-                    width: '15px',
-                    height: '15px',
-                    border: '2px solid #000',
-                    borderRadius: '50%',
-                    display: 'block',
-                    background: poisonerPerksSkillsDots[0] ? '#000' : '#fff',
-                    cursor: 'pointer',
-                    transition: 'background 0.2s'
-                  }}
-                ></span>
-              </span>
             </div>
           </div>
         </div>

@@ -67,6 +67,12 @@ export type CharacterSheet = {
   // Dart guns for Chemist class
   dartGuns?: string[];
 
+  // Lenses for Coder class
+  lenses?: string[];
+
+  // Algorithms for Coder class
+  algorithms?: string[];
+
   // Super Serums for Chemist class
   superSerums?: string[];
 

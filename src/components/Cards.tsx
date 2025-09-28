@@ -7,7 +7,9 @@ import { generateTheGoodStuffDescriptionJSX, calculateAnatomistTechniqueData } f
 import { generateTheBigOneJSX } from "../utils/grenadierTechnique";
 import { generateGraspOfTheGraveJSX, calculateNecroTechniqueData } from "../utils/necroTechnique";
 import { generateToxicTakedownJSX } from "../utils/poisonerTechnique";
+import { generateReflectionScriptDescriptionJSX } from "../utils/coderTechnique";
 import { CardsChemistAttacks } from "./CardsChemistAttacks";
+import { CardsCoderAttacks } from "./CardsCoderAttacks";
 import { calculateChemistFeatureData } from "../utils/chemistFeature";
 
 type CardsProps = {
@@ -518,29 +520,11 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
                     <div style={{ display: 'flex', alignItems: 'flex-start', flexWrap: 'wrap' }}>
                       {generateVolatileExperimentsDescriptionJSX(localSheet?.classCardDots)}
                     </div>
-                  ) : charClass === 'Coder' ? (() => {
-                    // Row 2: +1d6 Damage dots (3 dots)
-                    let dmg = 1;
-                    let resistText = '[ - ]';
-                    if (localSheet && Array.isArray(localSheet.classCardDots)) {
-                      if (Array.isArray(localSheet.classCardDots[2])) {
-                        const selected = localSheet.classCardDots[2].filter(Boolean).length;
-                        if (selected > 0) dmg = 2 + (selected - 1);
-                      }
-                      // Row 4: Damage Immunity (dot 0)
-                      if (Array.isArray(localSheet.classCardDots[4]) && localSheet.classCardDots[4][0]) {
-                        resistText = '[Immune]';
-                      } else if (Array.isArray(localSheet.classCardDots[3]) && localSheet.classCardDots[3][0]) {
-                        // Row 3: Resist all Damage (dot 0)
-                        resistText = '[Resistant]';
-                      }
-                    }
-                    return (
-                      <>
-                        Until the start of the next round, whenever you and any ally within 3hx of you take Damage from an enemy, that enemy takes <b>[{dmg}]</b>d6 Damage of the same type it dealt. Additionally, you and allies within 3hx are <b>{resistText}</b> to the original Damage.
-                      </>
-                    );
-                  })() : charClass === 'Commander' ? (() => {
+                  ) : charClass === 'Coder' ? (
+                    <div style={{ display: 'flex', alignItems: 'flex-start', flexWrap: 'wrap' }}>
+                      {generateReflectionScriptDescriptionJSX(localSheet?.classCardDots)}
+                    </div>
+                  ) : charClass === 'Commander' ? (() => {
                     // Commander: +1hx dots for Combat Delegation are in classCardDots[3], +1 ally dots are in classCardDots[4]
                     let hx = 5;
                     let allies = 1;
@@ -1101,6 +1085,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
         {/* Attack Cards */}
         {/* Chemist Attack Cards */}
         {charClass === 'Chemist' && <CardsChemistAttacks sheet={localSheet} />}
+        
+        {/* Coder Attack Cards */}
+        {charClass === 'Coder' && <CardsCoderAttacks sheet={localSheet} />}
 
       </div>
       

@@ -911,55 +911,68 @@ const LevelUpClassChemist: React.FC<LevelUpClassChemistProps> = ({
                         <i><b>Skills.</b> Investigation</i> +2
                       </div>
                       <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
-                        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', gap: '12px' }}>
-                          <span style={{ display: 'inline-block', maxWidth: 'calc(100% - 40px)' }}>
-                            <b><i style={{ color: '#721131' }}>Chemical Concoctions.</i></b> You can create myriad concoctions. When doing so, choose a skill. Upon drinking a concoction, the imbiber gains an advantage on the next skill roll of your choice. You can create up to 3 concoctions per day which each last until the end of the day.
-                          </span>
-                          <div style={{
-                            display: 'grid',
-                            gridTemplateColumns: '24px',
-                            gridTemplateRows: 'repeat(1, auto)',
-                            alignItems: 'start',
-                            marginLeft: '4px'
+                        <div style={{
+                          display: 'grid',
+                          gridTemplateColumns: '1fr 24px 24px 24px',
+                          gridTemplateRows: 'auto auto',
+                          columnGap: '6px',
+                          rowGap: '2px',
+                          alignItems: 'start',
+                          marginTop: '-12px',
+                          marginBottom: '2px',
+                          width: '100%',
+                          paddingLeft: '4px'
+                        }}>
+                          {/* Row 1: Empty cells and 10sp header */}
+                          <span></span>
+                          <span></span>
+                          <span></span>
+                          <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>10sp</span>
+                          {/* Row 2: Chemical Concoctions text and dot */}
+                          <div style={{ 
+                            fontSize: '1em', 
+                            fontFamily: 'Arial, Helvetica, sans-serif', 
+                            textAlign: 'left',
+                            paddingRight: '8px',
+                            lineHeight: '1.2',
+                            gridColumn: '1 / 4'
                           }}>
-                            {/* Row 1: 10sp */}
-                            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>10sp</span>
-                            {/* Row 2: dot (interactive) */}
-                            <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
-                              {(() => {
-                                const arr = safeGetDotsArray(9);
-                                const idx = 0;
-                                const canCheck = idx === 0 || arr.slice(0, idx).every(Boolean);
-                                const rightmostChecked = arr.lastIndexOf(true);
-                                const canUncheck = arr[idx] && idx === rightmostChecked;
-                                return (
-                                  <span
-                                    onClick={() => {
-                                      if (!arr[idx] && canCheck) {
-                                        const newDots = safeCloneClassCardDots();
-                                        for (let j = 0; j <= idx; ++j) newDots[9][j] = true;
-                                        persistClassCardDots(newDots, 10);
-                                      } else if (arr[idx] && canUncheck) {
-                                        const newDots = safeCloneClassCardDots();
-                                        for (let j = idx; j < arr.length; ++j) newDots[9][j] = false;
-                                        persistClassCardDots(newDots, -10);
-                                      }
-                                    }}
-                                    style={{
-                                      width: '15px',
-                                      height: '15px',
-                                      border: '2px solid #000',
-                                      borderRadius: '50%',
-                                      display: 'block',
-                                      background: arr[idx] ? '#000' : '#fff',
-                                      cursor: (canCheck && !arr[idx]) || canUncheck ? 'pointer' : 'not-allowed',
-                                      transition: 'background 0.2s'
-                                    }}
-                                  ></span>
-                                );
-                              })()}
-                            </span>
+                            <b><i style={{ color: '#721131' }}>Chemical Concoctions.</i></b> You can create myriad concoctions. When doing so, choose a skill. Upon drinking a concoction, the imbiber gains an advantage on the next skill roll of your choice. You can create up to 3 concoctions per day which each last until the end of the day.
                           </div>
+                          <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start' }}>
+                            {(() => {
+                              const arr = safeGetDotsArray(9);
+                              const idx = 0;
+                              const canCheck = idx === 0 || arr.slice(0, idx).every(Boolean);
+                              const rightmostChecked = arr.lastIndexOf(true);
+                              const canUncheck = arr[idx] && idx === rightmostChecked;
+                              return (
+                                <span
+                                  onClick={() => {
+                                    if (!arr[idx] && canCheck) {
+                                      const newDots = safeCloneClassCardDots();
+                                      for (let j = 0; j <= idx; ++j) newDots[9][j] = true;
+                                      persistClassCardDots(newDots, 10);
+                                    } else if (arr[idx] && canUncheck) {
+                                      const newDots = safeCloneClassCardDots();
+                                      for (let j = idx; j < arr.length; ++j) newDots[9][j] = false;
+                                      persistClassCardDots(newDots, -10);
+                                    }
+                                  }}
+                                  style={{
+                                    width: '15px',
+                                    height: '15px',
+                                    border: '2px solid #000',
+                                    borderRadius: '50%',
+                                    display: 'block',
+                                    background: arr[idx] ? '#000' : '#fff',
+                                    cursor: (canCheck && !arr[idx]) || canUncheck ? 'pointer' : 'not-allowed',
+                                    transition: 'background 0.2s'
+                                  }}
+                                ></span>
+                              );
+                            })()}
+                          </span>
                         </div>
                       </div>
                       <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif' }}>

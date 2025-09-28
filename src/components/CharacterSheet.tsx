@@ -1183,11 +1183,27 @@ const CharacterSheet: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, on
       );
     }
     
+    // Add Lenses for Coder class
+    if (charClass === 'Coder') {
+      attacks.push(
+        { name: 'Hodge Podge', type: 'Lens', cost: 150 },
+        { name: 'Time Stutter', type: 'Lens', cost: 150 }
+      );
+    }
+    
     return attacks;
   };
 
   const getAvailableSecondaryAttacks = () => {
     const attacks: { name: string; type: string; cost: number }[] = [];
+    
+    // Add Algorithms for Coder class
+    if (charClass === 'Coder') {
+      attacks.push(
+        { name: 'Digital Wave', type: 'Algorithm', cost: 205 },
+        { name: 'Soul Tracer', type: 'Algorithm', cost: 240 }
+      );
+    }
     
     // Add Super Serums for Anatomist subclass
     if (subclass === 'Anatomist') {
@@ -1230,7 +1246,7 @@ const CharacterSheet: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, on
 
   const handleAttackPurchase = (attackName: string, cost: number, type: string) => {
     if (credits < cost) {
-      // You could add a notice system here similar to the Level Up page
+      setNotice("Not enough credits!");
       return;
     }
     
@@ -1241,6 +1257,13 @@ const CharacterSheet: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, on
         updatedSheet = { 
           ...sheet, 
           dartGuns: newDartGuns,
+          credits: credits - cost
+        };
+      } else if (type === 'Lens') {
+        const newLenses = [...(sheet.lenses || []), attackName];
+        updatedSheet = { 
+          ...sheet, 
+          lenses: newLenses,
           credits: credits - cost
         };
       } else if (type === 'Super Serum') {
@@ -1268,6 +1291,12 @@ const CharacterSheet: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, on
           ...sheet, 
           dartGuns: newDartGuns
         };
+      } else if (type === 'Lens') {
+        const newLenses = [...(sheet.lenses || []), attackName];
+        updatedSheet = { 
+          ...sheet, 
+          lenses: newLenses
+        };
       } else if (type === 'Super Serum') {
         const newSuperSerums = [...(sheet.superSerums || []), attackName];
         updatedSheet = { 
@@ -1285,13 +1314,20 @@ const CharacterSheet: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, on
 
   const handleSecondaryAttackPurchase = (attackName: string, cost: number, type: string) => {
     if (credits < cost) {
-      // You could add a notice system here similar to the Level Up page
+      setNotice("Not enough credits!");
       return;
     }
     
     if (sheet) {
       let updatedSheet: CharacterSheet;
-      if (type === 'Super Serum') {
+      if (type === 'Algorithm') {
+        const newAlgorithms = [...(sheet.algorithms || []), attackName];
+        updatedSheet = { 
+          ...sheet, 
+          algorithms: newAlgorithms,
+          credits: credits - cost
+        };
+      } else if (type === 'Super Serum') {
         const newSuperSerums = [...(sheet.superSerums || []), attackName];
         updatedSheet = { 
           ...sheet, 
@@ -1332,7 +1368,13 @@ const CharacterSheet: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, on
   const handleSecondaryAttackAdd = (attackName: string, type: string) => {
     if (sheet) {
       let updatedSheet: CharacterSheet;
-      if (type === 'Super Serum') {
+      if (type === 'Algorithm') {
+        const newAlgorithms = [...(sheet.algorithms || []), attackName];
+        updatedSheet = { 
+          ...sheet, 
+          algorithms: newAlgorithms
+        };
+      } else if (type === 'Super Serum') {
         const newSuperSerums = [...(sheet.superSerums || []), attackName];
         updatedSheet = { 
           ...sheet, 
@@ -2297,6 +2339,13 @@ const CharacterSheet: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, on
               </span>
             </div>
           )}
+          {subclass === 'Poisoner' && sheet?.subclassProgressionDots?.poisonerVenomMasterDots?.[0] && (
+            <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <span>
+                <b><i style={{ color: '#cf7600' }}>Venom Master.</i></b> <span style={{ color: '#000' }}>You excel in the art of poisoning, and can create a multitude of poisons from the basic to the rare and exotic. Gain an advantage on skill rolls related to finding, identifying, creating and using poisons.</span>
+              </span>
+            </div>
+          )}
         </div>
       </div>
 
@@ -2324,10 +2373,10 @@ const CharacterSheet: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, on
                     textAlign: 'left',
                     minWidth: '180px'
                   }}
-                  value={pendingAttack || (charClass === 'Chemist' ? 'Dart Guns' : 'Select Primary Attack')}
+                  value={pendingAttack || (charClass === 'Chemist' ? 'Dart Guns' : charClass === 'Coder' ? 'Lenses' : 'Select Primary Attack')}
                   onChange={(e) => {
                     const value = e.target.value;
-                    if (value !== 'Dart Guns' && value !== 'Select Primary Attack') {
+                    if (value !== 'Dart Guns' && value !== 'Lenses' && value !== 'Select Primary Attack') {
                       setPendingAttack(value);
                     }
                   }}
@@ -2341,7 +2390,14 @@ const CharacterSheet: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, on
                       <option style={{ fontWeight: 'bold' }}>Prickly Goo</option>
                     </>
                   )}
-                  {charClass !== 'Chemist' && (
+                  {charClass === 'Coder' && (
+                    <>
+                      <option disabled style={{ fontWeight: 'bold' }}>Lenses</option>
+                      <option style={{ fontWeight: 'bold' }}>Hodge Podge</option>
+                      <option style={{ fontWeight: 'bold' }}>Time Stutter</option>
+                    </>
+                  )}
+                  {charClass !== 'Chemist' && charClass !== 'Coder' && (
                     <option disabled style={{ fontWeight: 'bold' }}>Select Primary Attack</option>
                   )}
                 </select>
@@ -2414,6 +2470,29 @@ const CharacterSheet: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, on
                       ))}
                     </div>
                   )}
+                  {(sheet?.lenses && sheet.lenses.length > 0) && (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginLeft: '8px' }}>
+                      {sheet?.lenses?.map((lens, idx) => (
+                        <span key={lens + idx + 'lens'} style={{ fontStyle: 'italic', display: 'flex', alignItems: 'center', background: '#f5f5f5', borderRadius: '6px', padding: '2px 8px' }}>
+                          {lens}
+                          <button
+                            style={{ marginLeft: '6px', padding: '0 6px', borderRadius: '50%', border: 'none', background: '#d32f2f', color: 'white', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.9em' }}
+                            title={`Remove ${lens}`}
+                            onClick={() => {
+                              if (sheet) {
+                                const newLenses = sheet.lenses?.filter((_, i) => i !== idx) || [];
+                                const updatedSheet = { 
+                                  ...sheet, 
+                                  lenses: newLenses
+                                };
+                                handleAutoSave(updatedSheet);
+                              }
+                            }}
+                          >×</button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -2437,14 +2516,21 @@ const CharacterSheet: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, on
                     textAlign: 'left',
                     minWidth: '180px'
                   }}
-                  value={pendingSecondaryAttack || (subclass === 'Anatomist' ? 'Super Serums' : subclass === 'Grenadier' ? 'Grenades' : subclass === 'Necro' ? 'Chem Zombies' : subclass === 'Poisoner' ? 'Noxious Fumes' : 'Select Secondary Attack')}
+                  value={pendingSecondaryAttack || (charClass === 'Coder' ? 'Algorithms' : subclass === 'Anatomist' ? 'Super Serums' : subclass === 'Grenadier' ? 'Grenades' : subclass === 'Necro' ? 'Chem Zombies' : subclass === 'Poisoner' ? 'Noxious Fumes' : 'Select Secondary Attack')}
                   onChange={(e) => {
                     const value = e.target.value;
-                    if (value !== 'Super Serums' && value !== 'Grenades' && value !== 'Chem Zombies' && value !== 'Noxious Fumes' && value !== 'Select Secondary Attack') {
+                    if (value !== 'Algorithms' && value !== 'Super Serums' && value !== 'Grenades' && value !== 'Chem Zombies' && value !== 'Noxious Fumes' && value !== 'Select Secondary Attack') {
                       setPendingSecondaryAttack(value);
                     }
                   }}
                 >
+                  {charClass === 'Coder' && (
+                    <>
+                      <option disabled style={{ fontWeight: 'bold' }}>Algorithms</option>
+                      <option style={{ fontWeight: 'bold' }}>Digital Wave</option>
+                      <option style={{ fontWeight: 'bold' }}>Soul Tracer</option>
+                    </>
+                  )}
                   {subclass === 'Anatomist' && (
                     <>
                       <option disabled style={{ fontWeight: 'bold' }}>Super Serums</option>
@@ -2472,7 +2558,7 @@ const CharacterSheet: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, on
                       <option style={{ fontWeight: 'bold' }}>Color Spray</option>
                     </>
                   )}
-                  {subclass !== 'Anatomist' && subclass !== 'Grenadier' && subclass !== 'Necro' && subclass !== 'Poisoner' && (
+                  {charClass !== 'Coder' && subclass !== 'Anatomist' && subclass !== 'Grenadier' && subclass !== 'Necro' && subclass !== 'Poisoner' && (
                     <option disabled style={{ fontWeight: 'bold' }}>Select Secondary Attack</option>
                   )}
                 </select>
@@ -2522,6 +2608,29 @@ const CharacterSheet: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, on
                 )}
                 
                 <div style={{ marginTop: '2px' }}>
+                  {(sheet?.algorithms && sheet.algorithms.length > 0) && (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginLeft: '8px' }}>
+                      {sheet?.algorithms?.map((algorithm, idx) => (
+                        <span key={algorithm + idx + 'algorithm'} style={{ fontStyle: 'italic', display: 'flex', alignItems: 'center', background: '#f5f5f5', borderRadius: '6px', padding: '2px 8px' }}>
+                          {algorithm}
+                          <button
+                            style={{ marginLeft: '6px', padding: '0 6px', borderRadius: '50%', border: 'none', background: '#d32f2f', color: 'white', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.9em' }}
+                            title={`Remove ${algorithm}`}
+                            onClick={() => {
+                              if (sheet) {
+                                const newAlgorithms = sheet.algorithms?.filter((_, i) => i !== idx) || [];
+                                const updatedSheet = { 
+                                  ...sheet, 
+                                  algorithms: newAlgorithms
+                                };
+                                handleAutoSave(updatedSheet);
+                              }
+                            }}
+                          >×</button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
                   {(sheet?.superSerums && sheet.superSerums.length > 0) && (
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginLeft: '8px' }}>
                       {sheet?.superSerums?.map((serum, idx) => (
