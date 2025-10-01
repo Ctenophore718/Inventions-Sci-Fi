@@ -136,66 +136,6 @@ const LevelUpClassCoder: React.FC<LevelUpClassCoderProps> = ({
       }
     };
     
-    // Helper function to handle dot clicking with sequential requirement
-    const handleDotClick = (
-      currentArray: boolean[], 
-      setArray: React.Dispatch<React.SetStateAction<boolean[]>>, 
-      index: number, 
-      xpCosts: number[]
-    ) => {
-      const newArray = [...currentArray];
-      const rightmostChecked = currentArray.lastIndexOf(true);
-      const canCheck = index === 0 || currentArray.slice(0, index).every(Boolean);
-      const canUncheck = currentArray[index] && index === rightmostChecked;
-      
-      let xpDelta = 0;
-      
-      if (!currentArray[index] && canCheck) {
-        // Checking dots - fill from start to current index
-        for (let j = 0; j <= index; j++) {
-          if (!currentArray[j]) {
-            newArray[j] = true;
-            xpDelta += xpCosts[j] || 0;
-          }
-        }
-      } else if (currentArray[index] && canUncheck) {
-        // Unchecking dots - clear from current index to end
-        for (let j = index; j < currentArray.length; j++) {
-          if (currentArray[j]) {
-            newArray[j] = false;
-            xpDelta -= xpCosts[j] || 0;
-          }
-        }
-      }
-      
-      if (xpDelta !== 0) {
-        setArray(newArray);
-        onXpSpChange?.(xpDelta, 0);
-      }
-    };
-  
-    // Helper function to handle SP dots (for Surgeon perk)
-    const handleSpDotClick = (
-      currentArray: boolean[], 
-      setArray: React.Dispatch<React.SetStateAction<boolean[]>>, 
-      index: number, 
-      spCosts: number[]
-    ) => {
-      const newArray = [...currentArray];
-      let spDelta = 0;
-      
-      if (!currentArray[index]) {
-        newArray[index] = true;
-        spDelta += spCosts[index] || 0;
-      } else {
-        newArray[index] = false;
-        spDelta -= spCosts[index] || 0;
-      }
-      
-      setArray(newArray);
-      onXpSpChange?.(0, spDelta);
-    };
-
 
       return (
         <div>

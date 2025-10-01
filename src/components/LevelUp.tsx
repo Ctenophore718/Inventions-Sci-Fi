@@ -13,6 +13,7 @@ import LevelUpClassExospecialist from "./LevelUpClassExospecialist";
 import LevelUpClassGunslinger from "./LevelUpClassGunslinger";
 import LevelUpClassTechnician from "./LevelUpClassTechnician";
 import LevelUpSubclassesChemist from "./LevelUpSubclassesChemist";
+import LevelUpSubclassesCoder from "./LevelUpSubclassesCoder";
 import { calculateChemistFeatureData } from "../utils/chemistFeature";
 
 
@@ -52,20 +53,6 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
     } else {
       console.log("Auto-save failed - missing onAutoSave function");
     }
-  };
-
-  // Handler for Anatomist XP/SP changes (independent from other systems)
-  const handleAnatomistXpSpChange = (xpDelta: number, spDelta: number) => {
-    const newXpSpent = xpSpent + xpDelta;
-    const newSpSpent = spSpent + spDelta;
-    
-    setXpSpent(newXpSpent);
-    setSpSpent(newSpSpent);
-    
-    handleAutoSave({ 
-      xpSpent: newXpSpent, 
-      spSpent: newSpSpent 
-    });
   };
 
   // Handler for Credits changes (similar to XP/SP)
@@ -1363,7 +1350,6 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                     sheet={sheet}
                     charClass={charClass}
                     subclass={subclass}
-                    onXpSpChange={handleAnatomistXpSpChange}
                     onCreditsChange={handleCreditsChangeNoSave}
                     xpTotal={xpTotal}
                     spTotal={spTotal}
@@ -1379,7 +1365,6 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                     sheet={sheet}
                     charClass={charClass}
                     subclass={subclass}
-                    onXpSpChange={handleAnatomistXpSpChange}
                     onCreditsChange={handleCreditsChangeNoSave}
                     xpTotal={xpTotal}
                     spTotal={spTotal}
@@ -1598,7 +1583,6 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                 sheet={sheet}
                 charClass={charClass}
                 subclass={subclass} 
-                onXpSpChange={handleAnatomistXpSpChange}
                 onCreditsChange={handleCreditsChangeNoSave}
                 onAutoSave={handleAutoSave}
                 xpTotal={xpTotal}
@@ -1606,6 +1590,23 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                 xpSpent={xpSpent}
                 spSpent={spSpent}
                 credits={credits}
+                setXpSpent={setXpSpent}
+                setSpSpent={setSpSpent}
+                setNotice={setNotice}
+              />
+            )}
+
+            {/* Coder Subclass Content */}
+            {charClass === "Coder" && subclass && (
+              <LevelUpSubclassesCoder
+                sheet={sheet}
+                charClass={charClass}
+                subclass={subclass}
+                onAutoSave={handleAutoSave}
+                xpTotal={xpTotal}
+                spTotal={spTotal}
+                xpSpent={xpSpent}
+                spSpent={spSpent}
                 setXpSpent={setXpSpent}
                 setSpSpent={setSpSpent}
                 setNotice={setNotice}
@@ -1938,7 +1939,15 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                           // Necro Survival booster always goes at position 2, same as class boosters
                           const isPoisonerThievery = subclass === "Poisoner" && skill === "Thievery" && i === 2;
 
-                          if (isChemistInvestigation || isCoderOikomagic || isCommanderDiplomacy || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine || isGrenadierIntimidation || isNecroSurvival || isPoisonerThievery) {
+                          // Check for Coercive Deception booster dot
+                          // Coercive Deception booster always goes at position 2, same as class boosters
+                          const isCoerciveDeception = subclass === "Coercive" && skill === "Deception" && i === 2;
+
+                          // Check for Divinist Investigation booster dot
+                          // Divinist Investigation booster always goes at position 2, same as class boosters
+                          const isDivinistInvestigation = subclass === "Divinist" && skill === "Investigation" && i === 2;
+
+                          if (isChemistInvestigation || isCoderOikomagic || isCommanderDiplomacy || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine || isGrenadierIntimidation || isNecroSurvival || isPoisonerThievery || isCoerciveDeception || isDivinistInvestigation) {
                             checked = true; // Force third dot to be filled for class booster dots
                           }
 
@@ -1957,6 +1966,8 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                             if (isGrenadierIntimidation) return "rgba(207,0,0,0.5)";
                             if (isNecroSurvival) return "rgba(0,51,207,0.5)";
                             if (isPoisonerThievery) return "rgba(207,118,0,0.5)";
+                            if (isCoerciveDeception) return "rgba(67,201,255,0.5)";
+                            if (isDivinistInvestigation) return "rgba(255,67,67,0.5)";
                             // Add other class colors here in the future
                             return "#d0d0d0"; // fallback color
                           };
@@ -1977,7 +1988,9 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                                                (subclass === "Anatomist" && skill === "Medicine" && dotIndex === 2) ||
                                                (subclass === "Grenadier" && skill === "Intimidation" && dotIndex === 2) ||
                                                (subclass === "Necro" && skill === "Survival" && dotIndex === 2) ||
-                                               (subclass === "Poisoner" && skill === "Thievery" && dotIndex === 2);
+                                               (subclass === "Poisoner" && skill === "Thievery" && dotIndex === 2) ||
+                                               (subclass === "Coercive" && skill === "Deception" && dotIndex === 2) ||
+                                               (subclass === "Divinist" && skill === "Investigation" && dotIndex === 2);
                             return dotFilled || isBoosterDot;
                           });
                           const rightmostChecked = skillDotsForSkill.lastIndexOf(true);
@@ -2000,7 +2013,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                                   if (isLockedColumn) return;
                                   
                                   // Prevent clicking on class-based automatic skill dots
-                                  if (isChemistInvestigation || isCoderOikomagic || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isCommanderDiplomacy || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine || isGrenadierIntimidation || isNecroSurvival || isPoisonerThievery) return;
+                                  if (isChemistInvestigation || isCoderOikomagic || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isCommanderDiplomacy || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine || isGrenadierIntimidation || isNecroSurvival || isPoisonerThievery || isCoerciveDeception || isDivinistInvestigation) return;
 
                                   // SP costs for each skill dot position: [1sp, 1sp, 2sp, 2sp, 3sp, 4sp, 5sp, 6sp, 8sp, 10sp]
                                   const spCosts = [1, 1, 2, 2, 3, 4, 5, 6, 8, 10];
@@ -2026,6 +2039,8 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                                       if (subclass === "Grenadier" && skillName === "Intimidation") return true;
                                       if (subclass === "Necro" && skillName === "Survival") return true;
                                       if (subclass === "Poisoner" && skillName === "Thievery") return true;
+                                      if (subclass === "Coercive" && skillName === "Deception") return true;
+                                      if (subclass === "Divinist" && skillName === "Investigation") return true;
                                     }
                                     
                                     return false;
@@ -2091,32 +2106,28 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                                   const newSpSpent = spSpent + spDelta;
                                   setSpSpent(newSpSpent);
                                   
-                                  // Auto-save the changes
+                                  // Auto-save the changes using the consistent pattern
                                   if (sheet) {
-                                    const updatedSkillDots = { ...skillDots, [skill]: (() => {
-                                      const currentSkillDots = skillDots[skill] || Array(10).fill(false);
-                                      let newSkillDots = [...currentSkillDots];
-                                      
-                                      if (!currentSkillDots[i] && canCheck) {
-                                        for (let j = 0; j <= i; j++) {
-                                          newSkillDots[j] = true;
-                                        }
-                                      } else if (currentSkillDots[i] && canUncheck) {
-                                        for (let j = i; j < newSkillDots.length; j++) {
-                                          newSkillDots[j] = false;
-                                        }
-                                      }
-                                      
-                                      return newSkillDots;
-                                    })() };
+                                    const currentSkillDots = skillDots[skill] || Array(10).fill(false);
+                                    let newSkillDots = [...currentSkillDots];
                                     
-                                    const updatedSheet = {
-                                      ...sheet,
+                                    if (!currentSkillDots[i] && canCheck) {
+                                      for (let j = 0; j <= i; j++) {
+                                        newSkillDots[j] = true;
+                                      }
+                                    } else if (currentSkillDots[i] && canUncheck) {
+                                      for (let j = i; j < newSkillDots.length; j++) {
+                                        newSkillDots[j] = false;
+                                      }
+                                    }
+                                    
+                                    const updatedSkillDots = { ...skillDots, [skill]: newSkillDots };
+                                    
+                                    handleAutoSave({
                                       skillDots: updatedSkillDots,
                                       spSpent: newSpSpent,
                                       spRemaining: (sheet.spTotal || 0) - newSpSpent
-                                    };
-                                    saveCharacterSheet(updatedSheet);
+                                    });
                                   }
                                 }}
                                 style={{
@@ -2124,13 +2135,13 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                                   width: isMobile ? 14 : 18,
                                   height: isMobile ? 14 : 18,
                                   borderRadius: '50%',
-                                  border: (isChemistInvestigation || isCoderOikomagic || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isCommanderDiplomacy || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine || isGrenadierIntimidation || isNecroSurvival || isPoisonerThievery) ? `2px solid ${classBoostColor}` : (isLockedColumn ? '2px solid #666' : '2px solid #000'),
-                                  background: checked ? ((isChemistInvestigation || isCoderOikomagic || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isCommanderDiplomacy || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine || isGrenadierIntimidation || isNecroSurvival || isPoisonerThievery) ? classBoostColor : (isLockedColumn ? '#666' : '#000')) : '#fff',
-                                  cursor: (isLockedColumn || isChemistInvestigation || isCoderOikomagic || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isCommanderDiplomacy || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine || isGrenadierIntimidation || isNecroSurvival || isPoisonerThievery) ? 'not-allowed' : ((canCheck && !checked) || canUncheck ? 'pointer' : 'not-allowed'),
-                                  opacity: (isLockedColumn || isChemistInvestigation || isCoderOikomagic || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isCommanderDiplomacy || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine || isGrenadierIntimidation || isNecroSurvival || isPoisonerThievery) ? 0.6 : ((canCheck && !checked) || canUncheck ? 1 : 0.4),
+                                  border: (isChemistInvestigation || isCoderOikomagic || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isCommanderDiplomacy || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine || isGrenadierIntimidation || isNecroSurvival || isPoisonerThievery || isCoerciveDeception || isDivinistInvestigation) ? `2px solid ${classBoostColor}` : (isLockedColumn ? '2px solid #666' : '2px solid #000'),
+                                  background: checked ? ((isChemistInvestigation || isCoderOikomagic || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isCommanderDiplomacy || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine || isGrenadierIntimidation || isNecroSurvival || isPoisonerThievery || isCoerciveDeception || isDivinistInvestigation) ? classBoostColor : (isLockedColumn ? '#666' : '#000')) : '#fff',
+                                  cursor: (isLockedColumn || isChemistInvestigation || isCoderOikomagic || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isCommanderDiplomacy || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine || isGrenadierIntimidation || isNecroSurvival || isPoisonerThievery || isCoerciveDeception || isDivinistInvestigation) ? 'not-allowed' : ((canCheck && !checked) || canUncheck ? 'pointer' : 'not-allowed'),
+                                  opacity: (isLockedColumn || isChemistInvestigation || isCoderOikomagic || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isCommanderDiplomacy || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine || isGrenadierIntimidation || isNecroSurvival || isPoisonerThievery || isCoerciveDeception || isDivinistInvestigation) ? 0.6 : ((canCheck && !checked) || canUncheck ? 1 : 0.4),
                                 }}
                                 title={
-                                  isChemistInvestigation || isCoderOikomagic || isCommanderDiplomacy || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine || isGrenadierIntimidation || isNecroSurvival || isPoisonerThievery
+                                  isChemistInvestigation || isCoderOikomagic || isCommanderDiplomacy || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine || isGrenadierIntimidation || isNecroSurvival || isPoisonerThievery || isCoerciveDeception || isDivinistInvestigation
                                     ? 'Class bonus skill dot (cannot be changed)'
                                     : isLockedColumn 
                                     ? 'Starting skill dots (cannot be changed)'

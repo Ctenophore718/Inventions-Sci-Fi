@@ -9,6 +9,7 @@ import { generateAnatomicalPrecisionJSX } from "../utils/anatomistFeature";
 import { generateBlasterMasterJSX } from "../utils/grenadierFeature";
 import { generateBodySnatcherJSX } from "../utils/necroFeature";
 import { generateBackstabberJSX } from "../utils/poisonerFeature";
+import { generateFieldOfCoercionJSX } from "../utils/coerciveFeature";
 
 
 type Props = {
@@ -716,7 +717,7 @@ const CharacterSheet: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, on
   // Add after necroFeatureJSX
   const coerciveFeatureJSX = (
     <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#43c9ff' }}>Field of Coercion.</i></b> You and allies within <b>[5]</b>hx are <i>Immune</i> to <b><i>Confuse</i></b> and <b><i>Mesmerize</i></b>. Additionally, enemies within <b>[5]</b>hx cannot benefit from <b><i>Confuse</i></b> or <b><i>Mesmerize</i></b> <i>Immunity</i>.
+      {generateFieldOfCoercionJSX(sheet)}
     </span>
   );
 
@@ -2152,6 +2153,14 @@ const CharacterSheet: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, on
                   </span>
                 );
               })()
+            ) : subclass === 'Coercive' ? (
+              <span style={{ fontWeight: 'normal', fontFamily: 'inherit', color: '#000', marginLeft: 4, display: 'flex', alignItems: 'center' }}>
+                1d6&nbsp;
+                <span style={{ color: '#a929ff', textDecoration: 'underline', fontWeight: 'bold', fontFamily: 'inherit', display: 'inline-flex', alignItems: 'center' }}>
+                  Neural
+                  <img src="/Neural.png" alt="Neural" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+                </span>
+              </span>
             ) : <span style={{ fontWeight: 'bold', fontFamily: 'inherit', color: '#000', marginLeft: 4 }}>{strikeDamage}</span>}
           </div>
           <div className={styles.horizontalLabel} style={{ color: '#351c75', fontWeight: 'bold' }}>Multi Strike <span style={{ color: '#000' }}>{charClass === 'Contemplative' ? (2 + (sheet?.classCardDots?.[1]?.[0] ? 1 : 0)) : (multiStrike > 0 ? multiStrike : <span style={{ visibility: 'hidden' }}>0</span>)}</span></div>
@@ -2163,7 +2172,9 @@ const CharacterSheet: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, on
                     ? <span style={{ color: '#000', fontWeight: 'normal' }}>Can choose to heal <span style={{ color: '#351c75' }}><b><i>Strike</i></b></span> amount</span>
                     : (subclass === 'Grenadier' && sheet?.subclassProgressionDots?.grenadierStrikeDots?.filter(Boolean).length > 0)
                       ? <span style={{ color: '#000', fontWeight: 'normal' }}><b>[{sheet?.subclassProgressionDots?.grenadierStrikeDots?.filter(Boolean).length}]</b>hx-radius <i>AoE</i></span>
-                      : strikeEffects
+                      : (subclass === 'Coercive' && sheet?.subclassProgressionDots?.coerciveStrikeMesmerizeDots?.[0])
+                        ? <span style={{ color: '#000', fontWeight: 'normal' }}><b><i>Mesmerize</i></b></span>
+                        : strikeEffects
               }
           </div>
         </div>
@@ -2223,6 +2234,16 @@ const CharacterSheet: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, on
               <span style={{ marginLeft: 8, display: 'inline-flex', alignItems: 'center', color: '#de7204', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                 <u>Chemical</u> <img src="/Chemical.png" alt="Chemical" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
               </span>
+            )}
+            {subclass === 'Coercive' && (
+              <>
+                <span style={{ marginLeft: 8, color: '#000', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                  <i>Confuse</i>
+                </span>
+                <span style={{ marginLeft: 8, color: '#000', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                  <i>Mesmerize</i>
+                </span>
+              </>
             )}
           </div>
           <div style={{ fontWeight: 'bold', marginBottom: 2, fontFamily: 'Arial, sans-serif', color: '#666666', wordBreak: 'break-word', overflowWrap: 'break-word' }}>Absorptions</div>
@@ -2343,6 +2364,13 @@ const CharacterSheet: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, on
             <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
               <span>
                 <b><i style={{ color: '#cf7600' }}>Venom Master.</i></b> <span style={{ color: '#000' }}>You excel in the art of poisoning, and can create a multitude of poisons from the basic to the rare and exotic. Gain an advantage on skill rolls related to finding, identifying, creating and using poisons.</span>
+              </span>
+            </div>
+          )}
+          {subclass === 'Coercive' && sheet?.subclassProgressionDots?.coercivePerksSkillsDots?.[0] && (
+            <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <span>
+                <b><i style={{ color: '#43c9ff' }}>Mind Reader.</i></b> <span style={{ color: '#000' }}>You are capable of reaching into the minds of other creatures and gleaning information around their thoughts, drives and premeditated actions. Gain an advantage on skill rolls when attempting to read minds. The DM determines how much info is divulged.</span>
               </span>
             </div>
           )}

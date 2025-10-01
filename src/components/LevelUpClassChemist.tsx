@@ -9,7 +9,6 @@ type LevelUpClassChemistProps = {
   sheet: CharacterSheet | null;
   charClass: string;
   subclass: string;
-  onXpSpChange?: (xpDelta: number, spDelta: number) => void;
   onCreditsChange?: (creditsDelta: number) => void;
   xpTotal: number;
   spTotal: number;
@@ -25,7 +24,6 @@ const LevelUpClassChemist: React.FC<LevelUpClassChemistProps> = ({
   sheet, 
   charClass,
   subclass, 
-  onXpSpChange,
   onCreditsChange,
   xpTotal,
   spTotal, 
@@ -162,7 +160,7 @@ const LevelUpClassChemist: React.FC<LevelUpClassChemistProps> = ({
       
       if (xpDelta !== 0) {
         setArray(newArray);
-        onXpSpChange?.(xpDelta, 0);
+        setXpSpent(xpSpent + xpDelta);
       }
     };
   
@@ -185,7 +183,7 @@ const LevelUpClassChemist: React.FC<LevelUpClassChemistProps> = ({
       }
       
       setArray(newArray);
-      onXpSpChange?.(0, spDelta);
+      setSpSpent(spSpent + spDelta);
     };
 
 

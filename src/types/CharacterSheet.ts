@@ -139,6 +139,14 @@ export type CharacterSheet = {
     poisonerAttackCritDots?: boolean[];
     poisonerAttackCooldownDots?: boolean[];
     poisonerPerksSkillsDots?: boolean[];
+    // Coercive subclass progression (Coder)
+    coerciveFeatureDots?: boolean[];
+    coerciveFeatureAllyAttackDots?: boolean[];
+    coerciveTechniqueDots?: boolean[];
+    coerciveTechniqueCreatureDots?: boolean[];
+    coerciveTechniqueCooldownDots?: boolean[];
+    coerciveStrikeMesmerizeDots?: boolean[];
+    coercivePerksSkillsDots?: boolean[];
     // Add other subclasses as needed
   };
 };

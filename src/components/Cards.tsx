@@ -8,6 +8,7 @@ import { generateTheBigOneJSX } from "../utils/grenadierTechnique";
 import { generateGraspOfTheGraveJSX, calculateNecroTechniqueData } from "../utils/necroTechnique";
 import { generateToxicTakedownJSX } from "../utils/poisonerTechnique";
 import { generateReflectionScriptDescriptionJSX } from "../utils/coderTechnique";
+import { generateEnemiesOnAllSidesCardJSX } from "../utils/coerciveTechnique";
 import { CardsChemistAttacks } from "./CardsChemistAttacks";
 import { CardsCoderAttacks } from "./CardsCoderAttacks";
 import { calculateChemistFeatureData } from "../utils/chemistFeature";
@@ -669,7 +670,7 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
                 fontFamily: 'Arial, Helvetica, sans-serif',
                 fontWeight: 'bold',
                 fontSize: 'clamp(0.8em, 4vw, 1.25em)',
-                color: localSheet?.subclass === 'Anatomist' ? '#66cf00' : localSheet?.subclass === 'Grenadier' ? '#cf0000' : localSheet?.subclass === 'Necro' ? '#0033cf' : localSheet?.subclass === 'Poisoner' ? '#cf7600' : 'black',
+                color: localSheet?.subclass === 'Anatomist' ? '#66cf00' : localSheet?.subclass === 'Grenadier' ? '#cf0000' : localSheet?.subclass === 'Necro' ? '#0033cf' : localSheet?.subclass === 'Poisoner' ? '#cf7600' : localSheet?.subclass === 'Coercive' ? '#43c9ff' : 'black',
                 lineHeight: 1,
                 textAlign: 'left',
                 whiteSpace: 'nowrap',
@@ -678,13 +679,13 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
                 flexShrink: 1,
                 marginRight: '5px'
               }}>
-                {localSheet?.subclass === 'Anatomist' ? 'The "Good Stuff"' : localSheet?.subclass === 'Grenadier' ? 'The "Big One"' : localSheet?.subclass === 'Necro' ? 'Grasp of the Grave' : localSheet?.subclass === 'Poisoner' ? 'Toxic Takedown' : 'Subclass Card Name'}
+                {localSheet?.subclass === 'Anatomist' ? 'The "Good Stuff"' : localSheet?.subclass === 'Grenadier' ? 'The "Big One"' : localSheet?.subclass === 'Necro' ? 'Grasp of the Grave' : localSheet?.subclass === 'Poisoner' ? 'Toxic Takedown' : localSheet?.subclass === 'Coercive' ? 'Enemies On All Sides' : 'Subclass Card Name'}
               </span>
               <span style={{
                 fontFamily: 'Arial, Helvetica, sans-serif',
                 fontStyle: 'italic',
                 fontSize: '0.75em',
-                color: localSheet?.subclass === 'Anatomist' ? '#66cf00' : localSheet?.subclass === 'Grenadier' ? '#cf0000' : localSheet?.subclass === 'Necro' ? '#0033cf' : localSheet?.subclass === 'Poisoner' ? '#cf7600' : 'black',
+                color: localSheet?.subclass === 'Anatomist' ? '#66cf00' : localSheet?.subclass === 'Grenadier' ? '#cf0000' : localSheet?.subclass === 'Necro' ? '#0033cf' : localSheet?.subclass === 'Poisoner' ? '#cf7600' : localSheet?.subclass === 'Coercive' ? '#43c9ff' : 'black',
                 lineHeight: 1,
                 whiteSpace: 'normal',
                 wordBreak: 'keep-all',
@@ -692,11 +693,11 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
                 maxWidth: '72px',
                 display: 'inline-block',
                 textAlign: 'right'
-              }}>{localSheet?.subclass === 'Anatomist' ? 'Anatomist' : localSheet?.subclass === 'Grenadier' ? 'Grenadier' : localSheet?.subclass === 'Necro' ? 'Necro' : localSheet?.subclass === 'Poisoner' ? 'Poisoner' : 'Subclass'}</span>
+              }}>{localSheet?.subclass === 'Anatomist' ? 'Anatomist' : localSheet?.subclass === 'Grenadier' ? 'Grenadier' : localSheet?.subclass === 'Necro' ? 'Necro' : localSheet?.subclass === 'Poisoner' ? 'Poisoner' : localSheet?.subclass === 'Coercive' ? 'Coercive' : 'Subclass'}</span>
             </div>
             <img 
-              src={localSheet?.subclass === 'Anatomist' ? "/The Good Stuff.png" : localSheet?.subclass === 'Grenadier' ? "/The Big One.png" : localSheet?.subclass === 'Necro' ? "/Grasp of the Grave.png" : localSheet?.subclass === 'Poisoner' ? "/Toxic Takedown.png" : "/Blank Card.png"}
-              alt={localSheet?.subclass === 'Anatomist' ? "The Good Stuff" : localSheet?.subclass === 'Grenadier' ? "The Big One" : localSheet?.subclass === 'Necro' ? "Grasp of the Grave" : localSheet?.subclass === 'Poisoner' ? "Toxic Takedown" : "Blank Card"}
+              src={localSheet?.subclass === 'Anatomist' ? "/The Good Stuff.png" : localSheet?.subclass === 'Grenadier' ? "/The Big One.png" : localSheet?.subclass === 'Necro' ? "/Grasp of the Grave.png" : localSheet?.subclass === 'Poisoner' ? "/Toxic Takedown.png" : localSheet?.subclass === 'Coercive' ? "/Enemies On All Sides.png" : "/Blank Card.png"}
+              alt={localSheet?.subclass === 'Anatomist' ? "The Good Stuff" : localSheet?.subclass === 'Grenadier' ? "The Big One" : localSheet?.subclass === 'Necro' ? "Grasp of the Grave" : localSheet?.subclass === 'Poisoner' ? "Toxic Takedown" : localSheet?.subclass === 'Coercive' ? "Enemies On All Sides" : "Blank Card"}
               style={{
                 position: 'absolute',
                 top: 35,
@@ -734,6 +735,8 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
                     }).cooldown}]</span></>
                   : localSheet?.subclass === 'Poisoner'
                   ? <>Cooldown <span style={{ fontWeight: 'bold', fontStyle: 'normal' }}>[{4 - (localSheet?.subclassProgressionDots?.poisonerTechniqueCooldownDots?.filter(Boolean).length || 0)}]</span></>
+                  : localSheet?.subclass === 'Coercive'
+                  ? <>Cooldown <span style={{ fontWeight: 'bold', fontStyle: 'normal' }}>[{4 - (localSheet?.subclassProgressionDots?.coerciveTechniqueCooldownDots?.filter(Boolean).length || 0)}]</span></>
                   : <>Cooldown <span style={{ fontWeight: 'bold', fontStyle: 'normal' }}>[{localSheet?.subclass === 'Anatomist' ? calculateAnatomistTechniqueData(localSheet?.subclassProgressionDots).cooldown : '#'}]</span></>}
               </span>
             </div>
@@ -783,6 +786,8 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
                       poisonerTechniqueExtraSpikeReroll5Dots: localSheet?.subclassProgressionDots?.poisonerTechniqueExtraSpikeReroll5Dots || [false],
                       poisonerTechniqueExtraSpikeReroll4Dots: localSheet?.subclassProgressionDots?.poisonerTechniqueExtraSpikeReroll4Dots || [false]
                     })
+                  : localSheet?.subclass === 'Coercive'
+                  ? generateEnemiesOnAllSidesCardJSX(localSheet)
                   : 'Card stats.'}
               </div>
             </div>
@@ -795,7 +800,7 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
               color: '#000',
               fontFamily: 'Arial, Helvetica, sans-serif',
               fontStyle: 'italic',
-              fontSize: localSheet?.subclass === 'Grenadier' ? '0.69em' : localSheet?.subclass === 'Anatomist' ? '0.69em' : localSheet?.subclass === 'Necro' ? '0.69em' : localSheet?.subclass === 'Poisoner' ? '0.69em' : '0.70em',
+              fontSize: localSheet?.subclass === 'Grenadier' ? '0.69em' : localSheet?.subclass === 'Anatomist' ? '0.69em' : localSheet?.subclass === 'Necro' ? '0.69em' : localSheet?.subclass === 'Poisoner' ? '0.69em' : localSheet?.subclass === 'Coercive' ? '0.69em' : '0.70em',
               fontWeight: 400,
               zIndex: 3,
               textAlign: 'left'
@@ -808,6 +813,8 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
                 ? '"Every organism is capable of performing well beyond its natural limit, if you simply inject it with the right components." --Rezz, Radiofrequent Anatomist'
                 : localSheet?.subclass === 'Poisoner'
                 ? '"Others might wear white coats and work in a lab, while my day-to-day is finding your weak spot and pressing where it hurts." --Tox, Nocturne Poisoner'
+                : localSheet?.subclass === 'Coercive'
+                ? '"Pure panic shall invade your mind, so much so that you won\'t be able to trust anyone anymore, not even yourself." --Limbus Navitron, Lumenaren Coercive'
                 : 'Flavor text.'}
             </div>
         </div>

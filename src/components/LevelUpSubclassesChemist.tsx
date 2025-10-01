@@ -6,7 +6,6 @@ type LevelUpSubclassesChemistProps = {
   sheet: CharacterSheet | null;
   charClass: string;
   subclass: string;
-  onXpSpChange?: (xpDelta: number, spDelta: number) => void;
   onCreditsChange?: (creditsDelta: number) => void;
   onAutoSave?: (fieldUpdates: Partial<CharacterSheet>) => void;
   xpTotal: number;
@@ -22,7 +21,6 @@ type LevelUpSubclassesChemistProps = {
 const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({ 
   sheet, 
   subclass, 
-  onXpSpChange,
   onCreditsChange,
   onAutoSave,
   xpTotal,
@@ -392,8 +390,6 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
           spSpent: newSpSpent,
           subclassProgressionDots: progressionDots
         });
-      } else {
-        onXpSpChange?.(xpDelta, 0);
       }
     }
   };
@@ -442,8 +438,6 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
         spSpent: newSpSpent,
         subclassProgressionDots: progressionDots
       });
-    } else {
-      onXpSpChange?.(0, spDelta);
     }
   };
     
