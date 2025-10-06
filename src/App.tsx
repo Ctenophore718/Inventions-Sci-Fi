@@ -440,6 +440,7 @@ const App = () => {
           onLevelUp={handleLevelUp}
           onHome={handleBackToHome}
           charClass={charClass}
+          subclass={subclass}
         />
       )}
     </div>

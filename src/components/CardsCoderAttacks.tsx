@@ -5,6 +5,7 @@ import { generateCoderSecondaryAttackStatsJSX, getAlgorithmCost } from '../utils
 
 interface CardsCoderAttacksProps {
   sheet: CharacterSheet | null;
+  subclass: string;
 }
 
 function getLensFlavorText(lens: string): string {
@@ -29,7 +30,7 @@ function getAlgorithmFlavorText(algorithm: string): string {
   }
 }
 
-export const CardsCoderAttacks: React.FC<CardsCoderAttacksProps> = ({ sheet }) => {
+export const CardsCoderAttacks: React.FC<CardsCoderAttacksProps> = ({ sheet, subclass }) => {
   const lenses = sheet?.lenses || [];
   const algorithms = sheet?.algorithms || [];
   
@@ -153,7 +154,7 @@ export const CardsCoderAttacks: React.FC<CardsCoderAttacksProps> = ({ sheet }) =
             zIndex: 2,
             lineHeight: 1.2
           }}>
-            {generateCoderPrimaryAttackStatsJSX(sheet?.classCardDots, getLensCost(lens), lens, hasIgnore100Cover)}
+            {generateCoderPrimaryAttackStatsJSX(sheet?.classCardDots, getLensCost(lens), lens, hasIgnore100Cover, subclass, sheet?.subclassProgressionDots)}
           </div>
           
           {/* Flavor Text */}
@@ -291,7 +292,7 @@ export const CardsCoderAttacks: React.FC<CardsCoderAttacksProps> = ({ sheet }) =
             zIndex: 2,
             lineHeight: 1.2
           }}>
-            {generateCoderSecondaryAttackStatsJSX(sheet?.classCardDots, getAlgorithmCost(algorithm), algorithm)}
+            {generateCoderSecondaryAttackStatsJSX(sheet?.classCardDots, getAlgorithmCost(algorithm), algorithm, subclass, sheet?.subclassProgressionDots)}
           </div>
           
           {/* Flavor Text */}

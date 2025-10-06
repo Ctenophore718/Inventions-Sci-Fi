@@ -31,17 +31,25 @@ export function generateCoderPrimaryAttackStatsJSX(
   classCardDots?: boolean[][],
   cost?: number,
   lensName?: string,
-  hasIgnore100Cover?: boolean
+  hasIgnore100Cover?: boolean,
+  subclass?: string,
+  subclassProgressionDots?: any
 ): React.ReactElement {
   const { dieSize, critThreshold } = calculateCoderPrimaryAttackData(classCardDots);
   
   // Determine cover percentage based on hasIgnore100Cover
   const coverPercentage = hasIgnore100Cover ? '100%' : '50%';
   
+  // Calculate range bonus from Divinist subclass
+  const rangeBonus = subclass === 'Divinist' 
+    ? (subclassProgressionDots?.divinistFeatureRangeDots?.filter(Boolean).length || 0)
+    : 0;
+  const totalRange = 10 + rangeBonus;
+  
   return (
     <div style={{ fontSize: '0.875em', width: '100%', height: 'fit-content', maxHeight: '100%', overflow: 'hidden' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-        <span><b><u>Range</u></b> 10hx</span>
+        <span><b><u>Range</u></b> {subclass === 'Divinist' ? <b>[{totalRange}]</b> : totalRange}hx</span>
         <span style={{ textAlign: 'right', minWidth: '80px' }}><b><u>Crit</u></b> <b>[{critThreshold}]</b>+</span>
       </div>
       <div>

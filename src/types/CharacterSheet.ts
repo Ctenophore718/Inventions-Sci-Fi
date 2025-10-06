@@ -70,6 +70,9 @@ export type CharacterSheet = {
   // Lenses for Coder class
   lenses?: string[];
 
+  // Rifles for Commander class
+  rifles?: string[];
+
   // Algorithms for Coder class
   algorithms?: string[];
 

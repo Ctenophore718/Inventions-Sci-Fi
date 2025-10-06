@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import type { CharacterSheet } from "../types/CharacterSheet";
 import { saveCharacterSheet } from "../utils/storage";
 
@@ -28,6 +28,8 @@ type LevelUpClassCommanderProps = {
   setXpSpent: (xp: number) => void;
   setSpSpent: (sp: number) => void;
   setNotice: (notice: string) => void;
+  onCreditsChange?: (creditsDelta: number) => void;
+  credits: number;
 };
 
 const LevelUpClassCommander: React.FC<LevelUpClassCommanderProps> = ({ 
@@ -41,7 +43,9 @@ const LevelUpClassCommander: React.FC<LevelUpClassCommanderProps> = ({
   spSpent,
   setXpSpent,
   setSpSpent,
-  setNotice
+  setNotice,
+  onCreditsChange,
+  credits
 }) => {
   
     // Local state for class card dots (Commander)
@@ -51,7 +55,17 @@ const LevelUpClassCommander: React.FC<LevelUpClassCommanderProps> = ({
       }
       return defaultCommanderDots.map(row => [...row]);
     });
-  
+
+    // Local state for Rifles
+    const [selectedRifles, setSelectedRifles] = useState<string[]>(sheet?.rifles || []);
+    const [pendingRifle, setPendingRifle] = useState<string>("");
+
+    // Sync selectedRifles when sheet prop changes
+    React.useEffect(() => {
+      const currentRifles = sheet?.rifles || [];
+      setSelectedRifles([...currentRifles]);
+    }, [sheet?.rifles]);
+
     // Helper function to safely access classCardDots array
     const safeGetDotsArray = (index: number): boolean[] => {
       if (!classCardDots || !Array.isArray(classCardDots) || index >= classCardDots.length) {
@@ -163,7 +177,7 @@ const LevelUpClassCommander: React.FC<LevelUpClassCommanderProps> = ({
                   <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32, fontFamily: 'Arial, Helvetica, sans-serif' }}>
                     <div style={{ fontWeight: 'bold', color: '#0b5394', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Feature</u></div>
                     <span style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
-                      <b><i style={{ color: '#717211', fontSize: '1em' }}>Stay Sharp.</i></b> <span style={{ fontSize: '1em', fontWeight: 400 }}>At the beginning of the round, you and allies within 3hx of you can remove an additional <i>Cooldown Token</i> from one <i>inactive</i> <b><i style={{ color: '#bf9000' }}>Technique</i></b> of their choice.</span>
+                      <b><i style={{ color: '#717211', fontSize: '1em' }}>Stay Sharp.</i></b> <span style={{ fontSize: '1em', fontWeight: 400 }}>At the beginning of the round, you and allies within <b>[{3 + (classCardDots[0]?.filter(Boolean).length || 0)}]</b>hx of you can remove an additional <i>Cooldown Token</i> from one <i>inactive</i> <b><i style={{ color: '#bf9000' }}>Technique</i></b> or <b>[{classCardDots[1]?.[0] ? <i style={{ color: '#990000' }}>Attack</i> : ' - '}]</b> of their choice.</span>
                     </span>
                   </span>
                 </div>
@@ -295,7 +309,17 @@ const LevelUpClassCommander: React.FC<LevelUpClassCommanderProps> = ({
                 <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
                   <div style={{ fontWeight: 'bold', color: '#bf9000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Technique</u></div>
                   <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
-                    <i style={{ color: '#717211' }}><b>Combat Delegation</b> (Cooldown 4).</i> One ally within 5hx that can see and/or hear you gains an extra <i>Action</i>.
+                    {(() => {
+                      const techniqueHxDots = classCardDots[3]?.filter(Boolean).length || 0;
+                      const techniqueAllyDots = classCardDots[4]?.filter(Boolean).length || 0;
+                      const techniqueCooldownDots = classCardDots[5]?.filter(Boolean).length || 0;
+                      const cooldown = Math.max(1, 4 - techniqueCooldownDots);
+                      return (
+                        <>
+                          <b><i style={{ color: '#717211', fontSize: '1em' }}>Combat Delegation</i></b> <span style={{ color: '#717211', fontSize: '1em' }}><i>(Cooldown <b style={{ color: '#000', fontStyle: 'normal' }}>[{cooldown}]</b>).</i></span> <b>[{1 + techniqueAllyDots}]</b> ally(s) within <b>[{5 + techniqueHxDots}]</b>hx that can see and/or hear you gains an extra <i>Action</i>.
+                        </>
+                      );
+                    })()}
                   </div>
                   {/* XP progression table for Technique */}
                   <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px' }}>
@@ -468,7 +492,146 @@ const LevelUpClassCommander: React.FC<LevelUpClassCommanderProps> = ({
                 <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
                   <div style={{ fontWeight: 'bold', color: '#990000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Attack</u></div>
                   <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
-                    <b><i>Primary <span style={{ color: '#990000' }}>Attack</span>.</i></b><br /> <i>Rifles.</i> 10hx Range, single target, 18+ Crit, 1d6 Damage.
+                    <div style={{ marginBottom: '4px' }}>
+                      <b><i>Primary <span style={{ color: '#990000' }}>Attack</span>.</i></b>
+                    </div>
+                    {/* Rifles Dropdown */}
+                    <div style={{ marginBottom: '4px', textAlign: 'left' }}>
+                      <select 
+                        style={{ 
+                          fontSize: '1em', 
+                          padding: '2px 8px', 
+                          borderRadius: '6px', 
+                          border: '1px solid #ccc', 
+                          background: '#fff', 
+                          color: '#222',
+                          fontWeight: 'bold',
+                          marginBottom: '4px',
+                          textAlign: 'left',
+                          minWidth: '180px'
+                        }} 
+                        defaultValue="Rifles"
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          if (value !== "Rifles") {
+                            setPendingRifle(value);
+                            e.target.value = "Rifles"; // Reset dropdown
+                          }
+                        }}
+                      >
+                        <option disabled style={{ fontWeight: 'bold' }}>Rifles</option>
+                        <option style={{ fontWeight: 'bold' }}>Plasma Rifle</option>
+                        <option style={{ fontWeight: 'bold' }}>Sapper Gun</option>
+                      </select>
+                      {/* Buy/Add dialog for Rifle selection */}
+                      {pendingRifle && (
+                        <div style={{ marginTop: '4px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                          <div style={{ fontWeight: 'bold' }}>
+                            {pendingRifle}
+                            <span style={{ color: '#bf9000', fontWeight: 'bold', marginLeft: '8px' }}>150c</span>
+                          </div>
+                          <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                            <button
+                              style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #1976d2', background: '#1976d2', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}
+                              onClick={() => {
+                                const cost = 150;
+                                // Check credits
+                                if (credits < cost) {
+                                  setNotice('Not enough credits!');
+                                  return;
+                                }
+                                // Atomic operation: update both rifles and credits
+                                const newRifles = [...selectedRifles, pendingRifle];
+                                setSelectedRifles(newRifles);
+
+                                if (sheet) {
+                                  const updatedSheet = { 
+                                    ...sheet, 
+                                    rifles: newRifles,
+                                    credits: credits - cost
+                                  };
+                                  saveCharacterSheet(updatedSheet);
+                                }
+                                
+                                // Update the LevelUp component's credits state (no auto-save)
+                                onCreditsChange?.(-cost);
+                                setPendingRifle("");
+                              }}
+                            >Buy</button>
+                            <button
+                              style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #28a745', background: '#28a745', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}
+                              onClick={() => {
+                                const newRifles = [...selectedRifles, pendingRifle];
+                                setSelectedRifles(newRifles);
+
+                                if (sheet) {
+                                  const updatedSheet = { 
+                                    ...sheet, 
+                                    rifles: newRifles,
+                                    credits: credits // Preserve current credits
+                                  };
+                                  saveCharacterSheet(updatedSheet);
+                                }
+                                
+                                setPendingRifle("");
+                              }}
+                            >Add</button>
+                            <button
+                              style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #aaa', background: '#eee', color: '#333', fontWeight: 'bold', cursor: 'pointer' }}
+                              onClick={() => setPendingRifle("")}
+                            >Cancel</button>
+                          </div>
+                        </div>
+                      )}
+                      <div style={{ marginTop: '2px' }}>
+                        {(selectedRifles && selectedRifles.length > 0) && (
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginLeft: '8px' }}>
+                            {selectedRifles.map((rifle, idx) => (
+                              <span key={rifle + idx + 'rifle'} style={{ fontStyle: 'italic', display: 'flex', alignItems: 'center', background: '#f5f5f5', borderRadius: '6px', padding: '2px 8px' }}>
+                                {rifle}
+                                <button
+                                  style={{ marginLeft: '6px', padding: '0 6px', borderRadius: '50%', border: 'none', background: '#d32f2f', color: 'white', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.9em' }}
+                                  title={`Remove ${rifle}`}
+                                  onClick={() => {
+                                    const newRifles = selectedRifles.filter((_, i) => i !== idx);
+                                    setSelectedRifles(newRifles);
+                                    if (sheet) {
+                                      const updatedSheet = { 
+                                        ...sheet, 
+                                        rifles: newRifles
+                                      };
+                                      saveCharacterSheet(updatedSheet);
+                                    }
+                                  }}
+                                >×</button>
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    {/* Dynamic Damage and Crit values */}
+                    {(() => {
+                      const damageDots = classCardDots[6]?.filter(Boolean).length || 0;
+                      const critDots = classCardDots[7]?.filter(Boolean).length || 0;
+                      const baseDamage = 1 + damageDots;
+                      const critThreshold = 18 - critDots;
+                      return (
+                        <div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+                            <span>
+                              <b><u>Range</u></b> 10hx
+                            </span>
+                            <span style={{ textAlign: 'right', minWidth: '80px' }}>
+                              <b><u>Crit</u></b> <b>[{critThreshold}]</b>+
+                            </span>
+                          </div>
+                          <b><u>Target</u></b> Single<br />
+                          <b><u>Damage</u></b> <b>[{baseDamage}]</b>d6 <br />
+                          <b><u>Crit Effect</u></b> <b>[{baseDamage}]</b>d6
+                        </div>
+                      );
+                    })()}
                   </div>
                   {/* XP progression table for Attack */}
                   <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px' }}>
@@ -587,8 +750,8 @@ const LevelUpClassCommander: React.FC<LevelUpClassCommanderProps> = ({
                   <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px' }}>
                     <div style={{
                       display: 'grid',
-                      gridTemplateColumns: '1fr 24px 24px',
-                      gridTemplateRows: 'repeat(3, auto)',
+                      gridTemplateColumns: '1fr 24px 24px 24px',
+                      gridTemplateRows: 'repeat(4, auto)',
                       columnGap: '6px',
                       rowGap: '2px',
                       alignItems: 'start',
@@ -600,6 +763,7 @@ const LevelUpClassCommander: React.FC<LevelUpClassCommanderProps> = ({
                       <span></span>
                       <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>6xp</span>
                       <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>10xp</span>
+                      <span></span>
                       {/* Row 2: +1 Damage die dots (interactive) */}
                       <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>+1 Damage die</span>
                       {[0,1].map(idx => {

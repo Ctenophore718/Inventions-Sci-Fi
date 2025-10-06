@@ -10,6 +10,13 @@ import { generateBlasterMasterJSX } from "../utils/grenadierFeature";
 import { generateBodySnatcherJSX } from "../utils/necroFeature";
 import { generateBackstabberJSX } from "../utils/poisonerFeature";
 import { generateFieldOfCoercionJSX } from "../utils/coerciveFeature";
+import { generateAuraOfLuckJSX } from "../utils/divinistFeature";
+import { generateBoughbenderJSX } from "../utils/naturalistFeature";
+import { generateNaturalistStrikeJSX } from "../utils/naturalistStrike";
+import { generateTechManipulationJSX } from "../utils/technologistFeature";
+import { generateForceFieldJSX } from "../utils/technologistTechnique";
+import { generateTechnologistStrikeJSX } from "../utils/technologistStrike";
+import { generateStaySharpJSX } from "../utils/commanderFeature";
 
 
 type Props = {
@@ -218,18 +225,7 @@ const CharacterSheet: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, on
       <b><i style={{ color: '#112972' }}>Subtle Magic.</i></b> Your <b><i><span style={{ color: '#990000' }}>Attacks</span></i></b> ignore <b>[{coderIgnore100 ? 100 : 50}]</b>% Cover and gain a +<b>[{coderCritBonus}]</b> Crit.
     </span>
   );
-  const commanderHx = charClass === "Commander" ? (sheet?.classCardDots?.[0]?.filter(Boolean).length ?? 0) : 0;
-  
-  let commanderIncludesAttacks = 0;
-  if (charClass === "Commander" && sheet?.classCardDots?.[1]) {
-    commanderIncludesAttacks = sheet.classCardDots[1].filter(Boolean).length;
-  }
-  const commanderIncludesAttacksDot = charClass === "Commander" && sheet?.classCardDots?.[1]?.[0];
-  const commanderFeatureJSX = (
-    <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#717211' }}>Stay Sharp.</i></b> At the beginning of the round, you and allies within <b>[{3 + commanderHx}]</b>hx of you can remove an additional <i>Cooldown Token</i> from one <i>inactive</i> <b><i><span style={{ color: '#bf9000' }}>Technique</span></i></b> or <b>[{commanderIncludesAttacksDot ? <i style={{ fontWeight: 'bold', color: '#990000' }}>Attacks</i> : " - "}]</b> of their choice.
-    </span>
-  );
+  const commanderFeatureJSX = generateStaySharpJSX(sheet?.classCardDots);
   const contemplativeFeatureJSX = (
     <span style={{ color: '#000', fontWeight: 400 }}>
       <b><i style={{ color: '#116372' }}>Psychosomatic Harmony.</i></b> You are <b>[resistant]</b> to <b><u style={{ color: '#a929ff', display: 'inline-flex', alignItems: 'center' }}>
@@ -724,23 +720,19 @@ const CharacterSheet: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, on
   // Add after coerciveFeatureJSX
   const divinistFeatureJSX = (
     <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#ff4343' }}>Aura of Luck.</i></b> You and allies within <b>[3]</b>hx of you can roll an additional +<b>[1]</b> Crit die and drop the lowest roll when making <b><i><span style={{ color: '#990000' }}>Attacks</span></i></b>.
+      {generateAuraOfLuckJSX({
+        divinistFeatureDots: sheet?.subclassProgressionDots?.divinistFeatureDots || [false, false, false],
+        divinistFeatureCritDots: sheet?.subclassProgressionDots?.divinistFeatureCritDots || [false, false, false],
+        divinistFeatureRangeDots: sheet?.subclassProgressionDots?.divinistFeatureRangeDots || [false, false, false],
+      })}
     </span>
   );
 
   // Add after divinistFeatureJSX
-  const naturalistFeatureJSX = (
-    <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#66cf00' }}>Boughbender.</i></b> You and allies within <b>[5]</b>hx may ignore <i>Obstacles</i> and <i>Rough Terrain</i> when <b><i style={{ color: '#38761d' }}>Moving</i></b>. Additionally, enemies treat <i>Terrain</i> within <b>[5]</b>hx of you as <i>Rough Terrain</i>.
-    </span>
-  );
+  const naturalistFeatureJSX = generateBoughbenderJSX(sheet);
 
   // Add after naturalistFeatureJSX
-  const technologistFeatureJSX = (
-    <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#8c43ff' }}>Tech Manipulation.</i></b> Enemies within <b>[5]</b>hx of you cannot Crit on <b><i><span style={{ color: '#990000' }}>Attacks</span></i></b>. In addition, when you or an ally within <b>[5]</b>hx of you removes a <i>Cooldown Token</i> from an <i>Item</i>, they can remove one additional <i>Cooldown Token</i>.
-    </span>
-  );
+  const technologistFeatureJSX = generateTechManipulationJSX(sheet);
 
   // Add after technologistFeatureJSX
   const beguilerFeatureJSX = (
@@ -1192,6 +1184,14 @@ const CharacterSheet: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, on
       );
     }
     
+    // Add Rifles for Commander class
+    if (charClass === 'Commander') {
+      attacks.push(
+        { name: 'Plasma Rifle', type: 'Rifle', cost: 150 },
+        { name: 'Sapper Gun', type: 'Rifle', cost: 150 }
+      );
+    }
+    
     return attacks;
   };
 
@@ -1274,6 +1274,13 @@ const CharacterSheet: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, on
           superSerums: newSuperSerums,
           credits: credits - cost
         };
+      } else if (type === 'Rifle') {
+        const newRifles = [...(sheet.rifles || []), attackName];
+        updatedSheet = { 
+          ...sheet, 
+          rifles: newRifles,
+          credits: credits - cost
+        };        
       } else {
         return;
       }
@@ -1303,6 +1310,12 @@ const CharacterSheet: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, on
         updatedSheet = { 
           ...sheet, 
           superSerums: newSuperSerums
+        };
+      } else if (type === 'Rifle') {
+        const newRifles = [...(sheet.rifles || []), attackName];
+        updatedSheet = { 
+          ...sheet, 
+          rifles: newRifles
         };
       } else {
         return;
@@ -1449,8 +1462,17 @@ const CharacterSheet: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, on
                                           (charClass === "Gunslinger" && skill === "Deception") ||
                                           (charClass === "Technician" && skill === "Technology");
                     
+                    // Check for subclass boosters
+                    const hasSubclassBooster = (subclass === "Anatomist" && skill === "Medicine") ||
+                                             (subclass === "Grenadier" && skill === "Intimidation") ||
+                                             (subclass === "Necro" && skill === "Survival") ||
+                                             (subclass === "Poisoner" && skill === "Thievery") ||
+                                             (subclass === "Coercive" && skill === "Deception") ||
+                                             (subclass === "Divinist" && skill === "Investigation") ||
+                                             (subclass === "Naturalist" && skill === "Survival");
+                    
                     // New characters default to 18+ (first two columns), but class boosters add a third column (16+)
-                    value = hasClassBooster ? "16+" : "18+";
+                    value = (hasClassBooster || hasSubclassBooster) ? "16+" : "18+";
                   } else {
                     // For existing characters, find the rightmost selected dot
                     let idx = dots.lastIndexOf(true);
@@ -1466,8 +1488,17 @@ const CharacterSheet: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, on
                                           (charClass === "Gunslinger" && skill === "Deception") ||
                                           (charClass === "Technician" && skill === "Technology");
                     
+                    // Check for subclass boosters
+                    const hasSubclassBooster = (subclass === "Anatomist" && skill === "Medicine") ||
+                                             (subclass === "Grenadier" && skill === "Intimidation") ||
+                                             (subclass === "Necro" && skill === "Survival") ||
+                                             (subclass === "Poisoner" && skill === "Thievery") ||
+                                             (subclass === "Coercive" && skill === "Deception") ||
+                                             (subclass === "Divinist" && skill === "Investigation") ||
+                                             (subclass === "Naturalist" && skill === "Survival");
+                    
                     // If class booster exists and we have at least the first two dots, ensure minimum of index 2 (16+)
-                    if (hasClassBooster && idx >= 1) {
+                    if ((hasClassBooster || hasSubclassBooster) && idx >= 1) {
                       idx = Math.max(idx, 2);
                     }
                     
@@ -2153,6 +2184,18 @@ const CharacterSheet: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, on
                   </span>
                 );
               })()
+            ) : subclass === 'Naturalist' ? (
+              generateNaturalistStrikeJSX(sheet)
+            ) : subclass === 'Technologist' ? (
+              generateTechnologistStrikeJSX(sheet)
+            ) : subclass === 'Divinist' ? (
+              <span style={{ fontWeight: 'normal', fontFamily: 'inherit', color: '#000', marginLeft: 4, display: 'flex', alignItems: 'center' }}>
+                1d6&nbsp;
+                <span style={{ color: '#a929ff', textDecoration: 'underline', fontWeight: 'bold', fontFamily: 'inherit', display: 'inline-flex', alignItems: 'center' }}>
+                  Neural
+                  <img src="/Neural.png" alt="Neural" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+                </span>
+              </span>
             ) : subclass === 'Coercive' ? (
               <span style={{ fontWeight: 'normal', fontFamily: 'inherit', color: '#000', marginLeft: 4, display: 'flex', alignItems: 'center' }}>
                 1d6&nbsp;
@@ -2168,13 +2211,19 @@ const CharacterSheet: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, on
               Strike Effects {
                 charClass === 'Contemplative' && sheet?.classCardDots?.[2]?.[0]
                   ? <span style={{ color: '#000', fontWeight: 'normal' }}>Can <span style={{ color: '#351c75' }}><b><i>Strike</i></b></span> a single target multiple times</span>
+                  : (subclass === 'Naturalist' && sheet?.subclassProgressionDots?.naturalistStrikeDrainDots?.[0])
+                    ? <span style={{ color: '#000', fontWeight: 'normal' }}><b><i>Drain</i></b></span>
+                  : (subclass === 'Technologist' && sheet?.subclassProgressionDots?.technologistStrikeRestrainDots?.[0])
+                    ? <span style={{ color: '#000', fontWeight: 'normal' }}><b><i>Restrain</i></b></span>
+                  : (subclass === 'Divinist' && sheet?.subclassProgressionDots?.divinistStrikeCritDots?.[0])
+                    ? <span style={{ color: '#000', fontWeight: 'normal' }}>+2 Crit on next <span style={{ color: '#990000' }}><b><i>Attack</i></b></span></span>
                   : (subclass === 'Anatomist' && sheet?.subclassProgressionDots?.anatomistStrikeDots?.[0])
                     ? <span style={{ color: '#000', fontWeight: 'normal' }}>Can choose to heal <span style={{ color: '#351c75' }}><b><i>Strike</i></b></span> amount</span>
-                    : (subclass === 'Grenadier' && sheet?.subclassProgressionDots?.grenadierStrikeDots?.filter(Boolean).length > 0)
-                      ? <span style={{ color: '#000', fontWeight: 'normal' }}><b>[{sheet?.subclassProgressionDots?.grenadierStrikeDots?.filter(Boolean).length}]</b>hx-radius <i>AoE</i></span>
-                      : (subclass === 'Coercive' && sheet?.subclassProgressionDots?.coerciveStrikeMesmerizeDots?.[0])
-                        ? <span style={{ color: '#000', fontWeight: 'normal' }}><b><i>Mesmerize</i></b></span>
-                        : strikeEffects
+                  : (subclass === 'Grenadier' && sheet?.subclassProgressionDots?.grenadierStrikeDots?.filter(Boolean).length > 0)
+                    ? <span style={{ color: '#000', fontWeight: 'normal' }}><b>[{sheet?.subclassProgressionDots?.grenadierStrikeDots?.filter(Boolean).length}]</b>hx-radius <i>AoE</i></span>
+                  : (subclass === 'Coercive' && sheet?.subclassProgressionDots?.coerciveStrikeMesmerizeDots?.[0])
+                    ? <span style={{ color: '#000', fontWeight: 'normal' }}><b><i>Mesmerize</i></b></span>
+                  : strikeEffects
               }
           </div>
         </div>
@@ -2374,6 +2423,27 @@ const CharacterSheet: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, on
               </span>
             </div>
           )}
+          {subclass === 'Divinist' && sheet?.subclassProgressionDots?.divinistPerksSkillsDots?.[0] && (
+            <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <span>
+                <b><i style={{ color: '#ff4343' }}>Sooth Seer.</i></b> <span style={{ color: '#000' }}>You have the uncanny ability to read someone's intentions despite their words and predict someone's next move outside of combat. Gain an advantage on any related skill roll.</span>
+              </span>
+            </div>
+          )}
+          {subclass === 'Naturalist' && sheet?.subclassProgressionDots?.naturalistPerksSkillsDots?.[0] && (
+            <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <span>
+                <b><i style={{ color: '#66cf00' }}>Nature's Advocate.</i></b> <span style={{ color: '#000' }}>You understand the natural workings of plants and animals at a fundamental level. Gain an advantage on skill rolls when interacting with or learning from plants, animals or other natural sources.</span>
+              </span>
+            </div>
+          )}
+          {subclass === 'Technologist' && sheet?.subclassProgressionDots?.technologistPerksSkillsDots?.[0] && (
+            <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <span>
+                <b><i style={{ color: '#8c43ff' }}>Mechanical Understanding.</i></b> <span style={{ color: '#000' }}>You grasp mechanical and technological concepts with an unmatched understanding. Gain an advantage on rolls when dealing with machines or other technology.</span>
+              </span>
+            </div>
+          )}
         </div>
       </div>
 
@@ -2401,10 +2471,10 @@ const CharacterSheet: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, on
                     textAlign: 'left',
                     minWidth: '180px'
                   }}
-                  value={pendingAttack || (charClass === 'Chemist' ? 'Dart Guns' : charClass === 'Coder' ? 'Lenses' : 'Select Primary Attack')}
+                  value={pendingAttack || (charClass === 'Chemist' ? 'Dart Guns' : charClass === 'Coder' ? 'Lenses' : charClass === 'Commander' ? 'Rifles' : 'Select Primary Attack')}
                   onChange={(e) => {
                     const value = e.target.value;
-                    if (value !== 'Dart Guns' && value !== 'Lenses' && value !== 'Select Primary Attack') {
+                    if (value !== 'Dart Guns' && value !== 'Lenses' && value !== 'Rifles' && value !== 'Select Primary Attack') {
                       setPendingAttack(value);
                     }
                   }}
@@ -2425,7 +2495,14 @@ const CharacterSheet: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, on
                       <option style={{ fontWeight: 'bold' }}>Time Stutter</option>
                     </>
                   )}
-                  {charClass !== 'Chemist' && charClass !== 'Coder' && (
+                  {charClass === 'Commander' && (
+                    <>
+                      <option disabled style={{ fontWeight: 'bold' }}>Rifles</option>
+                      <option style={{ fontWeight: 'bold' }}>Plasma Rifle</option>
+                      <option style={{ fontWeight: 'bold' }}>Sapper Gun</option>
+                    </>
+                  )}
+                  {charClass !== 'Chemist' && charClass !== 'Coder' && charClass !== 'Commander' && (
                     <option disabled style={{ fontWeight: 'bold' }}>Select Primary Attack</option>
                   )}
                 </select>
@@ -2512,6 +2589,29 @@ const CharacterSheet: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, on
                                 const updatedSheet = { 
                                   ...sheet, 
                                   lenses: newLenses
+                                };
+                                handleAutoSave(updatedSheet);
+                              }
+                            }}
+                          >×</button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  {(sheet?.rifles && sheet.rifles.length > 0) && (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginLeft: '8px' }}>
+                      {sheet?.rifles?.map((rifle, idx) => (
+                        <span key={rifle + idx + 'rifle'} style={{ fontStyle: 'italic', display: 'flex', alignItems: 'center', background: '#f5f5f5', borderRadius: '6px', padding: '2px 8px' }}>
+                          {rifle}
+                          <button
+                            style={{ marginLeft: '6px', padding: '0 6px', borderRadius: '50%', border: 'none', background: '#d32f2f', color: 'white', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.9em' }}
+                            title={`Remove ${rifle}`}
+                            onClick={() => {
+                              if (sheet) {
+                                const newRifles = sheet.rifles?.filter((_, i) => i !== idx) || [];
+                                const updatedSheet = { 
+                                  ...sheet, 
+                                  rifles: newRifles
                                 };
                                 handleAutoSave(updatedSheet);
                               }

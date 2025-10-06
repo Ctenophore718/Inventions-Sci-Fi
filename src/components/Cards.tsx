@@ -9,8 +9,13 @@ import { generateGraspOfTheGraveJSX, calculateNecroTechniqueData } from "../util
 import { generateToxicTakedownJSX } from "../utils/poisonerTechnique";
 import { generateReflectionScriptDescriptionJSX } from "../utils/coderTechnique";
 import { generateEnemiesOnAllSidesCardJSX } from "../utils/coerciveTechnique";
+import { generateFateReaderJSX } from "../utils/divinistTechnique";
+import { generateBedOfRejuvenationCardJSX } from "../utils/naturalistTechnique";
+import { generateForceFieldCardJSX } from "../utils/technologistTechnique";
+import { generateCombatDelegationCardJSX } from "../utils/commanderTechnique";
 import { CardsChemistAttacks } from "./CardsChemistAttacks";
 import { CardsCoderAttacks } from "./CardsCoderAttacks";
+import { CardsCommanderAttacks } from "./CardsCommanderAttacks";
 import { calculateChemistFeatureData } from "../utils/chemistFeature";
 
 type CardsProps = {
@@ -19,9 +24,10 @@ type CardsProps = {
   onLevelUp: () => void;
   onHome: () => void;
   charClass: string;
+  subclass: string;
 };
 
-const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charClass }) => {
+const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charClass, subclass }) => {
   const [localSheet, setLocalSheet] = React.useState<CharacterSheet | null>(sheet);
   const [isNavExpanded, setIsNavExpanded] = React.useState(false);
   const [isXpSpMenuExpanded, setIsXpSpMenuExpanded] = React.useState(false);
@@ -525,26 +531,11 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
                     <div style={{ display: 'flex', alignItems: 'flex-start', flexWrap: 'wrap' }}>
                       {generateReflectionScriptDescriptionJSX(localSheet?.classCardDots)}
                     </div>
-                  ) : charClass === 'Commander' ? (() => {
-                    // Commander: +1hx dots for Combat Delegation are in classCardDots[3], +1 ally dots are in classCardDots[4]
-                    let hx = 5;
-                    let allies = 1;
-                    if (localSheet && Array.isArray(localSheet.classCardDots)) {
-                      if (Array.isArray(localSheet.classCardDots[3])) {
-                        const selectedHx = localSheet.classCardDots[3].filter(Boolean).length;
-                        hx = 5 + selectedHx;
-                      }
-                      if (Array.isArray(localSheet.classCardDots[4])) {
-                        const selectedAllies = localSheet.classCardDots[4].filter(Boolean).length;
-                        allies = 1 + selectedAllies;
-                      }
-                    }
-                    return (
-                      <>
-                        <b>[{allies}]</b> ally(s) within <b>[{hx}]</b>hx that can see and/or hear you gains an extra <i>Action</i>.
-                      </>
-                    );
-                  })() : charClass === 'Contemplative' ? (
+                  ) : charClass === 'Commander' ? (
+                    <div style={{ display: 'flex', alignItems: 'flex-start', flexWrap: 'wrap' }}>
+                      {generateCombatDelegationCardJSX(localSheet?.classCardDots)}
+                    </div>
+                  ) : charClass === 'Contemplative' ? (
                     (() => {
                       let hx = 3;
                       if (localSheet && Array.isArray(localSheet.classCardDots) && Array.isArray(localSheet.classCardDots[3])) {
@@ -623,7 +614,7 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
                 : charClass === 'Coder' ?
                 (<span>“Although it’s a universal script, the math behind reflecting energetic material is quite complex.”<br />--Luminova, X-Ray Naturalist</span>)
                 : charClass === 'Commander' ? (
-                  <span>“...That's 'cause I got people with me, people who trust each other, who do for each other and ain't always looking for the advantage.” --Mal, Human Captain of Serenity</span>
+                  <span style={{ fontSize: '0.89em' }}>“...That's 'cause I got people with me, people who trust each other, who do for each other and ain't always looking for the advantage.” --Mal, Human Captain of Serenity</span>
                 ) : charClass === 'Contemplative' ? (
                   <span>“One must always be responsive at a moment’s notice to fight not only another day, but another instant.” --Master Li Ren, Felid Contemplative</span>
                 ) : charClass === 'Elementalist' ? (
@@ -670,7 +661,7 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
                 fontFamily: 'Arial, Helvetica, sans-serif',
                 fontWeight: 'bold',
                 fontSize: 'clamp(0.8em, 4vw, 1.25em)',
-                color: localSheet?.subclass === 'Anatomist' ? '#66cf00' : localSheet?.subclass === 'Grenadier' ? '#cf0000' : localSheet?.subclass === 'Necro' ? '#0033cf' : localSheet?.subclass === 'Poisoner' ? '#cf7600' : localSheet?.subclass === 'Coercive' ? '#43c9ff' : 'black',
+                color: localSheet?.subclass === 'Anatomist' ? '#66cf00' : localSheet?.subclass === 'Grenadier' ? '#cf0000' : localSheet?.subclass === 'Necro' ? '#0033cf' : localSheet?.subclass === 'Poisoner' ? '#cf7600' : localSheet?.subclass === 'Coercive' ? '#43c9ff' : localSheet?.subclass === 'Divinist' ? '#ff4343' : localSheet?.subclass === 'Naturalist' ? '#66cf00' : localSheet?.subclass === 'Technologist' ? '#8c43ff' : 'black',
                 lineHeight: 1,
                 textAlign: 'left',
                 whiteSpace: 'nowrap',
@@ -679,13 +670,13 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
                 flexShrink: 1,
                 marginRight: '5px'
               }}>
-                {localSheet?.subclass === 'Anatomist' ? 'The "Good Stuff"' : localSheet?.subclass === 'Grenadier' ? 'The "Big One"' : localSheet?.subclass === 'Necro' ? 'Grasp of the Grave' : localSheet?.subclass === 'Poisoner' ? 'Toxic Takedown' : localSheet?.subclass === 'Coercive' ? 'Enemies On All Sides' : 'Subclass Card Name'}
+                {localSheet?.subclass === 'Anatomist' ? 'The "Good Stuff"' : localSheet?.subclass === 'Grenadier' ? 'The "Big One"' : localSheet?.subclass === 'Necro' ? 'Grasp of the Grave' : localSheet?.subclass === 'Poisoner' ? 'Toxic Takedown' : localSheet?.subclass === 'Coercive' ? 'Enemies On All Sides' : localSheet?.subclass === 'Divinist' ? 'Fate Reader' : localSheet?.subclass === 'Naturalist' ? 'Bed of Rejuvenation' : localSheet?.subclass === 'Technologist' ? 'Force Field' : 'Subclass Card Name'}
               </span>
               <span style={{
                 fontFamily: 'Arial, Helvetica, sans-serif',
                 fontStyle: 'italic',
                 fontSize: '0.75em',
-                color: localSheet?.subclass === 'Anatomist' ? '#66cf00' : localSheet?.subclass === 'Grenadier' ? '#cf0000' : localSheet?.subclass === 'Necro' ? '#0033cf' : localSheet?.subclass === 'Poisoner' ? '#cf7600' : localSheet?.subclass === 'Coercive' ? '#43c9ff' : 'black',
+                color: localSheet?.subclass === 'Anatomist' ? '#66cf00' : localSheet?.subclass === 'Grenadier' ? '#cf0000' : localSheet?.subclass === 'Necro' ? '#0033cf' : localSheet?.subclass === 'Poisoner' ? '#cf7600' : localSheet?.subclass === 'Coercive' ? '#43c9ff' : localSheet?.subclass === 'Divinist' ? '#ff4343' : localSheet?.subclass === 'Naturalist' ? '#66cf00' : localSheet?.subclass === 'Technologist' ? '#8c43ff' : 'black',
                 lineHeight: 1,
                 whiteSpace: 'normal',
                 wordBreak: 'keep-all',
@@ -693,11 +684,11 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
                 maxWidth: '72px',
                 display: 'inline-block',
                 textAlign: 'right'
-              }}>{localSheet?.subclass === 'Anatomist' ? 'Anatomist' : localSheet?.subclass === 'Grenadier' ? 'Grenadier' : localSheet?.subclass === 'Necro' ? 'Necro' : localSheet?.subclass === 'Poisoner' ? 'Poisoner' : localSheet?.subclass === 'Coercive' ? 'Coercive' : 'Subclass'}</span>
+              }}>{localSheet?.subclass === 'Anatomist' ? 'Anatomist' : localSheet?.subclass === 'Grenadier' ? 'Grenadier' : localSheet?.subclass === 'Necro' ? 'Necro' : localSheet?.subclass === 'Poisoner' ? 'Poisoner' : localSheet?.subclass === 'Coercive' ? 'Coercive' : localSheet?.subclass === 'Divinist' ? 'Divinist' : localSheet?.subclass === 'Naturalist' ? 'Naturalist' : localSheet?.subclass === 'Technologist' ? 'Technologist' : 'Subclass'}</span>
             </div>
             <img 
-              src={localSheet?.subclass === 'Anatomist' ? "/The Good Stuff.png" : localSheet?.subclass === 'Grenadier' ? "/The Big One.png" : localSheet?.subclass === 'Necro' ? "/Grasp of the Grave.png" : localSheet?.subclass === 'Poisoner' ? "/Toxic Takedown.png" : localSheet?.subclass === 'Coercive' ? "/Enemies On All Sides.png" : "/Blank Card.png"}
-              alt={localSheet?.subclass === 'Anatomist' ? "The Good Stuff" : localSheet?.subclass === 'Grenadier' ? "The Big One" : localSheet?.subclass === 'Necro' ? "Grasp of the Grave" : localSheet?.subclass === 'Poisoner' ? "Toxic Takedown" : localSheet?.subclass === 'Coercive' ? "Enemies On All Sides" : "Blank Card"}
+              src={localSheet?.subclass === 'Anatomist' ? "/The Good Stuff.png" : localSheet?.subclass === 'Grenadier' ? "/The Big One.png" : localSheet?.subclass === 'Necro' ? "/Grasp of the Grave.png" : localSheet?.subclass === 'Poisoner' ? "/Toxic Takedown.png" : localSheet?.subclass === 'Coercive' ? "/Enemies On All Sides.png" : localSheet?.subclass === 'Divinist' ? "/Fate Reader.png" : localSheet?.subclass === 'Naturalist' ? "/Bed of Rejuvenation.png" : localSheet?.subclass === 'Technologist' ? "/Force Field.png" : "/Blank Card.png"}
+              alt={localSheet?.subclass === 'Anatomist' ? "The Good Stuff" : localSheet?.subclass === 'Grenadier' ? "The Big One" : localSheet?.subclass === 'Necro' ? "Grasp of the Grave" : localSheet?.subclass === 'Poisoner' ? "Toxic Takedown" : localSheet?.subclass === 'Coercive' ? "Enemies On All Sides" : localSheet?.subclass === 'Divinist' ? "Fate Reader" : localSheet?.subclass === 'Naturalist' ? "Bed of Rejuvenation" : localSheet?.subclass === 'Technologist' ? "Force Field" : "Blank Card"}
               style={{
                 position: 'absolute',
                 top: 35,
@@ -737,6 +728,12 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
                   ? <>Cooldown <span style={{ fontWeight: 'bold', fontStyle: 'normal' }}>[{4 - (localSheet?.subclassProgressionDots?.poisonerTechniqueCooldownDots?.filter(Boolean).length || 0)}]</span></>
                   : localSheet?.subclass === 'Coercive'
                   ? <>Cooldown <span style={{ fontWeight: 'bold', fontStyle: 'normal' }}>[{4 - (localSheet?.subclassProgressionDots?.coerciveTechniqueCooldownDots?.filter(Boolean).length || 0)}]</span></>
+                  : localSheet?.subclass === 'Divinist'
+                  ? <>Cooldown <span style={{ fontWeight: 'bold', fontStyle: 'normal' }}>[{4 - ((localSheet?.subclassProgressionDots as any)?.divinistTechniqueCooldownDots?.filter(Boolean).length || 0)}]</span></>
+                  : localSheet?.subclass === 'Naturalist'
+                  ? <>Cooldown <span style={{ fontWeight: 'bold', fontStyle: 'normal' }}>[{4 - ((localSheet?.subclassProgressionDots as any)?.naturalistTechniqueCooldownDots?.filter(Boolean).length || 0)}]</span></>
+                  : localSheet?.subclass === 'Technologist'
+                  ? <>Cooldown <span style={{ fontWeight: 'bold', fontStyle: 'normal' }}>[{3 - ((localSheet?.subclassProgressionDots as any)?.technologistTechniqueCooldownDots?.filter(Boolean).length || 0)}]</span></>
                   : <>Cooldown <span style={{ fontWeight: 'bold', fontStyle: 'normal' }}>[{localSheet?.subclass === 'Anatomist' ? calculateAnatomistTechniqueData(localSheet?.subclassProgressionDots).cooldown : '#'}]</span></>}
               </span>
             </div>
@@ -788,6 +785,16 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
                     })
                   : localSheet?.subclass === 'Coercive'
                   ? generateEnemiesOnAllSidesCardJSX(localSheet)
+                  : localSheet?.subclass === 'Divinist'
+                  ? generateFateReaderJSX({
+                      divinistTechniqueDots: (localSheet?.subclassProgressionDots as any)?.divinistTechniqueDots || [false, false, false],
+                      divinistTechniqueCoverDots: (localSheet?.subclassProgressionDots as any)?.divinistTechniqueCoverDots || [false],
+                      divinistTechniqueCooldownDots: (localSheet?.subclassProgressionDots as any)?.divinistTechniqueCooldownDots || [false, false]
+                    })
+                  : localSheet?.subclass === 'Naturalist'
+                  ? generateBedOfRejuvenationCardJSX(localSheet)
+                  : localSheet?.subclass === 'Technologist'
+                  ? generateForceFieldCardJSX(localSheet)
                   : 'Card stats.'}
               </div>
             </div>
@@ -800,7 +807,7 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
               color: '#000',
               fontFamily: 'Arial, Helvetica, sans-serif',
               fontStyle: 'italic',
-              fontSize: localSheet?.subclass === 'Grenadier' ? '0.69em' : localSheet?.subclass === 'Anatomist' ? '0.69em' : localSheet?.subclass === 'Necro' ? '0.69em' : localSheet?.subclass === 'Poisoner' ? '0.69em' : localSheet?.subclass === 'Coercive' ? '0.69em' : '0.70em',
+              fontSize: localSheet?.subclass === 'Grenadier' ? '0.69em' : localSheet?.subclass === 'Anatomist' ? '0.69em' : localSheet?.subclass === 'Necro' ? '0.69em' : localSheet?.subclass === 'Poisoner' ? '0.69em' : localSheet?.subclass === 'Coercive' ? '0.69em' : localSheet?.subclass === 'Divinist' ? '0.69em' : localSheet?.subclass === 'Naturalist' ? '0.69em' : localSheet?.subclass === 'Technologist' ? '0.69em' : '0.70em',
               fontWeight: 400,
               zIndex: 3,
               textAlign: 'left'
@@ -815,6 +822,12 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
                 ? '"Others might wear white coats and work in a lab, while my day-to-day is finding your weak spot and pressing where it hurts." --Tox, Nocturne Poisoner'
                 : localSheet?.subclass === 'Coercive'
                 ? '"Pure panic shall invade your mind, so much so that you won\'t be able to trust anyone anymore, not even yourself." --Limbus Navitron, Lumenaren Coercive'
+                : localSheet?.subclass === 'Divinist'
+                ? 'Though luck has its role in determining the future, once you can read fate, luck quickly withers away.'
+                : localSheet?.subclass === 'Naturalist'
+                ? '"True, the base code of nature is mathematical, but it\'s also much, much more than that." --Yenevieve Softwind, Wandering Naturalist'
+                : localSheet?.subclass === 'Technologist'
+                ? '"Some use high-tech armor to defend against an attack. I use Oikomagic code to reflect back that attack fourfold." --Zin, Human Technologist'
                 : 'Flavor text.'}
             </div>
         </div>
@@ -1094,7 +1107,10 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
         {charClass === 'Chemist' && <CardsChemistAttacks sheet={localSheet} />}
         
         {/* Coder Attack Cards */}
-        {charClass === 'Coder' && <CardsCoderAttacks sheet={localSheet} />}
+        {charClass === 'Coder' && <CardsCoderAttacks sheet={localSheet} subclass={subclass} />}
+
+        {/* Commander Attack Cards */}
+        {charClass === 'Commander' && <CardsCommanderAttacks sheet={localSheet} subclass={subclass} />}
 
       </div>
       

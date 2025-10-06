@@ -1,7 +1,12 @@
 import React, { useState } from "react";
 import type { CharacterSheet } from "../types/CharacterSheet";
+import { saveCharacterSheet } from "../utils/storage";
 import { generateFieldOfCoercionJSX } from "../utils/coerciveFeature";
 import { generateEnemiesOnAllSidesJSX } from "../utils/coerciveTechnique";
+import { generateBoughbenderJSX } from "../utils/naturalistFeature";
+import { generateBedOfRejuvenationJSX } from "../utils/naturalistTechnique";
+import { generateTechManipulationJSX } from "../utils/technologistFeature";
+import { generateForceFieldJSX } from "../utils/technologistTechnique";
 
 type LevelUpSubclassesCoderProps = {
   sheet: CharacterSheet | null;
@@ -75,8 +80,58 @@ const LevelUpSubclassesCoder: React.FC<LevelUpSubclassesCoderProps> = ({
   const [divinistStrikeCritDots, setDivinistStrikeCritDots] = useState<boolean[]>(
     (sheet?.subclassProgressionDots as any)?.divinistStrikeCritDots || [false]
   );
-  const [divinistPerksSkillsDots, setDivinistPerksSkillsDots] = useState<boolean[]>(
+  // Only initialize from props on mount, not on every render
+  const [divinistPerksSkillsDots, setDivinistPerksSkillsDots] = useState<boolean[]>(() =>
     (sheet?.subclassProgressionDots as any)?.divinistPerksSkillsDots || [false]
+  );
+
+  // Independent state for Naturalist dots
+  const [naturalistFeatureDots, setNaturalistFeatureDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.naturalistFeatureDots || [false, false, false]
+  );
+  const [naturalistFeatureDangerousDots, setNaturalistFeatureDangerousDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.naturalistFeatureDangerousDots || [false]
+  );
+  const [naturalistTechniqueDots, setNaturalistTechniqueDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.naturalistTechniqueDots || [false, false, false]
+  );
+  const [naturalistTechniqueHitPointsDots, setNaturalistTechniqueHitPointsDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.naturalistTechniqueHitPointsDots || [false, false, false]
+  );
+  const [naturalistTechniqueCooldownDots, setNaturalistTechniqueCooldownDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.naturalistTechniqueCooldownDots || [false, false]
+  );
+  const [naturalistStrikeDrainDots, setNaturalistStrikeDrainDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.naturalistStrikeDrainDots || [false]
+  );
+  const [naturalistPerksSkillsDots, setNaturalistPerksSkillsDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.naturalistPerksSkillsDots || [false]
+  );
+
+  // Independent state for Technologist dots
+  const [technologistFeatureDots, setTechnologistFeatureDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.technologistFeatureDots || [false, false, false]
+  );
+  const [technologistTechniqueDots, setTechnologistTechniqueDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.technologistTechniqueDots || [false, false, false]
+  );
+  const [technologistTechniqueTargetDots, setTechnologistTechniqueTargetDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.technologistTechniqueTargetDots || [false, false, false]
+  );
+  const [technologistTechniqueReflectHalfDots, setTechnologistTechniqueReflectHalfDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.technologistTechniqueReflectHalfDots || [false]
+  );
+  const [technologistTechniqueReflectFullDots, setTechnologistTechniqueReflectFullDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.technologistTechniqueReflectFullDots || [false]
+  );
+  const [technologistTechniqueCooldownDots, setTechnologistTechniqueCooldownDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.technologistTechniqueCooldownDots || [false, false]
+  );
+  const [technologistStrikeRestrainDots, setTechnologistStrikeRestrainDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.technologistStrikeRestrainDots || [false]
+  );
+  const [technologistPerksSkillsDots, setTechnologistPerksSkillsDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.technologistPerksSkillsDots || [false]
   );
 
   // Helper function to handle XP dot clicking with sequential requirement
@@ -85,7 +140,7 @@ const LevelUpSubclassesCoder: React.FC<LevelUpSubclassesCoderProps> = ({
     setArray: React.Dispatch<React.SetStateAction<boolean[]>>, 
     index: number, 
     xpCosts: number[],
-    fieldName: string
+    dotType?: string
   ) => {
     const newArray = [...currentArray];
     const rightmostChecked = currentArray.lastIndexOf(true);
@@ -120,20 +175,20 @@ const LevelUpSubclassesCoder: React.FC<LevelUpSubclassesCoderProps> = ({
         return;
       }
       
+      // Update state first
       setArray(newArray);
       setXpSpent(Math.max(0, newXpSpent));
       
-      // Auto-save the updated progression dots
-      if (sheet && onAutoSave) {
-        const updatedSubclassProgressionDots = {
-          ...sheet.subclassProgressionDots,
-          [fieldName]: newArray
+      // Include progression dots in the XP change communication to prevent race conditions
+      if (dotType && onAutoSave) {
+        const progressionDots = {
+          ...sheet?.subclassProgressionDots,
+          [dotType]: newArray
         };
-        const fieldUpdates = {
-          subclassProgressionDots: updatedSubclassProgressionDots,
+        onAutoSave({
+          subclassProgressionDots: progressionDots,
           xpSpent: Math.max(0, newXpSpent)
-        };
-        onAutoSave(fieldUpdates);
+        });
       }
     }
   };
@@ -144,7 +199,7 @@ const LevelUpSubclassesCoder: React.FC<LevelUpSubclassesCoderProps> = ({
     setArray: React.Dispatch<React.SetStateAction<boolean[]>>, 
     index: number, 
     spCosts: number[],
-    fieldName: string
+    dotType?: string
   ) => {
     const newArray = [...currentArray];
     let spDelta = 0;
@@ -157,27 +212,26 @@ const LevelUpSubclassesCoder: React.FC<LevelUpSubclassesCoderProps> = ({
       spDelta -= spCosts[index] || 0;
     }
     
-    // Enforce SP cannot exceed total
     const newSpSpent = spSpent + spDelta;
     if (newSpSpent > spTotal) {
       setNotice("Not enough sp!");
       return;
     }
     
+    // Update state first
     setArray(newArray);
     setSpSpent(Math.max(0, newSpSpent));
     
-    // Auto-save the updated progression dots
-    if (sheet && onAutoSave) {
-      const updatedSubclassProgressionDots = {
-        ...sheet.subclassProgressionDots,
-        [fieldName]: newArray
+    // Include progression dots in the SP change communication to prevent race conditions
+    if (dotType && onAutoSave) {
+      const progressionDots = {
+        ...sheet?.subclassProgressionDots,
+        [dotType]: newArray
       };
-      const fieldUpdates = {
-        subclassProgressionDots: updatedSubclassProgressionDots,
+      onAutoSave({
+        subclassProgressionDots: progressionDots,
         spSpent: Math.max(0, newSpSpent)
-      };
-      onAutoSave(fieldUpdates);
+      });
     }
   };
 
@@ -362,7 +416,7 @@ const LevelUpSubclassesCoder: React.FC<LevelUpSubclassesCoderProps> = ({
           <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
             <div style={{ fontWeight: 'bold', color: '#351c75', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Strike</u></div>
             <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
-              <b><i style={{ color: '#351c75', fontSize: '1em' }}>Strike Damage.</i></b> 1d6 <b><u style={{ color: '#a929ff', display: 'inline-flex', alignItems: 'center' }}>
+              <b><i style={{ color: '#351c75', fontSize: '1em' }}>Strike</i> <i>Damage.</i></b> 1d6 <b><u style={{ color: '#a929ff', display: 'inline-flex', alignItems: 'center' }}>
               Neural<img src="/Neural.png" alt="Neural" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} />
               </u></b>{coerciveStrikeMesmerizeDots[0] ? <>, <b><i>Mesmerize</i></b></> : ''}.
             </div>
@@ -468,23 +522,23 @@ const LevelUpSubclassesCoder: React.FC<LevelUpSubclassesCoderProps> = ({
             <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32, fontFamily: 'Arial, Helvetica, sans-serif' }}>
               <div style={{ fontWeight: 'bold', color: '#0b5394', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Feature</u></div>
               <span style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
-                <b><i style={{ color: '#43c9ff', fontSize: '1em' }}>Aura of Luck.</i></b> You and allies within <u><b>3</b></u>hx of you can roll an additional <span style={{ color: '#990000', textDecoration: 'underline', fontWeight: 'bold', fontFamily: 'inherit', display: 'inline-flex', alignItems: 'center' }}>Crit<img src="/Crit.png" alt="Crit" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></span> die and drop the lowest roll when making <span style={{ color: '#990000' }}><b><i>Attacks</i></b></span>.
+                <b><i style={{ color: '#ff4343', fontSize: '1em' }}>Aura of Luck.</i></b> You and allies within <b>[{3 + divinistFeatureDots.filter(Boolean).length}]</b>hx of you can roll <b>[{1 + divinistFeatureCritDots.filter(Boolean).length}]</b> additional Crit dice and drop the lowest roll(s) when making <span style={{ color: '#990000' }}><b><i>Attacks</i></b></span>. Additionally, your <span style={{ color: '#990000' }}><b><i>Attacks</i></b></span> gain a +<b>[{0 + divinistFeatureRangeDots.filter(Boolean).length}]</b>hx Range.
               </span>
             </span>
           </div>
 
           {/* Feature XP progression table - First row */}
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr 24px 24px 24px',
-            gridTemplateRows: 'repeat(2, auto)',
-            columnGap: '6px',
-            rowGap: '2px',
-            alignItems: 'start',
-            marginBottom: '8px',
-            width: '100%',
-            paddingLeft: '4px'
-          }}>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 24px 24px 24px',
+              gridTemplateRows: 'repeat(2, auto)',
+              columnGap: '6px',
+              rowGap: '2px',
+              alignItems: 'start',
+              marginBottom: '2px',
+              width: '100%',
+              paddingLeft: '4px'
+            }}>
             {/* Row 1: XP header */}
             <span></span>
             <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>5xp</span>
@@ -529,7 +583,7 @@ const LevelUpSubclassesCoder: React.FC<LevelUpSubclassesCoderProps> = ({
             <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>8xp</span>
             <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>12xp</span>
             {/* Row 2: +1 Crit die dots */}
-            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1 <span style={{ color: '#990000', textDecoration: 'underline', fontWeight: 'bold', fontFamily: 'inherit', display: 'inline-flex', alignItems: 'center' }}>Crit<img src="/Crit.png" alt="Crit" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></span> die</span>
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1 Crit die</span>
             {[0,1,2].map(idx => (
               <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                 <span
@@ -557,6 +611,7 @@ const LevelUpSubclassesCoder: React.FC<LevelUpSubclassesCoderProps> = ({
             columnGap: '6px',
             rowGap: '2px',
             alignItems: 'start',
+            marginTop: '-6px',
             marginBottom: '2px',
             width: '100%',
             paddingLeft: '4px'
@@ -591,7 +646,7 @@ const LevelUpSubclassesCoder: React.FC<LevelUpSubclassesCoderProps> = ({
           <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
             <div style={{ fontWeight: 'bold', color: '#bf9000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Technique</u></div>
             <div style={{ color: '#000', fontWeight: 400, fontSize: '1em', marginBottom: '8px' }}>
-              <b><i style={{ color: '#bf9000', fontSize: '1em' }}>Fate Reader</i></b> (Cooldown <u><b>4</b></u>). Until the start of the next round, whenever a creature within <u><b>5</b></u>hx of you rolls a <span style={{ color: '#7030a0', textDecoration: 'underline', fontWeight: 'bold', fontFamily: 'inherit', display: 'inline-flex', alignItems: 'center' }}>Cover<img src="/Cover.png" alt="Cover" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></span> die, they roll an additional die and you choose which one to drop.
+              <b><i style={{ color: '#ff4343', fontSize: '1em' }}>Fate Reader</i></b> <i style={{ color: '#ff4343', fontSize: '1em' }}>(Cooldown <b style={{ color: '#000', fontStyle: 'normal' }}>[{4 - divinistTechniqueCooldownDots.filter(Boolean).length}]</b>).</i> Until the start of the next round, whenever a creature within <b>[{5 + divinistTechniqueDots.filter(Boolean).length}]</b>hx of you rolls a Cover die, they roll <b>[{1 + (divinistTechniqueCoverDots[0] ? 1 : 0)}]</b> additional die and you choose which <b>[{divinistTechniqueCoverDots[0] ? 'two' : 'one'}]</b> to drop.
             </div>
 
             {/* Technique XP progression table - First row */}
@@ -602,7 +657,7 @@ const LevelUpSubclassesCoder: React.FC<LevelUpSubclassesCoderProps> = ({
               columnGap: '6px',
               rowGap: '2px',
               alignItems: 'start',
-              marginBottom: '8px',
+              marginBottom: '2px',
               width: '100%',
               paddingLeft: '4px'
             }}>
@@ -650,7 +705,7 @@ const LevelUpSubclassesCoder: React.FC<LevelUpSubclassesCoderProps> = ({
               <span></span>
               <span></span>
               {/* Row 2: +1 Cover die, drop another */}
-              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1 <span style={{ color: '#7030a0', textDecoration: 'underline', fontWeight: 'bold', fontFamily: 'inherit', display: 'inline-flex', alignItems: 'center' }}>Cover<img src="/Cover.png" alt="Cover" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></span> die, drop another</span>
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1 Cover die, drop another</span>
               <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                 <span
                   onClick={() => handleDotClick(divinistTechniqueCoverDots, setDivinistTechniqueCoverDots, 0, [7], 'divinistTechniqueCoverDots')}
@@ -671,17 +726,18 @@ const LevelUpSubclassesCoder: React.FC<LevelUpSubclassesCoderProps> = ({
             </div>
 
             {/* Technique XP progression table - Third row */}
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: '1fr 24px 24px 24px',
-              gridTemplateRows: 'repeat(2, auto)',
-              columnGap: '6px',
-              rowGap: '2px',
-              alignItems: 'start',
-              marginBottom: '2px',
-              width: '100%',
-              paddingLeft: '4px'
-            }}>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 24px 24px 24px',
+            gridTemplateRows: 'repeat(2, auto)',
+            columnGap: '6px',
+            rowGap: '2px',
+            alignItems: 'start',
+            marginTop: '-6px',
+            marginBottom: '2px',
+            width: '100%',
+            paddingLeft: '4px'
+          }}>
               {/* Row 1: XP header */}
               <span></span>
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>3xp</span>
@@ -712,9 +768,11 @@ const LevelUpSubclassesCoder: React.FC<LevelUpSubclassesCoderProps> = ({
 
           {/* Strike Section */}
           <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
-            <div style={{ fontWeight: 'bold', color: '#0b5394', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Strike</u></div>
+            <div style={{ fontWeight: 'bold', color: '#351c75', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Strike</u></div>
             <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
-              <b><u>Strike Damage</u></b>. 1d6 <span style={{ color: '#a929ff', textDecoration: 'underline', fontWeight: 'bold', fontFamily: 'inherit', display: 'inline-flex', alignItems: 'center' }}>Neural<img src="/Neural.png" alt="Neural" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></span>.
+              <b><i style={{ color: '#351c75', fontSize: '1em' }}>Strike</i> <i>Damage.</i></b> 1d6 <b><u style={{ color: '#a929ff', display: 'inline-flex', alignItems: 'center' }}>
+              Neural<img src="/Neural.png" alt="Neural" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} />
+              </u></b>{divinistStrikeCritDots[0] ? <>, +2 Crit on next <span style={{ color: '#990000' }}><b><i>Attack</i></b></span></> : ''}.
             </div>
 
             {/* Strike XP progression table */}
@@ -735,7 +793,7 @@ const LevelUpSubclassesCoder: React.FC<LevelUpSubclassesCoderProps> = ({
               <span></span>
               <span></span>
               {/* Row 2: +2 Crit on next Attack */}
-              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+2 <span style={{ color: '#990000', textDecoration: 'underline', fontWeight: 'bold', fontFamily: 'inherit', display: 'inline-flex', alignItems: 'center' }}>Crit<img src="/Crit.png" alt="Crit" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></span> on next <span style={{ color: '#990000' }}><b><i>Attack</i></b></span></span>
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+2 Crit on next <span style={{ color: '#990000' }}><b><i>Attack</i></b></span></span>
               <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                 <span
                   onClick={() => handleDotClick(divinistStrikeCritDots, setDivinistStrikeCritDots, 0, [4], 'divinistStrikeCritDots')}
@@ -787,7 +845,7 @@ const LevelUpSubclassesCoder: React.FC<LevelUpSubclassesCoderProps> = ({
                   overflowWrap: 'break-word',
                   wordWrap: 'break-word'
                 }}>
-                  <b><i style={{ color: '#43c9ff', fontSize: '1em' }}>Sooth Seer.</i></b> You have the uncanny ability to read someone's intentions despite their words and predict someone's next move outside of combat. Gain an advantage on any related skill roll.
+                  <b><i style={{ color: '#ff4343', fontSize: '1em' }}>Sooth Seer.</i></b> You have the uncanny ability to read someone's intentions despite their words and predict someone's next move outside of combat. Gain an advantage on any related skill roll.
                 </div>
                 <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start' }}>
                   <span
@@ -799,6 +857,697 @@ const LevelUpSubclassesCoder: React.FC<LevelUpSubclassesCoderProps> = ({
                       borderRadius: '50%',
                       display: 'block',
                       background: divinistPerksSkillsDots[0] ? '#000' : '#fff',
+                      cursor: 'pointer',
+                      transition: 'background 0.2s'
+                    }}
+                  ></span>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {subclass === 'Naturalist' && (
+        <div style={{ width: '100%', marginTop: '1rem', textAlign: 'left', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
+          {/* Feature header */}
+          <div style={{ color: '#0b5394', fontWeight: 'bold', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '8px' }}>
+            <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <div style={{ fontWeight: 'bold', color: '#0b5394', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Feature</u></div>
+              <span style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
+                {generateBoughbenderJSX(sheet)}
+              </span>
+            </span>
+          </div>
+
+          {/* Feature XP progression table - First row */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 24px 24px 24px',
+            gridTemplateRows: 'repeat(2, auto)',
+            columnGap: '6px',
+            rowGap: '2px',
+            alignItems: 'start',
+            marginBottom: '8px',
+            width: '100%',
+            paddingLeft: '4px'
+          }}>
+            {/* Row 1: XP header */}
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>4xp</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>7xp</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>11xp</span>
+            {/* Row 2: +1hx dots */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1hx</span>
+            {[0,1,2].map(idx => (
+              <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <span
+                  onClick={() => handleDotClick(naturalistFeatureDots, setNaturalistFeatureDots, idx, [4, 7, 11], 'naturalistFeatureDots')}
+                  style={{
+                    width: '15px',
+                    height: '15px',
+                    border: '2px solid #000',
+                    borderRadius: '50%',
+                    display: 'block',
+                    background: naturalistFeatureDots[idx] ? '#000' : '#fff',
+                    cursor: (idx === 0 || naturalistFeatureDots.slice(0, idx).every(Boolean)) ? 'pointer' : 'not-allowed',
+                    transition: 'background 0.2s'
+                  }}
+                ></span>
+              </span>
+            ))}
+          </div>
+
+          {/* Feature XP progression table - Second row */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 24px 24px 24px',
+            gridTemplateRows: 'repeat(2, auto)',
+            columnGap: '6px',
+            rowGap: '2px',
+            alignItems: 'start',
+            marginTop: '-6px',
+            marginBottom: '2px',
+            width: '100%',
+            paddingLeft: '4px'
+          }}>
+            {/* Row 1: XP header */}
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>12xp</span>
+            <span></span>
+            <span></span>
+            {/* Row 2: Ignore Dangerous Terrain */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>Ignore Dangerous Terrain</span>
+            <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <span
+                onClick={() => handleDotClick(naturalistFeatureDangerousDots, setNaturalistFeatureDangerousDots, 0, [12], 'naturalistFeatureDangerousDots')}
+                style={{
+                  width: '15px',
+                  height: '15px',
+                  border: '2px solid #000',
+                  borderRadius: '50%',
+                  display: 'block',
+                  background: naturalistFeatureDangerousDots[0] ? '#000' : '#fff',
+                  cursor: 'pointer',
+                  transition: 'background 0.2s'
+                }}
+              ></span>
+            </span>
+            <span></span>
+            <span></span>
+          </div>
+
+          {/* Technique Section */}
+          <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <div style={{ fontWeight: 'bold', color: '#bf9000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Technique</u></div>
+            <div style={{ color: '#000', fontWeight: 400, fontSize: '1em', marginBottom: '8px' }}>
+              {generateBedOfRejuvenationJSX(sheet)}
+            </div>
+
+            {/* Technique XP progression table - First row */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 24px 24px 24px',
+              gridTemplateRows: 'repeat(2, auto)',
+              columnGap: '6px',
+              rowGap: '2px',
+              alignItems: 'start',
+              marginBottom: '2px',
+              width: '100%',
+              paddingLeft: '4px'
+            }}>
+              {/* Row 1: XP header */}
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>6xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>10xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>14xp</span>
+              {/* Row 2: +1hx dots */}
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1hx</span>
+              {[0,1,2].map(idx => (
+                <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                  <span
+                    onClick={() => handleDotClick(naturalistTechniqueDots, setNaturalistTechniqueDots, idx, [6, 10, 14], 'naturalistTechniqueDots')}
+                    style={{
+                      width: '15px',
+                      height: '15px',
+                      border: '2px solid #000',
+                      borderRadius: '50%',
+                      display: 'block',
+                      background: naturalistTechniqueDots[idx] ? '#000' : '#fff',
+                      cursor: (idx === 0 || naturalistTechniqueDots.slice(0, idx).every(Boolean)) ? 'pointer' : 'not-allowed',
+                      transition: 'background 0.2s'
+                    }}
+                  ></span>
+                </span>
+              ))}
+            </div>
+
+            {/* Technique XP progression table - Second row */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 24px 24px 24px',
+              gridTemplateRows: 'repeat(2, auto)',
+              columnGap: '6px',
+              rowGap: '2px',
+              alignItems: 'start',
+              marginBottom: '8px',
+              width: '100%',
+              paddingLeft: '4px'
+            }}>
+              {/* Row 1: XP header */}
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>4xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>8xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>12xp</span>
+              {/* Row 2: +1d6 Hit Points */}
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1d6 <b><i style={{ color: '#990000', fontSize: '1em' }}>Hit Points</i></b></span>
+              {[0,1,2].map(idx => (
+                <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                  <span
+                    onClick={() => handleDotClick(naturalistTechniqueHitPointsDots, setNaturalistTechniqueHitPointsDots, idx, [4, 8, 12], 'naturalistTechniqueHitPointsDots')}
+                    style={{
+                      width: '15px',
+                      height: '15px',
+                      border: '2px solid #000',
+                      borderRadius: '50%',
+                      display: 'block',
+                      background: naturalistTechniqueHitPointsDots[idx] ? '#000' : '#fff',
+                      cursor: (idx === 0 || naturalistTechniqueHitPointsDots.slice(0, idx).every(Boolean)) ? 'pointer' : 'not-allowed',
+                      transition: 'background 0.2s'
+                    }}
+                  ></span>
+                </span>
+              ))}
+            </div>
+
+            {/* Technique XP progression table - Third row */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 24px 24px 24px',
+              gridTemplateRows: 'repeat(2, auto)',
+              columnGap: '6px',
+              rowGap: '2px',
+              alignItems: 'start',
+              marginTop: '-6px',
+              marginBottom: '2px',
+              width: '100%',
+              paddingLeft: '4px'
+            }}>
+              {/* Row 1: XP header */}
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>4xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>7xp</span>
+              <span></span>
+              {/* Row 2: -1 Cooldown dots */}
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>-1 Cooldown</span>
+              {[0,1].map(idx => (
+                <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                  <span
+                    onClick={() => handleDotClick(naturalistTechniqueCooldownDots, setNaturalistTechniqueCooldownDots, idx, [4, 7], 'naturalistTechniqueCooldownDots')}
+                    style={{
+                      width: '15px',
+                      height: '15px',
+                      border: '2px solid #000',
+                      borderRadius: '50%',
+                      display: 'block',
+                      background: naturalistTechniqueCooldownDots[idx] ? '#000' : '#fff',
+                      cursor: (idx === 0 || naturalistTechniqueCooldownDots.slice(0, idx).every(Boolean)) ? 'pointer' : 'not-allowed',
+                      transition: 'background 0.2s'
+                    }}
+                  ></span>
+                </span>
+              ))}
+              <span></span>
+              <span></span>
+            </div>
+          </div>
+
+          {/* Strike Section */}
+          <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <div style={{ fontWeight: 'bold', color: '#351c75', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Strike</u></div>
+            <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <b><i style={{ color: '#351c75', fontSize: '1em' }}>Strike</i> <i>Damage.</i></b> 1d6 <b><u style={{ color: '#6aa84f', display: 'inline-flex', alignItems: 'center' }}>
+              Toxic<img src="/Toxic.png" alt="Toxic" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} />
+              </u></b>{naturalistStrikeDrainDots[0] ? <>, <b><i>Drain</i></b></> : ''}.
+            </div>
+
+            {/* Strike XP progression table */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 24px 24px 24px',
+              gridTemplateRows: 'repeat(2, auto)',
+              columnGap: '6px',
+              rowGap: '2px',
+              alignItems: 'start',
+              marginBottom: '2px',
+              width: '100%',
+              paddingLeft: '4px'
+            }}>
+              {/* Row 1: XP header */}
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>6xp</span>
+              <span></span>
+              <span></span>
+              {/* Row 2: Drain dot */}
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}><i><b>Drain</b></i></span>
+              <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <span
+                  onClick={() => handleDotClick(naturalistStrikeDrainDots, setNaturalistStrikeDrainDots, 0, [6], 'naturalistStrikeDrainDots')}
+                  style={{
+                    width: '15px',
+                    height: '15px',
+                    border: '2px solid #000',
+                    borderRadius: '50%',
+                    display: 'block',
+                    background: naturalistStrikeDrainDots[0] ? '#000' : '#fff',
+                    cursor: 'pointer',
+                    transition: 'background 0.2s'
+                  }}
+                ></span>
+              </span>
+              <span></span>
+              <span></span>
+            </div>
+          </div>
+
+          {/* Perks Section */}
+          <div style={{ marginTop: '12px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <div style={{ fontWeight: 'bold', color: '#000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Perks</u></div>
+            <div style={{ fontSize: '1em', color: '#000', marginBottom: '6px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <i><b>Skills.</b> Survival</i> +2
+            </div>
+            <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 24px',
+                gridTemplateRows: 'auto auto',
+                columnGap: '6px',
+                rowGap: '2px',
+                alignItems: 'start',
+                marginTop: '-12px',
+                width: '100%',
+                paddingLeft: '4px'
+              }}>
+                {/* Row 1: SP header */}
+                <span></span>
+                <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>8sp</span>
+                {/* Row 2: Nature's Advocate */}
+                <div style={{
+                  fontSize: '1em', 
+                  fontFamily: 'Arial, Helvetica, sans-serif', 
+                  textAlign: 'left', 
+                  paddingRight: '8px',
+                  maxWidth: '500px',
+                  overflowWrap: 'break-word',
+                  wordWrap: 'break-word'
+                }}>
+                  <b><i style={{ color: '#66cf00', fontSize: '1em' }}>Nature's Advocate.</i></b> You understand the natural workings of plants and animals at a fundamental level. Gain an advantage on skill rolls when interacting with or learning from plants, animals or other natural sources.
+                </div>
+                <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start' }}>
+                  <span
+                    onClick={() => handleSpDotClick(naturalistPerksSkillsDots, setNaturalistPerksSkillsDots, 0, [8], 'naturalistPerksSkillsDots')}
+                    style={{
+                      width: '15px',
+                      height: '15px',
+                      border: '2px solid #000',
+                      borderRadius: '50%',
+                      display: 'block',
+                      background: naturalistPerksSkillsDots[0] ? '#000' : '#fff',
+                      cursor: 'pointer',
+                      transition: 'background 0.2s'
+                    }}
+                  ></span>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {subclass === 'Technologist' && (
+        <div style={{ width: '100%', marginTop: '1rem', textAlign: 'left', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
+          {/* Feature header */}
+          <div style={{ color: '#0b5394', fontWeight: 'bold', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '8px' }}>
+            <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <div style={{ fontWeight: 'bold', color: '#0b5394', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Feature</u></div>
+              <span style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
+                {generateTechManipulationJSX(sheet)}
+              </span>
+            </span>
+          </div>
+
+          {/* Feature XP progression table */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 24px 24px 24px',
+            gridTemplateRows: 'repeat(2, auto)',
+            columnGap: '6px',
+            rowGap: '2px',
+            alignItems: 'start',
+            marginBottom: '2px',
+            width: '100%',
+            paddingLeft: '4px'
+          }}>
+            {/* Row 1: XP header */}
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>4xp</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>7xp</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>11xp</span>
+            {/* Row 2: +1hx dots */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1hx</span>
+            {[0,1,2].map(idx => (
+              <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <span
+                  onClick={() => handleDotClick(technologistFeatureDots, setTechnologistFeatureDots, idx, [4, 7, 11], 'technologistFeatureDots')}
+                  style={{
+                    width: '15px',
+                    height: '15px',
+                    border: '2px solid #000',
+                    borderRadius: '50%',
+                    display: 'block',
+                    background: technologistFeatureDots[idx] ? '#000' : '#fff',
+                    cursor: (idx === 0 || technologistFeatureDots.slice(0, idx).every(Boolean)) ? 'pointer' : 'not-allowed',
+                    transition: 'background 0.2s'
+                  }}
+                ></span>
+              </span>
+            ))}
+          </div>
+
+          {/* Technique Section */}
+          <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <div style={{ fontWeight: 'bold', color: '#bf9000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Technique</u></div>
+            <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              {generateForceFieldJSX(sheet)}
+            </div>
+            
+            {/* Technique XP progression table - First row */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 24px 24px 24px',
+              gridTemplateRows: 'repeat(2, auto)',
+              columnGap: '6px',
+              rowGap: '2px',
+              alignItems: 'start',
+              marginBottom: '2px',
+              width: '100%',
+              paddingLeft: '4px'
+            }}>
+              {/* Row 1: XP header */}
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>4xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>7xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>10xp</span>
+              {/* Row 2: +1hx dots */}
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1hx</span>
+              {[0,1,2].map(idx => (
+                <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                  <span
+                    onClick={() => handleDotClick(technologistTechniqueDots, setTechnologistTechniqueDots, idx, [4, 7, 10], 'technologistTechniqueDots')}
+                    style={{
+                      width: '15px',
+                      height: '15px',
+                      border: '2px solid #000',
+                      borderRadius: '50%',
+                      display: 'block',
+                      background: technologistTechniqueDots[idx] ? '#000' : '#fff',
+                      cursor: (idx === 0 || technologistTechniqueDots.slice(0, idx).every(Boolean)) ? 'pointer' : 'not-allowed',
+                      transition: 'background 0.2s'
+                    }}
+                  ></span>
+                </span>
+              ))}
+            </div>
+
+            {/* Technique XP progression table - Second row */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 24px 24px 24px',
+              gridTemplateRows: 'repeat(2, auto)',
+              columnGap: '6px',
+              rowGap: '2px',
+              alignItems: 'start',
+              marginTop: '2px',
+              marginBottom: '2px',
+              width: '100%',
+              paddingLeft: '4px'
+            }}>
+              {/* Row 1: XP header */}
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>6xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>10xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>16xp</span>
+              {/* Row 2: +1 target dots */}
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1 target</span>
+              {[0,1,2].map(idx => (
+                <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                  <span
+                    onClick={() => handleDotClick(technologistTechniqueTargetDots, setTechnologistTechniqueTargetDots, idx, [6, 10, 16], 'technologistTechniqueTargetDots')}
+                    style={{
+                      width: '15px',
+                      height: '15px',
+                      border: '2px solid #000',
+                      borderRadius: '50%',
+                      display: 'block',
+                      background: technologistTechniqueTargetDots[idx] ? '#000' : '#fff',
+                      cursor: (idx === 0 || technologistTechniqueTargetDots.slice(0, idx).every(Boolean)) ? 'pointer' : 'not-allowed',
+                      transition: 'background 0.2s'
+                    }}
+                  ></span>
+                </span>
+              ))}
+            </div>
+
+            {/* Technique special effect rows */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 24px 24px 24px',
+              gridTemplateRows: 'repeat(4, auto)',
+              columnGap: '6px',
+              rowGap: '2px',
+              alignItems: 'start',
+              marginTop: '2px',
+              marginBottom: '2px',
+              width: '100%',
+              paddingLeft: '4px'
+            }}>
+              {/* Row 2: XP header (5xp) */}
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>5xp</span>
+              <span></span>
+              <span></span>
+
+
+              {/* Row 1: Reflect half damage */}
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>Reflect half Damage dealt</span>
+              <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <span
+                  onClick={() => {
+                    // If unchecking reflect half and reflect full is checked, uncheck reflect full first
+                    if (technologistTechniqueReflectHalfDots[0] && technologistTechniqueReflectFullDots[0]) {
+                      // Uncheck both with direct save to avoid race conditions
+                      const newReflectHalfArray = [false];
+                      const newReflectFullArray = [false];
+                      const totalXpDelta = -14; // -5 for half, -9 for full
+                      
+                      setTechnologistTechniqueReflectHalfDots(newReflectHalfArray);
+                      setTechnologistTechniqueReflectFullDots(newReflectFullArray);
+                      setXpSpent(Math.max(0, xpSpent + totalXpDelta));
+                      
+                      // Direct save to avoid race conditions
+                      if (sheet) {
+                        const updatedSheet = {
+                          ...sheet,
+                          subclassProgressionDots: {
+                            ...sheet.subclassProgressionDots,
+                            technologistTechniqueReflectHalfDots: newReflectHalfArray,
+                            technologistTechniqueReflectFullDots: newReflectFullArray
+                          },
+                          xpSpent: Math.max(0, xpSpent + totalXpDelta)
+                        };
+                        saveCharacterSheet(updatedSheet);
+                      }
+                    } else {
+                      handleDotClick(technologistTechniqueReflectHalfDots, setTechnologistTechniqueReflectHalfDots, 0, [5], 'technologistTechniqueReflectHalfDots');
+                    }
+                  }}
+                  style={{
+                    width: '15px',
+                    height: '15px',
+                    border: '2px solid #000',
+                    borderRadius: '50%',
+                    display: 'block',
+                    background: technologistTechniqueReflectHalfDots[0] ? '#000' : '#fff',
+                    cursor: 'pointer',
+                    transition: 'background 0.2s'
+                  }}
+                ></span>
+              </span>
+              <span></span>
+              <span></span>
+              {/* Row 3: Arrow and continuation */}
+              <span></span>
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>9xp</span>
+              <span></span>
+              {/* Row 4: Reflect full damage */}
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>Reflect full Damage dealt</span>
+              <span style={{ textAlign: 'center', fontSize: '1.2em', fontWeight: 'bold', color: '#666' }}>⤷</span>
+              <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <span
+                  onClick={() => {
+                    // Only allow if reflect half is selected
+                    if (technologistTechniqueReflectHalfDots[0]) {
+                      handleDotClick(technologistTechniqueReflectFullDots, setTechnologistTechniqueReflectFullDots, 0, [9], 'technologistTechniqueReflectFullDots');
+                    }
+                  }}
+                  style={{
+                    width: '15px',
+                    height: '15px',
+                    border: '2px solid #000',
+                    borderRadius: '50%',
+                    display: 'block',
+                    background: technologistTechniqueReflectFullDots[0] ? '#000' : '#fff',
+                    cursor: technologistTechniqueReflectHalfDots[0] ? 'pointer' : 'not-allowed',
+                    transition: 'background 0.2s'
+                  }}
+                ></span>
+              </span>
+              <span></span>
+            </div>
+
+            {/* Technique XP progression table - Cooldown row */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 24px 24px 24px',
+              gridTemplateRows: 'repeat(2, auto)',
+              columnGap: '6px',
+              rowGap: '2px',
+              alignItems: 'start',
+              marginTop: '-2px',
+              marginBottom: '2px',
+              width: '100%',
+              paddingLeft: '4px'
+            }}>
+              {/* Row 1: XP header */}
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>5xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>10xp</span>
+              <span></span>
+              {/* Row 2: -1 Cooldown dots */}
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>-1 Cooldown</span>
+              {[0,1].map(idx => (
+                <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                  <span
+                    onClick={() => handleDotClick(technologistTechniqueCooldownDots, setTechnologistTechniqueCooldownDots, idx, [5, 10], 'technologistTechniqueCooldownDots')}
+                    style={{
+                      width: '15px',
+                      height: '15px',
+                      border: '2px solid #000',
+                      borderRadius: '50%',
+                      display: 'block',
+                      background: technologistTechniqueCooldownDots[idx] ? '#000' : '#fff',
+                      cursor: (idx === 0 || technologistTechniqueCooldownDots.slice(0, idx).every(Boolean)) ? 'pointer' : 'not-allowed',
+                      transition: 'background 0.2s'
+                    }}
+                  ></span>
+                </span>
+              ))}
+              <span></span>
+            </div>
+          </div>
+
+          {/* Strike Section */}
+          <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <div style={{ fontWeight: 'bold', color: '#351c75', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Strike</u></div>
+            <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <b><i style={{ color: '#351c75', fontSize: '1em' }}>Strike</i> <i>Damage.</i></b> 1d6 <b><u style={{ color: '#d5d52a', display: 'inline-flex', alignItems: 'center' }}>
+              Electric<img src="/Electric.png" alt="Electric" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} />
+              </u></b>{technologistStrikeRestrainDots[0] ? <>, <b><i>Restrain</i></b></> : ''}.
+            </div>
+
+            {/* Strike XP progression table */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 24px 24px 24px',
+              gridTemplateRows: 'repeat(2, auto)',
+              columnGap: '6px',
+              rowGap: '2px',
+              alignItems: 'start',
+              marginBottom: '2px',
+              width: '100%',
+              paddingLeft: '4px'
+            }}>
+              {/* Row 1: XP header */}
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>6xp</span>
+              <span></span>
+              <span></span>
+              {/* Row 2: Restrain dot */}
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}><i><b>Restrain</b></i></span>
+              <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <span
+                  onClick={() => handleDotClick(technologistStrikeRestrainDots, setTechnologistStrikeRestrainDots, 0, [6], 'technologistStrikeRestrainDots')}
+                  style={{
+                    width: '15px',
+                    height: '15px',
+                    border: '2px solid #000',
+                    borderRadius: '50%',
+                    display: 'block',
+                    background: technologistStrikeRestrainDots[0] ? '#000' : '#fff',
+                    cursor: 'pointer',
+                    transition: 'background 0.2s'
+                  }}
+                ></span>
+              </span>
+              <span></span>
+              <span></span>
+            </div>
+          </div>
+
+          {/* Perks Section */}
+          <div style={{ marginTop: '12px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <div style={{ fontWeight: 'bold', color: '#000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Perks</u></div>
+            <div style={{ fontSize: '1em', color: '#000', marginBottom: '6px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <i><b>Skills.</b> Technology</i> +2
+            </div>
+            <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 24px',
+                gridTemplateRows: 'auto auto',
+                columnGap: '6px',
+                rowGap: '2px',
+                alignItems: 'start',
+                marginTop: '-12px',
+                width: '100%',
+                paddingLeft: '4px'
+              }}>
+                {/* Row 1: SP header */}
+                <span></span>
+                <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>10sp</span>
+                {/* Row 2: Mechanical Understanding */}
+                <div style={{
+                  fontSize: '1em', 
+                  fontFamily: 'Arial, Helvetica, sans-serif', 
+                  textAlign: 'left', 
+                  paddingRight: '8px',
+                  maxWidth: '500px',
+                  overflowWrap: 'break-word',
+                  wordWrap: 'break-word'
+                }}>
+                  <b><i style={{ color: '#8c43ff', fontSize: '1em' }}>Mechanical Understanding.</i></b> You grasp mechanical and technological concepts with an unmatched understanding. Gain an advantage on rolls when dealing with machines or other technology.
+                </div>
+                <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start' }}>
+                  <span
+                    onClick={() => handleSpDotClick(technologistPerksSkillsDots, setTechnologistPerksSkillsDots, 0, [10], 'technologistPerksSkillsDots')}
+                    style={{
+                      width: '15px',
+                      height: '15px',
+                      border: '2px solid #000',
+                      borderRadius: '50%',
+                      display: 'block',
+                      background: technologistPerksSkillsDots[0] ? '#000' : '#fff',
                       cursor: 'pointer',
                       transition: 'background 0.2s'
                     }}

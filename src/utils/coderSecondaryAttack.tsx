@@ -37,7 +37,9 @@ export function calculateCoderSecondaryAttackData(classCardDots?: boolean[][]): 
 export function generateCoderSecondaryAttackStatsJSX(
   classCardDots?: boolean[][],
   cost?: number,
-  algorithmName?: string
+  algorithmName?: string,
+  subclass?: string,
+  subclassProgressionDots?: any
 ): React.ReactElement {
   const { aoeSize, damageDice, critValue } = calculateCoderSecondaryAttackData(classCardDots);
   
@@ -45,10 +47,16 @@ export function generateCoderSecondaryAttackStatsJSX(
   const hasIgnore100Cover = classCardDots?.[0]?.[0] || false;
   const coverPercentage = hasIgnore100Cover ? '100%' : '50%';
   
+  // Calculate range bonus from Divinist subclass
+  const rangeBonus = subclass === 'Divinist' 
+    ? (subclassProgressionDots?.divinistFeatureRangeDots?.filter(Boolean).length || 0)
+    : 0;
+  const totalRange = 6 + rangeBonus;
+  
   return (
     <div style={{ fontSize: '0.875em', width: '100%', height: 'fit-content', maxHeight: '100%', overflow: 'hidden' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-        <span><b><u>Range</u></b> 6hx</span>
+        <span><b><u>Range</u></b> {subclass === 'Divinist' ? <b>[{totalRange}]</b> : totalRange}hx</span>
         <span style={{ textAlign: 'right', minWidth: '80px' }}><b><u>Crit</u></b> <b>[{critValue}]</b>+</span>
       </div>
       <div>

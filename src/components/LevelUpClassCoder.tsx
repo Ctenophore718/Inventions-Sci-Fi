@@ -630,7 +630,15 @@ const LevelUpClassCoder: React.FC<LevelUpClassCoderProps> = ({
 
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
                 <span>
-                  <b><u>Range</u></b> 10hx <br />
+                  {subclass === 'Divinist' ? (
+                    <>
+                      <b><u>Range</u></b> <b>[{10 + ((sheet?.subclassProgressionDots as any)?.divinistFeatureRangeDots?.filter(Boolean).length || 0)}]</b>hx <br />
+                    </>
+                  ) : (
+                    <>
+                      <b><u>Range</u></b> 10hx <br />
+                    </>
+                  )}
                 </span>
                   <span style={{ textAlign: 'right', minWidth: '80px' }}>
                     {/* Calculate Crit value based on +1 Crit dots in Primary Attack section (index 7) and Subtle Magic feature section (index 1) */}
@@ -920,7 +928,15 @@ const LevelUpClassCoder: React.FC<LevelUpClassCoderProps> = ({
 
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
                 <span>
-                  <b><u>Range</u></b> 6hx <br />
+                  {subclass === 'Divinist' ? (
+                    <>
+                      <b><u>Range</u></b> <b>[{6 + ((sheet?.subclassProgressionDots as any)?.divinistFeatureRangeDots?.filter(Boolean).length || 0)}]</b>hx <br />
+                    </>
+                  ) : (
+                    <>
+                      <b><u>Range</u></b> 6hx <br />
+                    </>
+                  )}
                 </span>
                   <span style={{ textAlign: 'right', minWidth: '80px' }}>
                     {/* Calculate Crit value based on +1 Crit dots in Secondary Attack section (index 10) and Subtle Magic feature section (index 1) */}
