@@ -8,7 +8,7 @@ type LevelUpClassCoderProps = {
   sheet: CharacterSheet | null;
   charClass: string;
   subclass: string;
-  onXpSpChange?: (xpDelta: number, spDelta: number) => void;
+  _onXpSpChange?: (xpDelta: number, spDelta: number) => void;
   onCreditsChange?: (creditsDelta: number) => void;
   xpTotal: number;
   spTotal: number;
@@ -40,7 +40,8 @@ const LevelUpClassCoder: React.FC<LevelUpClassCoderProps> = ({
   sheet, 
   charClass,
   subclass, 
-  onXpSpChange,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _onXpSpChange,
   onCreditsChange,
   xpTotal,
   spTotal, 

@@ -1,5 +1,5 @@
 interface ToxicTakedownProps {
-  poisonerTechniqueCooldownDots: boolean[];
+  _poisonerTechniqueCooldownDots: boolean[];
   poisonerTechnique2EffectsPerTokenDots: boolean[];
   poisonerTechniqueSameEffectMultipleDots: boolean[];
   poisonerTechniqueExtraSpikeReroll5Dots: boolean[];
@@ -7,7 +7,7 @@ interface ToxicTakedownProps {
 }
 
 export const generateToxicTakedownJSX = ({
-  poisonerTechniqueCooldownDots,
+  _poisonerTechniqueCooldownDots,
   poisonerTechnique2EffectsPerTokenDots,
   poisonerTechniqueSameEffectMultipleDots,
   poisonerTechniqueExtraSpikeReroll5Dots,

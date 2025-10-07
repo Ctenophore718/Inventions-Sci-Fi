@@ -1,7 +1,7 @@
 import React from 'react';
 import type { CharacterSheet } from '../types/CharacterSheet';
 
-export const generateTechnologistStrikeJSX = (sheet: CharacterSheet | null): React.JSX.Element => {
+export const generateTechnologistStrikeJSX = (_sheet: CharacterSheet | null): React.JSX.Element => {
   // Always 1d6 Electric for Technologist
   return (
     <span style={{ fontWeight: 'normal', fontFamily: 'inherit', color: '#000', marginLeft: 4, display: 'flex', alignItems: 'center' }}>

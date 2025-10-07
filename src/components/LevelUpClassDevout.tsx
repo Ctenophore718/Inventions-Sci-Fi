@@ -7,7 +7,7 @@ import { saveCharacterSheet } from "../utils/storage";
 type LevelUpClassDevoutProps = {
   sheet: CharacterSheet | null;
   charClass: string;
-  subclass: string;
+  _subclass: string;
   onXpSpChange?: (xpDelta: number, spDelta: number) => void;
   xpTotal: number;
   spTotal: number;
@@ -36,7 +36,7 @@ const defaultDevoutDots: boolean[][] = [
 const LevelUpClassDevout: React.FC<LevelUpClassDevoutProps> = ({ 
   sheet, 
   charClass,
-  subclass, 
+  _subclass, 
   onXpSpChange,
   xpTotal,
   spTotal, 
@@ -96,7 +96,7 @@ const LevelUpClassDevout: React.FC<LevelUpClassDevoutProps> = ({
     };
     
     // Helper function to handle dot clicking with sequential requirement
-    const handleDotClick = (
+    const _handleDotClick = (
       currentArray: boolean[], 
       setArray: React.Dispatch<React.SetStateAction<boolean[]>>, 
       index: number, 
@@ -134,7 +134,7 @@ const LevelUpClassDevout: React.FC<LevelUpClassDevoutProps> = ({
     };
   
     // Helper function to handle SP dots (for Surgeon perk)
-    const handleSpDotClick = (
+    const _handleSpDotClick = (
       currentArray: boolean[], 
       setArray: React.Dispatch<React.SetStateAction<boolean[]>>, 
       index: number, 

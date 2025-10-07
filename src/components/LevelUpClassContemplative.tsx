@@ -24,7 +24,7 @@ const defaultContemplativeDots: boolean[][] = [
 type LevelUpClassContemplativeProps = {
   sheet: CharacterSheet | null;
   charClass: string;
-  subclass: string;
+  _subclass: string;
   onXpSpChange?: (xpDelta: number, spDelta: number) => void;
   xpTotal: number;
   spTotal: number;
@@ -38,7 +38,7 @@ type LevelUpClassContemplativeProps = {
 const LevelUpClassContemplative: React.FC<LevelUpClassContemplativeProps> = ({ 
   sheet, 
   charClass,
-  subclass, 
+  _subclass, 
   onXpSpChange,
   xpTotal,
   spTotal, 
@@ -98,7 +98,7 @@ const LevelUpClassContemplative: React.FC<LevelUpClassContemplativeProps> = ({
     };
     
     // Helper function to handle dot clicking with sequential requirement
-    const handleDotClick = (
+    const _handleDotClick = (
       currentArray: boolean[], 
       setArray: React.Dispatch<React.SetStateAction<boolean[]>>, 
       index: number, 
@@ -136,7 +136,7 @@ const LevelUpClassContemplative: React.FC<LevelUpClassContemplativeProps> = ({
     };
   
     // Helper function to handle SP dots (for Surgeon perk)
-    const handleSpDotClick = (
+    const _handleSpDotClick = (
       currentArray: boolean[], 
       setArray: React.Dispatch<React.SetStateAction<boolean[]>>, 
       index: number, 

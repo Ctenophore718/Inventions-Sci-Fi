@@ -48,13 +48,14 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
   ];
 
   // Local state for class card dots (Chemist)
-  const [classCardDots, setClassCardDots] = useState<boolean[][]>(() => {
+  const [_classCardDots, _setClassCardDots] = useState<boolean[][]>(() => {
     if (sheet?.classCardDots && Array.isArray(sheet.classCardDots) && sheet.classCardDots.length > 0) {
       return sheet.classCardDots.map(row => Array.isArray(row) ? [...row] : []);
     }
     return defaultChemistDots.map(row => [...row]);
   });
 
+  /* Unused helper functions - commenting out to fix build
   // Helper function to safely access classCardDots array
   const safeGetDotsArray = (index: number): boolean[] => {
     if (!classCardDots || !Array.isArray(classCardDots) || index >= classCardDots.length) {
@@ -94,9 +95,10 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
       saveCharacterSheet(updatedSheet);
     }
   };
+  */
   
   // Independent state for Grenadier dots - completely separate from any other component
-  const [grenadierFeatureDots, setGrenadierFeatureDots] = useState<boolean[]>(
+  const [_grenadierFeatureDots, _setGrenadierFeatureDots] = useState<boolean[]>(
     sheet?.subclassProgressionDots?.grenadierFeatureDots || [false]
   );
   const [grenadierFeatureIncludesAlliesDots, setGrenadierFeatureIncludesAlliesDots] = useState<boolean[]>(
@@ -143,6 +145,7 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
   // Local state for pending grenade selection (Grenadier only)
   const [pendingGrenade, setPendingGrenade] = useState<string>("");
 
+  /* Unused save functions - commenting out to fix build
   // Save grenades to sheet (Grenadier only)
   const saveGrenades = (newGrenades: string[]) => {
     setSelectedGrenades(newGrenades);
@@ -156,6 +159,7 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
       saveCharacterSheet(updatedSheet);
     }
   };
+  */
 
   // Independent state for Anatomist dots - completely separate from any other component
   const [anatomistFeatureDots, setAnatomistFeatureDots] = useState<boolean[]>(
@@ -225,7 +229,7 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
   );
 
   // Independent state for Poisoner dots - completely separate from any other component
-  const [poisonerFeatureDots, setPoisonerFeatureDots] = useState<boolean[]>(
+  const [_poisonerFeatureDots, _setPoisonerFeatureDots] = useState<boolean[]>(
     sheet?.subclassProgressionDots?.poisonerFeatureDots || [false]
   );
   const [poisonerSpikeInflictToxicDots, setPoisonerSpikeInflictToxicDots] = useState<boolean[]>(
@@ -275,6 +279,7 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
   // Local state for pending chem zombie selection (Necro only)
   const [pendingChemZombie, setPendingChemZombie] = useState<string>("");
 
+  /* Unused save functions - commenting out to fix build
   // Save chem zombies to sheet (Necro only)
   const saveChemZombies = (newChemZombies: string[]) => {
     setSelectedChemZombies(newChemZombies);
@@ -288,6 +293,7 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
       saveCharacterSheet(updatedSheet);
     }
   };
+  */
 
   // Local state for selected super serums (Anatomist only)
   const [selectedSuperSerums, setSelectedSuperSerums] = useState<string[]>(() => {
@@ -296,6 +302,7 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
   // Local state for pending super serum selection (Anatomist only)
   const [pendingSuperSerum, setPendingSuperSerum] = useState<string>("");
 
+  /* Unused save functions - commenting out to fix build
   // Save super serums to sheet (Anatomist only)
   const saveSuperSerums = (newSuperSerums: string[]) => {
     setSelectedSuperSerums(newSuperSerums);
@@ -309,6 +316,7 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
       saveCharacterSheet(updatedSheet);
     }
   };
+  */
 
   // Local state for selected noxious fumes (Poisoner only)
   const [selectedNoxiousFumes, setSelectedNoxiousFumes] = useState<string[]>(() => {
@@ -317,6 +325,7 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
   // Local state for pending noxious fume selection (Poisoner only)
   const [pendingNoxiousFume, setPendingNoxiousFume] = useState<string>("");
 
+  /* Unused save functions - commenting out to fix build
   // Save noxious fumes to sheet (Poisoner only)
   const saveNoxiousFumes = (newNoxiousFumes: string[]) => {
     setSelectedNoxiousFumes(newNoxiousFumes);
@@ -330,6 +339,7 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
       saveCharacterSheet(updatedSheet);
     }
   };
+  */
 
   // Helper function to handle dot clicking with sequential requirement
   const handleDotClick = (

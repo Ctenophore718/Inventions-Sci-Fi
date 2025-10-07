@@ -36,7 +36,7 @@ export function calculateCoderSecondaryAttackData(classCardDots?: boolean[][]): 
  */
 export function generateCoderSecondaryAttackStatsJSX(
   classCardDots?: boolean[][],
-  cost?: number,
+  _cost?: number,
   algorithmName?: string,
   subclass?: string,
   subclassProgressionDots?: any

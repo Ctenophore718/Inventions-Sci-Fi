@@ -23,7 +23,7 @@ const defaultExospecialistDots: boolean[][] = [
 type LevelUpClassExospecialistProps = {
   sheet: CharacterSheet | null;
   charClass: string;
-  subclass: string;
+  _subclass: string;
   onXpSpChange?: (xpDelta: number, spDelta: number) => void;
   xpTotal: number;
   spTotal: number;
@@ -37,7 +37,7 @@ type LevelUpClassExospecialistProps = {
 const LevelUpClassExospecialist: React.FC<LevelUpClassExospecialistProps> = ({ 
   sheet, 
   charClass,
-  subclass, 
+  _subclass, 
   onXpSpChange,
   xpTotal,
   spTotal, 
@@ -97,7 +97,7 @@ const LevelUpClassExospecialist: React.FC<LevelUpClassExospecialistProps> = ({
     };
     
     // Helper function to handle dot clicking with sequential requirement
-    const handleDotClick = (
+    const _handleDotClick = (
       currentArray: boolean[], 
       setArray: React.Dispatch<React.SetStateAction<boolean[]>>, 
       index: number, 
@@ -135,7 +135,7 @@ const LevelUpClassExospecialist: React.FC<LevelUpClassExospecialistProps> = ({
     };
   
     // Helper function to handle SP dots (for Surgeon perk)
-    const handleSpDotClick = (
+    const _handleSpDotClick = (
       currentArray: boolean[], 
       setArray: React.Dispatch<React.SetStateAction<boolean[]>>, 
       index: number, 

@@ -20,9 +20,9 @@ export function calculateAnatomistSecondaryAttackData(
   const critEffectDie = 1 + (attackDamageDots?.filter(Boolean).length || 0);
   // Crit threshold: 18 - crit dots
   const critThreshold = 18 - (attackCritDots?.filter(Boolean).length || 0);
-  // Cooldown: 4 - cooldown dots
-  const cooldown = 4 - (attackCooldownDots?.filter(Boolean).length || 0);
-  return { damageDie, critEffectDie, critThreshold, cooldown };
+  // cooldown: 4 - cooldown dots
+  const _cooldown = 4 - (attackCooldownDots?.filter(Boolean).length || 0);
+  return { damageDie, critEffectDie, critThreshold, cooldown: _cooldown };
 }
 
 /**
@@ -33,9 +33,9 @@ export function generateAnatomistSecondaryAttackStatsJSX(
   attackCritDots?: boolean[],
   attackCooldownDots?: boolean[],
   serumName?: string,
-  cost?: number
+  _cost?: number
 ): React.ReactElement {
-  const { damageDie, critEffectDie, critThreshold, cooldown } = calculateAnatomistSecondaryAttackData(
+  const { damageDie, critEffectDie, critThreshold, cooldown: _cooldown } = calculateAnatomistSecondaryAttackData(
     attackDamageDots,
     attackCritDots,
     attackCooldownDots

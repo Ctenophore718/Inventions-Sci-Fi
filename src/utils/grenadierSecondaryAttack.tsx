@@ -21,10 +21,10 @@ export function calculateGrenadierSecondaryAttackData(
   const critEffectDie = 6 + 2 * (attackDamageDots?.filter(Boolean).length || 0);
   // Crit threshold: 18 - crit dots
   const critThreshold = 18 - (attackCritDots?.filter(Boolean).length || 0);
-  // Cooldown: 4 - cooldown dots
-  const cooldown = 4 - (attackCooldownDots?.filter(Boolean).length || 0);
+  // cooldown: 4 - cooldown dots
+  const _cooldown = 4 - (attackCooldownDots?.filter(Boolean).length || 0);
   const aoeRadius = 2 + (attackAoEDots?.filter(Boolean).length || 0);
-  return { damageDie, critEffectDie, critThreshold, cooldown, aoeRadius };
+  return { damageDie, critEffectDie, critThreshold, cooldown: _cooldown, aoeRadius };
 }
 
 /**
@@ -36,9 +36,9 @@ export function generateGrenadierSecondaryAttackStatsJSX(
   attackCooldownDots?: boolean[],
   attackAoEDots?: boolean[],
   grenadeName?: string,
-  cost?: number
+  _cost?: number
 ): React.ReactElement {
-  const { damageDie, critEffectDie, critThreshold, cooldown, aoeRadius } = calculateGrenadierSecondaryAttackData(
+  const { damageDie, critEffectDie, critThreshold, cooldown: _cooldown, aoeRadius } = calculateGrenadierSecondaryAttackData(
     attackDamageDots,
     attackCritDots,
     attackCooldownDots,

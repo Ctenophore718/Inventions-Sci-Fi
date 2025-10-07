@@ -98,7 +98,7 @@ const LevelUpClassElementalist: React.FC<LevelUpClassElementalistProps> = ({
     };
     
     // Helper function to handle dot clicking with sequential requirement
-    const handleDotClick = (
+    const _handleDotClick = (
       currentArray: boolean[], 
       setArray: React.Dispatch<React.SetStateAction<boolean[]>>, 
       index: number, 
@@ -136,7 +136,7 @@ const LevelUpClassElementalist: React.FC<LevelUpClassElementalistProps> = ({
     };
   
     // Helper function to handle SP dots (for Surgeon perk)
-    const handleSpDotClick = (
+    const _handleSpDotClick = (
       currentArray: boolean[], 
       setArray: React.Dispatch<React.SetStateAction<boolean[]>>, 
       index: number, 

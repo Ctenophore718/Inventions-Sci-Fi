@@ -1,5 +1,3 @@
-import React from 'react';
-
 interface BackstabberProps {
   poisonerChemicalImmunityDots: boolean[];
   poisonerToxicImmunityDots: boolean[];

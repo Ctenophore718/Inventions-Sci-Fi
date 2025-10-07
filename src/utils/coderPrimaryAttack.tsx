@@ -29,7 +29,8 @@ export function calculateCoderPrimaryAttackData(classCardDots?: boolean[][]): Co
  */
 export function generateCoderPrimaryAttackStatsJSX(
   classCardDots?: boolean[][],
-  cost?: number,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _cost?: number,
   lensName?: string,
   hasIgnore100Cover?: boolean,
   subclass?: string,

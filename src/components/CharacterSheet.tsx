@@ -14,7 +14,6 @@ import { generateAuraOfLuckJSX } from "../utils/divinistFeature";
 import { generateBoughbenderJSX } from "../utils/naturalistFeature";
 import { generateNaturalistStrikeJSX } from "../utils/naturalistStrike";
 import { generateTechManipulationJSX } from "../utils/technologistFeature";
-import { generateForceFieldJSX } from "../utils/technologistTechnique";
 import { generateTechnologistStrikeJSX } from "../utils/technologistStrike";
 import { generateStaySharpJSX } from "../utils/commanderFeature";
 
@@ -37,7 +36,7 @@ type Props = {
 };
 
 
-const CharacterSheet: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, onAutoSave, charClass, setCharClass, subclass, setSubclass, species, setSpecies, subspecies, setSubspecies, isNewCharacter = false }) => {
+const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, onAutoSave, charClass, setCharClass, subclass, setSubclass, species, setSpecies, subspecies, setSubspecies }) => {
   
   console.log('CharacterSheet render started, sheet:', sheet ? `ID: ${sheet.id}` : 'NULL');
   
@@ -148,7 +147,6 @@ const CharacterSheet: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, on
   const [name, setName] = useState(sheet?.name || "");
   // charClass, subclass, species, subspecies are now props
   const [background, setBackground] = useState(sheet?.background || "");
-  const [backgroundDescription, setBackgroundDescription] = useState(sheet?.backgroundDescription || "");
 
   // Sync local state when sheet prop changes
   React.useEffect(() => {
@@ -156,7 +154,6 @@ const CharacterSheet: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, on
       setPlayerName(sheet.playerName || "");
       setName(sheet.name || "");
       setBackground(sheet.background || "");
-      setBackgroundDescription(sheet.backgroundDescription || "");
       setResistances(sheet.resistances || "");
       setImmunities(sheet.immunities || "");
       setAbsorptions(sheet.absorptions || "");
@@ -170,9 +167,6 @@ const CharacterSheet: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, on
       setChemTokens(sheet.chemTokens || 0);
       setDeathCount(sheet.deathCount || 0);
       setClassFeature(sheet.classFeature || "");
-      setSubclassFeature(sheet.subclassFeature || "");
-      setSpeciesFeature(sheet.speciesFeature || "");
-      setSubspeciesFeature(sheet.subspeciesFeature || "");
     }
   }, [sheet]);
 
@@ -305,15 +299,12 @@ const CharacterSheet: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, on
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [charClass]);
-  const [subclassFeature, setSubclassFeature] = useState(sheet?.subclassFeature || "");
-  const [speciesFeature, setSpeciesFeature] = useState(sheet?.speciesFeature || "");
-  const [subspeciesFeature, setSubspeciesFeature] = useState(sheet?.subspeciesFeature || "");
   // Removed unused XP/SP fields
 
   // Combat fields
-  const [speed, setSpeed] = useState(sheet?.speed || "");
-  const [strikeDamage, setStrikeDamage] = useState(sheet?.strikeDamage || "");
-  const [maxHitPoints, setMaxHitPoints] = useState(sheet?.maxHitPoints || 0);
+  const speed = sheet?.speed || "";
+  const strikeDamage = sheet?.strikeDamage || "";
+  const maxHitPoints = sheet?.maxHitPoints || 0;
   const [deathCount, setDeathCount] = useState(sheet?.deathCount || 0);
 
   // Attributes
@@ -384,7 +375,6 @@ const CharacterSheet: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, on
   // Inventory state for Attack Weapons/Spells dropdown
   const [pendingAttack, setPendingAttack] = useState<string>("");
   const [pendingSecondaryAttack, setPendingSecondaryAttack] = useState<string>("");
-  const [pendingGrenade, setPendingGrenade] = useState<string>("");
 
   // Current Hit Points state (local only)
   const [currentHitPoints, setCurrentHitPoints] = useState<number>(sheet?.currentHitPoints ?? sheet?.maxHitPoints ?? 0);
@@ -1238,11 +1228,6 @@ const CharacterSheet: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, on
     }
     
     return attacks;
-  };
-
-  // Keep the original function for backward compatibility
-  const getAvailableAttacks = () => {
-    return [...getAvailablePrimaryAttacks(), ...getAvailableSecondaryAttacks()];
   };
 
   const handleAttackPurchase = (attackName: string, cost: number, type: string) => {
@@ -2219,7 +2204,7 @@ const CharacterSheet: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, on
                     ? <span style={{ color: '#000', fontWeight: 'normal' }}>+2 Crit on next <span style={{ color: '#990000' }}><b><i>Attack</i></b></span></span>
                   : (subclass === 'Anatomist' && sheet?.subclassProgressionDots?.anatomistStrikeDots?.[0])
                     ? <span style={{ color: '#000', fontWeight: 'normal' }}>Can choose to heal <span style={{ color: '#351c75' }}><b><i>Strike</i></b></span> amount</span>
-                  : (subclass === 'Grenadier' && sheet?.subclassProgressionDots?.grenadierStrikeDots?.filter(Boolean).length > 0)
+                  : (subclass === 'Grenadier' && (sheet?.subclassProgressionDots?.grenadierStrikeDots?.filter(Boolean).length || 0) > 0)
                     ? <span style={{ color: '#000', fontWeight: 'normal' }}><b>[{sheet?.subclassProgressionDots?.grenadierStrikeDots?.filter(Boolean).length}]</b>hx-radius <i>AoE</i></span>
                   : (subclass === 'Coercive' && sheet?.subclassProgressionDots?.coerciveStrikeMesmerizeDots?.[0])
                     ? <span style={{ color: '#000', fontWeight: 'normal' }}><b><i>Mesmerize</i></b></span>
@@ -3782,4 +3767,4 @@ const CharacterSheet: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, on
   );
 };
 
-export default CharacterSheet;
+export default CharacterSheetComponent;

@@ -1,5 +1,3 @@
-import React from 'react';
-
 export function generateBlasterMasterJSX({
 	grenadierFeatureIncludesAlliesDots = [false],
 	grenadierFeatureAoEDots = [false, false],

@@ -150,6 +150,20 @@ export type CharacterSheet = {
     coerciveTechniqueCooldownDots?: boolean[];
     coerciveStrikeMesmerizeDots?: boolean[];
     coercivePerksSkillsDots?: boolean[];
+    // Divinist subclass progression (Coder)
+    divinistFeatureDots?: boolean[];
+    divinistFeatureCritDots?: boolean[];
+    divinistFeatureRangeDots?: boolean[];
+    divinistStrikeCritDots?: boolean[];
+    divinistPerksSkillsDots?: boolean[];
+    // Naturalist subclass progression (Coder)
+    naturalistStrikeDrainDots?: boolean[];
+    naturalistPerksSkillsDots?: boolean[];
+    // Technologist subclass progression (Coder)
+    technologistStrikeRestrainDots?: boolean[];
+    technologistPerksSkillsDots?: boolean[];
+    // Poisoner venom master dots
+    poisonerVenomMasterDots?: boolean[];
     // Add other subclasses as needed
   };
 };

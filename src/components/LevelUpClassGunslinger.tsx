@@ -18,7 +18,7 @@ const defaultGunslingerDots: boolean[][] = [
 type LevelUpClassGunslingerProps = {
   sheet: CharacterSheet | null;
   charClass: string;
-  subclass: string;
+  _subclass: string;
   onXpSpChange?: (xpDelta: number, spDelta: number) => void;
   xpTotal: number;
   spTotal: number;
@@ -32,7 +32,7 @@ type LevelUpClassGunslingerProps = {
 const LevelUpClassGunslinger: React.FC<LevelUpClassGunslingerProps> = ({ 
   sheet, 
   charClass,
-  subclass, 
+  _subclass, 
   onXpSpChange,
   xpTotal,
   spTotal, 
@@ -92,7 +92,7 @@ const LevelUpClassGunslinger: React.FC<LevelUpClassGunslingerProps> = ({
     };
     
     // Helper function to handle dot clicking with sequential requirement
-    const handleDotClick = (
+    const _handleDotClick = (
       currentArray: boolean[], 
       setArray: React.Dispatch<React.SetStateAction<boolean[]>>, 
       index: number, 
@@ -130,7 +130,7 @@ const LevelUpClassGunslinger: React.FC<LevelUpClassGunslingerProps> = ({
     };
   
     // Helper function to handle SP dots (for Surgeon perk)
-    const handleSpDotClick = (
+    const _handleSpDotClick = (
       currentArray: boolean[], 
       setArray: React.Dispatch<React.SetStateAction<boolean[]>>, 
       index: number, 

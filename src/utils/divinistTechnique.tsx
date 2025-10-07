@@ -10,7 +10,7 @@ export function generateFateReaderJSX({
   const hx = 5 + divinistTechniqueDots.filter(Boolean).length;
   const additionalDie = 1 + (divinistTechniqueCoverDots[0] ? 1 : 0);
   const whichToDrop = divinistTechniqueCoverDots[0] ? 'two' : 'one';
-  const cooldown = 4 - divinistTechniqueCooldownDots.filter(Boolean).length;
+  const _cooldown = 4 - divinistTechniqueCooldownDots.filter(Boolean).length;
   
   return (
     <>

@@ -549,26 +549,6 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
                     })()
                   ) : charClass === 'Elementalist' ? (() => {
                     // Elementalist Commune card logic
-                    let hx = 3;
-                    let resistText = '[ - ]';
-                    let d6 = 1;
-                    if (localSheet && Array.isArray(localSheet.classCardDots)) {
-                      // hx range: classCardDots[2] (row 3)
-                      if (Array.isArray(localSheet.classCardDots[2])) {
-                        const selected = localSheet.classCardDots[2].filter(Boolean).length;
-                        hx = 3 + selected;
-                      }
-                      // d6: classCardDots[3] (row 4)
-                      if (Array.isArray(localSheet.classCardDots[3]) && localSheet.classCardDots[3][0]) {
-                        d6 = 2;
-                      }
-                      // resist: classCardDots[4] (row 5)
-                      if (Array.isArray(localSheet.classCardDots[4]) && localSheet.classCardDots[4][0]) {
-                        resistText = '[Immune]';
-                      } else if (Array.isArray(localSheet.classCardDots[5]) && localSheet.classCardDots[5][0]) {
-                        resistText = '[Resistant]';
-                      }
-                    }
                     // If classCardDots[2][0] (Triple Damage dice) is selected, show [triple] instead of [double]
                     const triple = Array.isArray(localSheet?.classCardDots?.[2]) && localSheet.classCardDots[2][0];
                     return (
@@ -777,7 +757,7 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
                   ? generateTheGoodStuffDescriptionJSX(localSheet?.subclassProgressionDots)
                   : localSheet?.subclass === 'Poisoner'
                   ? generateToxicTakedownJSX({
-                      poisonerTechniqueCooldownDots: localSheet?.subclassProgressionDots?.poisonerTechniqueCooldownDots || [false, false],
+                      _poisonerTechniqueCooldownDots: localSheet?.subclassProgressionDots?.poisonerTechniqueCooldownDots || [false, false],
                       poisonerTechnique2EffectsPerTokenDots: localSheet?.subclassProgressionDots?.poisonerTechnique2EffectsPerTokenDots || [false],
                       poisonerTechniqueSameEffectMultipleDots: localSheet?.subclassProgressionDots?.poisonerTechniqueSameEffectMultipleDots || [false],
                       poisonerTechniqueExtraSpikeReroll5Dots: localSheet?.subclassProgressionDots?.poisonerTechniqueExtraSpikeReroll5Dots || [false],

@@ -9,9 +9,9 @@ export function calculateNecroTechniqueData({
 }) {
     const range = 5 + (necroTechniqueRangeDots?.filter(Boolean).length || 0);
     const inflictsBlind = necroTechniqueInflictBlindDots?.[0] || false;
-    const cooldown = 4 - (necroTechniqueCooldownDots?.filter(Boolean).length || 0);
+    const _cooldown = 4 - (necroTechniqueCooldownDots?.filter(Boolean).length || 0);
 
-    return { range, inflictsBlind, cooldown };
+    return { range, inflictsBlind, cooldown: _cooldown };
 }
 
 export function generateGraspOfTheGraveJSX({
@@ -23,7 +23,7 @@ export function generateGraspOfTheGraveJSX({
     necroTechniqueInflictBlindDots?: boolean[];
     necroTechniqueCooldownDots?: boolean[];
 }) {
-    const { range, inflictsBlind, cooldown } = calculateNecroTechniqueData({
+    const { range, inflictsBlind, cooldown: _cooldown } = calculateNecroTechniqueData({
         necroTechniqueRangeDots,
         necroTechniqueInflictBlindDots,
         necroTechniqueCooldownDots

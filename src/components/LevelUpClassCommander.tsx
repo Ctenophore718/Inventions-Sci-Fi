@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import type { CharacterSheet } from "../types/CharacterSheet";
 import { saveCharacterSheet } from "../utils/storage";
 
@@ -19,7 +19,7 @@ const defaultCommanderDots: boolean[][] = [
 type LevelUpClassCommanderProps = {
   sheet: CharacterSheet | null;
   charClass: string;
-  subclass: string;
+  _subclass: string;
   onXpSpChange?: (xpDelta: number, spDelta: number) => void;
   xpTotal: number;
   spTotal: number;
@@ -35,7 +35,8 @@ type LevelUpClassCommanderProps = {
 const LevelUpClassCommander: React.FC<LevelUpClassCommanderProps> = ({ 
   sheet, 
   charClass,
-  subclass, 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _subclass, 
   onXpSpChange,
   xpTotal,
   spTotal, 
@@ -107,7 +108,8 @@ const LevelUpClassCommander: React.FC<LevelUpClassCommanderProps> = ({
     };
     
     // Helper function to handle dot clicking with sequential requirement
-    const handleDotClick = (
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const _handleDotClick = (
       currentArray: boolean[], 
       setArray: React.Dispatch<React.SetStateAction<boolean[]>>, 
       index: number, 
@@ -145,7 +147,8 @@ const LevelUpClassCommander: React.FC<LevelUpClassCommanderProps> = ({
     };
   
     // Helper function to handle SP dots (for Surgeon perk)
-    const handleSpDotClick = (
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const _handleSpDotClick = (
       currentArray: boolean[], 
       setArray: React.Dispatch<React.SetStateAction<boolean[]>>, 
       index: number, 

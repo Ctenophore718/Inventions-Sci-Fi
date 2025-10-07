@@ -7,7 +7,7 @@ export function generateTheBigOneJSX({
     grenadierTechniqueDieSizeDots?: boolean[];
     grenadierTechniqueRangeDots?: boolean[];
 }) {
-    const cooldown = 4 - (grenadierTechniqueCooldownDots?.filter(Boolean).length || 0);
+    const _cooldown = 4 - (grenadierTechniqueCooldownDots?.filter(Boolean).length || 0);
     const dieSize = grenadierTechniqueDieSizeDots[0] ? 12 : 10;
     const range = grenadierTechniqueRangeDots[0] ? 1 : 0;
     return (

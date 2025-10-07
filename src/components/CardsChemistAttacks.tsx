@@ -1,6 +1,6 @@
 import React from 'react';
 import type { CharacterSheet } from '../types/CharacterSheet';
-import { generateChemistPrimaryAttackStatsJSX, getDartGunCost } from '../utils/chemistPrimaryAttack';
+import { generateChemistPrimaryAttackStatsJSX } from '../utils/chemistPrimaryAttack';
 import { generateAnatomistSecondaryAttackStatsJSX } from '../utils/anatomistSecondaryAttack';
 import { generateGrenadierSecondaryAttackStatsJSX } from '../utils/grenadierSecondaryAttack';
 import { generateNecroSecondaryAttackStatsJSX } from '../utils/necroSecondaryAttack';

@@ -111,6 +111,7 @@ const LevelUpClassChemist: React.FC<LevelUpClassChemistProps> = ({
     };
 
     // Save dart guns to sheet
+    /* Unused function - may be needed in future
     const saveDartGuns = (newDartGuns: string[]) => {
       setSelectedDartGuns(newDartGuns);
       if (sheet) {
@@ -123,11 +124,13 @@ const LevelUpClassChemist: React.FC<LevelUpClassChemistProps> = ({
         saveCharacterSheet(updatedSheet);
       }
     };
+    */
 
 
     
+    /* Unused helper functions - may be needed in future
     // Helper function to handle dot clicking with sequential requirement
-    const handleDotClick = (
+    const _handleDotClick = (
       currentArray: boolean[], 
       setArray: React.Dispatch<React.SetStateAction<boolean[]>>, 
       index: number, 
@@ -165,7 +168,7 @@ const LevelUpClassChemist: React.FC<LevelUpClassChemistProps> = ({
     };
   
     // Helper function to handle SP dots (for Surgeon perk)
-    const handleSpDotClick = (
+    const _handleSpDotClick = (
       currentArray: boolean[], 
       setArray: React.Dispatch<React.SetStateAction<boolean[]>>, 
       index: number, 
@@ -185,7 +188,7 @@ const LevelUpClassChemist: React.FC<LevelUpClassChemistProps> = ({
       setArray(newArray);
       setSpSpent(spSpent + spDelta);
     };
-
+    */
 
       return (
         <div>

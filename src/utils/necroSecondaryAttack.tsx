@@ -24,9 +24,9 @@ export function calculateNecroSecondaryAttackData(
   const critEffectDie = 1 + (attackDamageDots?.filter(Boolean).length || 0);
   // Crit threshold: 18 - crit dots
   const critThreshold = 18 - (attackCritDots?.filter(Boolean).length || 0);
-  // Cooldown: 4 - cooldown dots
-  const cooldown = 4 - (attackCooldownDots?.filter(Boolean).length || 0);
-  return { speed, damageDie, critEffectDie, critThreshold, cooldown };
+  // cooldown: 4 - cooldown dots
+  const _cooldown = 4 - (attackCooldownDots?.filter(Boolean).length || 0);
+  return { speed, damageDie, critEffectDie, critThreshold, cooldown: _cooldown };
 }
 
 /**
@@ -38,9 +38,9 @@ export function generateNecroSecondaryAttackStatsJSX(
   attackCritDots?: boolean[],
   attackCooldownDots?: boolean[],
   chemZombieName?: string,
-  cost?: number
+  _cost?: number
 ): React.ReactElement {
-  const { speed, damageDie, critEffectDie, critThreshold, cooldown } = calculateNecroSecondaryAttackData(
+  const { speed, damageDie, critEffectDie, critThreshold, cooldown: _cooldown } = calculateNecroSecondaryAttackData(
     attackSpeedDots,
     attackDamageDots,
     attackCritDots,

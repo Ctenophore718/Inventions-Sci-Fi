@@ -55,20 +55,6 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
     }
   };
 
-  // Handler for Credits changes (similar to XP/SP)
-  const handleCreditsChange = (creditsDelta: number) => {
-    const newCredits = credits + creditsDelta;
-    
-    setCredits(newCredits);
-    setCreditsDelta(prev => prev + creditsDelta);
-    
-    handleAutoSave({ 
-      credits: newCredits,
-      // Preserve dart guns when credits change
-      dartGuns: sheet?.dartGuns || []
-    });
-  };
-
   // Handler for Credits changes without auto-save (for atomic operations)
   const handleCreditsChangeNoSave = (creditsDelta: number) => {
     const newCredits = credits + creditsDelta;
@@ -84,9 +70,6 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
   // Optionally, update local state if sheet changes
   const [spSpent, setSpSpent] = useState(sheet?.spSpent ?? 0);
   const [xpSpent, setXpSpent] = useState(sheet?.xpSpent ?? 0);
-
-  // Skills-related state and constants
-  const skillSpCosts = [1,1,2,2,3,4,5,6,8,10];
 
   // Add skillDots state for LevelUp (mirroring CharacterSheet)
   const skillList = [
@@ -971,149 +954,6 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
     return [];
   });
 
-  // Helper function to safely access classCardDots array
-  const safeGetDotsArray = (index: number): boolean[] => {
-    // Always normalize for Elementalist
-    if (charClass === "Elementalist") {
-      // Defensive: ensure array is exactly as long as defaultElementalistDots
-      if (classCardDots.length !== defaultElementalistDots.length) {
-        for (let i = classCardDots.length; i < defaultElementalistDots.length; ++i) {
-          classCardDots[i] = Array(defaultElementalistDots[i].length).fill(false);
-        }
-        if (classCardDots.length > defaultElementalistDots.length) {
-          classCardDots.length = defaultElementalistDots.length;
-        }
-      }
-      // Defensive: ensure each row is exactly as long as defaultElementalistDots[i]
-      for (let i = 0; i < defaultElementalistDots.length; ++i) {
-        if (!classCardDots[i]) classCardDots[i] = Array(defaultElementalistDots[i].length).fill(false);
-        if (classCardDots[i].length !== defaultElementalistDots[i].length) {
-          classCardDots[i] = [
-            ...classCardDots[i].slice(0, defaultElementalistDots[i].length),
-            ...Array(Math.max(0, defaultElementalistDots[i].length - classCardDots[i].length)).fill(false)
-          ];
-        }
-      }
-      return classCardDots[index] || [];
-    }
-    // Fallback for other classes
-    if (!classCardDots || !Array.isArray(classCardDots) || index >= classCardDots.length) {
-      if (charClass === "Coder") {
-        return defaultCoderDots[index] || [];
-      }
-      if (charClass === "Commander") {
-        return defaultCommanderDots[index] || [];
-      }
-      if (charClass === "Contemplative") {
-        return defaultContemplativeDots[index] || [];
-      }
-      if (charClass === "Devout") {
-        return defaultDevoutDots[index] || [];
-      }
-      if (charClass === "Exospecialist") {
-        return defaultExospecialistDots[index] || [];
-      }
-      if (charClass === "Technician") {
-        return defaultTechnicianDots[index] || [];
-      }
-      if (charClass === "Chemist") {
-        return defaultChemistDots[index] || [];
-      }
-      if (charClass === "Gunslinger") {
-        return defaultGunslingerDots[index] || [];
-      }
-    }
-    return classCardDots[index] || [];
-  };
-
-  // Helper function to safely clone classCardDots array
-  const safeCloneClassCardDots = (): boolean[][] => {
-    console.log('safeCloneClassCardDots called:', {
-      classCardDots,
-      charClass,
-      classCardDotsLength: classCardDots?.length,
-      isArray: Array.isArray(classCardDots)
-    });
-    
-    if (!classCardDots || !Array.isArray(classCardDots) || classCardDots.length === 0) {
-      console.warn('classCardDots is not properly initialized, returning default for class:', charClass);
-      if (charClass === "Coder") {
-        const result = defaultCoderDots.map(row => [...row]);
-        console.log('Returning default Coder dots:', result);
-        return result;
-      }
-      if (charClass === "Commander") {
-        const result = defaultCommanderDots.map(row => [...row]);
-        console.log('Returning default Commander dots:', result);
-        return result;
-      }
-      if (charClass === "Contemplative") {
-        const result = defaultContemplativeDots.map(row => [...row]);
-        console.log('Returning default Contemplative dots:', result);
-        return result;
-      }
-      if (charClass === "Devout") {
-        const result = defaultDevoutDots.map(row => [...row]);
-        console.log('Returning default Devout dots:', result);
-        return result;
-      }
-      if (charClass === "Elementalist") {
-        const result = defaultElementalistDots.map(row => [...row]);
-        console.log('Returning default Elementalist dots:', result);
-        return result;
-      }
-      if (charClass === "Exospecialist") {
-        const result = defaultExospecialistDots.map(row => [...row]);
-        console.log('Returning default Exospecialist dots:', result);
-        return result;
-      }
-      if (charClass === "Technician") {
-        const result = defaultTechnicianDots.map(row => [...row]);
-        console.log('Returning default Technician dots:', result);
-        return result;
-      }
-      if (charClass === "Chemist") {
-        const result = defaultChemistDots.map(row => [...row]);
-        console.log('Returning default Chemist dots:', result);
-        return result;
-      }
-      if (charClass === "Gunslinger") {
-        const result = defaultGunslingerDots.map(row => [...row]);
-        console.log('Returning default Gunslinger dots:', result);
-        return result;      
-      }
-    }
-    
-    const result = classCardDots.map(row => Array.isArray(row) ? [...row] : []);
-    console.log('Returning cloned classCardDots:', result);
-    return result;
-  };
-
-  // Save to sheet and localStorage
-  const persistClassCardDots = (newDots: boolean[][], spSpentDelta: number = 0, xpSpentDelta: number = 0) => {
-    let newSpSpent = spSpent + spSpentDelta;
-    let newXpSpent = xpSpent + xpSpentDelta;
-    // Enforce XP/SP cannot exceed total
-    if (newXpSpent > xpTotal) {
-      setNotice("Not enough xp!");
-      return;
-    }
-    if (newSpSpent > spTotal) {
-      setNotice("Not enough sp!");
-      return;
-    }
-    setClassCardDots(newDots);
-    newSpSpent = Math.max(0, newSpSpent);
-    newXpSpent = Math.max(0, newXpSpent);
-    setSpSpent(newSpSpent);
-    setXpSpent(newXpSpent);
-    if (sheet) {
-      const updatedSheet = { ...sheet, classCardDots: newDots, spSpent: newSpSpent, xpSpent: newXpSpent };
-      saveCharacterSheet(updatedSheet);
-      // Remove duplicate call to handleAutoSave since saveCharacterSheet already handles the save
-      // and the storage change effect will sync the data
-    }
-  };
   // Class options (copied from CharacterEditor)
   const classOptions = [
     { label: "Chemist", value: "Chemist", color: "#721131" },
@@ -1379,7 +1219,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                   <LevelUpClassCommander
                     sheet={sheet}
                     charClass={charClass}
-                    subclass={subclass}
+                    _subclass={subclass}
                     xpTotal={xpTotal}
                     spTotal={spTotal}
                     xpSpent={xpSpent}
@@ -1394,7 +1234,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                   <LevelUpClassContemplative
                     sheet={sheet}
                     charClass={charClass}
-                    subclass={subclass}
+                    _subclass={subclass}
                     xpTotal={xpTotal}
                     spTotal={spTotal}
                     xpSpent={xpSpent}
@@ -1407,7 +1247,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                   <LevelUpClassDevout
                     sheet={sheet}
                     charClass={charClass}
-                    subclass={subclass}
+                    _subclass={subclass}
                     xpTotal={xpTotal}
                     spTotal={spTotal}
                     xpSpent={xpSpent}
@@ -1433,7 +1273,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                   <LevelUpClassExospecialist
                     sheet={sheet}
                     charClass={charClass}
-                    subclass={subclass}
+                    _subclass={subclass}
                     xpTotal={xpTotal}
                     spTotal={spTotal}
                     xpSpent={xpSpent}
@@ -1446,7 +1286,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                   <LevelUpClassGunslinger
                     sheet={sheet}
                     charClass={charClass}
-                    subclass={subclass}
+                    _subclass={subclass}
                     xpTotal={xpTotal}
                     spTotal={spTotal}
                     xpSpent={xpSpent}
@@ -1459,7 +1299,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                   <LevelUpClassTechnician
                     sheet={sheet}
                     charClass={charClass}
-                    subclass={subclass}
+                    _subclass={subclass}
                     xpTotal={xpTotal}
                     spTotal={spTotal}
                     xpSpent={xpSpent}
