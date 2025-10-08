@@ -14,6 +14,7 @@ import LevelUpClassGunslinger from "./LevelUpClassGunslinger";
 import LevelUpClassTechnician from "./LevelUpClassTechnician";
 import LevelUpSubclassesChemist from "./LevelUpSubclassesChemist";
 import LevelUpSubclassesCoder from "./LevelUpSubclassesCoder";
+import LevelUpSubclassesCommander from "./LevelUpSubclassesCommander";
 import { calculateChemistFeatureData } from "../utils/chemistFeature";
 
 
@@ -1441,6 +1442,23 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
             {/* Coder Subclass Content */}
             {charClass === "Coder" && subclass && (
               <LevelUpSubclassesCoder
+                sheet={sheet}
+                charClass={charClass}
+                subclass={subclass}
+                onAutoSave={handleAutoSave}
+                xpTotal={xpTotal}
+                spTotal={spTotal}
+                xpSpent={xpSpent}
+                spSpent={spSpent}
+                setXpSpent={setXpSpent}
+                setSpSpent={setSpSpent}
+                setNotice={setNotice}
+              />
+            )}
+
+            {/* Commander Subclass Content */}
+            {charClass === "Commander" && subclass && (
+              <LevelUpSubclassesCommander
                 sheet={sheet}
                 charClass={charClass}
                 subclass={subclass}

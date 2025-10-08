@@ -5,6 +5,7 @@ import type { CharacterSheet } from "../types/CharacterSheet";
 import { saveCharacterSheet, loadSheetById } from "../utils/storage";
 import { generateChemicalReactionJSX, calculateChemistFeatureData } from "../utils/chemistFeature";
 import { generateChemistStrikeJSX } from "../utils/chemistStrike";
+import { generateCommanderStrikeJSX } from "../utils/commanderStrike";
 import { generateAnatomicalPrecisionJSX } from "../utils/anatomistFeature";
 import { generateBlasterMasterJSX } from "../utils/grenadierFeature";
 import { generateBodySnatcherJSX } from "../utils/necroFeature";
@@ -2160,15 +2161,9 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                 {generateChemistStrikeJSX(sheet?.classCardDots, 'charactersheet')}
               </span>
             ) : charClass === 'Commander' ? (
-              (() => {
-                const damageDots = sheet?.classCardDots?.[8] || [];
-                const numDice = 1 + damageDots.filter(Boolean).length;
-                return (
-                  <span style={{ fontWeight: 'bold', fontFamily: 'inherit', color: '#000', marginLeft: 0, display: 'flex', alignItems: 'center' }}>
-                    {numDice}d6&nbsp;
-                  </span>
-                );
-              })()
+              <span style={{ fontWeight: 'bold', fontFamily: 'inherit', color: '#000', marginLeft: 4, display: 'flex', alignItems: 'center' }}>
+                {generateCommanderStrikeJSX(sheet?.classCardDots, 'charactersheet')}
+              </span>
             ) : subclass === 'Naturalist' ? (
               generateNaturalistStrikeJSX(sheet)
             ) : subclass === 'Technologist' ? (

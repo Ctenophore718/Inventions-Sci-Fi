@@ -45,15 +45,17 @@ export function generateCommanderPrimaryAttackStatsJSX(
           <>
             <b><u>Damage</u></b> <b>[{baseDamage}]</b>d6 <b><u style={{ color: '#d5d52a', display: 'inline-flex', alignItems: 'center' }}>
             Electric<img src="/Electric.png" alt="Electric" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b><br />
-            <b><u>Crit Effect</u></b> <b>[{baseDamage}]</b>d6 <b><u style={{ color: '#d5d52a', display: 'inline-flex', alignItems: 'center' }}>
-            Electric<img src="/Electric.png" alt="Electric" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} /></u></b>
+            <b><u>Crit Effect</u></b> <b>[{baseDamage}]</b>d6 <b><u style={{ color: '#f90102', display: 'inline-flex', alignItems: 'center' }}>
+            Fire<img src="/Fire.png" alt="Fire" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} /></u></b>, <b><i>Spike</i></b><br /> 
+            <div style={{ textAlign: 'right', width: '100%' }}><b>(<u style={{ color: '#d5d52a', display: 'inline-flex', alignItems: 'center' }}>
+            Electric<img src="/Electric.png" alt="Electric" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u>)</b></div>   
           </>
         ) : rifleName === 'Sapper Gun' ? (
           <>
-            <b><u>Damage</u></b> <b>[{baseDamage}]</b>d6 <b><u style={{ color: '#516fff', display: 'inline-flex', alignItems: 'center' }}>
-            Force<img src="/Force.png" alt="Force" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b><br />
-            <b><u>Crit Effect</u></b> <b>[{baseDamage}]</b>d6 <b><u style={{ color: '#516fff', display: 'inline-flex', alignItems: 'center' }}>
-            Force<img src="/Force.png" alt="Force" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} /></u></b>, <b><i>Drain</i></b>
+            <b><u>Damage</u></b> <b>[{baseDamage}]</b>d6 <b><u style={{ color: '#a6965f', display: 'inline-flex', alignItems: 'center' }}>
+            Piercing<img src="/Piercing.png" alt="Piercing" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b><br />
+            <b><u>Crit Effect</u></b> <b>[{baseDamage}]</b>d6 <b><u style={{ color: '#a6965f', display: 'inline-flex', alignItems: 'center' }}>
+            Piercing<img src="/Piercing.png" alt="Piercing" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} /></u></b>, <b><i>Drain</i></b>
           </>
         ) : (
           <>
