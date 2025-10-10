@@ -42,9 +42,11 @@ export function generateBeguilerSecondaryAttackJSX(
       <div style={{ marginBottom: '4px' }}>
         <b><i><span style={{ color: '#000' }}>Secondary</span> <span style={{ color: '#990000' }}>Attack</span></i></b> <i>(Cooldown</i> <b>[{cooldown}]</b><i>).</i>
       </div>
-      <div style={{ marginBottom: '4px' }}>
-        <b>Whips.</b>
-      </div>
+      
+      
+      
+      
+      
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
         <span>
           <b><u>Range</u></b> 1hx
@@ -54,12 +56,76 @@ export function generateBeguilerSecondaryAttackJSX(
         </span>
       </div>
       <b><u>Target</u></b> <i>AoE</i> <b>[{chainAoE}]</b>hx-Chain <br />
-      <b><u>Damage</u></b> 1d4 <b><u style={{ color: '#a929ff', display: 'inline-flex', alignItems: 'center' }}>
-        Neural<img src="/Neural.png" alt="Neural" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} />
-      </u></b>, <b><i>Confuse</i></b> <br />
-      <b><u>Crit Effect</u></b> 1d4 <b><u style={{ color: '#a929ff', display: 'inline-flex', alignItems: 'center' }}>
-        Neural<img src="/Neural.png" alt="Neural" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} />
-      </u></b>, <b><i>Mesmerize</i></b>
+      <b><u>Damage</u></b> 1d4, status effect <br />
+      <b><u>Crit Effect</u></b> 1d4 
+    </div>
+  );
+}
+
+/**
+ * Generate the secondary attack stats for Beguiler Whips Cards
+ */
+export function generateBeguilerSecondaryAttackStatsJSX(
+  attackAoEDots?: boolean[],
+  attackCritDots?: boolean[],
+  attackCooldownDots?: boolean[],
+  whipName?: string,
+  _cost?: number
+): React.ReactElement {
+  const { chainAoE, critThreshold, cooldown: _cooldown } = calculateBeguilerSecondaryAttackData(
+    attackAoEDots,
+    attackCritDots,
+    attackCooldownDots
+  );
+
+  if (whipName === "Heartstrings") {
+    return (
+      <div style={{ fontSize: '0.875em', width: '100%', height: 'fit-content', maxHeight: '100%', overflow: 'hidden' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <span><b><u>Range</u></b> 1hx</span>
+          <span style={{ textAlign: 'right', minWidth: '80px' }}><b><u>Crit</u></b> <b>[{critThreshold}]</b>+</span>
+        </div>
+        <div>
+          <b><u>Target</u></b> <i>AoE</i> <b>[{chainAoE}]</b>hx-Chain <br />
+          <b><u>Damage</u></b> 1d4 <b><u style={{ color: '#a929ff', display: 'inline-flex', alignItems: 'center' }}>
+            Neural<img src="/Neural.png" alt="Neural" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>, <b><i>Confuse</i></b> <br />
+          <b><u>Crit Effect</u></b> 1d4 <b><u style={{ color: '#a929ff', display: 'inline-flex', alignItems: 'center' }}>
+            Neural<img src="/Neural.png" alt="Neural" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>
+        </div>
+      </div>
+    );
+  }
+
+  if (whipName === "The Crackler") {
+    return (
+      <div style={{ fontSize: '0.875em', width: '100%', height: 'fit-content', maxHeight: '100%', overflow: 'hidden' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <span><b><u>Range</u></b> 1hx</span>
+          <span style={{ textAlign: 'right', minWidth: '80px' }}><b><u>Crit</u></b> <b>[{critThreshold}]</b>+</span>
+        </div>
+        <div>
+          <b><u>Target</u></b> <i>AoE</i> <b>[{chainAoE}]</b>hx-Chain <br />
+          <b><u>Damage</u></b> 1d4 <b><u style={{ color: '#516fff', display: 'inline-flex', alignItems: 'center' }}>
+            Electric<img src="/Electric.png" alt="Electric" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>, <b><i>Mesmerize</i></b> <br />
+          <b><u>Crit Effect</u></b> 1d4 <b><u style={{ color: '#516fff', display: 'inline-flex', alignItems: 'center' }}>
+            Electric<img src="/Electric.png" alt="Electric" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>
+        </div>
+      </div>
+    );
+  }
+
+  // Default fallback
+  return (
+    <div style={{ fontSize: '0.875em', width: '100%', height: 'fit-content', maxHeight: '100%', overflow: 'hidden' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <span><b><u>Range</u></b> 1hx</span>
+        <span style={{ textAlign: 'right', minWidth: '80px' }}><b><u>Crit</u></b> <b>[{critThreshold}]</b>+</span>
+      </div>
+      <div>
+        <b><u>Target</u></b> <i>AoE</i> <b>[{chainAoE}]</b>hx-Chain <br />
+        <b><u>Damage</u></b> 1d4, status effect <br />
+        <b><u>Crit Effect</u></b> 1d4
+      </div>
     </div>
   );
 }

@@ -33,7 +33,7 @@ export function generateLoyalServantsJSX(
   
   return (
     <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#ff43da' }}>Loyal Servants.</i></b> You control allies within <b>[{range}]</b>hx of you when they suffer the <b><i>Confuse</i></b> or <b><i>Mesmerize</i></b> condition. Additionally, whenever you're targeted by an <span style={{ color: '#990000' }}><b><i>Attack</i></b></span>, an ally of your choice within <b>[{range}]</b>hx of you is targeted instead and suffers the <b><i>Confuse</i></b> condition.
+      <b><i style={{ color: '#1f21ce' }}>Loyal Servants.</i></b> You control allies within <b>[{range}]</b>hx of you when they suffer the <b><i>Confuse</i></b> or <b><i>Mesmerize</i></b> condition. Additionally, whenever you're targeted by an <span style={{ color: '#990000' }}><b><i>Attack</i></b></span>, an ally of your choice within <b>[{range}]</b>hx of you is targeted instead and suffers the <b><i>Confuse</i></b> condition.
     </span>
   );
 }

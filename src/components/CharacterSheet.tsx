@@ -17,6 +17,7 @@ import { generateNaturalistStrikeJSX } from "../utils/naturalistStrike";
 import { generateTechManipulationJSX } from "../utils/technologistFeature";
 import { generateTechnologistStrikeJSX } from "../utils/technologistStrike";
 import { generateStaySharpJSX } from "../utils/commanderFeature";
+import { generateLoyalServantsJSX } from "../utils/beguilerFeature";
 
 
 type Props = {
@@ -726,11 +727,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
   const technologistFeatureJSX = generateTechManipulationJSX(sheet);
 
   // Add after technologistFeatureJSX
-  const beguilerFeatureJSX = (
-    <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#1f21ce' }}>Loyal Servants.</i></b> You control allies within <b>[3]</b>hx of you when they suffer the <b><i>Confuse</i></b> or <b><i>Mesmerize</i></b> condition. Additionally, whenever you're targeted by an <b><i><span style={{ color: '#990000' }}>Attack</span></i></b>, an ally of your choice within <b>[3]</b>hx of you is targeted instead and suffers the <b><i>Confuse</i></b> condition.
-    </span>
-  );
+  // beguilerFeatureJSX is now handled dynamically in the subclass check
 
   // Add after beguilerFeatureJSX
   const galvanicFeatureJSX = (
@@ -1228,6 +1225,14 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
       );
     }
     
+    // Add Whips for Beguiler subclass
+    if (subclass === 'Beguiler') {
+      attacks.push(
+        { name: 'Heartstrings', type: 'Whip', cost: 190 },
+        { name: 'The Crackler', type: 'Whip', cost: 200 }
+      );
+    }
+    
     return attacks;
   };
 
@@ -1355,6 +1360,13 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
           noxiousFumes: newNoxiousFumes,
           credits: credits - cost
         };
+      } else if (type === 'Whip') {
+        const newWhips = [...(sheet.whips || []), attackName];
+        updatedSheet = { 
+          ...sheet, 
+          whips: newWhips,
+          credits: credits - cost
+        };
       } else {
         return;
       }
@@ -1397,6 +1409,12 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
         updatedSheet = { 
           ...sheet, 
           noxiousFumes: newNoxiousFumes
+        };
+      } else if (type === 'Whip') {
+        const newWhips = [...(sheet.whips || []), attackName];
+        updatedSheet = { 
+          ...sheet, 
+          whips: newWhips
         };
       } else {
         return;
@@ -1789,7 +1807,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
             subclass === "Anatomist" 
               ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{anatomistFeatureJSX}</span>
               : subclass === "Beguiler"
-                ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{beguilerFeatureJSX}</span>
+                ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{generateLoyalServantsJSX(sheet?.subclassProgressionDots?.beguilerFeatureHxDots || [false, false, false])}</span>
                 : subclass === "Coercive"
                   ? <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{coerciveFeatureJSX}</span>
                   : subclass === "Divinist"
@@ -2624,10 +2642,10 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                     textAlign: 'left',
                     minWidth: '180px'
                   }}
-                  value={pendingSecondaryAttack || (charClass === 'Coder' ? 'Algorithms' : subclass === 'Anatomist' ? 'Super Serums' : subclass === 'Grenadier' ? 'Grenades' : subclass === 'Necro' ? 'Chem Zombies' : subclass === 'Poisoner' ? 'Noxious Fumes' : 'Select Secondary Attack')}
+                  value={pendingSecondaryAttack || (charClass === 'Coder' ? 'Algorithms' : subclass === 'Anatomist' ? 'Super Serums' : subclass === 'Grenadier' ? 'Grenades' : subclass === 'Necro' ? 'Chem Zombies' : subclass === 'Poisoner' ? 'Noxious Fumes' : subclass === 'Beguiler' ? 'Whips' : 'Select Secondary Attack')}
                   onChange={(e) => {
                     const value = e.target.value;
-                    if (value !== 'Algorithms' && value !== 'Super Serums' && value !== 'Grenades' && value !== 'Chem Zombies' && value !== 'Noxious Fumes' && value !== 'Select Secondary Attack') {
+                    if (value !== 'Algorithms' && value !== 'Super Serums' && value !== 'Grenades' && value !== 'Chem Zombies' && value !== 'Noxious Fumes' && value !== 'Whips' && value !== 'Select Secondary Attack') {
                       setPendingSecondaryAttack(value);
                     }
                   }}
@@ -2666,7 +2684,14 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                       <option style={{ fontWeight: 'bold' }}>Color Spray</option>
                     </>
                   )}
-                  {charClass !== 'Coder' && subclass !== 'Anatomist' && subclass !== 'Grenadier' && subclass !== 'Necro' && subclass !== 'Poisoner' && (
+                  {subclass === 'Beguiler' && (
+                    <>
+                      <option disabled style={{ fontWeight: 'bold' }}>Whips</option>
+                      <option style={{ fontWeight: 'bold' }}>Heartstrings</option>
+                      <option style={{ fontWeight: 'bold' }}>The Crackler</option>
+                    </>
+                  )}
+                  {charClass !== 'Coder' && subclass !== 'Anatomist' && subclass !== 'Grenadier' && subclass !== 'Necro' && subclass !== 'Poisoner' && subclass !== 'Beguiler' && (
                     <option disabled style={{ fontWeight: 'bold' }}>Select Secondary Attack</option>
                   )}
                 </select>
@@ -2822,6 +2847,29 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                                 const updatedSheet = { 
                                   ...sheet, 
                                   noxiousFumes: newNoxiousFumes
+                                };
+                                handleAutoSave(updatedSheet);
+                              }
+                            }}
+                          >×</button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  {(sheet?.whips && sheet.whips.length > 0) && (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginLeft: '8px' }}>
+                      {sheet?.whips?.map((whip, idx) => (
+                        <span key={whip + idx + 'whip'} style={{ fontStyle: 'italic', display: 'flex', alignItems: 'center', background: '#f5f5f5', borderRadius: '6px', padding: '2px 8px' }}>
+                          {whip}
+                          <button
+                            style={{ marginLeft: '6px', padding: '0 6px', borderRadius: '50%', border: 'none', background: '#d32f2f', color: 'white', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.9em' }}
+                            title={`Remove ${whip}`}
+                            onClick={() => {
+                              if (sheet) {
+                                const newWhips = sheet.whips?.filter((_, i) => i !== idx) || [];
+                                const updatedSheet = { 
+                                  ...sheet, 
+                                  whips: newWhips
                                 };
                                 handleAutoSave(updatedSheet);
                               }

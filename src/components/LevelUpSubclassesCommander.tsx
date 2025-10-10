@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import type { CharacterSheet } from "../types/CharacterSheet";
 import { generateLoyalServantsJSX } from "../utils/beguilerFeature";
 import { generateSeduceJSX } from "../utils/beguilerTechnique";
@@ -63,6 +63,26 @@ const LevelUpSubclassesCommander: React.FC<LevelUpSubclassesCommanderProps> = ({
   const [beguilerPerksSkillsDots, setBeguilerPerksSkillsDots] = useState<boolean[]>(
     (sheet?.subclassProgressionDots as any)?.beguilerPerksSkillsDots || [false]
   );
+
+  // State for pending whip selection
+  const [pendingWhip, setPendingWhip] = useState<string>("");
+
+  // Sync local state with sheet changes to prevent race conditions
+  useEffect(() => {
+    if (sheet?.subclassProgressionDots) {
+      const dots = sheet.subclassProgressionDots as any;
+      setBeguilerFeatureHxDots(dots.beguilerFeatureHxDots || [false, false, false]);
+      setBeguilerTechniqueRangeDots(dots.beguilerTechniqueRangeDots || [false, false, false]);
+      setBeguilerTechniqueMoveDots(dots.beguilerTechniqueMoveDots || [false, false]);
+      setBeguilerTechniqueCooldownDots(dots.beguilerTechniqueCooldownDots || [false, false]);
+      setBeguilerAttackAoEDots(dots.beguilerAttackAoEDots || [false, false, false]);
+      setBeguilerAttackCritDots(dots.beguilerAttackCritDots || [false, false, false]);
+      setBeguilerAttackCooldownDots(dots.beguilerAttackCooldownDots || [false, false]);
+      setBeguilerStrikeStrikeDots(dots.beguilerStrikeStrikeDots || [false]);
+      setBeguilerStrikeMesmerizeDots(dots.beguilerStrikeMesmerizeDots || [false]);
+      setBeguilerPerksSkillsDots(dots.beguilerPerksSkillsDots || [false]);
+    }
+  }, [sheet?.subclassProgressionDots]);
 
   // Helper function to handle XP dot clicking with sequential requirement
   const handleDotClick = (
@@ -162,6 +182,35 @@ const LevelUpSubclassesCommander: React.FC<LevelUpSubclassesCommanderProps> = ({
         subclassProgressionDots: progressionDots,
         spSpent: Math.max(0, newSpSpent)
       });
+    }
+  };
+
+  // Handler for purchasing whips with credits
+  const handleWhipPurchase = (whipName: string, cost: number) => {
+    const currentCredits = sheet?.credits || 0;
+    if (currentCredits < cost) {
+      setNotice("Not enough credits!");
+      return;
+    }
+
+    if (sheet && onAutoSave) {
+      const newWhips = [...(sheet.whips || []), whipName];
+      onAutoSave({
+        whips: newWhips,
+        credits: currentCredits - cost
+      });
+      setPendingWhip(""); // Clear dropdown after purchase
+    }
+  };
+
+  // Handler for adding whips without cost
+  const handleWhipAdd = (whipName: string) => {
+    if (sheet && onAutoSave) {
+      const newWhips = [...(sheet.whips || []), whipName];
+      onAutoSave({
+        whips: newWhips
+      });
+      setPendingWhip(""); // Clear dropdown after adding
     }
   };
 
@@ -346,11 +395,122 @@ const LevelUpSubclassesCommander: React.FC<LevelUpSubclassesCommanderProps> = ({
           {/* Attack Section */}
           <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
             <div style={{ fontWeight: 'bold', color: '#990000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Attack</u></div>
-            {generateBeguilerSecondaryAttackJSX(
-              beguilerAttackAoEDots,
-              beguilerAttackCritDots,
-              beguilerAttackCooldownDots
-            )}
+            <div style={{ marginBottom: '4px' }}>
+              <b><i><span style={{ color: '#000' }}>Secondary</span> <span style={{ color: '#990000' }}>Attack</span></i></b> <i>(Cooldown</i> <b>[{4 - (beguilerAttackCooldownDots?.filter(Boolean).length || 0)}]</b><i>).</i>
+            </div>
+
+            {/* Whips dropdown section */}
+            <div style={{ marginTop: '8px', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <div style={{ marginBottom: '4px' }}>
+                <select
+                  style={{
+                    fontSize: '1em',
+                    padding: '2px 8px',
+                    borderRadius: '6px',
+                    border: '1px solid #ccc',
+                    background: '#fff',
+                    color: '#222',
+                    fontWeight: 'bold',
+                    marginBottom: '4px',
+                    textAlign: 'left',
+                    minWidth: '180px'
+                  }}
+                  value={pendingWhip || 'Whips'}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (value !== 'Whips') {
+                      setPendingWhip(value);
+                    }
+                  }}
+                >
+                  <option disabled style={{ fontWeight: 'bold' }}>Whips</option>
+                  <option style={{ fontWeight: 'bold' }}>Heartstrings</option>
+                  <option style={{ fontWeight: 'bold' }}>The Crackler</option>
+                </select>
+                
+                {pendingWhip && (
+                  <div style={{ marginTop: '4px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    <div style={{ fontWeight: 'bold' }}>
+                      {pendingWhip}
+                      <span style={{ color: '#bf9000', fontWeight: 'bold', marginLeft: '8px' }}>
+                        {pendingWhip === 'Heartstrings' ? '190c' : pendingWhip === 'The Crackler' ? '200c' : ''}
+                      </span>
+                    </div>
+                    <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                      <button
+                        style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #1976d2', background: '#1976d2', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}
+                        onClick={() => {
+                          const cost = pendingWhip === 'Heartstrings' ? 190 : pendingWhip === 'The Crackler' ? 200 : 0;
+                          handleWhipPurchase(pendingWhip, cost);
+                        }}
+                      >
+                        Buy
+                      </button>
+                      <button
+                        style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #28a745', background: '#28a745', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}
+                        onClick={() => handleWhipAdd(pendingWhip)}
+                      >
+                        Add
+                      </button>
+                      <button
+                        style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #aaa', background: '#eee', color: '#333', fontWeight: 'bold', cursor: 'pointer' }}
+                        onClick={() => setPendingWhip("")}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Display added whips */}
+                <div style={{ marginTop: '4px' }}>
+                  {(sheet?.whips && sheet.whips.length > 0) && (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                      {sheet?.whips?.map((whip, idx) => (
+                        <span key={whip + idx + 'whip'} style={{ fontStyle: 'italic', display: 'flex', alignItems: 'center', background: '#f5f5f5', borderRadius: '6px', padding: '2px 8px' }}>
+                          {whip}
+                          <button
+                            style={{ marginLeft: '6px', padding: '0 6px', borderRadius: '50%', border: 'none', background: '#d32f2f', color: 'white', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.9em' }}
+                            title={`Remove ${whip}`}
+                            onClick={() => {
+                              if (sheet && onAutoSave) {
+                                const newWhips = sheet.whips?.filter((_, i) => i !== idx) || [];
+                                onAutoSave({
+                                  whips: newWhips
+                                });
+                              }
+                            }}
+                          >×</button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Rest of Secondary Attack details from generateBeguilerSecondaryAttackJSX */}
+            {(() => {
+              const { chainAoE, critThreshold } = {
+                chainAoE: 5 + (beguilerAttackAoEDots?.filter(Boolean).length || 0),
+                critThreshold: 18 - (beguilerAttackCritDots?.filter(Boolean).length || 0)
+              };
+              return (
+                <div style={{ fontSize: '1em', color: '#000', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+                    <span>
+                      <b><u>Range</u></b> 1hx
+                    </span>
+                    <span style={{ textAlign: 'right', minWidth: '80px' }}>
+                      <b><u>Crit</u></b> <b>[{critThreshold}]</b>+
+                    </span>
+                  </div>
+                  <div style={{ marginTop: '4px' }}>
+                    <b><u>Target</u></b> <i>AoE</i> <b>[{chainAoE}]</b>hx-Chain
+                  </div>
+                </div>
+              );
+            })()}
 
             {/* Attack XP progression table - First row */}
             <div style={{
@@ -585,7 +745,7 @@ const LevelUpSubclassesCommander: React.FC<LevelUpSubclassesCommanderProps> = ({
                   overflowWrap: 'break-word',
                   wordWrap: 'break-word'
                 }}>
-                  <b><i style={{ color: '#ff43da', fontSize: '1em' }}>Object of Fascination.</i></b> Your seductive qualities are undeniable and you are capable of convincing nearly anyone to assist in almost any way. Gain an advantage on skill rolls related to coaxing others who are not outright hostile towards you to help you.
+                  <b><i style={{ color: '#1f21ce', fontSize: '1em' }}>Object of Fascination.</i></b> Your seductive qualities are undeniable and you are capable of convincing nearly anyone to assist in almost any way. Gain an advantage on skill rolls related to coaxing others who are not outright hostile towards you to help you.
                 </div>
                 <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start' }}>
                   <span

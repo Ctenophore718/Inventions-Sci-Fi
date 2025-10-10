@@ -32,7 +32,7 @@ export function generateSeduceJSX(subclassProgressionDots?: any): React.ReactEle
 
   return (
     <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#ff43da', fontSize: '1em' }}>Seduce</i></b> <span style={{ color: '#ff43da', fontSize: '1em' }}><i>(Cooldown <b style={{ color: '#000', fontStyle: 'normal' }}>[{cooldown}]</b>).</i></span> All enemies within <b>[{hxRange}]</b>hx <b><i style={{ color: '#38761d' }}>Move</i></b> <b>[{3 + moveCloserBonus}]</b>hx closer to you and suffer <i>Vulnerability</i> to all Damage against the next <span style={{ color: '#990000' }}><b><i>Attack</i></b></span> or <b><i style={{ color: '#351c75' }}>Strike</i></b> made against them until the beginning of the next round. This overrides any existing <i>Resistance</i> and/or <i>Immunity</i>.
+      <b><i style={{ color: '#1f21ce', fontSize: '1em' }}>Seduce</i></b> <span style={{ color: '#1f21ce', fontSize: '1em' }}><i>(Cooldown <b style={{ color: '#000', fontStyle: 'normal' }}>[{cooldown}]</b>).</i></span> All enemies within <b>[{hxRange}]</b>hx <b><i style={{ color: '#38761d' }}>Move</i></b> <b>[{3 + moveCloserBonus}]</b>hx closer to you and suffer <i>Vulnerability</i> to all Damage against the next <span style={{ color: '#990000' }}><b><i>Attack</i></b></span> or <b><i style={{ color: '#351c75' }}>Strike</i></b> made against them until the beginning of the next round. This overrides any existing <i>Resistance</i> and/or <i>Immunity</i>.
     </span>
   );
 }

@@ -88,6 +88,9 @@ export type CharacterSheet = {
   // Noxious Fumes for Poisoner subclass
   noxiousFumes?: string[];
 
+  // Whips for Beguiler subclass
+  whips?: string[];
+
   // Subclass progression dots (specific to each subclass)
   subclassProgressionDots?: {
     // Anatomist subclass progression
@@ -164,6 +167,17 @@ export type CharacterSheet = {
     technologistPerksSkillsDots?: boolean[];
     // Poisoner venom master dots
     poisonerVenomMasterDots?: boolean[];
+    // Beguiler subclass progression (Commander)
+    beguilerFeatureHxDots?: boolean[];
+    beguilerTechniqueRangeDots?: boolean[];
+    beguilerTechniqueMoveDots?: boolean[];
+    beguilerTechniqueCooldownDots?: boolean[];
+    beguilerAttackAoEDots?: boolean[];
+    beguilerAttackCritDots?: boolean[];
+    beguilerAttackCooldownDots?: boolean[];
+    beguilerStrikeStrikeDots?: boolean[];
+    beguilerStrikeMesmerizeDots?: boolean[];
+    beguilerPerksSkillsDots?: boolean[];
     // Add other subclasses as needed
   };
 };
