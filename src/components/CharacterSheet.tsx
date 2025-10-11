@@ -18,6 +18,7 @@ import { generateTechManipulationJSX } from "../utils/technologistFeature";
 import { generateTechnologistStrikeJSX } from "../utils/technologistStrike";
 import { generateStaySharpJSX } from "../utils/commanderFeature";
 import { generateLoyalServantsJSX } from "../utils/beguilerFeature";
+import { generateInspiringPresenceJSX } from "../utils/galvanicFeature";
 
 
 type Props = {
@@ -732,7 +733,10 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
   // Add after beguilerFeatureJSX
   const galvanicFeatureJSX = (
     <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#6fce1f' }}>Inspiring Presence.</i></b> Allies within <b>[3]</b>hx of you at the beginning of the round gain +<b>[1]</b>d6 <b><i style={{ color: '#990000' }}>Hit Points</i></b>.
+      {generateInspiringPresenceJSX(
+        sheet?.subclassProgressionDots?.galvanicFeatureHxDots,
+        sheet?.subclassProgressionDots?.galvanicFeatureHpDots
+      )}
     </span>
   );
 
@@ -1233,6 +1237,14 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
       );
     }
     
+    // Add Sabres for Galvanic subclass
+    if (subclass === 'Galvanic') {
+      attacks.push(
+        { name: 'Phase Sword', type: 'Sabre', cost: 185 },
+        { name: 'Truthsinger', type: 'Sabre', cost: 185 }
+      );
+    }
+    
     return attacks;
   };
 
@@ -1367,6 +1379,13 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
           whips: newWhips,
           credits: credits - cost
         };
+      } else if (type === 'Sabre') {
+        const newSabres = [...(sheet.sabres || []), attackName];
+        updatedSheet = { 
+          ...sheet, 
+          sabres: newSabres,
+          credits: credits - cost
+        };
       } else {
         return;
       }
@@ -1415,6 +1434,12 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
         updatedSheet = { 
           ...sheet, 
           whips: newWhips
+        };
+      } else if (type === 'Sabre') {
+        const newSabres = [...(sheet.sabres || []), attackName];
+        updatedSheet = { 
+          ...sheet, 
+          sabres: newSabres
         };
       } else {
         return;
@@ -2181,6 +2206,15 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
             ) : charClass === 'Commander' ? (
               <span style={{ fontWeight: 'bold', fontFamily: 'inherit', color: '#000', marginLeft: 4, display: 'flex', alignItems: 'center' }}>
                 {generateCommanderStrikeJSX(sheet?.classCardDots, 'charactersheet')}
+                {subclass === 'Beguiler' && (
+                  <>
+                    &nbsp;
+                    <span style={{ color: '#a929ff', textDecoration: 'underline', fontWeight: 'bold', fontFamily: 'inherit', display: 'inline-flex', alignItems: 'center' }}>
+                      Neural
+                      <img src="/Neural.png" alt="Neural" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+                    </span>
+                  </>
+                )}
               </span>
             ) : subclass === 'Naturalist' ? (
               generateNaturalistStrikeJSX(sheet)
@@ -2204,7 +2238,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
               </span>
             ) : <span style={{ fontWeight: 'bold', fontFamily: 'inherit', color: '#000', marginLeft: 4 }}>{strikeDamage}</span>}
           </div>
-          <div className={styles.horizontalLabel} style={{ color: '#351c75', fontWeight: 'bold' }}>Multi Strike <span style={{ color: '#000' }}>{charClass === 'Contemplative' ? (2 + (sheet?.classCardDots?.[1]?.[0] ? 1 : 0)) : (multiStrike > 0 ? multiStrike : <span style={{ visibility: 'hidden' }}>0</span>)}</span></div>
+          <div className={styles.horizontalLabel} style={{ color: '#351c75', fontWeight: 'bold' }}>Multi Strike <span style={{ color: '#000' }}>{charClass === 'Contemplative' ? (2 + (sheet?.classCardDots?.[1]?.[0] ? 1 : 0)) : (subclass === 'Beguiler' && sheet?.subclassProgressionDots?.beguilerStrikeStrikeDots?.[0]) ? 2 : (multiStrike > 0 ? multiStrike : <span style={{ visibility: 'hidden' }}>0</span>)}</span></div>
           <div className={styles.horizontalLabel} style={{ color: '#351c75', fontWeight: 'bold' }}>
               Strike Effects {
                 charClass === 'Contemplative' && sheet?.classCardDots?.[2]?.[0]
@@ -2220,6 +2254,8 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                   : (subclass === 'Grenadier' && (sheet?.subclassProgressionDots?.grenadierStrikeDots?.filter(Boolean).length || 0) > 0)
                     ? <span style={{ color: '#000', fontWeight: 'normal' }}><b>[{sheet?.subclassProgressionDots?.grenadierStrikeDots?.filter(Boolean).length}]</b>hx-radius <i>AoE</i></span>
                   : (subclass === 'Coercive' && sheet?.subclassProgressionDots?.coerciveStrikeMesmerizeDots?.[0])
+                    ? <span style={{ color: '#000', fontWeight: 'normal' }}><b><i>Mesmerize</i></b></span>
+                  : (subclass === 'Beguiler' && sheet?.subclassProgressionDots?.beguilerStrikeMesmerizeDots?.[0])
                     ? <span style={{ color: '#000', fontWeight: 'normal' }}><b><i>Mesmerize</i></b></span>
                   : strikeEffects
               }
@@ -2442,6 +2478,13 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
               </span>
             </div>
           )}
+            {subclass === 'Beguiler' && sheet?.subclassProgressionDots?.beguilerPerksSkillsDots?.[0] && (
+              <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+                <span>
+                  <b><i style={{ color: '#1f21ce' }}>Object of Fascination.</i></b> <span style={{ color: '#000' }}>Your seductive qualities are undeniable and you are capable of convincing nearly anyone to assist in almost any way. Gain an advantage on skill rolls related to coaxing others who are not outright hostile towards you to help you.</span>
+                </span>
+              </div>
+            )}
         </div>
       </div>
 
@@ -2642,10 +2685,10 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                     textAlign: 'left',
                     minWidth: '180px'
                   }}
-                  value={pendingSecondaryAttack || (charClass === 'Coder' ? 'Algorithms' : subclass === 'Anatomist' ? 'Super Serums' : subclass === 'Grenadier' ? 'Grenades' : subclass === 'Necro' ? 'Chem Zombies' : subclass === 'Poisoner' ? 'Noxious Fumes' : subclass === 'Beguiler' ? 'Whips' : 'Select Secondary Attack')}
+                  value={pendingSecondaryAttack || (charClass === 'Coder' ? 'Algorithms' : subclass === 'Anatomist' ? 'Super Serums' : subclass === 'Grenadier' ? 'Grenades' : subclass === 'Necro' ? 'Chem Zombies' : subclass === 'Poisoner' ? 'Noxious Fumes' : subclass === 'Beguiler' ? 'Whips' : subclass === 'Galvanic' ? 'Sabres' : 'Select Secondary Attack')}
                   onChange={(e) => {
                     const value = e.target.value;
-                    if (value !== 'Algorithms' && value !== 'Super Serums' && value !== 'Grenades' && value !== 'Chem Zombies' && value !== 'Noxious Fumes' && value !== 'Whips' && value !== 'Select Secondary Attack') {
+                    if (value !== 'Algorithms' && value !== 'Super Serums' && value !== 'Grenades' && value !== 'Chem Zombies' && value !== 'Noxious Fumes' && value !== 'Whips' && value !== 'Sabres' && value !== 'Select Secondary Attack') {
                       setPendingSecondaryAttack(value);
                     }
                   }}
@@ -2691,7 +2734,14 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                       <option style={{ fontWeight: 'bold' }}>The Crackler</option>
                     </>
                   )}
-                  {charClass !== 'Coder' && subclass !== 'Anatomist' && subclass !== 'Grenadier' && subclass !== 'Necro' && subclass !== 'Poisoner' && subclass !== 'Beguiler' && (
+                  {subclass === 'Galvanic' && (
+                    <>
+                      <option disabled style={{ fontWeight: 'bold' }}>Sabres</option>
+                      <option style={{ fontWeight: 'bold' }}>Phase Sword</option>
+                      <option style={{ fontWeight: 'bold' }}>Truthsinger</option>
+                    </>
+                  )}
+                  {charClass !== 'Coder' && subclass !== 'Anatomist' && subclass !== 'Grenadier' && subclass !== 'Necro' && subclass !== 'Poisoner' && subclass !== 'Beguiler' && subclass !== 'Galvanic' && (
                     <option disabled style={{ fontWeight: 'bold' }}>Select Secondary Attack</option>
                   )}
                 </select>
@@ -2870,6 +2920,29 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                                 const updatedSheet = { 
                                   ...sheet, 
                                   whips: newWhips
+                                };
+                                handleAutoSave(updatedSheet);
+                              }
+                            }}
+                          >×</button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  {(sheet?.sabres && sheet.sabres.length > 0) && (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginLeft: '8px' }}>
+                      {sheet?.sabres?.map((sabre, idx) => (
+                        <span key={sabre + idx + 'sabre'} style={{ fontStyle: 'italic', display: 'flex', alignItems: 'center', background: '#f5f5f5', borderRadius: '6px', padding: '2px 8px' }}>
+                          {sabre}
+                          <button
+                            style={{ marginLeft: '6px', padding: '0 6px', borderRadius: '50%', border: 'none', background: '#d32f2f', color: 'white', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.9em' }}
+                            title={`Remove ${sabre}`}
+                            onClick={() => {
+                              if (sheet) {
+                                const newSabres = sheet.sabres?.filter((_, i) => i !== idx) || [];
+                                const updatedSheet = { 
+                                  ...sheet, 
+                                  sabres: newSabres
                                 };
                                 handleAutoSave(updatedSheet);
                               }

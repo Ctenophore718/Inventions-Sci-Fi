@@ -4,6 +4,10 @@ import { generateLoyalServantsJSX } from "../utils/beguilerFeature";
 import { generateSeduceJSX } from "../utils/beguilerTechnique";
 import { generateBeguilerSecondaryAttackJSX } from "../utils/beguilerSecondaryAttack";
 import { generateBeguilerStrikeJSX } from "../utils/beguilerStrike";
+import { generateInspiringPresenceJSX } from "../utils/galvanicFeature";
+import { generateBolsteringOratoryJSX } from "../utils/galvanicTechnique";
+import { generateGalvanicSecondaryAttackJSX } from "../utils/galvanicSecondaryAttack";
+import { generateGalvanicStrikeJSX } from "../utils/galvanicStrike";
 
 type LevelUpSubclassesCommanderProps = {
   sheet: CharacterSheet | null;
@@ -67,21 +71,92 @@ const LevelUpSubclassesCommander: React.FC<LevelUpSubclassesCommanderProps> = ({
   // State for pending whip selection
   const [pendingWhip, setPendingWhip] = useState<string>("");
 
-  // Sync local state with sheet changes to prevent race conditions
+  // State for pending sabre selection
+  const [pendingSabre, setPendingSabre] = useState<string>("");
+
+  // Independent state for Galvanic dots
+  const [galvanicFeatureHxDots, setGalvanicFeatureHxDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.galvanicFeatureHxDots || [false, false, false]
+  );
+  const [galvanicFeatureHpDots, setGalvanicFeatureHpDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.galvanicFeatureHpDots || [false, false]
+  );
+  const [galvanicTechniqueHxDots, setGalvanicTechniqueHxDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.galvanicTechniqueHxDots || [false, false, false]
+  );
+  const [galvanicTechniqueCritDots, setGalvanicTechniqueCritDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.galvanicTechniqueCritDots || [false, false, false]
+  );
+  const [galvanicTechniqueHpDots, setGalvanicTechniqueHpDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.galvanicTechniqueHpDots || [false, false]
+  );
+  const [galvanicTechniqueCooldownDots, setGalvanicTechniqueCooldownDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.galvanicTechniqueCooldownDots || [false, false]
+  );
+  const [galvanicAttackAoEDots, setGalvanicAttackAoEDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.galvanicAttackAoEDots || [false, false]
+  );
+  const [galvanicAttackDamageDots, setGalvanicAttackDamageDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.galvanicAttackDamageDots || [false, false, false]
+  );
+  const [galvanicAttackCritDots, setGalvanicAttackCritDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.galvanicAttackCritDots || [false, false, false]
+  );
+  const [galvanicAttackCooldownDots, setGalvanicAttackCooldownDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.galvanicAttackCooldownDots || [false, false]
+  );
+  const [galvanicStrikeDamageDots, setGalvanicStrikeDamageDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.galvanicStrikeDamageDots || [false]
+  );
+  const [galvanicStrikeStrikeDots, setGalvanicStrikeStrikeDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.galvanicStrikeStrikeDots || [false]
+  );
+  const [galvanicStrikeAoEDots, setGalvanicStrikeAoEDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.galvanicStrikeAoEDots || [false, false]
+  );
+  const [galvanicPerksSkillsDots, setGalvanicPerksSkillsDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.galvanicPerksSkillsDots || [false]
+  );
+
+  // Sync local state with sheet changes - only update if values actually changed
   useEffect(() => {
     if (sheet?.subclassProgressionDots) {
       const dots = sheet.subclassProgressionDots as any;
-      setBeguilerFeatureHxDots(dots.beguilerFeatureHxDots || [false, false, false]);
-      setBeguilerTechniqueRangeDots(dots.beguilerTechniqueRangeDots || [false, false, false]);
-      setBeguilerTechniqueMoveDots(dots.beguilerTechniqueMoveDots || [false, false]);
-      setBeguilerTechniqueCooldownDots(dots.beguilerTechniqueCooldownDots || [false, false]);
-      setBeguilerAttackAoEDots(dots.beguilerAttackAoEDots || [false, false, false]);
-      setBeguilerAttackCritDots(dots.beguilerAttackCritDots || [false, false, false]);
-      setBeguilerAttackCooldownDots(dots.beguilerAttackCooldownDots || [false, false]);
-      setBeguilerStrikeStrikeDots(dots.beguilerStrikeStrikeDots || [false]);
-      setBeguilerStrikeMesmerizeDots(dots.beguilerStrikeMesmerizeDots || [false]);
-      setBeguilerPerksSkillsDots(dots.beguilerPerksSkillsDots || [false]);
+      
+      // Only update state if the values have actually changed (deep comparison)
+      const updateIfChanged = (current: boolean[], incoming: boolean[] | undefined, setter: React.Dispatch<React.SetStateAction<boolean[]>>, fallback: boolean[]) => {
+        const newValue = incoming || fallback;
+        if (JSON.stringify(current) !== JSON.stringify(newValue)) {
+          setter(newValue);
+        }
+      };
+
+      updateIfChanged(beguilerFeatureHxDots, dots.beguilerFeatureHxDots, setBeguilerFeatureHxDots, [false, false, false]);
+      updateIfChanged(beguilerTechniqueRangeDots, dots.beguilerTechniqueRangeDots, setBeguilerTechniqueRangeDots, [false, false, false]);
+      updateIfChanged(beguilerTechniqueMoveDots, dots.beguilerTechniqueMoveDots, setBeguilerTechniqueMoveDots, [false, false]);
+      updateIfChanged(beguilerTechniqueCooldownDots, dots.beguilerTechniqueCooldownDots, setBeguilerTechniqueCooldownDots, [false, false]);
+      updateIfChanged(beguilerAttackAoEDots, dots.beguilerAttackAoEDots, setBeguilerAttackAoEDots, [false, false, false]);
+      updateIfChanged(beguilerAttackCritDots, dots.beguilerAttackCritDots, setBeguilerAttackCritDots, [false, false, false]);
+      updateIfChanged(beguilerAttackCooldownDots, dots.beguilerAttackCooldownDots, setBeguilerAttackCooldownDots, [false, false]);
+      updateIfChanged(beguilerStrikeStrikeDots, dots.beguilerStrikeStrikeDots, setBeguilerStrikeStrikeDots, [false]);
+      updateIfChanged(beguilerStrikeMesmerizeDots, dots.beguilerStrikeMesmerizeDots, setBeguilerStrikeMesmerizeDots, [false]);
+      updateIfChanged(beguilerPerksSkillsDots, dots.beguilerPerksSkillsDots, setBeguilerPerksSkillsDots, [false]);
+      updateIfChanged(galvanicFeatureHxDots, dots.galvanicFeatureHxDots, setGalvanicFeatureHxDots, [false, false, false]);
+      updateIfChanged(galvanicFeatureHpDots, dots.galvanicFeatureHpDots, setGalvanicFeatureHpDots, [false, false]);
+      updateIfChanged(galvanicTechniqueHxDots, dots.galvanicTechniqueHxDots, setGalvanicTechniqueHxDots, [false, false, false]);
+      updateIfChanged(galvanicTechniqueCritDots, dots.galvanicTechniqueCritDots, setGalvanicTechniqueCritDots, [false, false, false]);
+      updateIfChanged(galvanicTechniqueHpDots, dots.galvanicTechniqueHpDots, setGalvanicTechniqueHpDots, [false, false]);
+      updateIfChanged(galvanicTechniqueCooldownDots, dots.galvanicTechniqueCooldownDots, setGalvanicTechniqueCooldownDots, [false, false]);
+      updateIfChanged(galvanicAttackAoEDots, dots.galvanicAttackAoEDots, setGalvanicAttackAoEDots, [false, false]);
+      updateIfChanged(galvanicAttackDamageDots, dots.galvanicAttackDamageDots, setGalvanicAttackDamageDots, [false, false, false]);
+      updateIfChanged(galvanicAttackCritDots, dots.galvanicAttackCritDots, setGalvanicAttackCritDots, [false, false, false]);
+      updateIfChanged(galvanicAttackCooldownDots, dots.galvanicAttackCooldownDots, setGalvanicAttackCooldownDots, [false, false]);
+      updateIfChanged(galvanicStrikeDamageDots, dots.galvanicStrikeDamageDots, setGalvanicStrikeDamageDots, [false]);
+      updateIfChanged(galvanicStrikeStrikeDots, dots.galvanicStrikeStrikeDots, setGalvanicStrikeStrikeDots, [false]);
+      updateIfChanged(galvanicStrikeAoEDots, dots.galvanicStrikeAoEDots, setGalvanicStrikeAoEDots, [false, false]);
+      updateIfChanged(galvanicPerksSkillsDots, dots.galvanicPerksSkillsDots, setGalvanicPerksSkillsDots, [false]);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sheet?.subclassProgressionDots]);
 
   // Helper function to handle XP dot clicking with sequential requirement
@@ -125,11 +200,10 @@ const LevelUpSubclassesCommander: React.FC<LevelUpSubclassesCommanderProps> = ({
         return;
       }
 
-      // Update state first
+      // Update local array state
       setArray(newArray);
-      setXpSpent(Math.max(0, newXpSpent));
 
-      // Include progression dots in the XP change communication to prevent race conditions
+      // Save to parent - parent will update xpSpent and trigger re-render
       if (dotType && onAutoSave) {
         const progressionDots = {
           ...sheet?.subclassProgressionDots,
@@ -168,11 +242,10 @@ const LevelUpSubclassesCommander: React.FC<LevelUpSubclassesCommanderProps> = ({
       return;
     }
 
-    // Update state first
+    // Update local array state
     setArray(newArray);
-    setSpSpent(Math.max(0, newSpSpent));
 
-    // Include progression dots in the SP change communication to prevent race conditions
+    // Save to parent - parent will update spSpent and trigger re-render
     if (dotType && onAutoSave) {
       const progressionDots = {
         ...sheet?.subclassProgressionDots,
@@ -211,6 +284,35 @@ const LevelUpSubclassesCommander: React.FC<LevelUpSubclassesCommanderProps> = ({
         whips: newWhips
       });
       setPendingWhip(""); // Clear dropdown after adding
+    }
+  };
+
+  // Handler for purchasing sabres with credits
+  const handleSabrePurchase = (sabreName: string, cost: number) => {
+    const currentCredits = sheet?.credits || 0;
+    if (currentCredits < cost) {
+      setNotice("Not enough credits!");
+      return;
+    }
+
+    if (sheet && onAutoSave) {
+      const newSabres = [...(sheet.sabres || []), sabreName];
+      onAutoSave({
+        sabres: newSabres,
+        credits: currentCredits - cost
+      });
+      setPendingSabre(""); // Clear dropdown after purchase
+    }
+  };
+
+  // Handler for adding sabres without cost
+  const handleSabreAdd = (sabreName: string) => {
+    if (sheet && onAutoSave) {
+      const newSabres = [...(sheet.sabres || []), sabreName];
+      onAutoSave({
+        sabres: newSabres
+      });
+      setPendingSabre(""); // Clear dropdown after adding
     }
   };
 
@@ -506,7 +608,9 @@ const LevelUpSubclassesCommander: React.FC<LevelUpSubclassesCommanderProps> = ({
                     </span>
                   </div>
                   <div style={{ marginTop: '4px' }}>
-                    <b><u>Target</u></b> <i>AoE</i> <b>[{chainAoE}]</b>hx-Chain
+                    <b><u>Target</u></b> <i>AoE</i> <b>[{chainAoE}]</b>hx-Chain <br />
+                    <b><u>Damage</u></b> 1d4, status effect <br />
+                    <b><u>Crit Effect</u></b> 1d4
                   </div>
                 </div>
               );
@@ -757,6 +861,691 @@ const LevelUpSubclassesCommander: React.FC<LevelUpSubclassesCommanderProps> = ({
                       borderRadius: '50%',
                       display: 'block',
                       background: beguilerPerksSkillsDots[0] ? '#000' : '#fff',
+                      cursor: 'pointer',
+                      transition: 'background 0.2s'
+                    }}
+                  ></span>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Galvanic Subclass */}
+      {subclass === 'Galvanic' && (
+        <div style={{ marginTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+          {/* Feature Section */}
+          <div style={{ marginTop: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <div style={{ fontWeight: 'bold', color: '#0b5394', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Feature</u></div>
+            {generateInspiringPresenceJSX(galvanicFeatureHxDots, galvanicFeatureHpDots)}
+
+            {/* Feature XP progression table - First row */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 24px 24px 24px',
+              gridTemplateRows: 'repeat(2, auto)',
+              columnGap: '6px',
+              rowGap: '2px',
+              alignItems: 'start',
+              marginTop: '8px',
+              marginBottom: '2px',
+              width: '100%',
+              paddingLeft: '4px'
+            }}>
+              {/* Row 1: XP header */}
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>5xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>9xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>14xp</span>
+              {/* Row 2: +1hx dots */}
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1hx</span>
+              {[0, 1, 2].map(idx => (
+                <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                  <span
+                    onClick={() => handleDotClick(galvanicFeatureHxDots, setGalvanicFeatureHxDots, idx, [5, 9, 14], 'galvanicFeatureHxDots')}
+                    style={{
+                      width: '15px',
+                      height: '15px',
+                      border: '2px solid #000',
+                      borderRadius: '50%',
+                      display: 'block',
+                      background: galvanicFeatureHxDots[idx] ? '#000' : '#fff',
+                      cursor: (idx === 0 || galvanicFeatureHxDots.slice(0, idx).every(Boolean)) ? 'pointer' : 'not-allowed',
+                      transition: 'background 0.2s'
+                    }}
+                  ></span>
+                </span>
+              ))}
+            </div>
+
+            {/* Feature XP progression table - Second row */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 24px 24px 24px',
+              gridTemplateRows: 'repeat(2, auto)',
+              columnGap: '6px',
+              rowGap: '2px',
+              alignItems: 'start',
+              marginTop: '2px',
+              marginBottom: '2px',
+              width: '100%',
+              paddingLeft: '4px'
+            }}>
+              {/* Row 1: XP header */}
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>10xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>18xp</span>
+              <span></span>
+              {/* Row 2: +1d6 Hit Points dots */}
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1d6 <span style={{ color: '#990000' }}><b><i>Hit Points</i></b></span></span>
+              {[0, 1].map(idx => (
+                <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                  <span
+                    onClick={() => handleDotClick(galvanicFeatureHpDots, setGalvanicFeatureHpDots, idx, [10, 18], 'galvanicFeatureHpDots')}
+                    style={{
+                      width: '15px',
+                      height: '15px',
+                      border: '2px solid #000',
+                      borderRadius: '50%',
+                      display: 'block',
+                      background: galvanicFeatureHpDots[idx] ? '#000' : '#fff',
+                      cursor: (idx === 0 || galvanicFeatureHpDots.slice(0, idx).every(Boolean)) ? 'pointer' : 'not-allowed',
+                      transition: 'background 0.2s'
+                    }}
+                  ></span>
+                </span>
+              ))}
+              <span></span>
+            </div>
+          </div>
+
+          {/* Technique Section */}
+          <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <div style={{ fontWeight: 'bold', color: '#bf9000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Technique</u></div>
+            {generateBolsteringOratoryJSX(galvanicTechniqueHxDots, galvanicTechniqueCritDots, galvanicTechniqueHpDots, galvanicTechniqueCooldownDots)}
+
+            {/* Technique XP progression table - First row */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 24px 24px 24px',
+              gridTemplateRows: 'repeat(2, auto)',
+              columnGap: '6px',
+              rowGap: '2px',
+              alignItems: 'start',
+              marginTop: '8px',
+              marginBottom: '2px',
+              width: '100%',
+              paddingLeft: '4px'
+            }}>
+              {/* Row 1: XP header */}
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>3xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>6xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>9xp</span>
+              {/* Row 2: +1hx dots */}
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1hx</span>
+              {[0, 1, 2].map(idx => (
+                <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                  <span
+                    onClick={() => handleDotClick(galvanicTechniqueHxDots, setGalvanicTechniqueHxDots, idx, [3, 6, 9], 'galvanicTechniqueHxDots')}
+                    style={{
+                      width: '15px',
+                      height: '15px',
+                      border: '2px solid #000',
+                      borderRadius: '50%',
+                      display: 'block',
+                      background: galvanicTechniqueHxDots[idx] ? '#000' : '#fff',
+                      cursor: (idx === 0 || galvanicTechniqueHxDots.slice(0, idx).every(Boolean)) ? 'pointer' : 'not-allowed',
+                      transition: 'background 0.2s'
+                    }}
+                  ></span>
+                </span>
+              ))}
+            </div>
+
+            {/* Technique XP progression table - Second row */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 24px 24px 24px',
+              gridTemplateRows: 'repeat(2, auto)',
+              columnGap: '6px',
+              rowGap: '2px',
+              alignItems: 'start',
+              marginTop: '2px',
+              marginBottom: '2px',
+              width: '100%',
+              paddingLeft: '4px'
+            }}>
+              {/* Row 1: XP header */}
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>2xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>4xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>6xp</span>
+              {/* Row 2: +2 Crit dots */}
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+2 Crit</span>
+              {[0, 1, 2].map(idx => (
+                <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                  <span
+                    onClick={() => handleDotClick(galvanicTechniqueCritDots, setGalvanicTechniqueCritDots, idx, [2, 4, 6], 'galvanicTechniqueCritDots')}
+                    style={{
+                      width: '15px',
+                      height: '15px',
+                      border: '2px solid #000',
+                      borderRadius: '50%',
+                      display: 'block',
+                      background: galvanicTechniqueCritDots[idx] ? '#000' : '#fff',
+                      cursor: (idx === 0 || galvanicTechniqueCritDots.slice(0, idx).every(Boolean)) ? 'pointer' : 'not-allowed',
+                      transition: 'background 0.2s'
+                    }}
+                  ></span>
+                </span>
+              ))}
+            </div>
+
+            {/* Technique XP progression table - Third row */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 24px 24px 24px',
+              gridTemplateRows: 'repeat(2, auto)',
+              columnGap: '6px',
+              rowGap: '2px',
+              alignItems: 'start',
+              marginTop: '2px',
+              marginBottom: '2px',
+              width: '100%',
+              paddingLeft: '4px'
+            }}>
+              {/* Row 1: XP header */}
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>6xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>10xp</span>
+              <span></span>
+              {/* Row 2: +1d6 Hit Points dots */}
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1d6 <span style={{ color: '#990000' }}><b><i>Hit Points</i></b></span></span>
+              {[0, 1].map(idx => (
+                <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                  <span
+                    onClick={() => handleDotClick(galvanicTechniqueHpDots, setGalvanicTechniqueHpDots, idx, [6, 10], 'galvanicTechniqueHpDots')}
+                    style={{
+                      width: '15px',
+                      height: '15px',
+                      border: '2px solid #000',
+                      borderRadius: '50%',
+                      display: 'block',
+                      background: galvanicTechniqueHpDots[idx] ? '#000' : '#fff',
+                      cursor: (idx === 0 || galvanicTechniqueHpDots.slice(0, idx).every(Boolean)) ? 'pointer' : 'not-allowed',
+                      transition: 'background 0.2s'
+                    }}
+                  ></span>
+                </span>
+              ))}
+              <span></span>
+            </div>
+
+            {/* Technique XP progression table - Fourth row */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 24px 24px 24px',
+              gridTemplateRows: 'repeat(2, auto)',
+              columnGap: '6px',
+              rowGap: '2px',
+              alignItems: 'start',
+              marginTop: '2px',
+              marginBottom: '2px',
+              width: '100%',
+              paddingLeft: '4px'
+            }}>
+              {/* Row 1: XP header */}
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>5xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>8xp</span>
+              <span></span>
+              {/* Row 2: -1 Cooldown dots */}
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>-1 Cooldown</span>
+              {[0, 1].map(idx => (
+                <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                  <span
+                    onClick={() => handleDotClick(galvanicTechniqueCooldownDots, setGalvanicTechniqueCooldownDots, idx, [5, 8], 'galvanicTechniqueCooldownDots')}
+                    style={{
+                      width: '15px',
+                      height: '15px',
+                      border: '2px solid #000',
+                      borderRadius: '50%',
+                      display: 'block',
+                      background: galvanicTechniqueCooldownDots[idx] ? '#000' : '#fff',
+                      cursor: (idx === 0 || galvanicTechniqueCooldownDots.slice(0, idx).every(Boolean)) ? 'pointer' : 'not-allowed',
+                      transition: 'background 0.2s'
+                    }}
+                  ></span>
+                </span>
+              ))}
+              <span></span>
+            </div>
+          </div>
+
+          {/* Attack Section */}
+          <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <div style={{ fontWeight: 'bold', color: '#990000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Attack</u></div>
+            <div style={{ fontSize: '1em', color: '#000', marginBottom: '6px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <b><i>Secondary <span style={{ color: '#990000' }}>Attack</span></i></b> <i>(Cooldown</i> <b>[{4 - galvanicAttackCooldownDots.filter(Boolean).length}]</b><i>)</i><br />
+            </div>
+
+            {/* Sabres dropdown section */}
+            <div style={{ marginTop: '8px', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <div style={{ marginBottom: '4px' }}>
+                <select
+                  style={{
+                    fontSize: '1em',
+                    padding: '2px 8px',
+                    borderRadius: '6px',
+                    border: '1px solid #ccc',
+                    background: '#fff',
+                    color: '#222',
+                    fontWeight: 'bold',
+                    marginBottom: '4px',
+                    textAlign: 'left',
+                    minWidth: '180px'
+                  }}
+                  value={pendingSabre || 'Sabres'}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (value !== 'Sabres') {
+                      setPendingSabre(value);
+                    }
+                  }}
+                >
+                  <option disabled style={{ fontWeight: 'bold' }}>Sabres</option>
+                  <option style={{ fontWeight: 'bold' }}>Phase Sword</option>
+                  <option style={{ fontWeight: 'bold' }}>Truthsinger</option>
+                </select>
+                
+                {pendingSabre && (
+                  <div style={{ marginTop: '4px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    <div style={{ fontWeight: 'bold' }}>
+                      {pendingSabre}
+                      <span style={{ color: '#bf9000', fontWeight: 'bold', marginLeft: '8px' }}>185c</span>
+                    </div>
+                    <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                      <button
+                        style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #1976d2', background: '#1976d2', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}
+                        onClick={() => handleSabrePurchase(pendingSabre, 185)}
+                      >
+                        Buy
+                      </button>
+                      <button
+                        style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #28a745', background: '#28a745', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}
+                        onClick={() => handleSabreAdd(pendingSabre)}
+                      >
+                        Add
+                      </button>
+                      <button
+                        style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #aaa', background: '#eee', color: '#333', fontWeight: 'bold', cursor: 'pointer' }}
+                        onClick={() => setPendingSabre("")}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Display added sabres */}
+                <div style={{ marginTop: '4px' }}>
+                  {(sheet?.sabres && sheet.sabres.length > 0) && (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                      {sheet?.sabres?.map((sabre, idx) => (
+                        <span key={sabre + idx + 'sabre'} style={{ fontStyle: 'italic', display: 'flex', alignItems: 'center', background: '#f5f5f5', borderRadius: '6px', padding: '2px 8px' }}>
+                          {sabre}
+                          <button
+                            style={{ marginLeft: '6px', padding: '0 6px', borderRadius: '50%', border: 'none', background: '#d32f2f', color: 'white', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.9em' }}
+                            title={`Remove ${sabre}`}
+                            onClick={() => {
+                              if (sheet && onAutoSave) {
+                                const newSabres = sheet.sabres?.filter((_, i) => i !== idx) || [];
+                                onAutoSave({
+                                  sabres: newSabres
+                                });
+                              }
+                            }}
+                          >
+                            ×
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+            {generateGalvanicSecondaryAttackJSX(galvanicAttackAoEDots, galvanicAttackDamageDots, galvanicAttackCritDots, galvanicAttackCooldownDots)}
+
+            {/* Attack XP progression table - First row */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 24px 24px 24px',
+              gridTemplateRows: 'repeat(2, auto)',
+              columnGap: '6px',
+              rowGap: '2px',
+              alignItems: 'start',
+              marginTop: '8px',
+              marginBottom: '2px',
+              width: '100%',
+              paddingLeft: '4px'
+            }}>
+              {/* Row 1: XP header */}
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>9xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>14xp</span>
+              <span></span>
+              {/* Row 2: +1hx-radius AoE dots */}
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1hx-radius AoE</span>
+              {[0, 1].map(idx => (
+                <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                  <span
+                    onClick={() => handleDotClick(galvanicAttackAoEDots, setGalvanicAttackAoEDots, idx, [9, 14], 'galvanicAttackAoEDots')}
+                    style={{
+                      width: '15px',
+                      height: '15px',
+                      border: '2px solid #000',
+                      borderRadius: '50%',
+                      display: 'block',
+                      background: galvanicAttackAoEDots[idx] ? '#000' : '#fff',
+                      cursor: (idx === 0 || galvanicAttackAoEDots.slice(0, idx).every(Boolean)) ? 'pointer' : 'not-allowed',
+                      transition: 'background 0.2s'
+                    }}
+                  ></span>
+                </span>
+              ))}
+              <span></span>
+            </div>
+
+            {/* Attack XP progression table - Second row */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 24px 24px 24px',
+              gridTemplateRows: 'repeat(2, auto)',
+              columnGap: '6px',
+              rowGap: '2px',
+              alignItems: 'start',
+              marginTop: '2px',
+              marginBottom: '2px',
+              width: '100%',
+              paddingLeft: '4px'
+            }}>
+              {/* Row 1: XP header */}
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>5xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>8xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>15xp</span>
+              {/* Row 2: +1 Damage die dots */}
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1 Damage die</span>
+              {[0, 1, 2].map(idx => (
+                <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                  <span
+                    onClick={() => handleDotClick(galvanicAttackDamageDots, setGalvanicAttackDamageDots, idx, [5, 8, 15], 'galvanicAttackDamageDots')}
+                    style={{
+                      width: '15px',
+                      height: '15px',
+                      border: '2px solid #000',
+                      borderRadius: '50%',
+                      display: 'block',
+                      background: galvanicAttackDamageDots[idx] ? '#000' : '#fff',
+                      cursor: (idx === 0 || galvanicAttackDamageDots.slice(0, idx).every(Boolean)) ? 'pointer' : 'not-allowed',
+                      transition: 'background 0.2s'
+                    }}
+                  ></span>
+                </span>
+              ))}
+            </div>
+
+            {/* Attack XP progression table - Third row */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 24px 24px 24px',
+              gridTemplateRows: 'repeat(2, auto)',
+              columnGap: '6px',
+              rowGap: '2px',
+              alignItems: 'start',
+              marginTop: '2px',
+              marginBottom: '2px',
+              width: '100%',
+              paddingLeft: '4px'
+            }}>
+              {/* Row 1: XP header */}
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>2xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>4xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>6xp</span>
+              {/* Row 2: +1 Crit dots */}
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1 Crit</span>
+              {[0, 1, 2].map(idx => (
+                <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                  <span
+                    onClick={() => handleDotClick(galvanicAttackCritDots, setGalvanicAttackCritDots, idx, [2, 4, 6], 'galvanicAttackCritDots')}
+                    style={{
+                      width: '15px',
+                      height: '15px',
+                      border: '2px solid #000',
+                      borderRadius: '50%',
+                      display: 'block',
+                      background: galvanicAttackCritDots[idx] ? '#000' : '#fff',
+                      cursor: (idx === 0 || galvanicAttackCritDots.slice(0, idx).every(Boolean)) ? 'pointer' : 'not-allowed',
+                      transition: 'background 0.2s'
+                    }}
+                  ></span>
+                </span>
+              ))}
+            </div>
+
+            {/* Attack XP progression table - Fourth row */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 24px 24px 24px',
+              gridTemplateRows: 'repeat(2, auto)',
+              columnGap: '6px',
+              rowGap: '2px',
+              alignItems: 'start',
+              marginTop: '2px',
+              marginBottom: '2px',
+              width: '100%',
+              paddingLeft: '4px'
+            }}>
+              {/* Row 1: XP header */}
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>5xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>6xp</span>
+              <span></span>
+              {/* Row 2: -1 Cooldown dots */}
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>-1 Cooldown</span>
+              {[0, 1].map(idx => (
+                <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                  <span
+                    onClick={() => handleDotClick(galvanicAttackCooldownDots, setGalvanicAttackCooldownDots, idx, [5, 6], 'galvanicAttackCooldownDots')}
+                    style={{
+                      width: '15px',
+                      height: '15px',
+                      border: '2px solid #000',
+                      borderRadius: '50%',
+                      display: 'block',
+                      background: galvanicAttackCooldownDots[idx] ? '#000' : '#fff',
+                      cursor: (idx === 0 || galvanicAttackCooldownDots.slice(0, idx).every(Boolean)) ? 'pointer' : 'not-allowed',
+                      transition: 'background 0.2s'
+                    }}
+                  ></span>
+                </span>
+              ))}
+              <span></span>
+            </div>
+
+          </div>
+
+          {/* Strike Section */}
+          <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <div style={{ fontWeight: 'bold', color: '#351c75', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Strike</u></div>
+            {generateGalvanicStrikeJSX(galvanicStrikeDamageDots, galvanicStrikeStrikeDots, galvanicStrikeAoEDots)}
+
+            {/* Strike XP progression table - First row */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 24px 24px 24px',
+              gridTemplateRows: 'repeat(2, auto)',
+              columnGap: '6px',
+              rowGap: '2px',
+              alignItems: 'start',
+              marginTop: '8px',
+              marginBottom: '2px',
+              width: '100%',
+              paddingLeft: '4px'
+            }}>
+              {/* Row 1: XP header */}
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>18xp</span>
+              <span></span>
+              <span></span>
+              {/* Row 2: +1 Damage die */}
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1 Damage die</span>
+              <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <span
+                  onClick={() => handleDotClick(galvanicStrikeDamageDots, setGalvanicStrikeDamageDots, 0, [18], 'galvanicStrikeDamageDots')}
+                  style={{
+                    width: '15px',
+                    height: '15px',
+                    border: '2px solid #000',
+                    borderRadius: '50%',
+                    display: 'block',
+                    background: galvanicStrikeDamageDots[0] ? '#000' : '#fff',
+                    cursor: 'pointer',
+                    transition: 'background 0.2s'
+                  }}
+                ></span>
+              </span>
+              <span></span>
+              <span></span>
+            </div>
+
+            {/* Strike XP progression table - Second row */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 24px 24px 24px',
+              gridTemplateRows: 'repeat(2, auto)',
+              columnGap: '6px',
+              rowGap: '2px',
+              alignItems: 'start',
+              marginTop: '2px',
+              marginBottom: '2px',
+              width: '100%',
+              paddingLeft: '4px'
+            }}>
+              {/* Row 1: XP header */}
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>12xp</span>
+              <span></span>
+              <span></span>
+              {/* Row 2: +1 Strike */}
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1 <b><i style={{ color: '#351c75' }}>Strike</i></b></span>
+              <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <span
+                  onClick={() => handleDotClick(galvanicStrikeStrikeDots, setGalvanicStrikeStrikeDots, 0, [12], 'galvanicStrikeStrikeDots')}
+                  style={{
+                    width: '15px',
+                    height: '15px',
+                    border: '2px solid #000',
+                    borderRadius: '50%',
+                    display: 'block',
+                    background: galvanicStrikeStrikeDots[0] ? '#000' : '#fff',
+                    cursor: 'pointer',
+                    transition: 'background 0.2s'
+                  }}
+                ></span>
+              </span>
+              <span></span>
+              <span></span>
+            </div>
+
+            {/* Strike XP progression table - Third row */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 24px 24px 24px',
+              gridTemplateRows: 'repeat(2, auto)',
+              columnGap: '6px',
+              rowGap: '2px',
+              alignItems: 'start',
+              marginTop: '2px',
+              marginBottom: '2px',
+              width: '100%',
+              paddingLeft: '4px'
+            }}>
+              {/* Row 1: XP header */}
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>10xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>14xp</span>
+              <span></span>
+              {/* Row 2: +1hx-radius AoE dots */}
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1hx-radius AoE</span>
+              {[0, 1].map(idx => (
+                <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                  <span
+                    onClick={() => handleDotClick(galvanicStrikeAoEDots, setGalvanicStrikeAoEDots, idx, [10, 14], 'galvanicStrikeAoEDots')}
+                    style={{
+                      width: '15px',
+                      height: '15px',
+                      border: '2px solid #000',
+                      borderRadius: '50%',
+                      display: 'block',
+                      background: galvanicStrikeAoEDots[idx] ? '#000' : '#fff',
+                      cursor: (idx === 0 || galvanicStrikeAoEDots.slice(0, idx).every(Boolean)) ? 'pointer' : 'not-allowed',
+                      transition: 'background 0.2s'
+                    }}
+                  ></span>
+                </span>
+              ))}
+              <span></span>
+            </div>
+          </div>
+
+          {/* Perks Section */}
+          <div style={{ marginTop: '12px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <div style={{ fontWeight: 'bold', color: '#000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Perks</u></div>
+            <div style={{ fontSize: '1em', color: '#000', marginBottom: '6px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <i><b>Skills.</b> Athletics</i> +2
+            </div>
+            <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 24px',
+                gridTemplateRows: 'auto auto',
+                columnGap: '6px',
+                rowGap: '2px',
+                alignItems: 'start',
+                marginTop: '-12px',
+                width: '100%',
+                paddingLeft: '4px'
+              }}>
+                {/* Row 1: SP header */}
+                <span></span>
+                <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>12sp</span>
+                {/* Row 2: Moral Support */}
+                <div style={{
+                  fontSize: '1em',
+                  fontFamily: 'Arial, Helvetica, sans-serif',
+                  textAlign: 'left',
+                  paddingRight: '8px',
+                  maxWidth: '500px',
+                  overflowWrap: 'break-word',
+                  wordWrap: 'break-word'
+                }}>
+                  <b><i style={{ color: '#6fce1f', fontSize: '1em' }}>Moral Support.</i></b> Your inspiring leadership is capable of pulling your comrades from the brink of death. Allies on the battlefield gain a +1 to Death Die rolls.
+                </div>
+                <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start' }}>
+                  <span
+                    onClick={() => handleSpDotClick(galvanicPerksSkillsDots, setGalvanicPerksSkillsDots, 0, [12], 'galvanicPerksSkillsDots')}
+                    style={{
+                      width: '15px',
+                      height: '15px',
+                      border: '2px solid #000',
+                      borderRadius: '50%',
+                      display: 'block',
+                      background: galvanicPerksSkillsDots[0] ? '#000' : '#fff',
                       cursor: 'pointer',
                       transition: 'background 0.2s'
                     }}

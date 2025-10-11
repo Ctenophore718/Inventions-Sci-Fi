@@ -46,10 +46,21 @@ const SheetManager: React.FC<SheetManagerProps> = ({ onLoad, onNew, onClear }) =
 
   return (
     <div>
-  <button onClick={onNew} style={{ fontFamily: 'Arial, sans-serif' }}>New Character</button>
-  <h2 style={{ fontFamily: 'Arial, sans-serif' }}>Saved Sheets</h2>
-      <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-        {sheets.map(sheet => {
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <button onClick={onNew} style={{ fontFamily: 'Arial, sans-serif' }}>New Character</button>
+        <a
+          href="/Rules.pdf"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ fontFamily: 'Arial, sans-serif', fontSize: '110%', fontWeight: 'bold', color: '#1f21ce', textDecoration: 'none' }}
+          title="Open Rules PDF in a new tab"
+        >
+          Rules
+        </a>
+      </div>
+      <h2 style={{ fontFamily: 'Arial, sans-serif' }}>Saved Sheets</h2>
+        <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+          {[...sheets].reverse().map(sheet => {
           // Color maps (should match LevelUp.tsx)
           const classOptions = [
             { label: "Chemist", value: "Chemist", color: "#721131" },

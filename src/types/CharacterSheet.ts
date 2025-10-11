@@ -91,6 +91,9 @@ export type CharacterSheet = {
   // Whips for Beguiler subclass
   whips?: string[];
 
+  // Sabres for Galvanic subclass
+  sabres?: string[];
+
   // Subclass progression dots (specific to each subclass)
   subclassProgressionDots?: {
     // Anatomist subclass progression
@@ -178,6 +181,21 @@ export type CharacterSheet = {
     beguilerStrikeStrikeDots?: boolean[];
     beguilerStrikeMesmerizeDots?: boolean[];
     beguilerPerksSkillsDots?: boolean[];
+    // Galvanic subclass progression (Commander)
+    galvanicFeatureHxDots?: boolean[];
+    galvanicFeatureHpDots?: boolean[];
+    galvanicTechniqueHxDots?: boolean[];
+    galvanicTechniqueCritDots?: boolean[];
+    galvanicTechniqueHpDots?: boolean[];
+    galvanicTechniqueCooldownDots?: boolean[];
+    galvanicAttackAoEDots?: boolean[];
+    galvanicAttackDamageDots?: boolean[];
+    galvanicAttackCritDots?: boolean[];
+    galvanicAttackCooldownDots?: boolean[];
+    galvanicStrikeDamageDots?: boolean[];
+    galvanicStrikeStrikeDots?: boolean[];
+    galvanicStrikeAoEDots?: boolean[];
+    galvanicPerksSkillsDots?: boolean[];
     // Add other subclasses as needed
   };
 };
