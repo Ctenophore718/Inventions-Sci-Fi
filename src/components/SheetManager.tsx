@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import type { CharacterSheet } from "../types/CharacterSheet";
-import { loadAllSheets, deleteSheetById } from "../utils/storage"; 
+import { loadAllSheets, loadAllSheetsAsync, deleteSheetById } from "../utils/storage"; 
 
 type SheetManagerProps = {
   onLoad: (sheet: CharacterSheet) => void;
@@ -12,8 +12,8 @@ const SheetManager: React.FC<SheetManagerProps> = ({ onLoad, onNew, onClear }) =
   const [sheets, setSheets] = useState<CharacterSheet[]>([]);
 
   useEffect(() => {
-    const loadSheets = () => {
-      const allSheets = loadAllSheets();
+    const loadSheets = async () => {
+      const allSheets = await loadAllSheetsAsync();
       console.log('SheetManager: Loading sheets:', allSheets);
       setSheets(allSheets);
     };
@@ -35,7 +35,7 @@ const SheetManager: React.FC<SheetManagerProps> = ({ onLoad, onNew, onClear }) =
       }
     };
 
-    window.addEventListener('character-updated', handleCharacterUpdate);
+  window.addEventListener('character-updated', handleCharacterUpdate as EventListener);
     window.addEventListener('storage', handleStorageChange);
 
     return () => {
@@ -46,17 +46,51 @@ const SheetManager: React.FC<SheetManagerProps> = ({ onLoad, onNew, onClear }) =
 
   return (
     <div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontFamily: 'Arial, sans-serif', fontSize: '110%', flexWrap: 'wrap' }}>
+          <a
+            href="/Rules.pdf"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ fontFamily: 'Arial, sans-serif', fontSize: '100%', fontWeight: 'bold', color: '#1f21ce', textDecoration: 'none' }}
+            title="Open Rules PDF in a new tab"
+          >
+            Rules
+          </a>
+          <span style={{ color: '#999' }}>|</span>
+          <a
+            href="/Character Options.pdf"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ fontFamily: 'Arial, sans-serif', fontSize: '100%', fontWeight: 'bold', color: '#1f21ce', textDecoration: 'none' }}
+            title="Open Character Options PDF in a new tab"
+          >
+            Character Options
+          </a>
+          <span style={{ color: '#999' }}>|</span>
+          <a
+            href="/Classes.pdf"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ fontFamily: 'Arial, sans-serif', fontSize: '100%', fontWeight: 'bold', color: '#1f21ce', textDecoration: 'none' }}
+            title="Open Classes PDF in a new tab"
+          >
+            Classes
+          </a>
+          <span style={{ color: '#999' }}>|</span>
+          <a
+            href="/Species.pdf"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ fontFamily: 'Arial, sans-serif', fontSize: '100%', fontWeight: 'bold', color: '#1f21ce', textDecoration: 'none' }}
+            title="Open Species PDF in a new tab"
+          >
+            Species
+          </a>
+        </div>
+        <div style={{ margin: '20px 0' }}></div> {/* Added spacing here */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
         <button onClick={onNew} style={{ fontFamily: 'Arial, sans-serif' }}>New Character</button>
-        <a
-          href="/Rules.pdf"
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{ fontFamily: 'Arial, sans-serif', fontSize: '110%', fontWeight: 'bold', color: '#1f21ce', textDecoration: 'none' }}
-          title="Open Rules PDF in a new tab"
-        >
-          Rules
-        </a>
       </div>
       <h2 style={{ fontFamily: 'Arial, sans-serif' }}>Saved Sheets</h2>
         <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
@@ -262,8 +296,11 @@ const SheetManager: React.FC<SheetManagerProps> = ({ onLoad, onNew, onClear }) =
                 onClick={() => {
                   const confirmed = window.confirm(`Delete "${sheet.name}"? This cannot be undone.`);
                   if (confirmed) {
-                    deleteSheetById(sheet.id);
-                    setSheets(loadAllSheets());
+                    (async () => {
+                      await deleteSheetById(sheet.id);
+                      const refreshed = await loadAllSheetsAsync();
+                      setSheets(refreshed);
+                    })();
                     onClear();
                   }
                 }}

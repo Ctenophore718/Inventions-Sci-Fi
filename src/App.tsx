@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import './responsive-headers.css';
 import SheetManager from "./components/SheetManager";
+import AuthBar from "./components/AuthBar";
 import CharacterSheetComponent from "./components/CharacterSheet";
 import LevelUp from "./components/LevelUp";
 import Cards from "./components/Cards";
@@ -23,7 +24,7 @@ const App = () => {
   const autoSaveTimeoutRef = React.useRef<number | null>(null);
 
   // Enhanced auto-save function that handles any character changes
-  const performAutoSave = React.useCallback((updatedSheet: CharacterSheet) => {
+  const performAutoSave = React.useCallback(async (updatedSheet: CharacterSheet) => {
     console.log('performAutoSave called with:', updatedSheet);
     console.log('performAutoSave - setting currentSheet to:', updatedSheet.id);
     // Immediately update the current sheet state for navigation
@@ -34,9 +35,9 @@ const App = () => {
       clearTimeout(autoSaveTimeoutRef.current);
     }
     
-    autoSaveTimeoutRef.current = setTimeout(() => {
-      console.log('Actually saving to localStorage:', updatedSheet);
-      saveCharacterSheet(updatedSheet);
+    autoSaveTimeoutRef.current = window.setTimeout(async () => {
+      console.log('Actually saving to storage (local/server):', updatedSheet);
+      await saveCharacterSheet(updatedSheet);
       console.log('Auto-saved character:', updatedSheet.name || 'Unnamed');
     }, 300); // 300ms debounce for better UX
   }, []);
@@ -169,7 +170,7 @@ const App = () => {
       if (updates.species !== undefined) setSpecies(updates.species);
       if (updates.subspecies !== undefined) setSubspecies(updates.subspecies);
       
-      performAutoSave(updatedSheet);
+  void performAutoSave(updatedSheet);
     } else {
       console.log('Error: Unexpected state - no current sheet available');
     }
@@ -244,7 +245,7 @@ const App = () => {
     // Create and immediately save a new character
     const newSheet = createNewCharacterSheet();
     setCurrentSheet(newSheet);
-    performAutoSave(newSheet);
+    void performAutoSave(newSheet);
     
     setView("editor");
   };
@@ -262,16 +263,17 @@ const App = () => {
 
     if (hasChanges) {
       // Debounce the save to prevent rapid-fire saves
-      const timeoutId = setTimeout(() => {
+      const timeoutId = window.setTimeout(() => {
         const updatedSheet = {
           ...currentSheet,
           charClass,
           subclass,
           species,
           subspecies
-        };
+        } as CharacterSheet;
         setCurrentSheet(updatedSheet);
-        saveCharacterSheet(updatedSheet);
+        // Fire-and-forget save (debounced)
+        void saveCharacterSheet(updatedSheet);
       }, 100); // 100ms debounce
 
       return () => clearTimeout(timeoutId);
@@ -373,7 +375,7 @@ const App = () => {
 
   return (
     <div style={{ padding: "2rem" }}>
-      <div className="headerRowResponsive" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1em' }}>
+      <div className="headerRowResponsive" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1em', gap: '12px' }}>
         <h1 style={{ fontFamily: 'Arial, Helvetica, sans-serif', margin: 0, fontSize: '2.45em' }}>Inventions Sci-Fi</h1>
         {view === "editor" && (
           <span className="pageHeader" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '2.0em', fontWeight: 600, margin: '0 auto', display: 'block', textAlign: 'center' }}>Character Sheet</span>
@@ -383,6 +385,11 @@ const App = () => {
         )}
         {view === "cards" && (
           <span className="pageHeader" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '2.0em', fontWeight: 600, margin: '0 auto', display: 'block', textAlign: 'center' }}>Cards</span>
+        )}
+        {view === "manager" && (
+          <div style={{ marginLeft: 'auto' }}>
+            <AuthBar />
+          </div>
         )}
       </div>
 
