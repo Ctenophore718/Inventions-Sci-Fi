@@ -10,12 +10,30 @@ const AuthBar: React.FC = () => {
   const [error, setError] = React.useState<string | null>(null);
 
   React.useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => setUserEmail(data.user?.email ?? null));
-    const { data: sub } = supabase.auth.onAuthStateChange(async (_event: any, session: any) => {
-      setUserEmail(session?.user?.email ?? null);
-      if (session?.user) {
-        try { await migrateLocalSheetsToServerIfEmpty(); } catch (e) { console.error(e); }
+    supabase.auth.getUser().then(({ data, error }) => {
+      if (error) {
+        console.error('AuthBar: Error getting user on mount:', error);
       }
+      const email = data.user?.email ?? null;
+      console.log('AuthBar: Initial user email:', email);
+      setUserEmail(email);
+    });
+    
+    const { data: sub } = supabase.auth.onAuthStateChange(async (event: any, session: any) => {
+      const email = session?.user?.email ?? null;
+      console.log('AuthBar: Auth state changed, event:', event, 'user email:', email);
+      setUserEmail(email);
+      
+      if (session?.user) {
+        try { 
+          console.log('AuthBar: User signed in, attempting migration');
+          await migrateLocalSheetsToServerIfEmpty(); 
+          console.log('AuthBar: Migration completed');
+        } catch (e) { 
+          console.error('AuthBar: Migration error:', e); 
+        }
+      }
+      
       window.dispatchEvent(new Event('character-updated'));
     });
     return () => { sub.subscription.unsubscribe(); };
@@ -23,23 +41,41 @@ const AuthBar: React.FC = () => {
 
   const signIn = async () => {
     setError(null); setLoading(true);
+    console.log('AuthBar: Attempting sign in for:', email);
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
-    if (error) setError(error.message);
+    if (error) {
+      console.error('AuthBar: Sign in error:', error);
+      setError(error.message);
+    } else {
+      console.log('AuthBar: Sign in successful');
+    }
   };
 
   const signUp = async () => {
     setError(null); setLoading(true);
+    console.log('AuthBar: Attempting sign up for:', email);
     const { error } = await supabase.auth.signUp({ email, password });
     setLoading(false);
-    if (error) setError(error.message);
+    if (error) {
+      console.error('AuthBar: Sign up error:', error);
+      setError(error.message);
+    } else {
+      console.log('AuthBar: Sign up successful');
+    }
   };
 
   const signOut = async () => {
     setError(null); setLoading(true);
+    console.log('AuthBar: Attempting sign out');
     const { error } = await supabase.auth.signOut();
     setLoading(false);
-    if (error) setError(error.message);
+    if (error) {
+      console.error('AuthBar: Sign out error:', error);
+      setError(error.message);
+    } else {
+      console.log('AuthBar: Sign out successful');
+    }
   };
 
   if (userEmail) {
