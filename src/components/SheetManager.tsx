@@ -147,7 +147,7 @@ const SheetManager: React.FC<SheetManagerProps> = ({ onLoad, onNew, onClear }) =
       </div>
       <h2 style={{ fontFamily: 'Arial, sans-serif' }}>Saved Sheets</h2>
         <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-          {[...sheets].reverse().map(sheet => {
+          {sheets.map(sheet => {
           // Color maps (should match LevelUp.tsx)
           const classOptions = [
             { label: "Chemist", value: "Chemist", color: "#721131" },
