@@ -14,6 +14,8 @@ export const dispatchCharacterUpdate = (sheet: CharacterSheet) => {
 };
 
 export const saveCharacterSheet = async (sheet: CharacterSheet) => {
+  console.log('saveCharacterSheet: ENTERED function for sheet:', sheet.id);
+  
   // Check if this sheet has actually changed
   const sheetJson = JSON.stringify(sheet);
   if (lastSavedSheets[sheet.id] === sheetJson) {
@@ -21,8 +23,11 @@ export const saveCharacterSheet = async (sheet: CharacterSheet) => {
     return; // No changes, skip save
   }
 
+  console.log('saveCharacterSheet: Changes detected, proceeding with save');
+
   // Try server save if authenticated
   try {
+    console.log('saveCharacterSheet: About to call supabase.auth.getUser()');
     const { data: userData, error: userError } = await supabase.auth.getUser();
     if (userError) {
       console.error('saveCharacterSheet: Error getting user:', userError);
