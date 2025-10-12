@@ -1,6 +1,8 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import type { CharacterSheet } from "../types/CharacterSheet";
-import { loadAllSheets, deleteSheetById, exportAllSheets, importSheets } from "../utils/storage"; 
+import { loadAllSheets, deleteSheetById } from "../utils/storage";
+import { useAuth } from "../contexts/AuthContext";
+import AuthModal from "./AuthModal"; 
 
 type SheetManagerProps = {
   onLoad: (sheet: CharacterSheet) => void;
@@ -10,29 +12,30 @@ type SheetManagerProps = {
 
 const SheetManager: React.FC<SheetManagerProps> = ({ onLoad, onNew, onClear }) => {
   const [sheets, setSheets] = useState<CharacterSheet[]>([]);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const { user, logout, isLoading } = useAuth();
 
   useEffect(() => {
-    const loadSheetsSync = () => {
-      const allSheets = loadAllSheets();
+    const loadSheetsAsync = async () => {
+      const allSheets = await loadAllSheets();
       console.log('SheetManager: Loading sheets:', allSheets);
       setSheets(allSheets);
     };
     
     // Load initial sheets
-    loadSheetsSync();
+    loadSheetsAsync();
 
     // Listen for character updates to refresh the list
     const handleCharacterUpdate = () => {
       console.log('SheetManager: Character updated, refreshing list');
-      loadSheetsSync();
+      loadSheetsAsync();
     };
 
     // Listen for storage changes from other windows
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === "rpg-character-sheets") {
         console.log('SheetManager: Storage changed, refreshing list');
-        loadSheetsSync();
+        loadSheetsAsync();
       }
     };
 
@@ -43,40 +46,69 @@ const SheetManager: React.FC<SheetManagerProps> = ({ onLoad, onNew, onClear }) =
       window.removeEventListener('character-updated', handleCharacterUpdate);
       window.removeEventListener('storage', handleStorageChange);
     };
-  }, []);
-
-  const handleExport = () => {
-    exportAllSheets();
-  };
-
-  const handleImportClick = () => {
-    fileInputRef.current?.click();
-  };
-
-  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    try {
-      const importedCount = await importSheets(file);
-      alert(`Successfully imported ${importedCount} character sheet(s)!`);
-      
-      // Refresh the list
-      const allSheets = loadAllSheets();
-      setSheets(allSheets);
-      
-      // Clear the input so the same file can be imported again if needed
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
-    } catch (error) {
-      alert(`Failed to import: ${error instanceof Error ? error.message : 'Unknown error'}`);
-      console.error('Import error:', error);
-    }
-  };
+  }, [user]); // Reload when user changes (login/logout)
 
   return (
     <div>
+      {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} />}
+
+      {/* Auth status bar */}
+      <div style={{ 
+        marginBottom: '1rem', 
+        padding: '0.75rem', 
+        backgroundColor: user ? '#e8f5e9' : '#fff3e0',
+        border: `1px solid ${user ? '#4caf50' : '#ff9800'}`,
+        borderRadius: '4px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        fontFamily: 'Arial, sans-serif'
+      }}>
+        <div>
+          {isLoading ? (
+            <span>Checking authentication...</span>
+          ) : user ? (
+            <span>Logged in as <strong>{user.username}</strong></span>
+          ) : (
+            <span>Not logged in - characters saved locally only</span>
+          )}
+        </div>
+        <div>
+          {!isLoading && (
+            user ? (
+              <button
+                onClick={logout}
+                style={{
+                  padding: '0.5rem 1rem',
+                  backgroundColor: '#f44336',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontFamily: 'Arial, sans-serif'
+                }}
+              >
+                Logout
+              </button>
+            ) : (
+              <button
+                onClick={() => setShowAuthModal(true)}
+                style={{
+                  padding: '0.5rem 1rem',
+                  backgroundColor: '#1f21ce',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontFamily: 'Arial, sans-serif'
+                }}
+              >
+                Login / Sign Up
+              </button>
+            )
+          )}
+        </div>
+      </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontFamily: 'Arial, sans-serif', fontSize: '110%', flexWrap: 'wrap' }}>
           <a
@@ -112,15 +144,6 @@ const SheetManager: React.FC<SheetManagerProps> = ({ onLoad, onNew, onClear }) =
         <div style={{ margin: '20px 0' }}></div> {/* Added spacing here */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
         <button onClick={onNew} style={{ fontFamily: 'Arial, sans-serif' }}>New Character</button>
-        <button onClick={handleExport} style={{ fontFamily: 'Arial, sans-serif' }}>Export All Sheets</button>
-        <button onClick={handleImportClick} style={{ fontFamily: 'Arial, sans-serif' }}>Import Sheets</button>
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept=".json"
-          onChange={handleFileChange}
-          style={{ display: 'none' }}
-        />
       </div>
       <h2 style={{ fontFamily: 'Arial, sans-serif' }}>Saved Sheets</h2>
         <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
@@ -323,11 +346,11 @@ const SheetManager: React.FC<SheetManagerProps> = ({ onLoad, onNew, onClear }) =
               
               {/* Delete button */}
               <button
-                onClick={() => {
+                onClick={async () => {
                   const confirmed = window.confirm(`Delete "${sheet.name}"? This cannot be undone.`);
                   if (confirmed) {
-                    deleteSheetById(sheet.id);
-                    const refreshed = loadAllSheets();
+                    await deleteSheetById(sheet.id);
+                    const refreshed = await loadAllSheets();
                     setSheets(refreshed);
                     onClear();
                   }

@@ -1,6 +1,12 @@
 import type { CharacterSheet } from "../types/CharacterSheet";
 
 const STORAGE_KEY = "rpg-character-sheets";
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+
+// Get auth token from localStorage
+const getAuthToken = (): string | null => {
+  return localStorage.getItem('auth_token');
+};
 
 // Custom event to notify other windows of character changes
 export const dispatchCharacterUpdate = (sheet: CharacterSheet) => {
@@ -9,80 +15,103 @@ export const dispatchCharacterUpdate = (sheet: CharacterSheet) => {
   }));
 };
 
-export const saveCharacterSheet = (sheet: CharacterSheet) => {
-  const existing = loadAllSheets();
+// Save to backend if authenticated, otherwise localStorage
+export const saveCharacterSheet = async (sheet: CharacterSheet) => {
+  const token = getAuthToken();
+
+  if (token) {
+    try {
+      const response = await fetch(`${API_URL}/api/sheets`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(sheet)
+      });
+
+      if (response.ok) {
+        console.log('Saved to backend');
+        dispatchCharacterUpdate(sheet);
+        return;
+      } else {
+        console.error('Backend save failed, falling back to localStorage');
+      }
+    } catch (error) {
+      console.error('Backend save error:', error);
+    }
+  }
+
+  // Fallback to localStorage
+  const existing = loadAllSheetsLocal();
   const updated = [...existing.filter(s => s.id !== sheet.id), sheet];
   localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-  
-  // Dispatch custom event for current window
   dispatchCharacterUpdate(sheet);
 };
 
-export const loadAllSheets = (): CharacterSheet[] => {
+// Load from backend if authenticated, otherwise localStorage
+export const loadAllSheets = async (): Promise<CharacterSheet[]> => {
+  const token = getAuthToken();
+
+  if (token) {
+    try {
+      const response = await fetch(`${API_URL}/api/sheets`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        const sheets = await response.json();
+        console.log('Loaded from backend:', sheets.length, 'sheets');
+        return sheets;
+      } else {
+        console.error('Backend load failed, falling back to localStorage');
+      }
+    } catch (error) {
+      console.error('Backend load error:', error);
+    }
+  }
+
+  // Fallback to localStorage
+  return loadAllSheetsLocal();
+};
+
+// Synchronous local-only load (for backwards compatibility)
+export const loadAllSheetsLocal = (): CharacterSheet[] => {
   const raw = localStorage.getItem(STORAGE_KEY);
   return raw ? JSON.parse(raw) : [];
 };
 
 export const loadSheetById = (id: string): CharacterSheet | undefined => {
-  return loadAllSheets().find(sheet => sheet.id === id);
+  return loadAllSheetsLocal().find(sheet => sheet.id === id);
 };
 
-export const deleteSheetById = (id: string) => {
-  const updated = loadAllSheets().filter(sheet => sheet.id !== id);
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-};
+// Delete from backend if authenticated, otherwise localStorage
+export const deleteSheetById = async (id: string) => {
+  const token = getAuthToken();
 
-// Export all sheets as a JSON file
-export const exportAllSheets = () => {
-  const sheets = loadAllSheets();
-  const dataStr = JSON.stringify(sheets, null, 2);
-  const dataBlob = new Blob([dataStr], { type: 'application/json' });
-  const url = URL.createObjectURL(dataBlob);
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = `character-sheets-${new Date().toISOString().split('T')[0]}.json`;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  URL.revokeObjectURL(url);
-};
-
-// Import sheets from a JSON file
-export const importSheets = (file: File): Promise<number> => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    
-    reader.onload = (e) => {
-      try {
-        const content = e.target?.result as string;
-        const importedSheets = JSON.parse(content) as CharacterSheet[];
-        
-        if (!Array.isArray(importedSheets)) {
-          reject(new Error('Invalid file format: expected an array of character sheets'));
-          return;
+  if (token) {
+    try {
+      const response = await fetch(`${API_URL}/api/sheets/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
         }
-        
-        const existing = loadAllSheets();
-        const existingIds = new Set(existing.map(s => s.id));
-        
-        // Only import sheets that don't already exist (prevent duplicates)
-        const newSheets = importedSheets.filter(sheet => !existingIds.has(sheet.id));
-        
-        if (newSheets.length > 0) {
-          const updated = [...existing, ...newSheets];
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-        }
-        
-        resolve(newSheets.length);
-      } catch (error) {
-        reject(error);
+      });
+
+      if (response.ok) {
+        console.log('Deleted from backend');
+        return;
+      } else {
+        console.error('Backend delete failed, falling back to localStorage');
       }
-    };
-    
-    reader.onerror = () => {
-      reject(new Error('Failed to read file'));
-    };
-    
-    reader.readAsText(file);
-  });
+    } catch (error) {
+      console.error('Backend delete error:', error);
+    }
+  }
+
+  // Fallback to localStorage
+  const updated = loadAllSheetsLocal().filter(sheet => sheet.id !== id);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
 };
