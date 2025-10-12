@@ -280,7 +280,7 @@ const App = () => {
     }
   }, [charClass, subclass, species, subspecies, currentSheet]);
 
-  const handleLevelUp = () => {
+  const handleLevelUp = async () => {
     console.log('handleLevelUp called, currentSheet before:', currentSheet ? `ID: ${currentSheet.id}` : 'NULL');
     // Auto-save before navigation - but reload current sheet from storage first to get latest changes
     if (currentSheet) {
@@ -295,13 +295,13 @@ const App = () => {
       };
       console.log('handleLevelUp - saving sheet with latest data:', updatedSheet.id);
       setCurrentSheet(updatedSheet);
-      saveCharacterSheet(updatedSheet);
+      await saveCharacterSheet(updatedSheet);
     }
     console.log('handleLevelUp - setting view to levelup');
     setView("levelup");
   };
 
-  const handleCards = () => {
+  const handleCards = async () => {
     console.log('handleCards called, currentSheet before:', currentSheet ? `ID: ${currentSheet.id}` : 'NULL');
     // Auto-save before navigation - but reload current sheet from storage first to get latest changes
     if (currentSheet) {
@@ -316,13 +316,13 @@ const App = () => {
       };
       console.log('handleCards - saving sheet with latest data:', updatedSheet.id, 'dartGuns:', updatedSheet.dartGuns);
       setCurrentSheet(updatedSheet);
-      saveCharacterSheet(updatedSheet);
+      await saveCharacterSheet(updatedSheet);
     }
     console.log('handleCards - setting view to cards');
     setView("cards");
   };
 
-  const handleBackToEditor = () => {
+  const handleBackToEditor = async () => {
     console.log('handleBackToEditor called, currentSheet before:', currentSheet ? `ID: ${currentSheet.id}` : 'NULL');
     // Auto-save before navigation
     if (currentSheet) {
@@ -336,11 +336,11 @@ const App = () => {
       console.log('handleBackToEditor - saving sheet:', updatedSheet.id);
       setCurrentSheet(updatedSheet);
       
-      // Force immediate save without debounce
+      // Force immediate save without debounce - AWAIT the save to complete
       if (autoSaveTimeoutRef.current) {
         clearTimeout(autoSaveTimeoutRef.current);
       }
-      saveCharacterSheet(updatedSheet);
+      await saveCharacterSheet(updatedSheet);
       console.log('handleBackToEditor - sheet saved, navigating to editor');
     }
     console.log('handleBackToEditor - setting view to editor');
@@ -361,11 +361,11 @@ const App = () => {
       console.log('handleBackToHome - saving sheet:', updatedSheet.id);
       setCurrentSheet(updatedSheet);
       
-      // Force immediate save without debounce
+      // Force immediate save without debounce - AWAIT the save to complete
       if (autoSaveTimeoutRef.current) {
         clearTimeout(autoSaveTimeoutRef.current);
       }
-      saveCharacterSheet(updatedSheet);
+      await saveCharacterSheet(updatedSheet);
       console.log('handleBackToHome - sheet saved, navigating to manager');
     }
     console.log('handleBackToHome - clearing currentSheet, setting view to manager');
