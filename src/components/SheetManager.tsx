@@ -59,16 +59,6 @@ const SheetManager: React.FC<SheetManagerProps> = ({ onLoad, onNew, onClear }) =
           </a>
           <span style={{ color: '#999' }}>|</span>
           <a
-            href="/Character Options.pdf"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ fontFamily: 'Arial, sans-serif', fontSize: '100%', fontWeight: 'bold', color: '#1f21ce', textDecoration: 'none' }}
-            title="Open Character Options PDF in a new tab"
-          >
-            Character Options
-          </a>
-          <span style={{ color: '#999' }}>|</span>
-          <a
             href="/Classes.pdf"
             target="_blank"
             rel="noopener noreferrer"
