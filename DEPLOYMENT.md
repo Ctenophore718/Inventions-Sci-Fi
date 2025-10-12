@@ -1,110 +1,65 @@
-# 🚀 Quick Deployment Guide - Fix iPad/iPhone Access
+# 🚀 Deployment Guide — Cloudflare Pages Functions + D1 (free)
 
-## The Problem
-Your backend server runs on `localhost:3001` which is only accessible from your laptop. iPad/iPhone need a public URL.
+This app now uses Cloudflare Pages Functions as the backend and D1 (SQLite) for storage, all on the same origin. That fixes mobile “load failed” by avoiding localhost and CORS.
 
-## Solution: Deploy Backend to Railway.app (5 minutes)
+## What you’ll get
+- Same-origin API at /api (e.g., /api/auth/login, /api/sheets)
+- Free D1 database for accounts and character sheets
+- No separate backend hosting needed
 
-### Step 1: Create Railway Account
-1. Go to https://railway.app
-2. Click "Login" → "Login with GitHub"
-3. Authorize Railway to access your GitHub
+## 1) Create the D1 database
+1. Go to Cloudflare Dashboard → Workers & Pages → D1
+2. Create Database
+   - Name: inventions-sheets (any name is fine)
+3. Note the database name; you’ll bind it as DB next.
 
-### Step 2: Deploy from GitHub
-1. Click "New Project"
-2. Select "Deploy from GitHub repo"
-3. Choose `Inventions-Sci-Fi` repository
-4. Railway will detect your backend automatically
+## 2) Bind D1 to your Pages project
+1. Go to Workers & Pages → your Pages project (inventions-sci-fi)
+2. Settings → Functions → D1 Databases → Add binding
+   - Variable name: DB
+   - Database: inventions-sheets (pick the DB you created)
+3. Save.
 
-### Step 3: Configure Backend Service
-1. In the Railway project, click on your service
-2. Go to **Settings** tab
-3. Under "Root Directory", enter: `backend`
-4. Under "Custom Start Command", enter: `npm start`
-5. Click "Deploy"
+Schema is created automatically on first request by the functions (ensureSchema).
 
-### Step 4: Set Environment Variables
-1. In your Railway service, go to **Variables** tab
-2. Click "Add Variable" and add these:
+## 3) Build and deploy the site
+If your Pages project is already connected to this repo, just trigger a deploy:
+- Push any commit to main, or
+- In Cloudflare Pages → Deployments → Retry latest
 
-   ```
-   NODE_ENV = production
-   JWT_SECRET = super-secret-random-string-change-this-123456789
-   ```
+No .env is required for the API because it runs same-origin. The frontend is already set to call relative /api paths by default.
 
-   **Important**: Change JWT_SECRET to a random string!
+## 4) Verify endpoints
+From the live site origin:
+- GET /api/auth/verify (requires Authorization header)
+- POST /api/auth/signup { username, password }
+- POST /api/auth/login { username, password }
+- GET /api/sheets (with Authorization)
+- POST /api/sheets (with Authorization)
+- DELETE /api/sheets/:id (with Authorization)
 
-### Step 5: Generate Public Domain
-1. Go to **Settings** tab
-2. Scroll to "Networking" section
-3. Click "Generate Domain"
-4. Copy the URL (e.g., `https://inventions-sci-fi-production-abc123.up.railway.app`)
+Tip: You can test quickly in your browser DevTools Console using fetch.
 
-### Step 6: Update Cloudflare Pages Environment Variable
-1. Go to https://dash.cloudflare.com
-2. Navigate to: Workers & Pages → inventions-sci-fi
-3. Go to **Settings** → **Environment variables**
-4. Add new variable:
-   - **Variable name**: `VITE_API_URL`
-   - **Value**: `https://your-railway-domain.up.railway.app` (paste your Railway URL from Step 5)
-   - **Environment**: Production
-5. Click "Save"
+## 5) Local development options (optional)
+You have two paths:
 
-### Step 7: Redeploy Frontend
-1. In Cloudflare Pages, go to **Deployments**
-2. Click "Retry deployment" on the latest deployment
-   OR
-3. Push a small change to GitHub to trigger a new deployment
+Option A — Keep using the local Node/Express backend in /backend for dev
+- Start it locally and set VITE_API_URL (only for local dev)
+- On Cloudflare, leave VITE_API_URL empty so production uses /api
 
-### Step 8: Update Backend CORS (Already Done!)
-✅ I've already updated `backend/server.js` to allow your Cloudflare domain
-✅ Changes are pushed to GitHub and will be deployed to Railway
+Option B — Use Wrangler to run Pages Functions locally
+1. Install Wrangler (one time): npm i -g wrangler
+2. Run: wrangler pages dev --persist
+3. This will serve your functions at /api and a local D1; great for end-to-end dev
 
-## Testing
-
-### Test Backend (Railway)
-Visit: `https://your-railway-url.up.railway.app/api/health`
-Should return: `{"status":"ok"}`
-
-### Test Frontend (Cloudflare)
-1. Open: `https://inventions-sci-fi.pages.dev` on iPad/iPhone
-2. Click "Login / Sign Up"
-3. Login with your existing account
-4. Your character should load!
-5. Create a new character - it should save and sync across devices
+## 6) iPad/iPhone testing
+Open your Cloudflare Pages URL (e.g., https://inventions-sci-fi.pages.dev) and login. Create/update/delete a character; it should sync across devices.
 
 ## Troubleshooting
-
-**Backend won't start on Railway:**
-- Check Railway logs (Click on service → Logs tab)
-- Ensure `backend/package.json` exists
-- Verify Root Directory is set to `backend`
-
-**Frontend can't connect:**
-- Verify `VITE_API_URL` environment variable is set in Cloudflare
-- Check that Railway backend is running (green checkmark)
-- Test backend health endpoint directly in browser
-
-**CORS errors:**
-- Update `backend/server.js` line 17 to include your exact Cloudflare URL
-- Redeploy Railway backend
-
-## Alternative: Use Render.com
-
-If Railway doesn't work, try Render.com (also free):
-
-1. Go to https://render.com
-2. Click "New +" → "Web Service"
-3. Connect GitHub repository
-4. Configure:
-   - **Name**: inventions-backend
-   - **Root Directory**: `backend`
-   - **Build Command**: `npm install`
-   - **Start Command**: `npm start`
-5. Add environment variables (same as Railway)
-6. Click "Create Web Service"
-7. Copy the URL and update Cloudflare Pages environment variable
+- 401 Unauthorized on API: Make sure you’re logged in; token is stored in localStorage and sent via Authorization: Bearer
+- D1 not bound: In Cloudflare Pages → Functions → D1 Databases, ensure the binding name is DB
+- TypeScript errors in functions locally: We added // @ts-nocheck in function files to avoid type issues in this repo; Cloudflare compiles functions fine on deploy
 
 ---
 
-**Need Help?** Check Railway logs or Cloudflare Pages build logs for specific errors.
+Previous instructions for Railway have been removed in favor of an all-Cloudflare setup that stays free.

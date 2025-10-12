@@ -16,7 +16,8 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+// Use relative API base by default so Cloudflare Pages Functions work (same origin)
+const API_BASE: string = import.meta.env.VITE_API_URL ? String(import.meta.env.VITE_API_URL) : '';
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -35,7 +36,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const verifyToken = async (storedToken: string) => {
     try {
-      const response = await fetch(`${API_URL}/api/auth/verify`, {
+  const response = await fetch(`${API_BASE}/api/auth/verify`, {
         headers: {
           'Authorization': `Bearer ${storedToken}`
         }
@@ -58,7 +59,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const login = async (username: string, password: string) => {
-    const response = await fetch(`${API_URL}/api/auth/login`, {
+  const response = await fetch(`${API_BASE}/api/auth/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -78,7 +79,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signup = async (username: string, password: string) => {
-    const response = await fetch(`${API_URL}/api/auth/signup`, {
+  const response = await fetch(`${API_BASE}/api/auth/signup`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

@@ -1,7 +1,8 @@
 import type { CharacterSheet } from "../types/CharacterSheet";
 
 const STORAGE_KEY = "rpg-character-sheets";
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+// Use relative API base by default so Cloudflare Pages Functions work (same origin)
+const API_BASE: string = import.meta.env.VITE_API_URL ? String(import.meta.env.VITE_API_URL) : '';
 
 // Get auth token from localStorage
 const getAuthToken = (): string | null => {
@@ -21,7 +22,7 @@ export const saveCharacterSheet = async (sheet: CharacterSheet) => {
 
   if (token) {
     try {
-      const response = await fetch(`${API_URL}/api/sheets`, {
+      const response = await fetch(`${API_BASE}/api/sheets`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -55,7 +56,7 @@ export const loadAllSheets = async (): Promise<CharacterSheet[]> => {
 
   if (token) {
     try {
-      const response = await fetch(`${API_URL}/api/sheets`, {
+      const response = await fetch(`${API_BASE}/api/sheets`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -93,7 +94,7 @@ export const deleteSheetById = async (id: string) => {
 
   if (token) {
     try {
-      const response = await fetch(`${API_URL}/api/sheets/${id}`, {
+      const response = await fetch(`${API_BASE}/api/sheets/${id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
