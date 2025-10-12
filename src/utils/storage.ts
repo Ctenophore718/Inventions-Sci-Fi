@@ -28,7 +28,16 @@ export const saveCharacterSheet = async (sheet: CharacterSheet) => {
   // Try server save if authenticated
   try {
     console.log('saveCharacterSheet: About to call supabase.auth.getUser()');
-    const { data: userData, error: userError } = await supabase.auth.getUser();
+    const getUserPromise = supabase.auth.getUser();
+    const timeoutPromise = new Promise<never>((_, reject) => 
+      setTimeout(() => reject(new Error('getUser timeout')), 3000)
+    );
+    
+    const { data: userData, error: userError } = await Promise.race([
+      getUserPromise,
+      timeoutPromise
+    ]) as Awaited<ReturnType<typeof supabase.auth.getUser>>;
+    
     if (userError) {
       console.error('saveCharacterSheet: Error getting user:', userError);
       throw userError;
@@ -81,7 +90,16 @@ export const loadAllSheets = (): CharacterSheet[] => {
 
 export const loadAllSheetsAsync = async (): Promise<CharacterSheet[]> => {
   try {
-    const { data: userData, error: userError } = await supabase.auth.getUser();
+    const getUserPromise = supabase.auth.getUser();
+    const timeoutPromise = new Promise<never>((_, reject) => 
+      setTimeout(() => reject(new Error('getUser timeout')), 3000)
+    );
+    
+    const { data: userData, error: userError } = await Promise.race([
+      getUserPromise,
+      timeoutPromise
+    ]) as Awaited<ReturnType<typeof supabase.auth.getUser>>;
+    
     if (userError) {
       console.error('loadAllSheetsAsync: Error getting user:', userError);
       throw userError;
@@ -123,7 +141,16 @@ export const loadSheetById = (id: string): CharacterSheet | undefined => {
 
 export const deleteSheetById = async (id: string) => {
   try {
-    const { data: userData, error: userError } = await supabase.auth.getUser();
+    const getUserPromise = supabase.auth.getUser();
+    const timeoutPromise = new Promise<never>((_, reject) => 
+      setTimeout(() => reject(new Error('getUser timeout')), 3000)
+    );
+    
+    const { data: userData, error: userError } = await Promise.race([
+      getUserPromise,
+      timeoutPromise
+    ]) as Awaited<ReturnType<typeof supabase.auth.getUser>>;
+    
     if (userError) {
       console.error('deleteSheetById: Error getting user:', userError);
       throw userError;
