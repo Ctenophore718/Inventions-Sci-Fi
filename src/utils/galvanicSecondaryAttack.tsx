@@ -109,7 +109,45 @@ export function generateGalvanicSecondaryAttackStatsJSX(
     galvanicAttackCritDots,
     galvanicAttackCooldownDots
   );
+
+  if (sabreName === "Phase Sword") {
+    return (
+      <div style={{ fontSize: '0.875em', width: '100%', height: 'fit-content', maxHeight: '100%', overflow: 'hidden' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <span><b><u>Range</u></b> 1hx</span>
+          <span style={{ textAlign: 'right', minWidth: '80px' }}><b><u>Crit</u></b> <b>[{crit}]</b>+</span>
+        </div>
+        <div>
+          <b><u>Target</u></b> <i>AoE</i> <b>[{aoe}]</b>hx-Radius <br />
+          <b><u>Damage</u></b> <b>[{damage}]</b>d8 <b><u style={{ color: '#d5d52a', display: 'inline-flex', alignItems: 'center' }}>
+            Electric<img src="/Electric.png" alt="Electric" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> <br />
+          <b><u>Crit Effect</u></b> <b>[{damage}]</b>d8 <b><u style={{ color: '#d5d52a', display: 'inline-flex', alignItems: 'center' }}>
+            Electric<img src="/Electric.png" alt="Electric" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>, <b><i>Drain</i></b>
+        </div>
+      </div>
+    );
+  }
+
+  if (sabreName === "Truthsinger") {
+    return (
+      <div style={{ fontSize: '0.875em', width: '100%', height: 'fit-content', maxHeight: '100%', overflow: 'hidden' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <span><b><u>Range</u></b> 1hx</span>
+          <span style={{ textAlign: 'right', minWidth: '80px' }}><b><u>Crit</u></b> <b>[{crit}]</b>+</span>
+        </div>
+        <div>
+          <b><u>Target</u></b> <i>AoE</i> <b>[{aoe}]</b>hx-Radius <br />
+          <b><u>Damage</u></b> <b>[{damage}]</b>d8 <b><u style={{ color: '#808080', display: 'inline-flex', alignItems: 'center' }}>
+            Slashing<img src="/Slashing.png" alt="Slashing" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> <br />
+          <b><u>Crit Effect</u></b> <b>[{damage}]</b>d8 <b><u style={{ color: '#a929ff', display: 'inline-flex', alignItems: 'center' }}>
+            Neural<img src="/Neural.png" alt="Neural" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>, <b><i>Blind</i></b>
+        </div>
+      </div>
+    );
+  }
+
   
+  // Default fallback
   return (
     <div style={{ fontSize: '0.875em', width: '100%', height: 'fit-content', maxHeight: '100%', overflow: 'hidden' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>

@@ -33,7 +33,7 @@ export const saveCharacterSheet = async (sheet: CharacterSheet) => {
 
       if (response.ok) {
         console.log('Saved to backend');
-        dispatchCharacterUpdate(sheet);
+        // Don't dispatch event - caller will handle state updates
         return;
       } else {
         console.error('Backend save failed, falling back to localStorage');
@@ -47,7 +47,7 @@ export const saveCharacterSheet = async (sheet: CharacterSheet) => {
   const existing = loadAllSheetsLocal();
   const updated = [...existing.filter(s => s.id !== sheet.id), sheet];
   localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-  dispatchCharacterUpdate(sheet);
+  // Don't dispatch event for localStorage either - caller handles state
 };
 
 // Load from backend if authenticated, otherwise localStorage

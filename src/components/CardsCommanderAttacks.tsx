@@ -362,7 +362,7 @@ export const CardsCommanderAttacks: React.FC<CardsCommanderAttacksProps> = ({ sh
             }}>Sabre</span>
           </div>
           <img 
-            src={'/Blank Card.png'}
+            src={sabre === 'Phase Sword' ? '/Phase Sword.png' : sabre === 'Truthsinger' ? '/Truthsinger.png' : '/Blank Card.png'}
             alt={sabre}
             style={{
               position: 'absolute',
@@ -440,8 +440,8 @@ export const CardsCommanderAttacks: React.FC<CardsCommanderAttacksProps> = ({ sh
             zIndex: 3,
             textAlign: 'left'
           }}>
-            {sabre === 'Phase Sword' ? 'This blade can shift between phases of matter, allowing it to pass through armor and strike at the very essence of its target.' 
-            : sabre === 'Truthsinger' ? 'Named for the haunting resonance it emits when swung, this sabre vibrates at a frequency that disrupts neural pathways, forcing targets to reveal their true intentions.' : 'Sabre effect.'}
+            {sabre === 'Phase Sword' ? 'Every phase sword seems to somehow reflect the personality of its wielder. If you see a red hue, be extremely wary.' 
+            : sabre === 'Truthsinger' ? '“They call it Truthsinger because of the light that shines in the mind of its target when the blade strikes true. A blinding truth.” --Rene Zin, Galvanic' : 'Sabre effect.'}
           </div>
         </div>
       ))}
