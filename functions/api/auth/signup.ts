@@ -4,6 +4,13 @@ import { badRequest, ensureSchema, Env, json, serverError, hashPassword, generat
 export const onRequestPost: PagesFunction<Env> = async (context) => {
   try {
     const env = context.env as Env;
+    
+    // Check if D1 binding exists
+    if (!env.DB) {
+      console.error('D1 database binding not found! Please bind a D1 database named "DB" to this Pages project.');
+      return json({ error: 'Database not configured. Please contact administrator.' }, 500);
+    }
+    
     await ensureSchema(env);
     const body = await context.request.json() as { username?: string; password?: string };
     const username = body.username?.trim();
@@ -20,7 +27,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     await env.DB.prepare('INSERT INTO users (username, password_hash, salt) VALUES (?, ?, ?)').bind(username, hashB64, saltB64).run();
 
     const user = await env.DB.prepare('SELECT id, username FROM users WHERE username = ?').bind(username).first<{ id: number; username: string }>();
-    if (!user) return serverError();
+    if (!user) return serverError('Failed to create user');
 
     const token = generateToken();
     const expiresAt = Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 30; // 30 days
@@ -28,7 +35,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
     return json({ token, user: { id: user.id, username: user.username } });
   } catch (e) {
-    console.error('Signup error', e);
-    return serverError();
+    console.error('Signup error:', e);
+    return json({ error: `Server error: ${e.message || 'Unknown error'}` }, 500);
   }
 };

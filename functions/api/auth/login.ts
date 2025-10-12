@@ -4,6 +4,13 @@ import { badRequest, ensureSchema, Env, json, serverError, verifyPassword, gener
 export const onRequestPost: PagesFunction<Env> = async (context) => {
   try {
     const env = context.env as Env;
+    
+    // Check if D1 binding exists
+    if (!env.DB) {
+      console.error('D1 database binding not found!');
+      return json({ error: 'Database not configured. Please contact administrator.' }, 500);
+    }
+    
     await ensureSchema(env);
     const body = await context.request.json();
     const username = body.username?.trim();
@@ -22,7 +29,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
     return json({ token, user: { id: user.id, username: user.username } });
   } catch (e) {
-    console.error('Login error', e);
-    return serverError();
+    console.error('Login error:', e);
+    return json({ error: `Server error: ${e.message || 'Unknown error'}` }, 500);
   }
 };
