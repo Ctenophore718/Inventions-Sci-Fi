@@ -6,6 +6,7 @@ import { saveCharacterSheet, loadSheetById } from "../utils/storage";
 import { generateChemicalReactionJSX, calculateChemistFeatureData } from "../utils/chemistFeature";
 import { generateChemistStrikeJSX } from "../utils/chemistStrike";
 import { generateCommanderStrikeJSX } from "../utils/commanderStrike";
+import { generateGalvanicStrikeJSX } from "../utils/galvanicStrike";
 import { generateAnatomicalPrecisionJSX } from "../utils/anatomistFeature";
 import { generateBlasterMasterJSX } from "../utils/grenadierFeature";
 import { generateBodySnatcherJSX } from "../utils/necroFeature";
@@ -1498,7 +1499,8 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                                              (subclass === "Poisoner" && skill === "Thievery") ||
                                              (subclass === "Coercive" && skill === "Deception") ||
                                              (subclass === "Divinist" && skill === "Investigation") ||
-                                             (subclass === "Naturalist" && skill === "Survival");
+                                             (subclass === "Naturalist" && skill === "Survival") ||
+                                             (subclass === "Galvanic" && skill === "Athletics");
                     
                     // New characters default to 18+ (first two columns), but class boosters add a third column (16+)
                     value = (hasClassBooster || hasSubclassBooster) ? "16+" : "18+";
@@ -1524,7 +1526,8 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                                              (subclass === "Poisoner" && skill === "Thievery") ||
                                              (subclass === "Coercive" && skill === "Deception") ||
                                              (subclass === "Divinist" && skill === "Investigation") ||
-                                             (subclass === "Naturalist" && skill === "Survival");
+                                             (subclass === "Naturalist" && skill === "Survival") ||
+                                             (subclass === "Galvanic" && skill === "Athletics");
                     
                     // If class booster exists and we have at least the first two dots, ensure minimum of index 2 (16+)
                     if ((hasClassBooster || hasSubclassBooster) && idx >= 1) {
@@ -2205,13 +2208,26 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
               </span>
             ) : charClass === 'Commander' ? (
               <span style={{ fontWeight: 'bold', fontFamily: 'inherit', color: '#000', marginLeft: 4, display: 'flex', alignItems: 'center' }}>
-                {generateCommanderStrikeJSX(sheet?.classCardDots, 'charactersheet')}
+                {generateCommanderStrikeJSX(
+                  sheet?.classCardDots, 
+                  'charactersheet',
+                  (sheet?.subclassProgressionDots as any)?.galvanicStrikeDamageDots
+                )}
                 {subclass === 'Beguiler' && (
                   <>
                     &nbsp;
                     <span style={{ color: '#a929ff', textDecoration: 'underline', fontWeight: 'bold', fontFamily: 'inherit', display: 'inline-flex', alignItems: 'center' }}>
                       Neural
                       <img src="/Neural.png" alt="Neural" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+                    </span>
+                  </>
+                )}
+                {subclass === 'Galvanic' && (
+                  <>
+                    &nbsp;
+                    <span style={{ color: '#808080', textDecoration: 'underline', fontWeight: 'bold', fontFamily: 'inherit', display: 'inline-flex', alignItems: 'center' }}>
+                      Slashing
+                      <img src="/Slashing.png" alt="Slashing" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
                     </span>
                   </>
                 )}
@@ -2238,7 +2254,15 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
               </span>
             ) : <span style={{ fontWeight: 'bold', fontFamily: 'inherit', color: '#000', marginLeft: 4 }}>{strikeDamage}</span>}
           </div>
-          <div className={styles.horizontalLabel} style={{ color: '#351c75', fontWeight: 'bold' }}>Multi Strike <span style={{ color: '#000' }}>{charClass === 'Contemplative' ? (2 + (sheet?.classCardDots?.[1]?.[0] ? 1 : 0)) : (subclass === 'Beguiler' && sheet?.subclassProgressionDots?.beguilerStrikeStrikeDots?.[0]) ? 2 : (multiStrike > 0 ? multiStrike : <span style={{ visibility: 'hidden' }}>0</span>)}</span></div>
+          <div className={styles.horizontalLabel} style={{ color: '#351c75', fontWeight: 'bold' }}>Multi Strike <span style={{ color: '#000' }}>{
+            charClass === 'Contemplative'
+              ? (2 + (sheet?.classCardDots?.[1]?.[0] ? 1 : 0))
+              : (subclass === 'Beguiler' && sheet?.subclassProgressionDots?.beguilerStrikeStrikeDots?.[0])
+                ? 2
+                : (subclass === 'Galvanic' && (sheet?.subclassProgressionDots as any)?.galvanicStrikeStrikeDots?.[0])
+                  ? 2
+                  : (multiStrike > 0 ? multiStrike : <span style={{ visibility: 'hidden' }}>0</span>)
+          }</span></div>
           <div className={styles.horizontalLabel} style={{ color: '#351c75', fontWeight: 'bold' }}>
               Strike Effects {
                 charClass === 'Contemplative' && sheet?.classCardDots?.[2]?.[0]
@@ -2257,6 +2281,8 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                     ? <span style={{ color: '#000', fontWeight: 'normal' }}><b><i>Mesmerize</i></b></span>
                   : (subclass === 'Beguiler' && sheet?.subclassProgressionDots?.beguilerStrikeMesmerizeDots?.[0])
                     ? <span style={{ color: '#000', fontWeight: 'normal' }}><b><i>Mesmerize</i></b></span>
+                  : (subclass === 'Galvanic' && ((sheet?.subclassProgressionDots as any)?.galvanicStrikeAoEDots?.filter(Boolean).length || 0) > 0)
+                    ? <span style={{ color: '#000', fontWeight: 'normal' }}><i>AoE</i> <b>[{((sheet?.subclassProgressionDots as any)?.galvanicStrikeAoEDots?.filter(Boolean).length || 0)}]</b>hx-Radius</span>
                   : strikeEffects
               }
           </div>
@@ -2485,6 +2511,13 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                 </span>
               </div>
             )}
+            {subclass === 'Galvanic' && (sheet?.subclassProgressionDots as any)?.galvanicPerksSkillsDots?.[0] && (
+            <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <span>
+                <b><i style={{ color: '#6fce1f' }}>Moral Support.</i></b> <span style={{ color: '#000' }}>Your inspiring leadership is capable of pulling your comrades from the brink of death. Allies on the battlefield gain a +1 to <b><i>Death Die</i></b> rolls.</span>
+              </span>
+            </div>
+          )}
         </div>
       </div>
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import type { CharacterSheet } from "../types/CharacterSheet";
 import { generateLoyalServantsJSX } from "../utils/beguilerFeature";
 import { generateSeduceJSX } from "../utils/beguilerTechnique";
@@ -118,47 +118,6 @@ const LevelUpSubclassesCommander: React.FC<LevelUpSubclassesCommanderProps> = ({
     (sheet?.subclassProgressionDots as any)?.galvanicPerksSkillsDots || [false]
   );
 
-  // Sync local state with sheet changes - only update if values actually changed
-  useEffect(() => {
-    if (sheet?.subclassProgressionDots) {
-      const dots = sheet.subclassProgressionDots as any;
-      
-      // Only update state if the values have actually changed (deep comparison)
-      const updateIfChanged = (current: boolean[], incoming: boolean[] | undefined, setter: React.Dispatch<React.SetStateAction<boolean[]>>, fallback: boolean[]) => {
-        const newValue = incoming || fallback;
-        if (JSON.stringify(current) !== JSON.stringify(newValue)) {
-          setter(newValue);
-        }
-      };
-
-      updateIfChanged(beguilerFeatureHxDots, dots.beguilerFeatureHxDots, setBeguilerFeatureHxDots, [false, false, false]);
-      updateIfChanged(beguilerTechniqueRangeDots, dots.beguilerTechniqueRangeDots, setBeguilerTechniqueRangeDots, [false, false, false]);
-      updateIfChanged(beguilerTechniqueMoveDots, dots.beguilerTechniqueMoveDots, setBeguilerTechniqueMoveDots, [false, false]);
-      updateIfChanged(beguilerTechniqueCooldownDots, dots.beguilerTechniqueCooldownDots, setBeguilerTechniqueCooldownDots, [false, false]);
-      updateIfChanged(beguilerAttackAoEDots, dots.beguilerAttackAoEDots, setBeguilerAttackAoEDots, [false, false, false]);
-      updateIfChanged(beguilerAttackCritDots, dots.beguilerAttackCritDots, setBeguilerAttackCritDots, [false, false, false]);
-      updateIfChanged(beguilerAttackCooldownDots, dots.beguilerAttackCooldownDots, setBeguilerAttackCooldownDots, [false, false]);
-      updateIfChanged(beguilerStrikeStrikeDots, dots.beguilerStrikeStrikeDots, setBeguilerStrikeStrikeDots, [false]);
-      updateIfChanged(beguilerStrikeMesmerizeDots, dots.beguilerStrikeMesmerizeDots, setBeguilerStrikeMesmerizeDots, [false]);
-      updateIfChanged(beguilerPerksSkillsDots, dots.beguilerPerksSkillsDots, setBeguilerPerksSkillsDots, [false]);
-      updateIfChanged(galvanicFeatureHxDots, dots.galvanicFeatureHxDots, setGalvanicFeatureHxDots, [false, false, false]);
-      updateIfChanged(galvanicFeatureHpDots, dots.galvanicFeatureHpDots, setGalvanicFeatureHpDots, [false, false]);
-      updateIfChanged(galvanicTechniqueHxDots, dots.galvanicTechniqueHxDots, setGalvanicTechniqueHxDots, [false, false, false]);
-      updateIfChanged(galvanicTechniqueCritDots, dots.galvanicTechniqueCritDots, setGalvanicTechniqueCritDots, [false, false, false]);
-      updateIfChanged(galvanicTechniqueHpDots, dots.galvanicTechniqueHpDots, setGalvanicTechniqueHpDots, [false, false]);
-      updateIfChanged(galvanicTechniqueCooldownDots, dots.galvanicTechniqueCooldownDots, setGalvanicTechniqueCooldownDots, [false, false]);
-      updateIfChanged(galvanicAttackAoEDots, dots.galvanicAttackAoEDots, setGalvanicAttackAoEDots, [false, false]);
-      updateIfChanged(galvanicAttackDamageDots, dots.galvanicAttackDamageDots, setGalvanicAttackDamageDots, [false, false, false]);
-      updateIfChanged(galvanicAttackCritDots, dots.galvanicAttackCritDots, setGalvanicAttackCritDots, [false, false, false]);
-      updateIfChanged(galvanicAttackCooldownDots, dots.galvanicAttackCooldownDots, setGalvanicAttackCooldownDots, [false, false]);
-      updateIfChanged(galvanicStrikeDamageDots, dots.galvanicStrikeDamageDots, setGalvanicStrikeDamageDots, [false]);
-      updateIfChanged(galvanicStrikeStrikeDots, dots.galvanicStrikeStrikeDots, setGalvanicStrikeStrikeDots, [false]);
-      updateIfChanged(galvanicStrikeAoEDots, dots.galvanicStrikeAoEDots, setGalvanicStrikeAoEDots, [false, false]);
-      updateIfChanged(galvanicPerksSkillsDots, dots.galvanicPerksSkillsDots, setGalvanicPerksSkillsDots, [false]);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sheet?.subclassProgressionDots]);
-
   // Helper function to handle XP dot clicking with sequential requirement
   const handleDotClick = (
     currentArray: boolean[],
@@ -167,25 +126,30 @@ const LevelUpSubclassesCommander: React.FC<LevelUpSubclassesCommanderProps> = ({
     xpCosts: number[],
     dotType?: string
   ) => {
-    const newArray = [...currentArray];
-    const rightmostChecked = currentArray.lastIndexOf(true);
-    const canCheck = index === 0 || currentArray.slice(0, index).every(Boolean);
-    const canUncheck = currentArray[index] && index === rightmostChecked;
+    // Use the most up-to-date data from sheet to avoid XP drift
+    const actualCurrentArray = dotType && sheet?.subclassProgressionDots
+      ? ((sheet.subclassProgressionDots as any)[dotType] as boolean[] || currentArray)
+      : currentArray;
+    
+    const newArray = [...actualCurrentArray];
+    const rightmostChecked = actualCurrentArray.lastIndexOf(true);
+    const canCheck = index === 0 || actualCurrentArray.slice(0, index).every(Boolean);
+    const canUncheck = actualCurrentArray[index] && index === rightmostChecked;
 
     let xpDelta = 0;
 
-    if (!currentArray[index] && canCheck) {
+    if (!actualCurrentArray[index] && canCheck) {
       // Checking dots - fill from start to current index
       for (let j = 0; j <= index; j++) {
-        if (!currentArray[j]) {
+        if (!actualCurrentArray[j]) {
           newArray[j] = true;
           xpDelta += xpCosts[j] || 0;
         }
       }
-    } else if (currentArray[index] && canUncheck) {
+    } else if (actualCurrentArray[index] && canUncheck) {
       // Unchecking dots - clear from current index to end
-      for (let j = index; j < currentArray.length; j++) {
-        if (currentArray[j]) {
+      for (let j = index; j < actualCurrentArray.length; j++) {
+        if (actualCurrentArray[j]) {
           newArray[j] = false;
           xpDelta -= xpCosts[j] || 0;
         }
@@ -203,7 +167,10 @@ const LevelUpSubclassesCommander: React.FC<LevelUpSubclassesCommanderProps> = ({
       // Update local array state
       setArray(newArray);
 
-      // Save to parent - parent will update xpSpent and trigger re-render
+      // Immediately update parent state to prevent race conditions on rapid clicks
+      setXpSpent(Math.max(0, newXpSpent));
+
+      // Save to parent - parent will persist the changes
       if (dotType && onAutoSave) {
         const progressionDots = {
           ...sheet?.subclassProgressionDots,
@@ -225,10 +192,15 @@ const LevelUpSubclassesCommander: React.FC<LevelUpSubclassesCommanderProps> = ({
     spCosts: number[],
     dotType?: string
   ) => {
-    const newArray = [...currentArray];
+    // Use the most up-to-date data from sheet to avoid SP drift
+    const actualCurrentArray = dotType && sheet?.subclassProgressionDots
+      ? ((sheet.subclassProgressionDots as any)[dotType] as boolean[] || currentArray)
+      : currentArray;
+    
+    const newArray = [...actualCurrentArray];
     let spDelta = 0;
 
-    if (!currentArray[index]) {
+    if (!actualCurrentArray[index]) {
       newArray[index] = true;
       spDelta += spCosts[index] || 0;
     } else {
@@ -245,7 +217,10 @@ const LevelUpSubclassesCommander: React.FC<LevelUpSubclassesCommanderProps> = ({
     // Update local array state
     setArray(newArray);
 
-    // Save to parent - parent will update spSpent and trigger re-render
+    // Immediately update parent state to prevent race conditions on rapid clicks
+    setSpSpent(Math.max(0, newSpSpent));
+
+    // Save to parent - parent will persist the changes
     if (dotType && onAutoSave) {
       const progressionDots = {
         ...sheet?.subclassProgressionDots,
@@ -1481,7 +1456,7 @@ const LevelUpSubclassesCommander: React.FC<LevelUpSubclassesCommanderProps> = ({
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>14xp</span>
               <span></span>
               {/* Row 2: +1hx-radius AoE dots */}
-              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1hx-radius AoE</span>
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1hx-Radius <i>AoE</i></span>
               {[0, 1].map(idx => (
                 <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                   <span
@@ -1534,7 +1509,7 @@ const LevelUpSubclassesCommander: React.FC<LevelUpSubclassesCommanderProps> = ({
                   overflowWrap: 'break-word',
                   wordWrap: 'break-word'
                 }}>
-                  <b><i style={{ color: '#6fce1f', fontSize: '1em' }}>Moral Support.</i></b> Your inspiring leadership is capable of pulling your comrades from the brink of death. Allies on the battlefield gain a +1 to Death Die rolls.
+                  <b><i style={{ color: '#6fce1f', fontSize: '1em' }}>Moral Support.</i></b> Your inspiring leadership is capable of pulling your comrades from the brink of death. Allies on the battlefield gain a +1 to <b><i>Death Die</i></b> rolls.
                 </div>
                 <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start' }}>
                   <span
