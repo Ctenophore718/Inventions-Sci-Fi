@@ -64,7 +64,7 @@ export async function hashPassword(password: string, salt?: Uint8Array) {
     false,
     ['deriveBits']
   );
-  const iterations = 150_000; // reasonable balance for Workers
+  const iterations = 100_000; // D1 max supported iterations
   const bits = await crypto.subtle.deriveBits(
     {
       name: 'PBKDF2',
