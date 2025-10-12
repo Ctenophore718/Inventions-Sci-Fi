@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import type { CharacterSheet } from "../types/CharacterSheet";
-import { loadAllSheets, loadAllSheetsAsync, deleteSheetById } from "../utils/storage"; 
+import { loadAllSheets, deleteSheetById, exportAllSheets, importSheets } from "../utils/storage"; 
 
 type SheetManagerProps = {
   onLoad: (sheet: CharacterSheet) => void;
@@ -10,28 +10,29 @@ type SheetManagerProps = {
 
 const SheetManager: React.FC<SheetManagerProps> = ({ onLoad, onNew, onClear }) => {
   const [sheets, setSheets] = useState<CharacterSheet[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    const loadSheets = async () => {
-      const allSheets = await loadAllSheetsAsync();
+    const loadSheetsSync = () => {
+      const allSheets = loadAllSheets();
       console.log('SheetManager: Loading sheets:', allSheets);
       setSheets(allSheets);
     };
     
     // Load initial sheets
-    loadSheets();
+    loadSheetsSync();
 
     // Listen for character updates to refresh the list
     const handleCharacterUpdate = () => {
       console.log('SheetManager: Character updated, refreshing list');
-      loadSheets();
+      loadSheetsSync();
     };
 
     // Listen for storage changes from other windows
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === "rpg-character-sheets") {
         console.log('SheetManager: Storage changed, refreshing list');
-        loadSheets();
+        loadSheetsSync();
       }
     };
 
@@ -43,6 +44,36 @@ const SheetManager: React.FC<SheetManagerProps> = ({ onLoad, onNew, onClear }) =
       window.removeEventListener('storage', handleStorageChange);
     };
   }, []);
+
+  const handleExport = () => {
+    exportAllSheets();
+  };
+
+  const handleImportClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const importedCount = await importSheets(file);
+      alert(`Successfully imported ${importedCount} character sheet(s)!`);
+      
+      // Refresh the list
+      const allSheets = loadAllSheets();
+      setSheets(allSheets);
+      
+      // Clear the input so the same file can be imported again if needed
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    } catch (error) {
+      alert(`Failed to import: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      console.error('Import error:', error);
+    }
+  };
 
   return (
     <div>
@@ -81,6 +112,15 @@ const SheetManager: React.FC<SheetManagerProps> = ({ onLoad, onNew, onClear }) =
         <div style={{ margin: '20px 0' }}></div> {/* Added spacing here */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
         <button onClick={onNew} style={{ fontFamily: 'Arial, sans-serif' }}>New Character</button>
+        <button onClick={handleExport} style={{ fontFamily: 'Arial, sans-serif' }}>Export All Sheets</button>
+        <button onClick={handleImportClick} style={{ fontFamily: 'Arial, sans-serif' }}>Import Sheets</button>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".json"
+          onChange={handleFileChange}
+          style={{ display: 'none' }}
+        />
       </div>
       <h2 style={{ fontFamily: 'Arial, sans-serif' }}>Saved Sheets</h2>
         <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
@@ -286,11 +326,9 @@ const SheetManager: React.FC<SheetManagerProps> = ({ onLoad, onNew, onClear }) =
                 onClick={() => {
                   const confirmed = window.confirm(`Delete "${sheet.name}"? This cannot be undone.`);
                   if (confirmed) {
-                    (async () => {
-                      await deleteSheetById(sheet.id);
-                      const refreshed = await loadAllSheetsAsync();
-                      setSheets(refreshed);
-                    })();
+                    deleteSheetById(sheet.id);
+                    const refreshed = loadAllSheets();
+                    setSheets(refreshed);
                     onClear();
                   }
                 }}

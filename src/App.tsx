@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import './responsive-headers.css';
 import SheetManager from "./components/SheetManager";
-import AuthBar from "./components/AuthBar";
 import CharacterSheetComponent from "./components/CharacterSheet";
 import LevelUp from "./components/LevelUp";
 import Cards from "./components/Cards";
@@ -24,7 +23,7 @@ const App = () => {
   const autoSaveTimeoutRef = React.useRef<number | null>(null);
 
   // Enhanced auto-save function that handles any character changes
-  const performAutoSave = React.useCallback(async (updatedSheet: CharacterSheet) => {
+  const performAutoSave = React.useCallback((updatedSheet: CharacterSheet) => {
     console.log('performAutoSave called with:', updatedSheet);
     console.log('performAutoSave - setting currentSheet to:', updatedSheet.id);
     // Immediately update the current sheet state for navigation
@@ -35,9 +34,9 @@ const App = () => {
       clearTimeout(autoSaveTimeoutRef.current);
     }
     
-    autoSaveTimeoutRef.current = window.setTimeout(async () => {
-      console.log('Actually saving to storage (local/server):', updatedSheet);
-      await saveCharacterSheet(updatedSheet);
+    autoSaveTimeoutRef.current = window.setTimeout(() => {
+      console.log('Actually saving to storage (local):', updatedSheet);
+      saveCharacterSheet(updatedSheet);
       console.log('Auto-saved character:', updatedSheet.name || 'Unnamed');
     }, 300); // 300ms debounce for better UX
   }, []);
@@ -272,17 +271,17 @@ const App = () => {
           subspecies
         } as CharacterSheet;
         setCurrentSheet(updatedSheet);
-        // Fire-and-forget save (debounced)
-        void saveCharacterSheet(updatedSheet);
+        // Synchronous save
+        saveCharacterSheet(updatedSheet);
       }, 100); // 100ms debounce
 
       return () => clearTimeout(timeoutId);
     }
   }, [charClass, subclass, species, subspecies, currentSheet]);
 
-  const handleLevelUp = async () => {
+  const handleLevelUp = () => {
     console.log('handleLevelUp called, currentSheet before:', currentSheet ? `ID: ${currentSheet.id}` : 'NULL');
-    // Auto-save before navigation - but reload current sheet from storage first to get latest changes
+    // Auto-save before navigation - reload current sheet from storage first to get latest changes
     if (currentSheet) {
       // Load the latest version from storage to get any changes made in other components
       const latestSheet = loadSheetById(currentSheet.id);
@@ -295,23 +294,15 @@ const App = () => {
       };
       console.log('handleLevelUp - saving sheet with latest data:', updatedSheet.id);
       setCurrentSheet(updatedSheet);
-      
-      try {
-        await Promise.race([
-          saveCharacterSheet(updatedSheet),
-          new Promise((_, reject) => setTimeout(() => reject(new Error('Save timeout')), 5000))
-        ]);
-      } catch (error) {
-        console.error('handleLevelUp - save failed or timed out:', error);
-      }
+      saveCharacterSheet(updatedSheet);
     }
     console.log('handleLevelUp - setting view to levelup');
     setView("levelup");
   };
 
-  const handleCards = async () => {
+  const handleCards = () => {
     console.log('handleCards called, currentSheet before:', currentSheet ? `ID: ${currentSheet.id}` : 'NULL');
-    // Auto-save before navigation - but reload current sheet from storage first to get latest changes
+    // Auto-save before navigation - reload current sheet from storage first to get latest changes
     if (currentSheet) {
       // Load the latest version from storage to get any changes made in LevelUp
       const latestSheet = loadSheetById(currentSheet.id);
@@ -324,21 +315,13 @@ const App = () => {
       };
       console.log('handleCards - saving sheet with latest data:', updatedSheet.id, 'dartGuns:', updatedSheet.dartGuns);
       setCurrentSheet(updatedSheet);
-      
-      try {
-        await Promise.race([
-          saveCharacterSheet(updatedSheet),
-          new Promise((_, reject) => setTimeout(() => reject(new Error('Save timeout')), 5000))
-        ]);
-      } catch (error) {
-        console.error('handleCards - save failed or timed out:', error);
-      }
+      saveCharacterSheet(updatedSheet);
     }
     console.log('handleCards - setting view to cards');
     setView("cards");
   };
 
-  const handleBackToEditor = async () => {
+  const handleBackToEditor = () => {
     console.log('handleBackToEditor called, currentSheet before:', currentSheet ? `ID: ${currentSheet.id}` : 'NULL');
     // Auto-save before navigation
     if (currentSheet) {
@@ -352,26 +335,19 @@ const App = () => {
       console.log('handleBackToEditor - saving sheet:', updatedSheet.id);
       setCurrentSheet(updatedSheet);
       
-      // Force immediate save without debounce - with timeout protection
+      // Force immediate save without debounce
       if (autoSaveTimeoutRef.current) {
         clearTimeout(autoSaveTimeoutRef.current);
       }
       
-      try {
-        await Promise.race([
-          saveCharacterSheet(updatedSheet),
-          new Promise((_, reject) => setTimeout(() => reject(new Error('Save timeout')), 5000))
-        ]);
-        console.log('handleBackToEditor - sheet saved, navigating to editor');
-      } catch (error) {
-        console.error('handleBackToEditor - save failed or timed out:', error);
-      }
+      saveCharacterSheet(updatedSheet);
+      console.log('handleBackToEditor - sheet saved, navigating to editor');
     }
     console.log('handleBackToEditor - setting view to editor');
     setView("editor");
   };
 
-  const handleBackToHome = async () => {
+  const handleBackToHome = () => {
     console.log('handleBackToHome called, currentSheet before:', currentSheet ? `ID: ${currentSheet.id}` : 'NULL');
     // Auto-save before navigation
     if (currentSheet) {
@@ -385,22 +361,13 @@ const App = () => {
       console.log('handleBackToHome - saving sheet:', updatedSheet.id);
       setCurrentSheet(updatedSheet);
       
-      // Force immediate save without debounce - with timeout protection
+      // Force immediate save without debounce
       if (autoSaveTimeoutRef.current) {
         clearTimeout(autoSaveTimeoutRef.current);
       }
       
-      try {
-        // Add a timeout to prevent hanging forever
-        await Promise.race([
-          saveCharacterSheet(updatedSheet),
-          new Promise((_, reject) => setTimeout(() => reject(new Error('Save timeout')), 5000))
-        ]);
-        console.log('handleBackToHome - sheet saved, navigating to manager');
-      } catch (error) {
-        console.error('handleBackToHome - save failed or timed out:', error);
-        // Navigate anyway to prevent being stuck
-      }
+      saveCharacterSheet(updatedSheet);
+      console.log('handleBackToHome - sheet saved, navigating to manager');
     }
     console.log('handleBackToHome - clearing currentSheet, setting view to manager');
     setCurrentSheet(null);
@@ -419,11 +386,6 @@ const App = () => {
         )}
         {view === "cards" && (
           <span className="pageHeader" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '2.0em', fontWeight: 600, margin: '0 auto', display: 'block', textAlign: 'center' }}>Cards</span>
-        )}
-        {view === "manager" && (
-          <div style={{ marginLeft: 'auto' }}>
-            <AuthBar />
-          </div>
         )}
       </div>
 
