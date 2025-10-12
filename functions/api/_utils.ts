@@ -18,30 +18,39 @@ export const serverError = (msg = 'Server error') => json({ error: msg }, 500);
 
 // Ensure schema exists (idempotent)
 export async function ensureSchema(env: Env) {
-  await env.DB.exec(`
-    PRAGMA foreign_keys = ON;
-    CREATE TABLE IF NOT EXISTS users (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      username TEXT UNIQUE NOT NULL,
-      password_hash TEXT NOT NULL,
-      salt TEXT NOT NULL,
-      created_at INTEGER DEFAULT (strftime('%s','now'))
-    );
-    CREATE TABLE IF NOT EXISTS sessions (
-      token TEXT PRIMARY KEY,
-      user_id INTEGER NOT NULL,
-      expires_at INTEGER NOT NULL,
-      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-    );
-    CREATE TABLE IF NOT EXISTS character_sheets (
-      id TEXT PRIMARY KEY,
-      user_id INTEGER NOT NULL,
-      content TEXT NOT NULL,
-      updated_at INTEGER NOT NULL DEFAULT (strftime('%s','now')),
-      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-    );
-    CREATE INDEX IF NOT EXISTS idx_sheets_user_id ON character_sheets(user_id);
-  `);
+  // D1 exec() requires statements separated into a batch
+  // Note: PRAGMA is not needed in D1 as foreign keys are enabled by default
+  await env.DB.batch([
+    env.DB.prepare(`
+      CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT UNIQUE NOT NULL,
+        password_hash TEXT NOT NULL,
+        salt TEXT NOT NULL,
+        created_at INTEGER DEFAULT (strftime('%s','now'))
+      )
+    `),
+    env.DB.prepare(`
+      CREATE TABLE IF NOT EXISTS sessions (
+        token TEXT PRIMARY KEY,
+        user_id INTEGER NOT NULL,
+        expires_at INTEGER NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+      )
+    `),
+    env.DB.prepare(`
+      CREATE TABLE IF NOT EXISTS character_sheets (
+        id TEXT PRIMARY KEY,
+        user_id INTEGER NOT NULL,
+        content TEXT NOT NULL,
+        updated_at INTEGER NOT NULL DEFAULT (strftime('%s','now')),
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+      )
+    `),
+    env.DB.prepare(`
+      CREATE INDEX IF NOT EXISTS idx_sheets_user_id ON character_sheets(user_id)
+    `)
+  ]);
 }
 
 // Password hashing using PBKDF2 (bcrypt isn't available in Workers)
