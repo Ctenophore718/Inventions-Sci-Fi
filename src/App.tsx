@@ -295,7 +295,15 @@ const App = () => {
       };
       console.log('handleLevelUp - saving sheet with latest data:', updatedSheet.id);
       setCurrentSheet(updatedSheet);
-      await saveCharacterSheet(updatedSheet);
+      
+      try {
+        await Promise.race([
+          saveCharacterSheet(updatedSheet),
+          new Promise((_, reject) => setTimeout(() => reject(new Error('Save timeout')), 5000))
+        ]);
+      } catch (error) {
+        console.error('handleLevelUp - save failed or timed out:', error);
+      }
     }
     console.log('handleLevelUp - setting view to levelup');
     setView("levelup");
@@ -316,7 +324,15 @@ const App = () => {
       };
       console.log('handleCards - saving sheet with latest data:', updatedSheet.id, 'dartGuns:', updatedSheet.dartGuns);
       setCurrentSheet(updatedSheet);
-      await saveCharacterSheet(updatedSheet);
+      
+      try {
+        await Promise.race([
+          saveCharacterSheet(updatedSheet),
+          new Promise((_, reject) => setTimeout(() => reject(new Error('Save timeout')), 5000))
+        ]);
+      } catch (error) {
+        console.error('handleCards - save failed or timed out:', error);
+      }
     }
     console.log('handleCards - setting view to cards');
     setView("cards");
@@ -336,12 +352,20 @@ const App = () => {
       console.log('handleBackToEditor - saving sheet:', updatedSheet.id);
       setCurrentSheet(updatedSheet);
       
-      // Force immediate save without debounce - AWAIT the save to complete
+      // Force immediate save without debounce - with timeout protection
       if (autoSaveTimeoutRef.current) {
         clearTimeout(autoSaveTimeoutRef.current);
       }
-      await saveCharacterSheet(updatedSheet);
-      console.log('handleBackToEditor - sheet saved, navigating to editor');
+      
+      try {
+        await Promise.race([
+          saveCharacterSheet(updatedSheet),
+          new Promise((_, reject) => setTimeout(() => reject(new Error('Save timeout')), 5000))
+        ]);
+        console.log('handleBackToEditor - sheet saved, navigating to editor');
+      } catch (error) {
+        console.error('handleBackToEditor - save failed or timed out:', error);
+      }
     }
     console.log('handleBackToEditor - setting view to editor');
     setView("editor");
@@ -361,12 +385,22 @@ const App = () => {
       console.log('handleBackToHome - saving sheet:', updatedSheet.id);
       setCurrentSheet(updatedSheet);
       
-      // Force immediate save without debounce - AWAIT the save to complete
+      // Force immediate save without debounce - with timeout protection
       if (autoSaveTimeoutRef.current) {
         clearTimeout(autoSaveTimeoutRef.current);
       }
-      await saveCharacterSheet(updatedSheet);
-      console.log('handleBackToHome - sheet saved, navigating to manager');
+      
+      try {
+        // Add a timeout to prevent hanging forever
+        await Promise.race([
+          saveCharacterSheet(updatedSheet),
+          new Promise((_, reject) => setTimeout(() => reject(new Error('Save timeout')), 5000))
+        ]);
+        console.log('handleBackToHome - sheet saved, navigating to manager');
+      } catch (error) {
+        console.error('handleBackToHome - save failed or timed out:', error);
+        // Navigate anyway to prevent being stuck
+      }
     }
     console.log('handleBackToHome - clearing currentSheet, setting view to manager');
     setCurrentSheet(null);
