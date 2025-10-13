@@ -1269,32 +1269,28 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
     }
     
     if (sheet) {
-      let updatedSheet: CharacterSheet;
+      let partialUpdate: Partial<CharacterSheet>;
       if (type === 'Dart Gun') {
         const newDartGuns = [...(sheet.dartGuns || []), attackName];
-        updatedSheet = { 
-          ...sheet, 
+        partialUpdate = { 
           dartGuns: newDartGuns,
           credits: credits - cost
         };
       } else if (type === 'Lens') {
         const newLenses = [...(sheet.lenses || []), attackName];
-        updatedSheet = { 
-          ...sheet, 
+        partialUpdate = { 
           lenses: newLenses,
           credits: credits - cost
         };
       } else if (type === 'Super Serum') {
         const newSuperSerums = [...(sheet.superSerums || []), attackName];
-        updatedSheet = { 
-          ...sheet, 
+        partialUpdate = { 
           superSerums: newSuperSerums,
           credits: credits - cost
         };
       } else if (type === 'Rifle') {
         const newRifles = [...(sheet.rifles || []), attackName];
-        updatedSheet = { 
-          ...sheet, 
+        partialUpdate = { 
           rifles: newRifles,
           credits: credits - cost
         };        
@@ -1302,43 +1298,39 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
         return;
       }
       
-      handleAutoSave(updatedSheet);
+      handleAutoSave(partialUpdate);
     }
     setPendingAttack("");
   };
 
   const handleAttackAdd = (attackName: string, type: string) => {
     if (sheet) {
-      let updatedSheet: CharacterSheet;
+      let partialUpdate: Partial<CharacterSheet>;
       if (type === 'Dart Gun') {
         const newDartGuns = [...(sheet.dartGuns || []), attackName];
-        updatedSheet = { 
-          ...sheet, 
+        partialUpdate = { 
           dartGuns: newDartGuns
         };
       } else if (type === 'Lens') {
         const newLenses = [...(sheet.lenses || []), attackName];
-        updatedSheet = { 
-          ...sheet, 
+        partialUpdate = { 
           lenses: newLenses
         };
       } else if (type === 'Super Serum') {
         const newSuperSerums = [...(sheet.superSerums || []), attackName];
-        updatedSheet = { 
-          ...sheet, 
+        partialUpdate = { 
           superSerums: newSuperSerums
         };
       } else if (type === 'Rifle') {
         const newRifles = [...(sheet.rifles || []), attackName];
-        updatedSheet = { 
-          ...sheet, 
+        partialUpdate = { 
           rifles: newRifles
         };
       } else {
         return;
       }
       
-      handleAutoSave(updatedSheet);
+      handleAutoSave(partialUpdate);
     }
     setPendingAttack("");
   };
@@ -1350,60 +1342,52 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
     }
     
     if (sheet) {
-      let updatedSheet: CharacterSheet;
+      let partialUpdate: Partial<CharacterSheet>;
       if (type === 'Algorithm') {
         const newAlgorithms = [...(sheet.algorithms || []), attackName];
-        updatedSheet = { 
-          ...sheet, 
+        partialUpdate = { 
           algorithms: newAlgorithms,
           credits: credits - cost
         };
       } else if (type === 'Super Serum') {
         const newSuperSerums = [...(sheet.superSerums || []), attackName];
-        updatedSheet = { 
-          ...sheet, 
+        partialUpdate = { 
           superSerums: newSuperSerums,
           credits: credits - cost
         };
       } else if (type === 'Grenade') {
         const newGrenades = [...(sheet.grenades || []), attackName];
-        updatedSheet = { 
-          ...sheet, 
+        partialUpdate = { 
           grenades: newGrenades,
           credits: credits - cost
         };
       } else if (type === 'Chem Zombie') {
         const newChemZombies = [...(sheet.chemZombies || []), attackName];
-        updatedSheet = { 
-          ...sheet, 
+        partialUpdate = { 
           chemZombies: newChemZombies,
           credits: credits - cost
         };
       } else if (type === 'Noxious Fume') {
         const newNoxiousFumes = [...(sheet.noxiousFumes || []), attackName];
-        updatedSheet = { 
-          ...sheet, 
+        partialUpdate = { 
           noxiousFumes: newNoxiousFumes,
           credits: credits - cost
         };
       } else if (type === 'Whip') {
         const newWhips = [...(sheet.whips || []), attackName];
-        updatedSheet = { 
-          ...sheet, 
+        partialUpdate = { 
           whips: newWhips,
           credits: credits - cost
         };
       } else if (type === 'Sabre') {
         const newSabres = [...(sheet.sabres || []), attackName];
-        updatedSheet = { 
-          ...sheet, 
+        partialUpdate = { 
           sabres: newSabres,
           credits: credits - cost
         };
       } else if (type === 'Flare') {
         const newFlares = [...(sheet.flares || []), attackName];
-        updatedSheet = { 
-          ...sheet, 
+        partialUpdate = { 
           flares: newFlares,
           credits: credits - cost
         };
@@ -1411,7 +1395,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
         return;
       }
       
-      handleAutoSave(updatedSheet);
+      handleAutoSave(partialUpdate);
       setCredits(credits - cost);
     }
     setPendingSecondaryAttack("");
@@ -1419,60 +1403,52 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
 
   const handleSecondaryAttackAdd = (attackName: string, type: string) => {
     if (sheet) {
-      let updatedSheet: CharacterSheet;
+      let partialUpdate: Partial<CharacterSheet>;
       if (type === 'Algorithm') {
         const newAlgorithms = [...(sheet.algorithms || []), attackName];
-        updatedSheet = { 
-          ...sheet, 
+        partialUpdate = { 
           algorithms: newAlgorithms
         };
       } else if (type === 'Super Serum') {
         const newSuperSerums = [...(sheet.superSerums || []), attackName];
-        updatedSheet = { 
-          ...sheet, 
+        partialUpdate = { 
           superSerums: newSuperSerums
         };
       } else if (type === 'Grenade') {
         const newGrenades = [...(sheet.grenades || []), attackName];
-        updatedSheet = { 
-          ...sheet, 
+        partialUpdate = { 
           grenades: newGrenades
         };
       } else if (type === 'Chem Zombie') {
         const newChemZombies = [...(sheet.chemZombies || []), attackName];
-        updatedSheet = { 
-          ...sheet, 
+        partialUpdate = { 
           chemZombies: newChemZombies
         };
       } else if (type === 'Noxious Fume') {
         const newNoxiousFumes = [...(sheet.noxiousFumes || []), attackName];
-        updatedSheet = { 
-          ...sheet, 
+        partialUpdate = { 
           noxiousFumes: newNoxiousFumes
         };
       } else if (type === 'Whip') {
         const newWhips = [...(sheet.whips || []), attackName];
-        updatedSheet = { 
-          ...sheet, 
+        partialUpdate = { 
           whips: newWhips
         };
       } else if (type === 'Sabre') {
         const newSabres = [...(sheet.sabres || []), attackName];
-        updatedSheet = { 
-          ...sheet, 
+        partialUpdate = { 
           sabres: newSabres
         };
       } else if (type === 'Flare') {
         const newFlares = [...(sheet.flares || []), attackName];
-        updatedSheet = { 
-          ...sheet, 
+        partialUpdate = { 
           flares: newFlares
         };
       } else {
         return;
       }
       
-      handleAutoSave(updatedSheet);
+      handleAutoSave(partialUpdate);
     }
     setPendingSecondaryAttack("");
   };
@@ -3169,6 +3145,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                       e.stopPropagation();
                       setShowPortraitOptions(false);
                       setPortraitUrl(null);
+                      handleAutoSave({ portrait: undefined });
                     }}
                   >
                     Remove
@@ -3187,7 +3164,9 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
               if (file) {
                 const reader = new FileReader();
                 reader.onload = ev => {
-                  setPortraitUrl(ev.target?.result as string);
+                  const newPortraitUrl = ev.target?.result as string;
+                  setPortraitUrl(newPortraitUrl);
+                  handleAutoSave({ portrait: newPortraitUrl });
                 };
                 reader.readAsDataURL(file);
               }

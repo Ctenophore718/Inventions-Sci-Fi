@@ -1772,6 +1772,13 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                         {(skillDots[skill] || Array(10).fill(false)).map((checked, i) => {
                           const skillDotsForSkill = skillDots[skill] || Array(10).fill(false);
                           
+                          // For new characters without hasFreeSkillStarterDots set, force first two columns to be checked
+                          const isNewCharacter = !sheet?.hasFreeSkillStarterDots;
+                          const isFirstTwoColumns = i === 0 || i === 1;
+                          if (isNewCharacter && isFirstTwoColumns) {
+                            checked = true;
+                          }
+                          
                           // Check for class-based automatic skill dots
                           const isChemistInvestigation = charClass === "Chemist" && skill === "Investigation" && i === 2;
                           const isCoderOikomagic = charClass === "Coder" && skill === "Oikomagic" && i === 2;
@@ -1885,7 +1892,6 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                           });
                           const rightmostChecked = skillDotsForSkill.lastIndexOf(true);
                           const canUncheck = checked && i === rightmostChecked;
-                          const isFirstTwoColumns = i === 0 || i === 1;
                           const hasFreeDots = sheet?.hasFreeSkillStarterDots;
                           const isLockedColumn = hasFreeDots && isFirstTwoColumns;
                           
