@@ -94,6 +94,9 @@ export type CharacterSheet = {
   // Sabres for Galvanic subclass
   sabres?: string[];
 
+  // Flares for Tactician subclass
+  flares?: string[];
+
   // Subclass progression dots (specific to each subclass)
   subclassProgressionDots?: {
     // Anatomist subclass progression
@@ -196,6 +199,10 @@ export type CharacterSheet = {
     galvanicStrikeStrikeDots?: boolean[];
     galvanicStrikeAoEDots?: boolean[];
     galvanicPerksSkillsDots?: boolean[];
+    // Tactician subclass progression (Commander)
+    tacticianFeatureRangeHxDots?: boolean[];
+    tacticianFeatureCritDots?: boolean[];
+    tacticianFeatureSpeedDots?: boolean[];
     // Add other subclasses as needed
   };
 };

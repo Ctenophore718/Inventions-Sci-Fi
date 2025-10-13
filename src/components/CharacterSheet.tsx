@@ -20,6 +20,7 @@ import { generateTechnologistStrikeJSX } from "../utils/technologistStrike";
 import { generateStaySharpJSX } from "../utils/commanderFeature";
 import { generateLoyalServantsJSX } from "../utils/beguilerFeature";
 import { generateInspiringPresenceJSX } from "../utils/galvanicFeature";
+import { generateTacticalOffensiveJSX } from "../utils/tacticianFeature";
 
 
 type Props = {
@@ -744,7 +745,11 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
   // Add after galvanicFeatureJSX
   const tacticianFeatureJSX = (
     <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#cec31f' }}>Tactical Offensive.</i></b> At the beginning of the round, you and allies within <b>[3]</b>hx of you ignore <i>Rough Terrain</i>, gain +<b>[1]</b> to Crit rolls and +<b>[1]</b> <b><i style={{ color: '#38761d' }}>Speed</i></b> until the end of their turn.
+      {generateTacticalOffensiveJSX(
+        sheet?.subclassProgressionDots?.tacticianFeatureRangeHxDots,
+        sheet?.subclassProgressionDots?.tacticianFeatureCritDots,
+        sheet?.subclassProgressionDots?.tacticianFeatureSpeedDots
+      )}
     </span>
   );
 
@@ -1246,6 +1251,14 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
       );
     }
     
+    // Add Flares for Tactician subclass
+    if (subclass === 'Tactician') {
+      attacks.push(
+        { name: 'Fire Flare', type: 'Flare', cost: 185 },
+        { name: 'Flash Freeze', type: 'Flare', cost: 185 }
+      );
+    }
+    
     return attacks;
   };
 
@@ -1387,6 +1400,13 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
           sabres: newSabres,
           credits: credits - cost
         };
+      } else if (type === 'Flare') {
+        const newFlares = [...(sheet.flares || []), attackName];
+        updatedSheet = { 
+          ...sheet, 
+          flares: newFlares,
+          credits: credits - cost
+        };
       } else {
         return;
       }
@@ -1442,6 +1462,12 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
           ...sheet, 
           sabres: newSabres
         };
+      } else if (type === 'Flare') {
+        const newFlares = [...(sheet.flares || []), attackName];
+        updatedSheet = { 
+          ...sheet, 
+          flares: newFlares
+        };
       } else {
         return;
       }
@@ -1479,69 +1505,99 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                 return skillList.map(skill => {
                   const dots = sheet?.skillDots?.[skill] || [];
                   
+                  // Helper to get booster dot color
+                  const getBoosterColor = (skill: string) => {
+                    // Class booster colors
+                    if (charClass === "Chemist" && skill === "Investigation") return "rgba(114,17,49,0.5)";
+                    if (charClass === "Coder" && skill === "Oikomagic") return "rgba(17,33,114,0.5)";
+                    if (charClass === "Commander" && skill === "Diplomacy") return "rgba(113,114,17,0.5)";
+                    if (charClass === "Contemplative" && skill === "Awareness") return "rgba(17,99,114,0.5)";
+                    if (charClass === "Devout" && skill === "Xenomagic") return "rgba(107,17,114,0.5)";
+                    if (charClass === "Elementalist" && skill === "Xenomagic") return "rgba(35,17,114,0.5)";
+                    if (charClass === "Exospecialist" && skill === "Athletics") return "rgba(17,114,51,0.5)";
+                    if (charClass === "Gunslinger" && skill === "Deception") return "rgba(78,114,17,0.5)";
+                    if (charClass === "Technician" && skill === "Technology") return "rgba(114,72,17,0.5)";
+                    
+                    // Subclass booster colors
+                    if (subclass === "Anatomist" && skill === "Medicine") return "rgba(102,207,0,0.5)";
+                    if (subclass === "Grenadier" && skill === "Intimidation") return "rgba(207,0,0,0.5)";
+                    if (subclass === "Necro" && skill === "Survival") return "rgba(0,51,207,0.5)";
+                    if (subclass === "Poisoner" && skill === "Thievery") return "rgba(207,118,0,0.5)";
+                    if (subclass === "Coercive" && skill === "Deception") return "rgba(67,201,255,0.5)";
+                    if (subclass === "Divinist" && skill === "Investigation") return "rgba(255,67,67,0.5)";
+                    if (subclass === "Naturalist" && skill === "Survival") return "rgba(102,207,0,0.5)";
+                    if (subclass === "Technologist" && skill === "Technology") return "rgba(140,67,255,0.5)";
+                    if (subclass === "Beguiler" && skill === "Deception") return "rgba(31,33,206,0.5)";
+                    if (subclass === "Galvanic" && skill === "Athletics") return "rgba(111,206,31,0.5)";
+                    if (subclass === "Tactician" && skill === "Awareness") return "rgba(206,195,31,0.5)";
+                    
+                    return null;
+                  };
+                  
+                  // Check if this skill has a booster dot at position 2
+                  const boosterColor = getBoosterColor(skill);
+                  const hasBooster = boosterColor !== null;
+                  
                   let value;
+                  let displayDots = [];
+                  
                   if (isNewCharacter) {
-                    // For new characters, check if they have a class that gives a booster dot for this skill
-                    const hasClassBooster = (charClass === "Chemist" && skill === "Investigation") ||
-                                          (charClass === "Coder" && skill === "Oikomagic") ||
-                                          (charClass === "Commander" && skill === "Diplomacy") ||
-                                          (charClass === "Contemplative" && skill === "Awareness") ||
-                                          (charClass === "Devout" && skill === "Xenomagic") ||
-                                          (charClass === "Elementalist" && skill === "Xenomagic") ||
-                                          (charClass === "Exospecialist" && skill === "Athletics") ||
-                                          (charClass === "Gunslinger" && skill === "Deception") ||
-                                          (charClass === "Technician" && skill === "Technology");
-                    
-                    // Check for subclass boosters
-                    const hasSubclassBooster = (subclass === "Anatomist" && skill === "Medicine") ||
-                                             (subclass === "Grenadier" && skill === "Intimidation") ||
-                                             (subclass === "Necro" && skill === "Survival") ||
-                                             (subclass === "Poisoner" && skill === "Thievery") ||
-                                             (subclass === "Coercive" && skill === "Deception") ||
-                                             (subclass === "Divinist" && skill === "Investigation") ||
-                                             (subclass === "Naturalist" && skill === "Survival") ||
-                                             (subclass === "Galvanic" && skill === "Athletics");
-                    
-                    // New characters default to 18+ (first two columns), but class boosters add a third column (16+)
-                    value = (hasClassBooster || hasSubclassBooster) ? "16+" : "18+";
+                    // New characters default to first two dots, plus booster if applicable
+                    displayDots = [true, true];
+                    if (hasBooster) {
+                      displayDots.push(true);
+                      value = "16+";
+                    } else {
+                      value = "18+";
+                    }
                   } else {
-                    // For existing characters, find the rightmost selected dot
-                    let idx = dots.lastIndexOf(true);
+                    // For existing characters, use actual dot data
+                    displayDots = [...dots];
                     
-                    // Check if this skill should have a class booster dot that might not be in the saved data
-                    const hasClassBooster = (charClass === "Chemist" && skill === "Investigation") ||
-                                          (charClass === "Coder" && skill === "Oikomagic") ||
-                                          (charClass === "Commander" && skill === "Diplomacy") ||
-                                          (charClass === "Contemplative" && skill === "Awareness") ||
-                                          (charClass === "Devout" && skill === "Xenomagic") ||
-                                          (charClass === "Elementalist" && skill === "Xenomagic") ||
-                                          (charClass === "Exospecialist" && skill === "Athletics") ||
-                                          (charClass === "Gunslinger" && skill === "Deception") ||
-                                          (charClass === "Technician" && skill === "Technology");
-                    
-                    // Check for subclass boosters
-                    const hasSubclassBooster = (subclass === "Anatomist" && skill === "Medicine") ||
-                                             (subclass === "Grenadier" && skill === "Intimidation") ||
-                                             (subclass === "Necro" && skill === "Survival") ||
-                                             (subclass === "Poisoner" && skill === "Thievery") ||
-                                             (subclass === "Coercive" && skill === "Deception") ||
-                                             (subclass === "Divinist" && skill === "Investigation") ||
-                                             (subclass === "Naturalist" && skill === "Survival") ||
-                                             (subclass === "Galvanic" && skill === "Athletics");
-                    
-                    // If class booster exists and we have at least the first two dots, ensure minimum of index 2 (16+)
-                    if ((hasClassBooster || hasSubclassBooster) && idx >= 1) {
-                      idx = Math.max(idx, 2);
+                    // Ensure booster dot is shown if applicable
+                    if (hasBooster && displayDots.length >= 2) {
+                      // Make sure we have at least 3 elements
+                      while (displayDots.length < 3) {
+                        displayDots.push(false);
+                      }
+                      // Force the booster dot (index 2) to be true
+                      displayDots[2] = true;
                     }
                     
-                    // If no dots, show "-"
+                    let idx = displayDots.lastIndexOf(true);
                     value = idx >= 0 ? skillColumnValues[idx] + "+" : "-";
                   }
                   
+                  // Render visual dots
+                  const dotElements = displayDots.map((isFilled, dotIndex) => {
+                    if (!isFilled) return null;
+                    
+                    // Check if this is the booster dot
+                    const isBoosterDot = hasBooster && dotIndex === 2;
+                    const dotColor = isBoosterDot ? boosterColor : '#666';
+                    
+                    return (
+                      <span
+                        key={dotIndex}
+                        style={{
+                          display: 'inline-block',
+                          width: 10,
+                          height: 10,
+                          borderRadius: '50%',
+                          background: dotColor,
+                          marginRight: 2
+                        }}
+                      />
+                    );
+                  });
+                  
                   return (
                     <li key={skill} style={{ display: 'flex', alignItems: 'center', marginBottom: 2, fontFamily: 'Arial, sans-serif', fontSize: '1em' }}>
-                      <span style={{ fontWeight: 'bold', minWidth: 120 }}>{skill}</span>
-                      <span style={{ marginLeft: 8, fontWeight: 'bold', color: '#000', fontSize: '1em' }}>{value}</span>
+                      <span style={{ fontWeight: 'bold', minWidth: 120, textAlign: 'right', marginRight: 10, marginLeft: -10 }}>{skill}</span>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                        <span style={{ fontWeight: 'bold', color: '#000', fontSize: '1em', marginRight: 10, minWidth: 32, textAlign: 'right', display: 'inline-block' }}>{value}</span>
+                        {dotElements}
+                      </span>
                     </li>
                   );
                 });
@@ -2231,6 +2287,15 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                     </span>
                   </>
                 )}
+                  {subclass === 'Tactician' && (
+                    <>
+                      &nbsp;
+                      <span style={{ color: '#a6965f', textDecoration: 'underline', fontWeight: 'bold', fontFamily: 'inherit', display: 'inline-flex', alignItems: 'center' }}>
+                        Piercing
+                        <img src="/Piercing.png" alt="Piercing" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+                      </span>
+                    </>
+                  )}
               </span>
             ) : subclass === 'Naturalist' ? (
               generateNaturalistStrikeJSX(sheet)
@@ -2261,7 +2326,9 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                 ? 2
                 : (subclass === 'Galvanic' && (sheet?.subclassProgressionDots as any)?.galvanicStrikeStrikeDots?.[0])
                   ? 2
-                  : (multiStrike > 0 ? multiStrike : <span style={{ visibility: 'hidden' }}>0</span>)
+                  : (subclass === 'Tactician' && (sheet?.subclassProgressionDots as any)?.tacticianStrikeStrikeDots?.[0])
+                    ? 2
+                    : (multiStrike > 0 ? multiStrike : <span style={{ visibility: 'hidden' }}>0</span>)
           }</span></div>
           <div className={styles.horizontalLabel} style={{ color: '#351c75', fontWeight: 'bold' }}>
               Strike Effects {
@@ -2518,6 +2585,13 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
               </span>
             </div>
           )}
+            {subclass === 'Tactician' && (sheet?.subclassProgressionDots as any)?.tacticianPerksSkillsDots?.[0] && (
+            <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <span>
+                <b><i style={{ color: '#cec31f' }}>Three Moves Ahead.</i></b> <span style={{ color: '#000' }}>You are always thinking ahead and analyzing several possible outcomes based on the actions you and your allies make. Gain an advantage on skills related to creating or enacting a plan.</span>
+              </span>
+            </div>
+          )}
         </div>
       </div>
 
@@ -2718,10 +2792,10 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                     textAlign: 'left',
                     minWidth: '180px'
                   }}
-                  value={pendingSecondaryAttack || (charClass === 'Coder' ? 'Algorithms' : subclass === 'Anatomist' ? 'Super Serums' : subclass === 'Grenadier' ? 'Grenades' : subclass === 'Necro' ? 'Chem Zombies' : subclass === 'Poisoner' ? 'Noxious Fumes' : subclass === 'Beguiler' ? 'Whips' : subclass === 'Galvanic' ? 'Sabres' : 'Select Secondary Attack')}
+                  value={pendingSecondaryAttack || (charClass === 'Coder' ? 'Algorithms' : subclass === 'Anatomist' ? 'Super Serums' : subclass === 'Grenadier' ? 'Grenades' : subclass === 'Necro' ? 'Chem Zombies' : subclass === 'Poisoner' ? 'Noxious Fumes' : subclass === 'Beguiler' ? 'Whips' : subclass === 'Galvanic' ? 'Sabres' : subclass === 'Tactician' ? 'Flares' : 'Select Secondary Attack')}
                   onChange={(e) => {
                     const value = e.target.value;
-                    if (value !== 'Algorithms' && value !== 'Super Serums' && value !== 'Grenades' && value !== 'Chem Zombies' && value !== 'Noxious Fumes' && value !== 'Whips' && value !== 'Sabres' && value !== 'Select Secondary Attack') {
+                    if (value !== 'Algorithms' && value !== 'Super Serums' && value !== 'Grenades' && value !== 'Chem Zombies' && value !== 'Noxious Fumes' && value !== 'Whips' && value !== 'Sabres' && value !== 'Flares' && value !== 'Select Secondary Attack') {
                       setPendingSecondaryAttack(value);
                     }
                   }}
@@ -2774,7 +2848,14 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                       <option style={{ fontWeight: 'bold' }}>Truthsinger</option>
                     </>
                   )}
-                  {charClass !== 'Coder' && subclass !== 'Anatomist' && subclass !== 'Grenadier' && subclass !== 'Necro' && subclass !== 'Poisoner' && subclass !== 'Beguiler' && subclass !== 'Galvanic' && (
+                  {subclass === 'Tactician' && (
+                    <>
+                      <option disabled style={{ fontWeight: 'bold' }}>Flares</option>
+                      <option style={{ fontWeight: 'bold' }}>Fire Flare</option>
+                      <option style={{ fontWeight: 'bold' }}>Flash Freeze</option>
+                    </>
+                  )}
+                  {charClass !== 'Coder' && subclass !== 'Anatomist' && subclass !== 'Grenadier' && subclass !== 'Necro' && subclass !== 'Poisoner' && subclass !== 'Beguiler' && subclass !== 'Galvanic' && subclass !== 'Tactician' && (
                     <option disabled style={{ fontWeight: 'bold' }}>Select Secondary Attack</option>
                   )}
                 </select>
@@ -2976,6 +3057,29 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                                 const updatedSheet = { 
                                   ...sheet, 
                                   sabres: newSabres
+                                };
+                                handleAutoSave(updatedSheet);
+                              }
+                            }}
+                          >×</button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  {(sheet?.flares && sheet.flares.length > 0) && (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginLeft: '8px' }}>
+                      {sheet?.flares?.map((flare, idx) => (
+                        <span key={flare + idx + 'flare'} style={{ fontStyle: 'italic', display: 'flex', alignItems: 'center', background: '#f5f5f5', borderRadius: '6px', padding: '2px 8px' }}>
+                          {flare}
+                          <button
+                            style={{ marginLeft: '6px', padding: '0 6px', borderRadius: '50%', border: 'none', background: '#d32f2f', color: 'white', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.9em' }}
+                            title={`Remove ${flare}`}
+                            onClick={() => {
+                              if (sheet) {
+                                const newFlares = sheet.flares?.filter((_, i) => i !== idx) || [];
+                                const updatedSheet = { 
+                                  ...sheet, 
+                                  flares: newFlares
                                 };
                                 handleAutoSave(updatedSheet);
                               }

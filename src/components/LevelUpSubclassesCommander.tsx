@@ -8,6 +8,10 @@ import { generateInspiringPresenceJSX } from "../utils/galvanicFeature";
 import { generateBolsteringOratoryJSX } from "../utils/galvanicTechnique";
 import { generateGalvanicSecondaryAttackJSX } from "../utils/galvanicSecondaryAttack";
 import { generateGalvanicStrikeJSX } from "../utils/galvanicStrike";
+import { generateTacticalOffensiveJSX } from "../utils/tacticianFeature";
+import { generateStratigeryJSX } from "../utils/tacticianTechnique";
+import { generateTacticianSecondaryAttackJSX } from "../utils/tacticianSecondaryAttack";
+import { generateTacticianStrikeJSX } from "../utils/tacticianStrike";
 
 type LevelUpSubclassesCommanderProps = {
   sheet: CharacterSheet | null;
@@ -74,6 +78,9 @@ const LevelUpSubclassesCommander: React.FC<LevelUpSubclassesCommanderProps> = ({
   // State for pending sabre selection
   const [pendingSabre, setPendingSabre] = useState<string>("");
 
+  // State for pending flare selection
+  const [pendingFlare, setPendingFlare] = useState<string>("");
+
   // Independent state for Galvanic dots
   const [galvanicFeatureHxDots, setGalvanicFeatureHxDots] = useState<boolean[]>(
     (sheet?.subclassProgressionDots as any)?.galvanicFeatureHxDots || [false, false, false]
@@ -116,6 +123,41 @@ const LevelUpSubclassesCommander: React.FC<LevelUpSubclassesCommanderProps> = ({
   );
   const [galvanicPerksSkillsDots, setGalvanicPerksSkillsDots] = useState<boolean[]>(
     (sheet?.subclassProgressionDots as any)?.galvanicPerksSkillsDots || [false]
+  );
+
+  // Independent state for Tactician dots
+  const [tacticianFeatureRangeHxDots, setTacticianFeatureRangeHxDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.tacticianFeatureRangeHxDots || [false, false, false]
+  );
+  const [tacticianFeatureCritDots, setTacticianFeatureCritDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.tacticianFeatureCritDots || [false, false]
+  );
+  const [tacticianFeatureSpeedDots, setTacticianFeatureSpeedDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.tacticianFeatureSpeedDots || [false, false]
+  );
+  const [tacticianTechniqueRangeHxDots, setTacticianTechniqueRangeHxDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.tacticianTechniqueRangeHxDots || [false, false, false]
+  );
+  const [tacticianTechniqueDamageDiceDots, setTacticianTechniqueDamageDiceDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.tacticianTechniqueDamageDiceDots || [false, false, false]
+  );
+  const [tacticianTechniqueCooldownDots, setTacticianTechniqueCooldownDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.tacticianTechniqueCooldownDots || [false, false]
+  );
+  const [tacticianAttackAoEDots, setTacticianAttackAoEDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.tacticianAttackAoEDots || [false, false]
+  );
+  const [tacticianAttackCritDots, setTacticianAttackCritDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.tacticianAttackCritDots || [false, false, false]
+  );
+  const [tacticianAttackCooldownDots, setTacticianAttackCooldownDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.tacticianAttackCooldownDots || [false, false]
+  );
+  const [tacticianStrikeStrikeDots, setTacticianStrikeStrikeDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.tacticianStrikeStrikeDots || [false]
+  );
+  const [tacticianPerksSkillsDots, setTacticianPerksSkillsDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.tacticianPerksSkillsDots || [false]
   );
 
   // Helper function to handle XP dot clicking with sequential requirement
@@ -288,6 +330,34 @@ const LevelUpSubclassesCommander: React.FC<LevelUpSubclassesCommanderProps> = ({
         sabres: newSabres
       });
       setPendingSabre(""); // Clear dropdown after adding
+    }
+  };
+
+  // Handler for purchasing flares with credits
+  const handleFlarePurchase = (flareName: string, cost: number) => {
+    if (sheet && onAutoSave) {
+      const currentCredits = sheet.credits || 0;
+      if (currentCredits < cost) {
+        setNotice("Not enough credits!");
+        return;
+      }
+      const newFlares = [...(sheet.flares || []), flareName];
+      onAutoSave({
+        flares: newFlares,
+        credits: currentCredits - cost
+      });
+      setPendingFlare(""); // Clear dropdown after purchase
+    }
+  };
+
+  // Handler for adding flares without cost
+  const handleFlareAdd = (flareName: string) => {
+    if (sheet && onAutoSave) {
+      const newFlares = [...(sheet.flares || []), flareName];
+      onAutoSave({
+        flares: newFlares
+      });
+      setPendingFlare(""); // Clear dropdown after adding
     }
   };
 
@@ -1521,6 +1591,570 @@ const LevelUpSubclassesCommander: React.FC<LevelUpSubclassesCommanderProps> = ({
                       borderRadius: '50%',
                       display: 'block',
                       background: galvanicPerksSkillsDots[0] ? '#000' : '#fff',
+                      cursor: 'pointer',
+                      transition: 'background 0.2s'
+                    }}
+                  ></span>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Tactician Subclass */}
+      {subclass === 'Tactician' && (
+        <div style={{ width: '100%', marginTop: '1rem', textAlign: 'left', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
+          {/* Feature header */}
+          <div style={{ color: '#0b5394', fontWeight: 'bold', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '8px' }}>
+            <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <div style={{ fontWeight: 'bold', color: '#0b5394', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Feature</u></div>
+              <span style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
+                {generateTacticalOffensiveJSX(tacticianFeatureRangeHxDots, tacticianFeatureCritDots, tacticianFeatureSpeedDots)}
+              </span>
+            </span>
+          </div>
+
+          {/* Feature XP progression table */}
+          <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px' }}>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 24px 24px 24px',
+              gridTemplateRows: 'repeat(2, auto)',
+              columnGap: '6px',
+              rowGap: '2px',
+              alignItems: 'start',
+              marginBottom: '2px',
+              width: '100%',
+              paddingLeft: '4px'
+            }}>
+              {/* Row 1: XP headers */}
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>5xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>9xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>14xp</span>
+
+              {/* Row 2: +1hx dots */}
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>+1hx</span>
+              {[0, 1, 2].map(idx => (
+                <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
+                  <span
+                    onClick={() => handleDotClick(tacticianFeatureRangeHxDots, setTacticianFeatureRangeHxDots, idx, [5, 9, 14], 'tacticianFeatureRangeHxDots')}
+                    style={{
+                      width: '15px',
+                      height: '15px',
+                      border: '2px solid #000',
+                      borderRadius: '50%',
+                      display: 'block',
+                      background: tacticianFeatureRangeHxDots[idx] ? '#000' : '#fff',
+                      cursor: (idx === 0 || tacticianFeatureRangeHxDots.slice(0, idx).every(Boolean)) ? 'pointer' : 'not-allowed',
+                      transition: 'background 0.2s'
+                    }}
+                  ></span>
+                </span>
+              ))}
+            </div>
+
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 24px 24px 24px',
+              gridTemplateRows: 'repeat(3, auto)',
+              columnGap: '6px',
+              rowGap: '2px',
+              alignItems: 'start',
+              marginBottom: '2px',
+              width: '100%',
+              paddingLeft: '4px'
+            }}>
+              {/* Row 1: XP headers */}
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>3xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>6xp</span>
+              <span></span>
+              {/* Row 2: +1 Crit dots */}
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>+1 Crit</span>
+              {[0, 1].map(idx => (
+                <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
+                  <span
+                    onClick={() => handleDotClick(tacticianFeatureCritDots, setTacticianFeatureCritDots, idx, [3, 6], 'tacticianFeatureCritDots')}
+                    style={{
+                      width: '15px',
+                      height: '15px',
+                      border: '2px solid #000',
+                      borderRadius: '50%',
+                      display: 'block',
+                      background: tacticianFeatureCritDots[idx] ? '#000' : '#fff',
+                      cursor: (idx === 0 || tacticianFeatureCritDots.slice(0, idx).every(Boolean)) ? 'pointer' : 'not-allowed',
+                      transition: 'background 0.2s'
+                    }}
+                  ></span>
+                </span>
+              ))}
+            </div>
+
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 24px 24px 24px',
+              gridTemplateRows: 'repeat(3, auto)',
+              columnGap: '6px',
+              rowGap: '2px',
+              alignItems: 'start',
+              marginBottom: '2px',
+              width: '100%',
+              paddingLeft: '4px'
+            }}>
+              {/* Row 1: XP headers */}
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>6xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>10xp</span>
+              <span></span>
+              {/* Row 2: +1 Speed dots */}
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>+1 <b><i style={{ color: '#38761d', fontSize: '1em' }}>Speed</i></b></span>
+              {[0, 1].map(idx => (
+                <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
+                  <span
+                    onClick={() => handleDotClick(tacticianFeatureSpeedDots, setTacticianFeatureSpeedDots, idx, [6, 10], 'tacticianFeatureSpeedDots')}
+                    style={{
+                      width: '15px',
+                      height: '15px',
+                      border: '2px solid #000',
+                      borderRadius: '50%',
+                      display: 'block',
+                      background: tacticianFeatureSpeedDots[idx] ? '#000' : '#fff',
+                      cursor: (idx === 0 || tacticianFeatureSpeedDots.slice(0, idx).every(Boolean)) ? 'pointer' : 'not-allowed',
+                      transition: 'background 0.2s'
+                    }}
+                  ></span>
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* Technique Section */}
+          <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <div style={{ fontWeight: 'bold', color: '#bf9000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Technique</u></div>
+            <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              {generateStratigeryJSX(tacticianTechniqueRangeHxDots, tacticianTechniqueDamageDiceDots, tacticianTechniqueCooldownDots)}
+            </div>
+
+            {/* Technique XP progression table */}
+            <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px' }}>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 24px 24px 24px',
+                gridTemplateRows: 'repeat(2, auto)',
+                columnGap: '6px',
+                rowGap: '2px',
+                alignItems: 'start',
+                marginBottom: '2px',
+                width: '100%',
+                paddingLeft: '4px'
+              }}>
+                {/* Row 1: XP headers */}
+                <span></span>
+                <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>3xp</span>
+                <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>6xp</span>
+                <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>9xp</span>
+
+                {/* Row 2: +1hx dots */}
+                <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>+1hx</span>
+                {[0, 1, 2].map(idx => (
+                  <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
+                    <span
+                      onClick={() => handleDotClick(tacticianTechniqueRangeHxDots, setTacticianTechniqueRangeHxDots, idx, [3, 6, 9], 'tacticianTechniqueRangeHxDots')}
+                      style={{
+                        width: '15px',
+                        height: '15px',
+                        border: '2px solid #000',
+                        borderRadius: '50%',
+                        display: 'block',
+                        background: tacticianTechniqueRangeHxDots[idx] ? '#000' : '#fff',
+                        cursor: (idx === 0 || tacticianTechniqueRangeHxDots.slice(0, idx).every(Boolean)) ? 'pointer' : 'not-allowed',
+                        transition: 'background 0.2s'
+                      }}
+                    ></span>
+                  </span>
+                ))}
+              </div>
+
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 24px 24px 24px',
+                gridTemplateRows: 'repeat(2, auto)',
+                columnGap: '6px',
+                rowGap: '2px',
+                alignItems: 'start',
+                marginBottom: '2px',
+                width: '100%',
+                paddingLeft: '4px'
+              }}>
+                {/* Row 1: XP headers */}
+                <span></span>
+                <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>5xp</span>
+                <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>8xp</span>
+                <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>11xp</span>
+
+                {/* Row 2: +1 Damage die dots */}
+                <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>+1 Damage die</span>
+                {[0, 1, 2].map(idx => (
+                  <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
+                    <span
+                      onClick={() => handleDotClick(tacticianTechniqueDamageDiceDots, setTacticianTechniqueDamageDiceDots, idx, [5, 8, 11], 'tacticianTechniqueDamageDiceDots')}
+                      style={{
+                        width: '15px',
+                        height: '15px',
+                        border: '2px solid #000',
+                        borderRadius: '50%',
+                        display: 'block',
+                        background: tacticianTechniqueDamageDiceDots[idx] ? '#000' : '#fff',
+                        cursor: (idx === 0 || tacticianTechniqueDamageDiceDots.slice(0, idx).every(Boolean)) ? 'pointer' : 'not-allowed',
+                        transition: 'background 0.2s'
+                      }}
+                    ></span>
+                  </span>
+                ))}
+              </div>
+
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 24px 24px 24px',
+                gridTemplateRows: 'repeat(2, auto)',
+                columnGap: '6px',
+                rowGap: '2px',
+                alignItems: 'start',
+                marginBottom: '2px',
+                width: '100%',
+                paddingLeft: '4px'
+              }}>
+                {/* Row 1: XP headers */}
+                <span></span>
+                <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>5xp</span>
+                <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>8xp</span>
+                <span></span>
+                {/* Row 2: -1 Cooldown dots */}
+                <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>-1 Cooldown</span>
+                {[0, 1].map(idx => (
+                  <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
+                    <span
+                      onClick={() => handleDotClick(tacticianTechniqueCooldownDots, setTacticianTechniqueCooldownDots, idx, [5, 8], 'tacticianTechniqueCooldownDots')}
+                      style={{
+                        width: '15px',
+                        height: '15px',
+                        border: '2px solid #000',
+                        borderRadius: '50%',
+                        display: 'block',
+                        background: tacticianTechniqueCooldownDots[idx] ? '#000' : '#fff',
+                        cursor: (idx === 0 || tacticianTechniqueCooldownDots.slice(0, idx).every(Boolean)) ? 'pointer' : 'not-allowed',
+                        transition: 'background 0.2s'
+                      }}
+                    ></span>
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Attack Section */}
+          <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <div style={{ fontWeight: 'bold', color: '#990000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Attack</u></div>
+            <div style={{ fontSize: '1em', color: '#000', marginBottom: '4px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <b><i>Secondary <span style={{ color: '#990000' }}>Attack</span></i></b> <i>(Cooldown</i> <b>[4]</b><i>)</i><br />
+            </div>
+
+            {/* Flares dropdown section */}
+            <div style={{ marginTop: '8px', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <div style={{ marginBottom: '4px' }}>
+                <select
+                  style={{
+                    fontSize: '1em',
+                    padding: '2px 8px',
+                    borderRadius: '6px',
+                    border: '1px solid #ccc',
+                    background: '#fff',
+                    color: '#222',
+                    fontWeight: 'bold',
+                    marginBottom: '4px',
+                    textAlign: 'left',
+                    minWidth: '180px'
+                  }}
+                  value={pendingFlare || 'Flares'}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (value !== 'Flares') {
+                      setPendingFlare(value);
+                    }
+                  }}
+                >
+                  <option disabled style={{ fontWeight: 'bold' }}>Flares</option>
+                  <option style={{ fontWeight: 'bold' }}>Fire Flare</option>
+                  <option style={{ fontWeight: 'bold' }}>Flash Freeze</option>
+                </select>
+                
+                {pendingFlare && (
+                  <div style={{ marginTop: '4px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    <div style={{ fontWeight: 'bold' }}>
+                      {pendingFlare}
+                      <span style={{ color: '#bf9000', fontWeight: 'bold', marginLeft: '8px' }}>
+                        185c
+                      </span>
+                    </div>
+                    <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                      <button
+                        style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #1976d2', background: '#1976d2', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}
+                        onClick={() => handleFlarePurchase(pendingFlare, 185)}
+                      >
+                        Buy
+                      </button>
+                      <button
+                        style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #28a745', background: '#28a745', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}
+                        onClick={() => handleFlareAdd(pendingFlare)}
+                      >
+                        Add
+                      </button>
+                      <button
+                        style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #aaa', background: '#eee', color: '#333', fontWeight: 'bold', cursor: 'pointer' }}
+                        onClick={() => setPendingFlare("")}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Display added flares */}
+                <div style={{ marginTop: '4px' }}>
+                  {(sheet?.flares && sheet.flares.length > 0) && (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                      {sheet?.flares?.map((flare, idx) => (
+                        <span key={flare + idx + 'flare'} style={{ fontStyle: 'italic', display: 'flex', alignItems: 'center', background: '#f5f5f5', borderRadius: '6px', padding: '2px 8px' }}>
+                          {flare}
+                          <button
+                            style={{ marginLeft: '6px', padding: '0 6px', borderRadius: '50%', border: 'none', background: '#d32f2f', color: 'white', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.9em' }}
+                            title={`Remove ${flare}`}
+                            onClick={() => {
+                              if (sheet && onAutoSave) {
+                                const newFlares = sheet.flares?.filter((_, i) => i !== idx) || [];
+                                onAutoSave({
+                                  flares: newFlares
+                                });
+                              }
+                            }}
+                          >×</button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              {generateTacticianSecondaryAttackJSX(tacticianAttackAoEDots, tacticianAttackCritDots, tacticianAttackCooldownDots)}
+            </div>
+
+            {/* Attack XP progression table */}
+            <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px' }}>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 24px 24px 24px',
+                gridTemplateRows: 'repeat(2, auto)',
+                columnGap: '6px',
+                rowGap: '2px',
+                alignItems: 'start',
+                marginBottom: '2px',
+                width: '100%',
+                paddingLeft: '4px'
+              }}>
+                {/* Row 1: XP headers */}
+                <span></span>
+                <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>9xp</span>
+                <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>14xp</span>
+                <span></span>
+                {/* Row 2: +1hx-radius AoE dots */}
+                <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>+1hx-Radius <i>AoE</i></span>
+                {[0, 1].map(idx => (
+                  <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
+                    <span
+                      onClick={() => handleDotClick(tacticianAttackAoEDots, setTacticianAttackAoEDots, idx, [9, 14], 'tacticianAttackAoEDots')}
+                      style={{
+                        width: '15px',
+                        height: '15px',
+                        border: '2px solid #000',
+                        borderRadius: '50%',
+                        display: 'block',
+                        background: tacticianAttackAoEDots[idx] ? '#000' : '#fff',
+                        cursor: (idx === 0 || tacticianAttackAoEDots.slice(0, idx).every(Boolean)) ? 'pointer' : 'not-allowed',
+                        transition: 'background 0.2s'
+                      }}
+                    ></span>
+                  </span>
+                ))}
+              </div>
+
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 24px 24px 24px',
+                gridTemplateRows: 'repeat(2, auto)',
+                columnGap: '6px',
+                rowGap: '2px',
+                alignItems: 'start',
+                marginBottom: '2px',
+                width: '100%',
+                paddingLeft: '4px'
+              }}>
+                {/* Row 1: XP headers */}
+                <span></span>
+                <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>3xp</span>
+                <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>5xp</span>
+                <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>8xp</span>
+
+                {/* Row 2: +1 Crit dots */}
+                <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>+1 Crit</span>
+                {[0, 1, 2].map(idx => (
+                  <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
+                    <span
+                      onClick={() => handleDotClick(tacticianAttackCritDots, setTacticianAttackCritDots, idx, [3, 5, 8], 'tacticianAttackCritDots')}
+                      style={{
+                        width: '15px',
+                        height: '15px',
+                        border: '2px solid #000',
+                        borderRadius: '50%',
+                        display: 'block',
+                        background: tacticianAttackCritDots[idx] ? '#000' : '#fff',
+                        cursor: (idx === 0 || tacticianAttackCritDots.slice(0, idx).every(Boolean)) ? 'pointer' : 'not-allowed',
+                        transition: 'background 0.2s'
+                      }}
+                    ></span>
+                  </span>
+                ))}
+              </div>
+
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 24px 24px 24px',
+                gridTemplateRows: 'repeat(2, auto)',
+                columnGap: '6px',
+                rowGap: '2px',
+                alignItems: 'start',
+                marginBottom: '2px',
+                width: '100%',
+                paddingLeft: '4px'
+              }}>
+                {/* Row 1: XP headers */}
+                <span></span>
+                <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>5xp</span>
+                <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>6xp</span>
+                <span></span>
+                {/* Row 2: -1 Cooldown dots */}
+                <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>-1 Cooldown</span>
+                {[0, 1].map(idx => (
+                  <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
+                    <span
+                      onClick={() => handleDotClick(tacticianAttackCooldownDots, setTacticianAttackCooldownDots, idx, [5, 6], 'tacticianAttackCooldownDots')}
+                      style={{
+                        width: '15px',
+                        height: '15px',
+                        border: '2px solid #000',
+                        borderRadius: '50%',
+                        display: 'block',
+                        background: tacticianAttackCooldownDots[idx] ? '#000' : '#fff',
+                        cursor: (idx === 0 || tacticianAttackCooldownDots.slice(0, idx).every(Boolean)) ? 'pointer' : 'not-allowed',
+                        transition: 'background 0.2s'
+                      }}
+                    ></span>
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Strike Section */}
+          <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <div style={{ fontWeight: 'bold', color: '#351c75', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Strike</u></div>
+            {generateTacticianStrikeJSX(tacticianStrikeStrikeDots)}
+
+            {/* Strike XP progression table */}
+            <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px' }}>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 24px 24px 24px',
+                gridTemplateRows: 'repeat(2, auto)',
+                columnGap: '6px',
+                rowGap: '2px',
+                alignItems: 'start',
+                marginBottom: '2px',
+                width: '100%',
+                paddingLeft: '4px'
+              }}>
+                {/* Row 1: XP headers */}
+                <span></span>
+                <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>12xp</span>
+                <span></span>
+                <span></span>
+                {/* Row 2: +1 Strike dot */}
+                <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>+1 <b><i style={{ color: '#351c75' }}>Strike</i></b></span>
+                <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
+                  <span
+                    onClick={() => handleDotClick(tacticianStrikeStrikeDots, setTacticianStrikeStrikeDots, 0, [12], 'tacticianStrikeStrikeDots')}
+                    style={{
+                      width: '15px',
+                      height: '15px',
+                      border: '2px solid #000',
+                      borderRadius: '50%',
+                      display: 'block',
+                      background: tacticianStrikeStrikeDots[0] ? '#000' : '#fff',
+                      cursor: 'pointer',
+                      transition: 'background 0.2s'
+                    }}
+                  ></span>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Perks Section */}
+          <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <div style={{ fontWeight: 'bold', color: '#000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Perks</u></div>
+            <div style={{ fontSize: '1em', color: '#000', marginBottom: '6px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <i><b>Skills.</b> Awareness</i> +2
+            </div>
+            <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 24px',
+                gridTemplateRows: 'auto auto',
+                columnGap: '6px',
+                rowGap: '2px',
+                alignItems: 'start',
+                marginTop: '-12px',
+                width: '100%',
+                paddingLeft: '4px'
+              }}>
+                {/* Row 1: SP header */}
+                <span></span>
+                <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>9sp</span>
+                {/* Row 2: Three Moves Ahead */}
+                <div style={{
+                  fontSize: '1em',
+                  fontFamily: 'Arial, Helvetica, sans-serif',
+                  textAlign: 'left',
+                  paddingRight: '8px',
+                  maxWidth: '500px',
+                  overflowWrap: 'break-word',
+                  wordWrap: 'break-word'
+                }}>
+                  <b><i style={{ color: '#cec31f', fontSize: '1em' }}>Three Moves Ahead.</i></b> You are always thinking ahead and analyzing several possible outcomes based on the actions you and your allies make. Gain an advantage on skills related to creating or enacting a plan.
+                </div>
+                <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start' }}>
+                  <span
+                    onClick={() => handleSpDotClick(tacticianPerksSkillsDots, setTacticianPerksSkillsDots, 0, [9], 'tacticianPerksSkillsDots')}
+                    style={{
+                      width: '15px',
+                      height: '15px',
+                      border: '2px solid #000',
+                      borderRadius: '50%',
+                      display: 'block',
+                      background: tacticianPerksSkillsDots[0] ? '#000' : '#fff',
                       cursor: 'pointer',
                       transition: 'background 0.2s'
                     }}
