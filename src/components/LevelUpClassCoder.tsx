@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
 import type { CharacterSheet } from "../types/CharacterSheet";
-import { saveCharacterSheet } from "../utils/storage";
 import { generateSubtleMagicJSX } from "../utils/coderFeature";
 import { generateReflectionScriptJSX } from "../utils/coderTechnique";
 
@@ -10,6 +9,7 @@ type LevelUpClassCoderProps = {
   subclass: string;
   _onXpSpChange?: (xpDelta: number, spDelta: number) => void;
   onCreditsChange?: (creditsDelta: number) => void;
+  onAutoSave?: (updates: Partial<CharacterSheet>) => void;
   xpTotal: number;
   spTotal: number;
   xpSpent: number;
@@ -43,6 +43,7 @@ const LevelUpClassCoder: React.FC<LevelUpClassCoderProps> = ({
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _onXpSpChange,
   onCreditsChange,
+  onAutoSave,
   xpTotal,
   spTotal, 
   xpSpent,
@@ -131,9 +132,8 @@ const LevelUpClassCoder: React.FC<LevelUpClassCoderProps> = ({
       newXpSpent = Math.max(0, newXpSpent);
       setSpSpent(newSpSpent);
       setXpSpent(newXpSpent);
-      if (sheet) {
-        const updatedSheet = { ...sheet, classCardDots: newDots, spSpent: newSpSpent, xpSpent: newXpSpent };
-        saveCharacterSheet(updatedSheet);
+      if (sheet && onAutoSave) {
+        onAutoSave({ classCardDots: newDots, spSpent: newSpSpent, xpSpent: newXpSpent });
       }
     };
     
@@ -555,13 +555,11 @@ const LevelUpClassCoder: React.FC<LevelUpClassCoderProps> = ({
                               const newLenses = [...selectedLenses, pendingLens];
                               setSelectedLenses(newLenses);
                               
-                              if (sheet) {
-                                const updatedSheet = { 
-                                  ...sheet, 
+                              if (sheet && onAutoSave) {
+                                onAutoSave({ 
                                   lenses: newLenses,
                                   credits: credits - cost
-                                };
-                                saveCharacterSheet(updatedSheet);
+                                });
                               }
                               
                               // Update the LevelUp component's credits state (no auto-save)
@@ -575,13 +573,11 @@ const LevelUpClassCoder: React.FC<LevelUpClassCoderProps> = ({
                               const newLenses = [...selectedLenses, pendingLens];
                               setSelectedLenses(newLenses);
                               
-                              if (sheet) {
-                                const updatedSheet = { 
-                                  ...sheet, 
+                              if (sheet && onAutoSave) {
+                                onAutoSave({ 
                                   lenses: newLenses,
                                   credits: credits // Preserve current credits
-                                };
-                                saveCharacterSheet(updatedSheet);
+                                });
                               }
                               
                               setPendingLens("");
@@ -606,12 +602,8 @@ const LevelUpClassCoder: React.FC<LevelUpClassCoderProps> = ({
                                 onClick={() => {
                                   const newLenses = selectedLenses.filter((_, i) => i !== idx);
                                   setSelectedLenses(newLenses);
-                                  if (sheet) {
-                                    const updatedSheet = { 
-                                      ...sheet, 
-                                      lenses: newLenses
-                                    };
-                                    saveCharacterSheet(updatedSheet);
+                                  if (sheet && onAutoSave) {
+                                    onAutoSave({ lenses: newLenses });
                                   }
                                 }}
                               >×</button>
@@ -852,13 +844,11 @@ const LevelUpClassCoder: React.FC<LevelUpClassCoderProps> = ({
                                 const newAlgorithms = [...selectedAlgorithms, pendingAlgorithm];
                                 setSelectedAlgorithms(newAlgorithms);
                                 
-                                if (sheet) {
-                                  const updatedSheet = { 
-                                    ...sheet, 
+                                if (sheet && onAutoSave) {
+                                  onAutoSave({ 
                                     algorithms: newAlgorithms,
                                     credits: credits - cost
-                                  };
-                                  saveCharacterSheet(updatedSheet);
+                                  });
                                 }
                                 
                                 // Update the LevelUp component's credits state (no auto-save)
@@ -872,13 +862,11 @@ const LevelUpClassCoder: React.FC<LevelUpClassCoderProps> = ({
                                 const newAlgorithms = [...selectedAlgorithms, pendingAlgorithm];
                                 setSelectedAlgorithms(newAlgorithms);
                                 
-                                if (sheet) {
-                                  const updatedSheet = { 
-                                    ...sheet, 
+                                if (sheet && onAutoSave) {
+                                  onAutoSave({ 
                                     algorithms: newAlgorithms,
                                     credits: credits // Preserve current credits
-                                  };
-                                  saveCharacterSheet(updatedSheet);
+                                  });
                                 }
                                 
                                 setPendingAlgorithm("");
@@ -903,12 +891,8 @@ const LevelUpClassCoder: React.FC<LevelUpClassCoderProps> = ({
                                   onClick={() => {
                                     const newAlgorithms = selectedAlgorithms.filter((_, i) => i !== idx);
                                     setSelectedAlgorithms(newAlgorithms);
-                                    if (sheet) {
-                                      const updatedSheet = { 
-                                        ...sheet, 
-                                        algorithms: newAlgorithms
-                                      };
-                                      saveCharacterSheet(updatedSheet);
+                                    if (sheet && onAutoSave) {
+                                      onAutoSave({ algorithms: newAlgorithms });
                                     }
                                   }}
                                 >×</button>

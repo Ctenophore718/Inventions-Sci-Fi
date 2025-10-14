@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import type { CharacterSheet } from "../types/CharacterSheet";
-import { saveCharacterSheet } from "../utils/storage";
 
 // Default Commander Dots structure: 10 arrays for each progression row
 const defaultCommanderDots: boolean[][] = [
@@ -21,6 +20,7 @@ type LevelUpClassCommanderProps = {
   charClass: string;
   _subclass: string;
   onXpSpChange?: (xpDelta: number, spDelta: number) => void;
+  onAutoSave?: (updates: Partial<CharacterSheet>) => void;
   xpTotal: number;
   spTotal: number;
   xpSpent: number;
@@ -38,6 +38,7 @@ const LevelUpClassCommander: React.FC<LevelUpClassCommanderProps> = ({
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _subclass, 
   onXpSpChange,
+  onAutoSave,
   xpTotal,
   spTotal, 
   xpSpent,
@@ -101,9 +102,8 @@ const LevelUpClassCommander: React.FC<LevelUpClassCommanderProps> = ({
       newXpSpent = Math.max(0, newXpSpent);
       setSpSpent(newSpSpent);
       setXpSpent(newXpSpent);
-      if (sheet) {
-        const updatedSheet = { ...sheet, classCardDots: newDots, spSpent: newSpSpent, xpSpent: newXpSpent };
-        saveCharacterSheet(updatedSheet);
+      if (sheet && onAutoSave) {
+        onAutoSave({ classCardDots: newDots, spSpent: newSpSpent, xpSpent: newXpSpent });
       }
     };
     
@@ -547,13 +547,11 @@ const LevelUpClassCommander: React.FC<LevelUpClassCommanderProps> = ({
                                 const newRifles = [...selectedRifles, pendingRifle];
                                 setSelectedRifles(newRifles);
 
-                                if (sheet) {
-                                  const updatedSheet = { 
-                                    ...sheet, 
+                                if (sheet && onAutoSave) {
+                                  onAutoSave({ 
                                     rifles: newRifles,
                                     credits: credits - cost
-                                  };
-                                  saveCharacterSheet(updatedSheet);
+                                  });
                                 }
                                 
                                 // Update the LevelUp component's credits state (no auto-save)
@@ -567,13 +565,11 @@ const LevelUpClassCommander: React.FC<LevelUpClassCommanderProps> = ({
                                 const newRifles = [...selectedRifles, pendingRifle];
                                 setSelectedRifles(newRifles);
 
-                                if (sheet) {
-                                  const updatedSheet = { 
-                                    ...sheet, 
+                                if (sheet && onAutoSave) {
+                                  onAutoSave({ 
                                     rifles: newRifles,
                                     credits: credits // Preserve current credits
-                                  };
-                                  saveCharacterSheet(updatedSheet);
+                                  });
                                 }
                                 
                                 setPendingRifle("");
@@ -598,12 +594,8 @@ const LevelUpClassCommander: React.FC<LevelUpClassCommanderProps> = ({
                                   onClick={() => {
                                     const newRifles = selectedRifles.filter((_, i) => i !== idx);
                                     setSelectedRifles(newRifles);
-                                    if (sheet) {
-                                      const updatedSheet = { 
-                                        ...sheet, 
-                                        rifles: newRifles
-                                      };
-                                      saveCharacterSheet(updatedSheet);
+                                    if (sheet && onAutoSave) {
+                                      onAutoSave({ rifles: newRifles });
                                     }
                                   }}
                                 >×</button>

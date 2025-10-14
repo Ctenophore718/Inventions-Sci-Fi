@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import type { CharacterSheet } from "../types/CharacterSheet";
-import { saveCharacterSheet } from "../utils/storage";
 
 
 
@@ -25,6 +24,7 @@ type LevelUpClassExospecialistProps = {
   charClass: string;
   _subclass: string;
   onXpSpChange?: (xpDelta: number, spDelta: number) => void;
+  onAutoSave?: (updates: Partial<CharacterSheet>) => void;
   xpTotal: number;
   spTotal: number;
   xpSpent: number;
@@ -39,6 +39,7 @@ const LevelUpClassExospecialist: React.FC<LevelUpClassExospecialistProps> = ({
   charClass,
   _subclass, 
   onXpSpChange,
+  onAutoSave,
   xpTotal,
   spTotal, 
   xpSpent,
@@ -90,9 +91,8 @@ const LevelUpClassExospecialist: React.FC<LevelUpClassExospecialistProps> = ({
       newXpSpent = Math.max(0, newXpSpent);
       setSpSpent(newSpSpent);
       setXpSpent(newXpSpent);
-      if (sheet) {
-        const updatedSheet = { ...sheet, classCardDots: newDots, spSpent: newSpSpent, xpSpent: newXpSpent };
-        saveCharacterSheet(updatedSheet);
+      if (sheet && onAutoSave) {
+        onAutoSave({ classCardDots: newDots, spSpent: newSpSpent, xpSpent: newXpSpent });
       }
     };
     

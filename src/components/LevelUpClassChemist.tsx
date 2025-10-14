@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import type { CharacterSheet } from "../types/CharacterSheet";
-import { saveCharacterSheet } from "../utils/storage";
 import { generateChemicalReactionJSX } from "../utils/chemistFeature";
 import { generateVolatileExperimentsJSX } from "../utils/chemistTechnique";
 import { generateChemistStrikeJSX } from "../utils/chemistStrike";
@@ -10,6 +9,7 @@ type LevelUpClassChemistProps = {
   charClass: string;
   subclass: string;
   onCreditsChange?: (creditsDelta: number) => void;
+  onAutoSave?: (updates: Partial<CharacterSheet>) => void;
   xpTotal: number;
   spTotal: number;
   xpSpent: number;
@@ -25,6 +25,7 @@ const LevelUpClassChemist: React.FC<LevelUpClassChemistProps> = ({
   charClass,
   subclass, 
   onCreditsChange,
+  onAutoSave,
   xpTotal,
   spTotal, 
   xpSpent,
@@ -100,11 +101,10 @@ const LevelUpClassChemist: React.FC<LevelUpClassChemistProps> = ({
       newXpSpent = Math.max(0, newXpSpent);
       setSpSpent(newSpSpent);
       setXpSpent(newXpSpent);
-      if (sheet) {
-        // Use current selectedDartGuns state, not captured closure value
+      if (sheet && onAutoSave) {
+        // Get current dartGuns to include in save
         setSelectedDartGuns(currentDartGuns => {
-          const updatedSheet = { ...sheet, classCardDots: newDots, spSpent: newSpSpent, xpSpent: newXpSpent, dartGuns: currentDartGuns };
-          saveCharacterSheet(updatedSheet);
+          onAutoSave({ classCardDots: newDots, spSpent: newSpSpent, xpSpent: newXpSpent, dartGuns: currentDartGuns });
           return currentDartGuns; // Don't change the state, just use current value
         });
       }
@@ -629,13 +629,11 @@ const LevelUpClassChemist: React.FC<LevelUpClassChemistProps> = ({
                                   const newCredits = credits - cost;
                                   setSelectedDartGuns(newDartGuns);
                                   
-                                  if (sheet) {
-                                    const updatedSheet = { 
-                                      ...sheet, 
+                                  if (sheet && onAutoSave) {
+                                    onAutoSave({ 
                                       dartGuns: newDartGuns,
                                       credits: newCredits
-                                    };
-                                    saveCharacterSheet(updatedSheet);
+                                    });
                                   }
                                   
                                   // Update the LevelUp component's credits state (no auto-save)
@@ -649,13 +647,11 @@ const LevelUpClassChemist: React.FC<LevelUpClassChemistProps> = ({
                                   const newDartGuns = [...selectedDartGuns, pendingDartGun];
                                   setSelectedDartGuns(newDartGuns);
                                   
-                                  if (sheet) {
-                                    const updatedSheet = { 
-                                      ...sheet, 
+                                  if (sheet && onAutoSave) {
+                                    onAutoSave({ 
                                       dartGuns: newDartGuns,
                                       credits: credits // Preserve current credits
-                                    };
-                                    saveCharacterSheet(updatedSheet);
+                                    });
                                   }
                                   
                                   setPendingDartGun("");
@@ -681,13 +677,11 @@ const LevelUpClassChemist: React.FC<LevelUpClassChemistProps> = ({
                                         const newDartGuns = selectedDartGuns.filter((_, i) => i !== idx);
                                         setSelectedDartGuns(newDartGuns);
                                         
-                                        if (sheet) {
-                                          const updatedSheet = { 
-                                            ...sheet, 
+                                        if (sheet && onAutoSave) {
+                                          onAutoSave({ 
                                             dartGuns: newDartGuns,
                                             credits: credits // Preserve current credits
-                                          };
-                                          saveCharacterSheet(updatedSheet);
+                                          });
                                         }
                                       }}
                                     >×</button>
