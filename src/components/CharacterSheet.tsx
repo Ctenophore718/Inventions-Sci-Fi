@@ -325,51 +325,8 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
   });
 
   // Auto-save when critical fields change (debounced for performance)
-  React.useEffect(() => {
-    if (!sheet || !sheet.id) return;
-    
-    const hasChanges = (
-      sheet.playerName !== playerName ||
-      sheet.name !== name ||
-      sheet.background !== background ||
-      sheet.classFeature !== classFeature ||
-      sheet.resistances !== resistances ||
-      sheet.immunities !== immunities ||
-      sheet.absorptions !== absorptions ||
-      sheet.movement !== movement ||
-      sheet.strike !== strike ||
-      sheet.xpTotal !== xpTotal ||
-      sheet.spTotal !== spTotal ||
-      sheet.portrait !== portraitUrl
-    );
-
-    if (hasChanges) {
-      // Debounce saves to prevent excessive storage writes
-      const timeoutId = setTimeout(() => {
-        const updatedSheet: CharacterSheet = {
-          ...sheet,
-          playerName,
-          name,
-          background,
-          classFeature,
-          resistances,
-          immunities,
-          absorptions,
-          movement,
-          strike,
-          xpTotal,
-          spTotal,
-          portrait: portraitUrl || undefined,
-          xpRemaining: xpTotal - (sheet.xpSpent ?? 0),
-          spRemaining: spTotal - spSpent,
-          spSpent,
-        };
-        saveCharacterSheet(updatedSheet);
-      }, 300); // 300ms debounce for text fields
-
-      return () => clearTimeout(timeoutId);
-    }
-  }, [playerName, name, background, classFeature, resistances, immunities, absorptions, movement, strike, xpTotal, spTotal, portraitUrl, sheet, spSpent]);
+  // REMOVED - This useEffect was bypassing the parent's auto-save system and causing state sync issues
+  // All saves now go through handleAutoSave which properly updates the parent's currentSheet state
 
   // Hit Points UI state
   const [deathDots, setDeathDots] = useState<boolean[]>(sheet?.deathDots || Array(10).fill(false));
@@ -1527,11 +1484,19 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                       value = "18+";
                     }
                   } else {
-                    // For existing characters, use actual dot data
+                    // For existing characters, ensure first two dots are always present
                     displayDots = [...dots];
                     
+                    // Ensure we have at least the first two starter dots
+                    while (displayDots.length < 2) {
+                      displayDots.push(false);
+                    }
+                    // Force first two dots to always be true (starter dots)
+                    displayDots[0] = true;
+                    displayDots[1] = true;
+                    
                     // Ensure booster dot is shown if applicable
-                    if (hasBooster && displayDots.length >= 2) {
+                    if (hasBooster) {
                       // Make sure we have at least 3 elements
                       while (displayDots.length < 3) {
                         displayDots.push(false);

@@ -1772,10 +1772,11 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                         {(skillDots[skill] || Array(10).fill(false)).map((checked, i) => {
                           const skillDotsForSkill = skillDots[skill] || Array(10).fill(false);
                           
-                          // For new characters without hasFreeSkillStarterDots set, force first two columns to be checked
-                          const isNewCharacter = !sheet?.hasFreeSkillStarterDots;
+                          // CRITICAL FIX: Force first two columns to always be checked
+                          // These are the free starter dots that all characters get automatically
+                          // This ensures they display immediately, even before useEffect completes
                           const isFirstTwoColumns = i === 0 || i === 1;
-                          if (isNewCharacter && isFirstTwoColumns) {
+                          if (isFirstTwoColumns) {
                             checked = true;
                           }
                           
@@ -1867,6 +1868,9 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                           
                           // Account for booster dots when checking if previous dots are filled
                           const canCheck = i === 0 || skillDotsForSkill.slice(0, i).every((dotFilled, dotIndex) => {
+                            // The first two dots are free starter dots and should always be treated as filled
+                            const isStarterDot = dotIndex === 0 || dotIndex === 1;
+                            
                             // Check if this position has a booster dot
                             const isBoosterDot = (charClass === "Chemist" && skill === "Investigation" && dotIndex === 2) ||
                                                (charClass === "Coder" && skill === "Oikomagic" && dotIndex === 2) ||
@@ -1888,7 +1892,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                                                (subclass === "Technologist" && skill === "Technology" && dotIndex === 2) ||
                                                (subclass === "Galvanic" && skill === "Athletics" && dotIndex === 2) ||
                                                (subclass === "Tactician" && skill === "Awareness" && dotIndex === 2);
-                            return dotFilled || isBoosterDot;
+                            return dotFilled || isBoosterDot || isStarterDot;
                           });
                           const rightmostChecked = skillDotsForSkill.lastIndexOf(true);
                           const canUncheck = checked && i === rightmostChecked;
