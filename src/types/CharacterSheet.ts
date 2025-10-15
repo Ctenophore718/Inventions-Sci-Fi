@@ -97,6 +97,9 @@ export type CharacterSheet = {
   // Flares for Tactician subclass
   flares?: string[];
 
+  // Blasters for Tyrant subclass
+  blasters?: string[];
+
   // Subclass progression dots (specific to each subclass)
   subclassProgressionDots?: {
     // Anatomist subclass progression
@@ -203,6 +206,27 @@ export type CharacterSheet = {
     tacticianFeatureRangeHxDots?: boolean[];
     tacticianFeatureCritDots?: boolean[];
     tacticianFeatureSpeedDots?: boolean[];
+    tacticianTechniqueRangeHxDots?: boolean[];
+    tacticianTechniqueDamageDiceDots?: boolean[];
+    tacticianTechniqueCooldownDots?: boolean[];
+    tacticianAttackAoEDots?: boolean[];
+    tacticianAttackCritDots?: boolean[];
+    tacticianAttackCooldownDots?: boolean[];
+    tacticianStrikeStrikeDots?: boolean[];
+    tacticianPerksSkillsDots?: boolean[];
+    // Tyrant subclass progression (Commander)
+    tyrantFeatureHxDots?: boolean[];
+    tyrantFeatureConfuseImmunityDots?: boolean[];
+    tyrantFeatureMesmerizeImmunityDots?: boolean[];
+    tyrantTechniqueHxDots?: boolean[];
+    tyrantTechniqueMoveDots?: boolean[];
+    tyrantTechniqueCooldownDots?: boolean[];
+    tyrantAttackDamageDots?: boolean[];
+    tyrantAttackCritDots?: boolean[];
+    tyrantAttackCooldownDots?: boolean[];
+    tyrantStrikeDamageDots?: boolean[];
+    tyrantStrikeDemorizeDots?: boolean[];
+    tyrantPerksSkillsDots?: boolean[];
     // Add other subclasses as needed
   };
 };

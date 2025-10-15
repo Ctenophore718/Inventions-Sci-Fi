@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import type { CharacterSheet } from "../types/CharacterSheet";
-import { saveCharacterSheet } from "../utils/storage";
 
 type LevelUpSubclassesChemistProps = {
   sheet: CharacterSheet | null;
@@ -727,13 +726,11 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
                         const newCredits = credits - cost;
                         setSelectedSuperSerums(newSuperSerums);
                         
-                        if (sheet) {
-                          const updatedSheet = { 
-                            ...sheet, 
+                        if (sheet && onAutoSave) {
+                          onAutoSave({
                             superSerums: newSuperSerums,
                             credits: newCredits
-                          };
-                          saveCharacterSheet(updatedSheet);
+                          });
                         }
                         
                         // Update the LevelUp component's credits state (no auto-save)
@@ -747,13 +744,10 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
                         const newSuperSerums = [...selectedSuperSerums, pendingSuperSerum];
                         setSelectedSuperSerums(newSuperSerums);
                         
-                        if (sheet) {
-                          const updatedSheet = { 
-                            ...sheet, 
-                            superSerums: newSuperSerums,
-                            credits: credits // Preserve current credits
-                          };
-                          saveCharacterSheet(updatedSheet);
+                        if (sheet && onAutoSave) {
+                          onAutoSave({
+                            superSerums: newSuperSerums
+                          });
                         }
                         
                         setPendingSuperSerum("");
@@ -779,13 +773,10 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
                               const newSuperSerums = selectedSuperSerums.filter((_, i) => i !== idx);
                               setSelectedSuperSerums(newSuperSerums);
                               
-                              if (sheet) {
-                                const updatedSheet = { 
-                                  ...sheet, 
-                                  superSerums: newSuperSerums,
-                                  credits: credits // Preserve current credits
-                                };
-                                saveCharacterSheet(updatedSheet);
+                              if (sheet && onAutoSave) {
+                                onAutoSave({
+                                  superSerums: newSuperSerums
+                                });
                               }
                             }}
                           >×</button>
@@ -1307,13 +1298,11 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
                         const newCredits = credits - cost;
                         setSelectedGrenades(newGrenades);
                         
-                        if (sheet) {
-                          const updatedSheet = { 
-                            ...sheet, 
+                        if (sheet && onAutoSave) {
+                          onAutoSave({
                             grenades: newGrenades,
                             credits: newCredits
-                          };
-                          saveCharacterSheet(updatedSheet);
+                          });
                         }
                         
                         // Update the LevelUp component's credits state (no auto-save)
@@ -1327,13 +1316,10 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
                         const newGrenades = [...selectedGrenades, pendingGrenade];
                         setSelectedGrenades(newGrenades);
                         
-                        if (sheet) {
-                          const updatedSheet = { 
-                            ...sheet, 
-                            grenades: newGrenades,
-                            credits: credits // Preserve current credits
-                          };
-                          saveCharacterSheet(updatedSheet);
+                        if (sheet && onAutoSave) {
+                          onAutoSave({
+                            grenades: newGrenades
+                          });
                         }
                         
                         setPendingGrenade("");
@@ -1359,13 +1345,10 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
                               const newGrenades = selectedGrenades.filter((_, i) => i !== idx);
                               setSelectedGrenades(newGrenades);
                               
-                              if (sheet) {
-                                const updatedSheet = { 
-                                  ...sheet, 
-                                  grenades: newGrenades,
-                                  credits: credits // Preserve current credits
-                                };
-                                saveCharacterSheet(updatedSheet);
+                              if (sheet && onAutoSave) {
+                                onAutoSave({
+                                  grenades: newGrenades
+                                });
                               }
                             }}
                           >×</button>
@@ -1887,13 +1870,11 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
                         const newCredits = credits - cost;
                         setSelectedChemZombies(newChemZombies);
                         
-                        if (sheet) {
-                          const updatedSheet = { 
-                            ...sheet, 
+                        if (sheet && onAutoSave) {
+                          onAutoSave({
                             chemZombies: newChemZombies,
                             credits: newCredits
-                          };
-                          saveCharacterSheet(updatedSheet);
+                          });
                         }
                         
                         // Update the LevelUp component's credits state (no auto-save)
@@ -1907,13 +1888,10 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
                         const newChemZombies = [...selectedChemZombies, pendingChemZombie];
                         setSelectedChemZombies(newChemZombies);
                         
-                        if (sheet) {
-                          const updatedSheet = { 
-                            ...sheet, 
-                            chemZombies: newChemZombies,
-                            credits: credits // Preserve current credits
-                          };
-                          saveCharacterSheet(updatedSheet);
+                        if (sheet && onAutoSave) {
+                          onAutoSave({
+                            chemZombies: newChemZombies
+                          });
                         }
                         
                         setPendingChemZombie("");
@@ -1939,13 +1917,10 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
                               const newChemZombies = selectedChemZombies.filter((_, i) => i !== idx);
                               setSelectedChemZombies(newChemZombies);
                               
-                              if (sheet) {
-                                const updatedSheet = { 
-                                  ...sheet, 
-                                  chemZombies: newChemZombies,
-                                  credits: credits // Preserve current credits
-                                };
-                                saveCharacterSheet(updatedSheet);
+                              if (sheet && onAutoSave) {
+                                onAutoSave({
+                                  chemZombies: newChemZombies
+                                });
                               }
                             }}
                           >×</button>
@@ -2503,13 +2478,11 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
                         const newCredits = credits - cost;
                         setSelectedNoxiousFumes(newNoxiousFumes);
                         
-                        if (sheet) {
-                          const updatedSheet = { 
-                            ...sheet, 
+                        if (sheet && onAutoSave) {
+                          onAutoSave({
                             noxiousFumes: newNoxiousFumes,
                             credits: newCredits
-                          };
-                          saveCharacterSheet(updatedSheet);
+                          });
                         }
                         
                         // Update the LevelUp component's credits state (no auto-save)
@@ -2523,13 +2496,10 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
                         const newNoxiousFumes = [...selectedNoxiousFumes, pendingNoxiousFume];
                         setSelectedNoxiousFumes(newNoxiousFumes);
                         
-                        if (sheet) {
-                          const updatedSheet = { 
-                            ...sheet, 
-                            noxiousFumes: newNoxiousFumes,
-                            credits: credits // Preserve current credits
-                          };
-                          saveCharacterSheet(updatedSheet);
+                        if (sheet && onAutoSave) {
+                          onAutoSave({
+                            noxiousFumes: newNoxiousFumes
+                          });
                         }
                         
                         setPendingNoxiousFume("");
@@ -2552,13 +2522,10 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
                             onClick={() => {
                               const newNoxiousFumes = selectedNoxiousFumes.filter((_, i) => i !== index);
                               setSelectedNoxiousFumes(newNoxiousFumes);
-                              if (sheet) {
-                                const updatedSheet = { 
-                                  ...sheet, 
-                                  noxiousFumes: newNoxiousFumes,
-                                  credits: credits // Preserve current credits when removing
-                                };
-                                saveCharacterSheet(updatedSheet);
+                              if (sheet && onAutoSave) {
+                                onAutoSave({
+                                  noxiousFumes: newNoxiousFumes
+                                });
                               }
                             }}
                             style={{ marginLeft: '6px', padding: '0 6px', borderRadius: '50%', border: 'none', background: '#d32f2f', color: 'white', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.9em' }}

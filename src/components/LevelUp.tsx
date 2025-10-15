@@ -293,7 +293,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
       // Initialize with default empty state
       setSkillDots(Object.fromEntries(skillList.map(skill => [skill, Array(10).fill(false)])));
     }
-  }, [sheet?.id]);
+  }, [sheet?.id, sheet?.credits]);
 
   // Auto-dismiss notice after 2.5 seconds
   React.useEffect(() => {

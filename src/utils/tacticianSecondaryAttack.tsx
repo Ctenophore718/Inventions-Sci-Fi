@@ -12,13 +12,16 @@ export interface TacticianSecondaryAttackData {
 export function calculateTacticianSecondaryAttackData(
   aoeDots?: boolean[],
   critDots?: boolean[],
-  cooldownDots?: boolean[]
+  cooldownDots?: boolean[],
+  tacticalOffensiveCritDots?: boolean[]
 ): TacticianSecondaryAttackData {
   // Base AoE is 2hx-radius
   const aoe = 2 + (aoeDots?.filter(Boolean).length || 0);
   
-  // Base crit is 18, can reduce by up to 3
-  const crit = 18 - (critDots?.filter(Boolean).length || 0);
+  // Base crit is 18, can reduce by up to 3 from attack dots, plus Tactical Offensive bonus (base +1, plus +1 per dot)
+  const attackCritBonus = critDots?.filter(Boolean).length || 0;
+  const featureCritBonus = 1 + (tacticalOffensiveCritDots?.filter(Boolean).length || 0);
+  const crit = 18 - attackCritBonus - featureCritBonus;
   
   // Base cooldown is 4, can reduce by 2
   const cooldown = 4 - (cooldownDots?.filter(Boolean).length || 0);
@@ -32,9 +35,10 @@ export function calculateTacticianSecondaryAttackData(
 export function generateTacticianSecondaryAttackJSX(
   aoeDots?: boolean[],
   critDots?: boolean[],
-  cooldownDots?: boolean[]
+  cooldownDots?: boolean[],
+  tacticalOffensiveCritDots?: boolean[]
 ): React.ReactElement {
-  const { aoe, crit, cooldown } = calculateTacticianSecondaryAttackData(aoeDots, critDots, cooldownDots);
+  const { aoe, crit, cooldown } = calculateTacticianSecondaryAttackData(aoeDots, critDots, cooldownDots, tacticalOffensiveCritDots);
 
   return (
     <div style={{ fontSize: '1em', color: '#000', fontFamily: 'Arial, Helvetica, sans-serif' }}>
@@ -60,9 +64,10 @@ export function generateTacticianSecondaryAttackStatsJSX(
   aoeDots?: boolean[],
   critDots?: boolean[],
   cooldownDots?: boolean[],
-  flareName?: string
+  flareName?: string,
+  tacticalOffensiveCritDots?: boolean[]
 ): React.ReactElement {
-  const { aoe, crit, cooldown } = calculateTacticianSecondaryAttackData(aoeDots, critDots, cooldownDots);
+  const { aoe, crit, cooldown } = calculateTacticianSecondaryAttackData(aoeDots, critDots, cooldownDots, tacticalOffensiveCritDots);
 
   if (flareName === "Fire Flare") {
     return (

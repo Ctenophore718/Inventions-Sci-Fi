@@ -610,7 +610,11 @@ const LevelUpClassCommander: React.FC<LevelUpClassCommanderProps> = ({
                       const damageDots = classCardDots[6]?.filter(Boolean).length || 0;
                       const critDots = classCardDots[7]?.filter(Boolean).length || 0;
                       const baseDamage = 1 + damageDots;
-                      const critThreshold = 18 - critDots;
+                      // Add Tactician Tactical Offensive crit bonus: base +1, plus +1 per dot (up to 2 dots)
+                      const tacticianCritBonus = sheet?.subclass === 'Tactician' 
+                        ? 1 + ((sheet?.subclassProgressionDots as any)?.tacticianFeatureCritDots?.filter(Boolean).length || 0) 
+                        : 0;
+                      const critThreshold = 18 - critDots - tacticianCritBonus;
                       return (
                         <div>
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>

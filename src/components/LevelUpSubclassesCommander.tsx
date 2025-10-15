@@ -12,6 +12,10 @@ import { generateTacticalOffensiveJSX } from "../utils/tacticianFeature";
 import { generateStratigeryJSX } from "../utils/tacticianTechnique";
 import { generateTacticianSecondaryAttackJSX } from "../utils/tacticianSecondaryAttack";
 import { generateTacticianStrikeJSX } from "../utils/tacticianStrike";
+import { generateFearlessJSX } from "../utils/tyrantFeature";
+import { generateTyrannizeJSX } from "../utils/tyrantTechnique";
+import { generateTyrantSecondaryAttackJSX } from "../utils/tyrantSecondaryAttack";
+import { generateTyrantStrikeJSX } from "../utils/tyrantStrike";
 
 type LevelUpSubclassesCommanderProps = {
   sheet: CharacterSheet | null;
@@ -159,6 +163,47 @@ const LevelUpSubclassesCommander: React.FC<LevelUpSubclassesCommanderProps> = ({
   const [tacticianPerksSkillsDots, setTacticianPerksSkillsDots] = useState<boolean[]>(
     (sheet?.subclassProgressionDots as any)?.tacticianPerksSkillsDots || [false]
   );
+
+  // Independent state for Tyrant dots
+  const [tyrantFeatureHxDots, setTyrantFeatureHxDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.tyrantFeatureHxDots || [false, false, false]
+  );
+  const [tyrantFeatureConfuseImmunityDots, setTyrantFeatureConfuseImmunityDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.tyrantFeatureConfuseImmunityDots || [false]
+  );
+  const [tyrantFeatureMesmerizeImmunityDots, setTyrantFeatureMesmerizeImmunityDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.tyrantFeatureMesmerizeImmunityDots || [false]
+  );
+  const [tyrantTechniqueHxDots, setTyrantTechniqueHxDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.tyrantTechniqueHxDots || [false, false, false]
+  );
+  const [tyrantTechniqueMoveDots, setTyrantTechniqueMoveDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.tyrantTechniqueMoveDots || [false, false, false]
+  );
+  const [tyrantTechniqueCooldownDots, setTyrantTechniqueCooldownDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.tyrantTechniqueCooldownDots || [false, false]
+  );
+  const [tyrantAttackDamageDots, setTyrantAttackDamageDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.tyrantAttackDamageDots || [false, false, false]
+  );
+  const [tyrantAttackCritDots, setTyrantAttackCritDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.tyrantAttackCritDots || [false, false, false]
+  );
+  const [tyrantAttackCooldownDots, setTyrantAttackCooldownDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.tyrantAttackCooldownDots || [false, false]
+  );
+  const [tyrantStrikeDamageDots, setTyrantStrikeDamageDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.tyrantStrikeDamageDots || [false, false]
+  );
+  const [tyrantStrikeDemorizeDots, setTyrantStrikeDemorizeDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.tyrantStrikeDemorizeDots || [false]
+  );
+  const [tyrantPerksSkillsDots, setTyrantPerksSkillsDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.tyrantPerksSkillsDots || [false]
+  );
+
+  // State for pending blaster selection
+  const [pendingBlaster, setPendingBlaster] = useState<string>("");
 
   // Helper function to handle XP dot clicking with sequential requirement
   const handleDotClick = (
@@ -358,6 +403,34 @@ const LevelUpSubclassesCommander: React.FC<LevelUpSubclassesCommanderProps> = ({
         flares: newFlares
       });
       setPendingFlare(""); // Clear dropdown after adding
+    }
+  };
+
+  // Handler for purchasing blasters with credits
+  const handleBlasterPurchase = (blasterName: string, cost: number) => {
+    if (sheet && onAutoSave) {
+      const currentCredits = sheet.credits || 0;
+      if (currentCredits < cost) {
+        setNotice("Not enough credits!");
+        return;
+      }
+      const newBlasters = [...(sheet.blasters || []), blasterName];
+      onAutoSave({
+        blasters: newBlasters,
+        credits: currentCredits - cost
+      });
+      setPendingBlaster(""); // Clear dropdown after purchase
+    }
+  };
+
+  // Handler for adding blasters without cost
+  const handleBlasterAdd = (blasterName: string) => {
+    if (sheet && onAutoSave) {
+      const newBlasters = [...(sheet.blasters || []), blasterName];
+      onAutoSave({
+        blasters: newBlasters
+      });
+      setPendingBlaster(""); // Clear dropdown after adding
     }
   };
 
@@ -1858,7 +1931,7 @@ const LevelUpSubclassesCommander: React.FC<LevelUpSubclassesCommanderProps> = ({
           <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
             <div style={{ fontWeight: 'bold', color: '#990000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Attack</u></div>
             <div style={{ fontSize: '1em', color: '#000', marginBottom: '4px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
-              <b><i>Secondary <span style={{ color: '#990000' }}>Attack</span></i></b> <i>(Cooldown</i> <b>[4]</b><i>)</i><br />
+              <b><i>Secondary <span style={{ color: '#990000' }}>Attack</span></i></b> <i>(Cooldown</i> <b>[{4 - ((tacticianAttackCooldownDots?.filter(Boolean).length) || 0)}]</b><i>)</i><br />
             </div>
 
             {/* Flares dropdown section */}
@@ -1949,7 +2022,7 @@ const LevelUpSubclassesCommander: React.FC<LevelUpSubclassesCommanderProps> = ({
             </div>
 
             <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
-              {generateTacticianSecondaryAttackJSX(tacticianAttackAoEDots, tacticianAttackCritDots, tacticianAttackCooldownDots)}
+              {generateTacticianSecondaryAttackJSX(tacticianAttackAoEDots, tacticianAttackCritDots, tacticianAttackCooldownDots, tacticianFeatureCritDots)}
             </div>
 
             {/* Attack XP progression table */}
@@ -2155,6 +2228,610 @@ const LevelUpSubclassesCommander: React.FC<LevelUpSubclassesCommanderProps> = ({
                       borderRadius: '50%',
                       display: 'block',
                       background: tacticianPerksSkillsDots[0] ? '#000' : '#fff',
+                      cursor: 'pointer',
+                      transition: 'background 0.2s'
+                    }}
+                  ></span>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {subclass === 'Tyrant' && (
+        <div style={{ width: '100%', marginTop: '1rem', textAlign: 'left', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
+          {/* Feature header */}
+          <div style={{ color: '#0b5394', fontWeight: 'bold', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '8px' }}>
+            <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <div style={{ fontWeight: 'bold', color: '#0b5394', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Feature</u></div>
+              <span style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
+                {generateFearlessJSX(tyrantFeatureHxDots, tyrantFeatureConfuseImmunityDots, tyrantFeatureMesmerizeImmunityDots)}
+              </span>
+            </span>
+          </div>
+
+          {/* Feature XP progression table */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 24px 24px 24px',
+            gridTemplateRows: 'repeat(2, auto)',
+            columnGap: '6px',
+            rowGap: '2px',
+            alignItems: 'start',
+            marginBottom: '2px',
+            width: '100%',
+            paddingLeft: '4px'
+          }}>
+            {/* Row 1: XP header */}
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>5xp</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>9xp</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>14xp</span>
+            {/* Row 2: +1hx dots (interactive) */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>+1hx</span>
+            {[0, 1, 2].map(idx => (
+              <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
+                <span
+                  onClick={() => handleDotClick(tyrantFeatureHxDots, setTyrantFeatureHxDots, idx, [5, 9, 14], 'tyrantFeatureHxDots')}
+                  style={{
+                    width: '15px',
+                    height: '15px',
+                    border: '2px solid #000',
+                    borderRadius: '50%',
+                    display: 'block',
+                    background: tyrantFeatureHxDots[idx] ? '#000' : '#fff',
+                    cursor: (idx === 0 || tyrantFeatureHxDots.slice(0, idx).every(Boolean)) ? 'pointer' : 'not-allowed',
+                    transition: 'background 0.2s'
+                  }}
+                ></span>
+              </span>
+            ))}
+          </div>
+
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 24px 24px 24px',
+            gridTemplateRows: 'repeat(2, auto)',
+            columnGap: '6px',
+            rowGap: '2px',
+            alignItems: 'start',
+            marginBottom: '2px',
+            width: '100%',
+            paddingLeft: '4px'
+          }}>
+            {/* Row 1: XP header */}
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>10xp</span>
+            <span></span>
+            <span></span>
+            {/* Row 2: Confuse immunity */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}><b><i>Confuse</i></b> immunity</span>
+            <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
+              <span
+                onClick={() => handleDotClick(tyrantFeatureConfuseImmunityDots, setTyrantFeatureConfuseImmunityDots, 0, [10], 'tyrantFeatureConfuseImmunityDots')}
+                style={{
+                  width: '15px',
+                  height: '15px',
+                  border: '2px solid #000',
+                  borderRadius: '50%',
+                  display: 'block',
+                  background: tyrantFeatureConfuseImmunityDots[0] ? '#000' : '#fff',
+                  cursor: 'pointer',
+                  transition: 'background 0.2s'
+                }}
+              ></span>
+            </span>
+            <span></span>
+            <span></span>
+          </div>
+
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 24px 24px 24px',
+            gridTemplateRows: 'repeat(2, auto)',
+            columnGap: '6px',
+            rowGap: '2px',
+            alignItems: 'start',
+            marginBottom: '2px',
+            width: '100%',
+            paddingLeft: '4px'
+          }}>
+            {/* Row 1: XP header */}
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>10xp</span>
+            <span></span>
+            <span></span>
+            {/* Row 2: Mesmerize immunity */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}><b><i>Mesmerize</i></b> immunity</span>
+            <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
+              <span
+                onClick={() => handleDotClick(tyrantFeatureMesmerizeImmunityDots, setTyrantFeatureMesmerizeImmunityDots, 0, [10], 'tyrantFeatureMesmerizeImmunityDots')}
+                style={{
+                  width: '15px',
+                  height: '15px',
+                  border: '2px solid #000',
+                  borderRadius: '50%',
+                  display: 'block',
+                  background: tyrantFeatureMesmerizeImmunityDots[0] ? '#000' : '#fff',
+                  cursor: 'pointer',
+                  transition: 'background 0.2s'
+                }}
+              ></span>
+            </span>
+            <span></span>
+            <span></span>
+          </div>
+
+          {/* Technique section */}
+          <div style={{ marginTop: '1rem' }}>
+            <div style={{ fontWeight: 'bold', color: '#0b5394', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Technique</u></div>
+            <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              {generateTyrannizeJSX(tyrantTechniqueHxDots, tyrantTechniqueMoveDots, tyrantTechniqueCooldownDots)}
+            </div>
+
+            {/* Technique XP progression table */}
+            <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px' }}>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 24px 24px 24px',
+                gridTemplateRows: 'repeat(2, auto)',
+                columnGap: '6px',
+                rowGap: '2px',
+                alignItems: 'start',
+                marginBottom: '2px',
+                width: '100%',
+                paddingLeft: '4px'
+              }}>
+                {/* Row 1: XP headers */}
+                <span></span>
+                <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>3xp</span>
+                <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>6xp</span>
+                <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>9xp</span>
+                {/* Row 2: +1hx dots */}
+                <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>+1hx</span>
+                {[0, 1, 2].map(idx => (
+                  <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
+                    <span
+                      onClick={() => handleDotClick(tyrantTechniqueHxDots, setTyrantTechniqueHxDots, idx, [3, 6, 9], 'tyrantTechniqueHxDots')}
+                      style={{
+                        width: '15px',
+                        height: '15px',
+                        border: '2px solid #000',
+                        borderRadius: '50%',
+                        display: 'block',
+                        background: tyrantTechniqueHxDots[idx] ? '#000' : '#fff',
+                        cursor: (idx === 0 || tyrantTechniqueHxDots.slice(0, idx).every(Boolean)) ? 'pointer' : 'not-allowed',
+                        transition: 'background 0.2s'
+                      }}
+                    ></span>
+                  </span>
+                ))}
+              </div>
+
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 24px 24px 24px',
+                gridTemplateRows: 'repeat(2, auto)',
+                columnGap: '6px',
+                rowGap: '2px',
+                alignItems: 'start',
+                marginBottom: '2px',
+                width: '100%',
+                paddingLeft: '4px'
+              }}>
+                {/* Row 1: XP headers */}
+                <span></span>
+                <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>5xp</span>
+                <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>8xp</span>
+                <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>11xp</span>
+                {/* Row 2: +1hx Move away dots */}
+                <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>+1hx Move away</span>
+                {[0, 1, 2].map(idx => (
+                  <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
+                    <span
+                      onClick={() => handleDotClick(tyrantTechniqueMoveDots, setTyrantTechniqueMoveDots, idx, [5, 8, 11], 'tyrantTechniqueMoveDots')}
+                      style={{
+                        width: '15px',
+                        height: '15px',
+                        border: '2px solid #000',
+                        borderRadius: '50%',
+                        display: 'block',
+                        background: tyrantTechniqueMoveDots[idx] ? '#000' : '#fff',
+                        cursor: (idx === 0 || tyrantTechniqueMoveDots.slice(0, idx).every(Boolean)) ? 'pointer' : 'not-allowed',
+                        transition: 'background 0.2s'
+                      }}
+                    ></span>
+                  </span>
+                ))}
+              </div>
+
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 24px 24px 24px',
+                gridTemplateRows: 'repeat(2, auto)',
+                columnGap: '6px',
+                rowGap: '2px',
+                alignItems: 'start',
+                marginBottom: '2px',
+                width: '100%',
+                paddingLeft: '4px'
+              }}>
+                {/* Row 1: XP headers */}
+                <span></span>
+                <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>4xp</span>
+                <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>7xp</span>
+                <span></span>
+                {/* Row 2: -1 Cooldown dots */}
+                <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>-1 Cooldown</span>
+                {[0, 1].map(idx => (
+                  <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
+                    <span
+                      onClick={() => handleDotClick(tyrantTechniqueCooldownDots, setTyrantTechniqueCooldownDots, idx, [4, 7], 'tyrantTechniqueCooldownDots')}
+                      style={{
+                        width: '15px',
+                        height: '15px',
+                        border: '2px solid #000',
+                        borderRadius: '50%',
+                        display: 'block',
+                        background: tyrantTechniqueCooldownDots[idx] ? '#000' : '#fff',
+                        cursor: (idx === 0 || tyrantTechniqueCooldownDots.slice(0, idx).every(Boolean)) ? 'pointer' : 'not-allowed',
+                        transition: 'background 0.2s'
+                      }}
+                    ></span>
+                  </span>
+                ))}
+                <span></span>
+              </div>
+            </div>
+          </div>
+
+          {/* Attack section */}
+          <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <div style={{ fontWeight: 'bold', color: '#990000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Attack</u></div>
+            <div style={{ fontSize: '1em', color: '#000', marginBottom: '4px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <b><i>Secondary <span style={{ color: '#990000' }}>Attack</span></i></b> <i>(Cooldown</i> <b>[{4 - ((tyrantAttackCooldownDots?.filter(Boolean).length) || 0)}]</b><i>)</i><br />
+            </div>
+
+            {/* Blasters dropdown section */}
+            <div style={{ marginTop: '8px', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <div style={{ marginBottom: '4px' }}>
+                <select
+                  style={{
+                    fontSize: '1em',
+                    padding: '2px 8px',
+                    borderRadius: '6px',
+                    border: '1px solid #ccc',
+                    background: '#fff',
+                    color: '#222',
+                    fontWeight: 'bold',
+                    marginBottom: '4px',
+                    textAlign: 'left',
+                    minWidth: '180px'
+                  }}
+                  value={pendingBlaster || 'Blasters'}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (value !== 'Blasters') {
+                      setPendingBlaster(value);
+                    }
+                  }}
+                >
+                  <option disabled style={{ fontWeight: 'bold' }}>Blasters</option>
+                  <option style={{ fontWeight: 'bold' }}>Blizzard Blast</option>
+                  <option style={{ fontWeight: 'bold' }}>Shock Gun</option>
+                </select>
+
+                {pendingBlaster && (
+                  <div style={{ marginTop: '4px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    <div style={{ fontWeight: 'bold' }}>
+                      {pendingBlaster}
+                      <span style={{ color: '#bf9000', fontWeight: 'bold', marginLeft: '8px' }}>
+                        {pendingBlaster === 'Blizzard Blast' ? '215c' : pendingBlaster === 'Shock Gun' ? '195c' : ''}
+                      </span>
+                    </div>
+                    <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                      <button
+                        style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #1976d2', background: '#1976d2', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}
+                        onClick={() => {
+                          const cost = pendingBlaster === 'Blizzard Blast' ? 215 : pendingBlaster === 'Shock Gun' ? 195 : 0;
+                          handleBlasterPurchase(pendingBlaster, cost);
+                        }}
+                      >
+                        Buy
+                      </button>
+                      <button
+                        style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #28a745', background: '#28a745', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}
+                        onClick={() => handleBlasterAdd(pendingBlaster)}
+                      >
+                        Add
+                      </button>
+                      <button
+                        style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #aaa', background: '#eee', color: '#333', fontWeight: 'bold', cursor: 'pointer' }}
+                        onClick={() => setPendingBlaster("")}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Display added blasters */}
+                <div style={{ marginTop: '4px' }}>
+                  {(sheet?.blasters && sheet.blasters.length > 0) && (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                      {sheet?.blasters?.map((blaster, idx) => (
+                        <span key={blaster + idx + 'blaster'} style={{ fontStyle: 'italic', display: 'flex', alignItems: 'center', background: '#f5f5f5', borderRadius: '6px', padding: '2px 8px' }}>
+                          {blaster}
+                          <button
+                            style={{ marginLeft: '6px', padding: '0 6px', borderRadius: '50%', border: 'none', background: '#d32f2f', color: 'white', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.9em' }}
+                            title={`Remove ${blaster}`}
+                            onClick={() => {
+                              if (sheet && onAutoSave) {
+                                const newBlasters = sheet.blasters?.filter((_, i) => i !== idx) || [];
+                                onAutoSave({
+                                  blasters: newBlasters
+                                });
+                              }
+                            }}
+                          >×</button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>                
+            
+            <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              {generateTyrantSecondaryAttackJSX(tyrantAttackDamageDots, tyrantAttackCritDots, tyrantAttackCooldownDots)}
+            </div>
+
+            {/* Attack XP progression table */}
+            <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px' }}>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 24px 24px 24px',
+                gridTemplateRows: 'repeat(2, auto)',
+                columnGap: '6px',
+                rowGap: '2px',
+                alignItems: 'start',
+                marginBottom: '2px',
+                width: '100%',
+                paddingLeft: '4px'
+              }}>
+                {/* Row 1: XP headers */}
+                <span></span>
+                <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>5xp</span>
+                <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>8xp</span>
+                <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>15xp</span>
+                {/* Row 2: +1 Damage die dots */}
+                <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>+1 Damage die</span>
+                {[0, 1, 2].map(idx => (
+                  <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
+                    <span
+                      onClick={() => handleDotClick(tyrantAttackDamageDots, setTyrantAttackDamageDots, idx, [5, 8, 15], 'tyrantAttackDamageDots')}
+                      style={{
+                        width: '15px',
+                        height: '15px',
+                        border: '2px solid #000',
+                        borderRadius: '50%',
+                        display: 'block',
+                        background: tyrantAttackDamageDots[idx] ? '#000' : '#fff',
+                        cursor: (idx === 0 || tyrantAttackDamageDots.slice(0, idx).every(Boolean)) ? 'pointer' : 'not-allowed',
+                        transition: 'background 0.2s'
+                      }}
+                    ></span>
+                  </span>
+                ))}
+              </div>
+
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 24px 24px 24px',
+                gridTemplateRows: 'repeat(2, auto)',
+                columnGap: '6px',
+                rowGap: '2px',
+                alignItems: 'start',
+                marginBottom: '2px',
+                width: '100%',
+                paddingLeft: '4px'
+              }}>
+                {/* Row 1: XP headers */}
+                <span></span>
+                <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>3xp</span>
+                <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>5xp</span>
+                <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>8xp</span>
+                {/* Row 2: +1 Crit dots */}
+                <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>+1 Crit</span>
+                {[0, 1, 2].map(idx => (
+                  <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
+                    <span
+                      onClick={() => handleDotClick(tyrantAttackCritDots, setTyrantAttackCritDots, idx, [3, 5, 8], 'tyrantAttackCritDots')}
+                      style={{
+                        width: '15px',
+                        height: '15px',
+                        border: '2px solid #000',
+                        borderRadius: '50%',
+                        display: 'block',
+                        background: tyrantAttackCritDots[idx] ? '#000' : '#fff',
+                        cursor: (idx === 0 || tyrantAttackCritDots.slice(0, idx).every(Boolean)) ? 'pointer' : 'not-allowed',
+                        transition: 'background 0.2s'
+                      }}
+                    ></span>
+                  </span>
+                ))}
+              </div>
+
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 24px 24px 24px',
+                gridTemplateRows: 'repeat(2, auto)',
+                columnGap: '6px',
+                rowGap: '2px',
+                alignItems: 'start',
+                marginBottom: '2px',
+                width: '100%',
+                paddingLeft: '4px'
+              }}>
+                {/* Row 1: XP headers */}
+                <span></span>
+                <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>5xp</span>
+                <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>6xp</span>
+                <span></span>
+                {/* Row 2: -1 Cooldown dots */}
+                <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>-1 Cooldown</span>
+                {[0, 1].map(idx => (
+                  <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
+                    <span
+                      onClick={() => handleDotClick(tyrantAttackCooldownDots, setTyrantAttackCooldownDots, idx, [5, 6], 'tyrantAttackCooldownDots')}
+                      style={{
+                        width: '15px',
+                        height: '15px',
+                        border: '2px solid #000',
+                        borderRadius: '50%',
+                        display: 'block',
+                        background: tyrantAttackCooldownDots[idx] ? '#000' : '#fff',
+                        cursor: (idx === 0 || tyrantAttackCooldownDots.slice(0, idx).every(Boolean)) ? 'pointer' : 'not-allowed',
+                        transition: 'background 0.2s'
+                      }}
+                    ></span>
+                  </span>
+                ))}
+                <span></span>
+              </div>
+            </div>
+          </div>
+
+          {/* Strike section */}
+          <div style={{ marginTop: '1rem' }}>
+            <div style={{ fontWeight: 'bold', color: '#0b5394', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Strike</u></div>
+            <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              {generateTyrantStrikeJSX(tyrantStrikeDamageDots, tyrantStrikeDemorizeDots)}
+            </div>
+
+            {/* Strike XP progression table */}
+            <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px' }}>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 24px 24px 24px',
+                gridTemplateRows: 'repeat(2, auto)',
+                columnGap: '6px',
+                rowGap: '2px',
+                alignItems: 'start',
+                marginBottom: '2px',
+                width: '100%',
+                paddingLeft: '4px'
+              }}>
+                {/* Row 1: XP headers */}
+                <span></span>
+                <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>6xp</span>
+                <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>10xp</span>
+                <span></span>
+                {/* Row 2: +1 Damage dice dots */}
+                <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>+1 Damage dice</span>
+                {[0, 1].map(idx => (
+                  <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
+                    <span
+                      onClick={() => handleDotClick(tyrantStrikeDamageDots, setTyrantStrikeDamageDots, idx, [6, 10], 'tyrantStrikeDamageDots')}
+                      style={{
+                        width: '15px',
+                        height: '15px',
+                        border: '2px solid #000',
+                        borderRadius: '50%',
+                        display: 'block',
+                        background: tyrantStrikeDamageDots[idx] ? '#000' : '#fff',
+                        cursor: (idx === 0 || tyrantStrikeDamageDots.slice(0, idx).every(Boolean)) ? 'pointer' : 'not-allowed',
+                        transition: 'background 0.2s'
+                      }}
+                    ></span>
+                  </span>
+                ))}
+                <span></span>
+              </div>
+
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 24px 24px 24px',
+                gridTemplateRows: 'repeat(2, auto)',
+                columnGap: '6px',
+                rowGap: '2px',
+                alignItems: 'start',
+                marginBottom: '2px',
+                width: '100%',
+                paddingLeft: '4px'
+              }}>
+                {/* Row 1: XP header */}
+                <span></span>
+                <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>9xp</span>
+                <span></span>
+                <span></span>
+                {/* Row 2: Inflict Demoralize */}
+                <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>Inflict <b><i>Demoralize</i></b></span>
+                <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
+                  <span
+                    onClick={() => handleDotClick(tyrantStrikeDemorizeDots, setTyrantStrikeDemorizeDots, 0, [9], 'tyrantStrikeDemorizeDots')}
+                    style={{
+                      width: '15px',
+                      height: '15px',
+                      border: '2px solid #000',
+                      borderRadius: '50%',
+                      display: 'block',
+                      background: tyrantStrikeDemorizeDots[0] ? '#000' : '#fff',
+                      cursor: 'pointer',
+                      transition: 'background 0.2s'
+                    }}
+                  ></span>
+                </span>
+                <span></span>
+                <span></span>
+              </div>
+            </div>
+          </div>
+
+          {/* Perks section */}
+          <div style={{ marginTop: '1rem' }}>
+            <div style={{ fontWeight: 'bold', color: '#0b5394', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Perks</u></div>
+            <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <b>Skills.</b> Intimidation +2
+            </div>
+            <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 24px',
+                gridTemplateRows: 'auto auto',
+                columnGap: '6px',
+                rowGap: '2px',
+                alignItems: 'start',
+                marginTop: '-12px',
+                width: '100%',
+                paddingLeft: '4px'
+              }}>
+                {/* Row 1: SP header */}
+                <span></span>
+                <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>10sp</span>
+                {/* Row 2: Fearmonger */}
+                <div style={{
+                  fontSize: '1em',
+                  fontFamily: 'Arial, Helvetica, sans-serif',
+                  textAlign: 'left',
+                  paddingRight: '8px',
+                  maxWidth: '500px',
+                  overflowWrap: 'break-word',
+                  wordWrap: 'break-word'
+                }}>
+                  <b><i style={{ color: '#8b0000', fontSize: '1em' }}>Fearmonger.</i></b> Your presence automatically sets others on alert, and those weaker of heart are downright fearful of you. Gain an advantage on skill rolls related to any social interactions involving the use of fear.
+                </div>
+                <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start' }}>
+                  <span
+                    onClick={() => handleSpDotClick(tyrantPerksSkillsDots, setTyrantPerksSkillsDots, 0, [10], 'tyrantPerksSkillsDots')}
+                    style={{
+                      width: '15px',
+                      height: '15px',
+                      border: '2px solid #000',
+                      borderRadius: '50%',
+                      display: 'block',
+                      background: tyrantPerksSkillsDots[0] ? '#000' : '#fff',
                       cursor: 'pointer',
                       transition: 'background 0.2s'
                     }}

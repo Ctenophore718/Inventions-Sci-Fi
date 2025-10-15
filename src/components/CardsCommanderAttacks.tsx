@@ -144,7 +144,12 @@ export const CardsCommanderAttacks: React.FC<CardsCommanderAttacksProps> = ({ sh
             zIndex: 2,
             lineHeight: 1.2
           }}>
-            {generateCommanderPrimaryAttackStatsJSX(sheet?.classCardDots, rifle)}
+            {generateCommanderPrimaryAttackStatsJSX(
+              sheet?.classCardDots, 
+              rifle, 
+              sheet?.subclass, 
+              (sheet?.subclassProgressionDots as any)?.tacticianFeatureCritDots
+            )}
           </div>
           
           {/* Flavor Text */}
@@ -564,7 +569,8 @@ export const CardsCommanderAttacks: React.FC<CardsCommanderAttacksProps> = ({ sh
                 (sheet?.subclassProgressionDots as any)?.tacticianAttackAoEDots,
                 (sheet?.subclassProgressionDots as any)?.tacticianAttackCritDots,
                 (sheet?.subclassProgressionDots as any)?.tacticianAttackCooldownDots,
-                flare
+                flare,
+                (sheet?.subclassProgressionDots as any)?.tacticianFeatureCritDots,
               )}
             </div>
           </div>

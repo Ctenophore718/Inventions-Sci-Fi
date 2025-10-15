@@ -10,7 +10,11 @@ export interface CommanderPrimaryAttackData {
 /**
  * Calculate Commander primary attack values based on class card dots
  */
-export function calculateCommanderPrimaryAttackData(classCardDots?: boolean[][]): CommanderPrimaryAttackData {
+export function calculateCommanderPrimaryAttackData(
+  classCardDots?: boolean[][],
+  subclass?: string,
+  tacticianFeatureCritDots?: boolean[]
+): CommanderPrimaryAttackData {
   // Get damage die dots (array index 6)
   const damageDots = classCardDots?.[6]?.filter(Boolean).length || 0;
   // Get crit dots (array index 7)
@@ -18,8 +22,14 @@ export function calculateCommanderPrimaryAttackData(classCardDots?: boolean[][])
   
   // Calculate base damage dice: 1 + damage dots
   const baseDamage = 1 + damageDots;
-  // Calculate crit threshold: 18 - crit dots
-  const critThreshold = 18 - critDots;
+  
+  // Add Tactician Tactical Offensive crit bonus: base +1, plus +1 per dot (up to 2 dots)
+  const tacticianCritBonus = subclass === 'Tactician' 
+    ? 1 + (tacticianFeatureCritDots?.filter(Boolean).length || 0) 
+    : 0;
+  
+  // Calculate crit threshold: 18 - crit dots - Tactician bonus
+  const critThreshold = 18 - critDots - tacticianCritBonus;
   
   return { damageBonus: damageDots, critBonus: critDots, baseDamage, critThreshold };
 }
@@ -29,9 +39,11 @@ export function calculateCommanderPrimaryAttackData(classCardDots?: boolean[][])
  */
 export function generateCommanderPrimaryAttackStatsJSX(
   classCardDots?: boolean[][],
-  rifleName?: string
+  rifleName?: string,
+  subclass?: string,
+  tacticianFeatureCritDots?: boolean[]
 ): React.ReactElement {
-  const { baseDamage, critThreshold } = calculateCommanderPrimaryAttackData(classCardDots);
+  const { baseDamage, critThreshold } = calculateCommanderPrimaryAttackData(classCardDots, subclass, tacticianFeatureCritDots);
   
   return (
     <div style={{ fontSize: '0.875em', width: '100%', height: 'fit-content', maxHeight: '100%', overflow: 'hidden' }}>
