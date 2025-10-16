@@ -1880,37 +1880,80 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                           };
                           const classBoostColor = getClassBoostColor();
                           
-                          // Account for booster dots when checking if previous dots are filled
-                          const canCheck = i === 0 || skillDotsForSkill.slice(0, i).every((dotFilled, dotIndex) => {
-                            // The first two dots are free starter dots and should always be treated as filled
-                            const isStarterDot = dotIndex === 0 || dotIndex === 1;
-                            
-                            // Check if this position has a booster dot
-                            const isBoosterDot = (charClass === "Chemist" && skill === "Investigation" && dotIndex === 2) ||
-                                               (charClass === "Coder" && skill === "Oikomagic" && dotIndex === 2) ||
-                                               (charClass === "Exospecialist" && skill === "Athletics" && dotIndex === 2) ||
-                                               (charClass === "Commander" && skill === "Diplomacy" && dotIndex === 2) ||
-                                               (charClass === "Contemplative" && skill === "Awareness" && dotIndex === 2) ||
-                                               (charClass === "Devout" && skill === "Xenomagic" && dotIndex === 2) ||
-                                               (charClass === "Elementalist" && skill === "Xenomagic" && dotIndex === 2) ||
-                                               (charClass === "Gunslinger" && skill === "Deception" && dotIndex === 2) ||
-                                               (charClass === "Technician" && skill === "Technology" && dotIndex === 2) ||
-                                               (subclass === "Anatomist" && skill === "Medicine" && dotIndex === 2) ||
-                                               (subclass === "Grenadier" && skill === "Intimidation" && dotIndex === 2) ||
-                                               (subclass === "Necro" && skill === "Survival" && dotIndex === 2) ||
-                                               (subclass === "Poisoner" && skill === "Thievery" && dotIndex === 2) ||
-                                               (subclass === "Coercive" && skill === "Deception" && dotIndex === 2) ||
-                                               (subclass === "Beguiler" && skill === "Deception" && dotIndex === 2) ||
-                                               (subclass === "Divinist" && skill === "Investigation" && dotIndex === 2) ||
-                                               (subclass === "Naturalist" && skill === "Survival" && dotIndex === 2) ||
-                                               (subclass === "Technologist" && skill === "Technology" && dotIndex === 2) ||
-                                               (subclass === "Galvanic" && skill === "Athletics" && dotIndex === 2) ||
-                                               (subclass === "Tactician" && skill === "Awareness" && dotIndex === 2)||
-                                               (subclass === "Tyrant" && skill === "Intimidation" && dotIndex === 2);
-                            return dotFilled || isBoosterDot || isStarterDot;
-                          });
                           const rightmostChecked = skillDotsForSkill.lastIndexOf(true);
+                          
+                          // Account for booster dots when checking if previous dots are filled
+                          // Allow clicking any unfilled dot to the right of the rightmost checked dot
+                          const canCheck = !checked && i > rightmostChecked;
                           const canUncheck = checked && i === rightmostChecked;
+                          
+                          // Calculate the SP cost if this dot were clicked (for cursor and tooltip)
+                          let spCostForThisDot = 0;
+                          if (canCheck) {
+                            for (let j = 0; j <= i; j++) {
+                              if (!skillDotsForSkill[j] && !((j === 0 || j === 1) || 
+                                  (j === 2 && (
+                                    (charClass === "Chemist" && skill === "Investigation") ||
+                                    (charClass === "Coder" && skill === "Oikomagic") ||
+                                    (charClass === "Exospecialist" && skill === "Athletics") ||
+                                    (charClass === "Commander" && skill === "Diplomacy") ||
+                                    (charClass === "Contemplative" && skill === "Awareness") ||
+                                    (charClass === "Devout" && skill === "Xenomagic") ||
+                                    (charClass === "Elementalist" && skill === "Xenomagic") ||
+                                    (charClass === "Gunslinger" && skill === "Deception") ||
+                                    (charClass === "Technician" && skill === "Technology") ||
+                                    (subclass === "Anatomist" && skill === "Medicine") ||
+                                    (subclass === "Grenadier" && skill === "Intimidation") ||
+                                    (subclass === "Necro" && skill === "Survival") ||
+                                    (subclass === "Poisoner" && skill === "Thievery") ||
+                                    (subclass === "Coercive" && skill === "Deception") ||
+                                    (subclass === "Beguiler" && skill === "Deception") ||
+                                    (subclass === "Divinist" && skill === "Investigation") ||
+                                    (subclass === "Naturalist" && skill === "Survival") ||
+                                    (subclass === "Technologist" && skill === "Technology") ||
+                                    (subclass === "Galvanic" && skill === "Athletics") ||
+                                    (subclass === "Tactician" && skill === "Awareness") ||
+                                    (subclass === "Tyrant" && skill === "Intimidation")
+                                  ))
+                              )) {
+                                spCostForThisDot += [1, 1, 2, 2, 3, 4, 5, 6, 8, 10][j];
+                              }
+                            }
+                          } else if (canUncheck) {
+                            // Calculate refund amount for unchecking
+                            for (let j = i; j < skillDotsForSkill.length; j++) {
+                              if (skillDotsForSkill[j] && !((j === 0 || j === 1) || 
+                                  (j === 2 && (
+                                    (charClass === "Chemist" && skill === "Investigation") ||
+                                    (charClass === "Coder" && skill === "Oikomagic") ||
+                                    (charClass === "Exospecialist" && skill === "Athletics") ||
+                                    (charClass === "Commander" && skill === "Diplomacy") ||
+                                    (charClass === "Contemplative" && skill === "Awareness") ||
+                                    (charClass === "Devout" && skill === "Xenomagic") ||
+                                    (charClass === "Elementalist" && skill === "Xenomagic") ||
+                                    (charClass === "Gunslinger" && skill === "Deception") ||
+                                    (charClass === "Technician" && skill === "Technology") ||
+                                    (subclass === "Anatomist" && skill === "Medicine") ||
+                                    (subclass === "Grenadier" && skill === "Intimidation") ||
+                                    (subclass === "Necro" && skill === "Survival") ||
+                                    (subclass === "Poisoner" && skill === "Thievery") ||
+                                    (subclass === "Coercive" && skill === "Deception") ||
+                                    (subclass === "Beguiler" && skill === "Deception") ||
+                                    (subclass === "Divinist" && skill === "Investigation") ||
+                                    (subclass === "Naturalist" && skill === "Survival") ||
+                                    (subclass === "Technologist" && skill === "Technology") ||
+                                    (subclass === "Galvanic" && skill === "Athletics") ||
+                                    (subclass === "Tactician" && skill === "Awareness") ||
+                                    (subclass === "Tyrant" && skill === "Intimidation")
+                                  ))
+                              )) {
+                                spCostForThisDot += [1, 1, 2, 2, 3, 4, 5, 6, 8, 10][j];
+                              }
+                            }
+                          }
+                          
+                          const hasEnoughSP = spSpent + spCostForThisDot <= (sheet?.spTotal || 0);
+                          const canAffordCheck = canCheck && hasEnoughSP;
                           const hasFreeDots = sheet?.hasFreeSkillStarterDots;
                           const isLockedColumn = hasFreeDots && isFirstTwoColumns;
                           
@@ -1934,8 +1977,13 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                                   const spCosts = [1, 1, 2, 2, 3, 4, 5, 6, 8, 10];
                                   const currentSkillDots = skillDots[skill] || Array(10).fill(false);
                                   
-                                  // Helper function to check if a position is a booster dot (free)
-                                  const isBoosterDot = (skillName: string, position: number) => {
+                                  // Helper function to check if a position is a free dot (starter or booster)
+                                  const isFreeDot = (skillName: string, position: number) => {
+                                    // Positions 0 and 1 are always free starter dots for all skills
+                                    if (position === 0 || position === 1) {
+                                      return true;
+                                    }
+                                    
                                     // All booster dots are at position 2
                                     if (position === 2) {
                                       // Class booster dots
@@ -1967,26 +2015,42 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                                     return false;
                                   };
                                   
+                                  const rightmostChecked = currentSkillDots.lastIndexOf(true);
+                                  const canCheckThisDot = !currentSkillDots[i] && i > rightmostChecked;
+                                  const canUncheck = currentSkillDots[i] && i === rightmostChecked;
+                                  
                                   let spDelta = 0;
 
                                   // Calculate SP cost/refund before attempting changes
-                                  if (!currentSkillDots[i] && canCheck) {
-                                    // Filling dots: calculate SP cost for new dots being filled (excluding booster dots)
+                                  if (canCheckThisDot) {
+                                    // Filling dots: calculate SP cost for new dots being filled (excluding free dots)
+                                    console.log(`Attempting to fill ${skill} at index ${i} (column ${[20, 18, 16, 14, 12, 10, 8, 6, 4, 2][i]}+)`);
+                                    console.log(`Current skill dots:`, currentSkillDots);
+                                    console.log(`Current SP spent: ${spSpent}, Total SP: ${sheet?.spTotal || 0}, Remaining: ${(sheet?.spTotal || 0) - spSpent}`);
+                                    
                                     for (let j = 0; j <= i; j++) {
-                                      if (!currentSkillDots[j] && !isBoosterDot(skill, j)) {
+                                      const isFree = isFreeDot(skill, j);
+                                      const isFilled = currentSkillDots[j];
+                                      console.log(`  Position ${j}: filled=${isFilled}, isFreeDot=${isFree}, cost=${spCosts[j]}`);
+                                      
+                                      if (!currentSkillDots[j] && !isFreeDot(skill, j)) {
                                         spDelta += spCosts[j];
+                                        console.log(`    Adding ${spCosts[j]}sp to spDelta (now ${spDelta})`);
                                       }
                                     }
                                     
+                                    console.log(`Total SP delta: ${spDelta}, Would result in: ${spSpent + spDelta} spent`);
+                                    
                                     // Check if user has enough SP
                                     if (spSpent + spDelta > (sheet?.spTotal || 0)) {
+                                      console.log(`NOT ENOUGH SP! Need ${spSpent + spDelta} but only have ${sheet?.spTotal || 0}`);
                                       setNotice("Not enough sp!");
                                       return;
                                     }
                                   } else if (currentSkillDots[i] && canUncheck) {
-                                    // Unfilling dots: calculate SP to be refunded (excluding booster dots)
+                                    // Unfilling dots: calculate SP to be refunded (excluding free dots)
                                     for (let j = i; j < currentSkillDots.length; j++) {
-                                      if (currentSkillDots[j] && !isBoosterDot(skill, j)) {
+                                      if (currentSkillDots[j] && !isFreeDot(skill, j)) {
                                         spDelta -= spCosts[j];
                                       }
                                     }
@@ -2000,12 +2064,12 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                                     let newSkillDots = [...currentSkillDots];
                                     
                                     // Handle dot clicking logic
-                                    if (!currentSkillDots[i] && canCheck) {
+                                    if (canCheckThisDot) {
                                       // Fill dots from left to right up to and including clicked position
                                       for (let j = 0; j <= i; j++) {
                                         newSkillDots[j] = true;
                                       }
-                                    } else if (currentSkillDots[i] && canUncheck) {
+                                    } else if (canUncheck) {
                                       // Unfill dots from clicked position to the right
                                       for (let j = i; j < newSkillDots.length; j++) {
                                         newSkillDots[j] = false;
@@ -2032,11 +2096,11 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                                     const currentSkillDots = skillDots[skill] || Array(10).fill(false);
                                     let newSkillDots = [...currentSkillDots];
                                     
-                                    if (!currentSkillDots[i] && canCheck) {
+                                    if (canCheckThisDot) {
                                       for (let j = 0; j <= i; j++) {
                                         newSkillDots[j] = true;
                                       }
-                                    } else if (currentSkillDots[i] && canUncheck) {
+                                    } else if (canUncheck) {
                                       for (let j = i; j < newSkillDots.length; j++) {
                                         newSkillDots[j] = false;
                                       }
@@ -2058,8 +2122,8 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                                   borderRadius: '50%',
                                   border: (isChemistInvestigation || isCoderOikomagic || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isCommanderDiplomacy || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine || isGrenadierIntimidation || isNecroSurvival || isPoisonerThievery || isCoerciveDeception || isBeguilerDeception || isDivinistInvestigation || isNaturalistSurvival || isTechnologistTechnology || isGalvanicAthletics || isTacticianAwareness || isTyrantIntimidation) ? `2px solid ${classBoostColor}` : (isLockedColumn ? '2px solid #666' : '2px solid #000'),
                                   background: checked ? ((isChemistInvestigation || isCoderOikomagic || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isCommanderDiplomacy || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine || isGrenadierIntimidation || isNecroSurvival || isPoisonerThievery || isCoerciveDeception || isBeguilerDeception || isDivinistInvestigation || isNaturalistSurvival || isTechnologistTechnology || isGalvanicAthletics || isTacticianAwareness || isTyrantIntimidation) ? classBoostColor : (isLockedColumn ? '#666' : '#000')) : '#fff',
-                                  cursor: (isLockedColumn || isChemistInvestigation || isCoderOikomagic || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isCommanderDiplomacy || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine || isGrenadierIntimidation || isNecroSurvival || isPoisonerThievery || isCoerciveDeception || isBeguilerDeception || isDivinistInvestigation || isNaturalistSurvival || isTechnologistTechnology || isGalvanicAthletics || isTacticianAwareness || isTyrantIntimidation) ? 'not-allowed' : ((canCheck && !checked) || canUncheck ? 'pointer' : 'not-allowed'),
-                                  opacity: (isLockedColumn || isChemistInvestigation || isCoderOikomagic || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isCommanderDiplomacy || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine || isGrenadierIntimidation || isNecroSurvival || isPoisonerThievery || isCoerciveDeception || isBeguilerDeception || isDivinistInvestigation || isNaturalistSurvival || isTechnologistTechnology || isGalvanicAthletics || isTacticianAwareness || isTyrantIntimidation) ? 0.6 : ((canCheck && !checked) || canUncheck ? 1 : 0.4),
+                                  cursor: (isLockedColumn || isChemistInvestigation || isCoderOikomagic || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isCommanderDiplomacy || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine || isGrenadierIntimidation || isNecroSurvival || isPoisonerThievery || isCoerciveDeception || isBeguilerDeception || isDivinistInvestigation || isNaturalistSurvival || isTechnologistTechnology || isGalvanicAthletics || isTacticianAwareness || isTyrantIntimidation) ? 'not-allowed' : (canAffordCheck || canUncheck ? 'pointer' : 'not-allowed'),
+                                  opacity: (isLockedColumn || isChemistInvestigation || isCoderOikomagic || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isCommanderDiplomacy || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine || isGrenadierIntimidation || isNecroSurvival || isPoisonerThievery || isCoerciveDeception || isBeguilerDeception || isDivinistInvestigation || isNaturalistSurvival || isTechnologistTechnology || isGalvanicAthletics || isTacticianAwareness || isTyrantIntimidation) ? 0.6 : (canAffordCheck || canUncheck ? 1 : 0.4),
                                 }}
                                 title={
                                   isChemistInvestigation || isCoderOikomagic || isCommanderDiplomacy || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine || isGrenadierIntimidation || isNecroSurvival || isPoisonerThievery || isCoerciveDeception || isBeguilerDeception || isDivinistInvestigation || isNaturalistSurvival || isTechnologistTechnology || isGalvanicAthletics || isTacticianAwareness || isTyrantIntimidation
@@ -2067,8 +2131,8 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                                     : isLockedColumn 
                                     ? 'Starting skill dots (cannot be changed)'
                                     : (!checked && canCheck)
-                                    ? `Click to fill (Cost: ${[1, 1, 2, 2, 3, 4, 5, 6, 8, 10][i]}sp)`
-                                    : (canUncheck ? `Click to unfill (Refund: ${[1, 1, 2, 2, 3, 4, 5, 6, 8, 10][i]}sp)` : `Must uncheck rightmost first`)
+                                    ? (hasEnoughSP ? `Click to fill up to here (Total cost: ${spCostForThisDot}sp)` : `Not enough SP (Need ${spCostForThisDot}sp, have ${(sheet?.spTotal || 0) - spSpent}sp)`)
+                                    : (canUncheck ? `Click to unfill from here (Refund: ${spCostForThisDot}sp)` : `Already filled or blocked`)
                                 }
                               />
                             </td>
