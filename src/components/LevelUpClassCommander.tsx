@@ -743,7 +743,7 @@ const LevelUpClassCommander: React.FC<LevelUpClassCommanderProps> = ({
                 <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
                   <div style={{ fontWeight: 'bold', color: '#351c75', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Strike</u></div>
                   <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
-                    <b><i><span style={{ color: '#351c75' }}>Strike</span> Damage.</i></b> <b>[{1 + safeGetDotsArray(8).filter(Boolean).length + ((sheet?.subclassProgressionDots as any)?.galvanicStrikeDamageDots?.filter(Boolean).length || 0)}]</b>d6.
+                    <b><i><span style={{ color: '#351c75' }}>Strike</span> Damage.</i></b> <b>[{1 + safeGetDotsArray(8).filter(Boolean).length + ((sheet?.subclassProgressionDots as any)?.galvanicStrikeDamageDots?.filter(Boolean).length || 0) + ((sheet?.subclassProgressionDots as any)?.tyrantStrikeDamageDots?.filter(Boolean).length || 0)}]</b>d6.
                   </div>
                   {/* XP progression table for Strike */}
                   <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px' }}>

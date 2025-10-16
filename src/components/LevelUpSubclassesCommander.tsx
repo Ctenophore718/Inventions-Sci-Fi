@@ -2365,7 +2365,7 @@ const LevelUpSubclassesCommander: React.FC<LevelUpSubclassesCommanderProps> = ({
 
           {/* Technique section */}
           <div style={{ marginTop: '1rem' }}>
-            <div style={{ fontWeight: 'bold', color: '#0b5394', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Technique</u></div>
+            <div style={{ fontWeight: 'bold', color: '#bf9000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Technique</u></div>
             <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
               {generateTyrannizeJSX(tyrantTechniqueHxDots, tyrantTechniqueMoveDots, tyrantTechniqueCooldownDots)}
             </div>
@@ -2426,7 +2426,7 @@ const LevelUpSubclassesCommander: React.FC<LevelUpSubclassesCommanderProps> = ({
                 <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>8xp</span>
                 <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>11xp</span>
                 {/* Row 2: +1hx Move away dots */}
-                <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>+1hx Move away</span>
+                <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>+1hx <b><i style={{ color: '#38761d' }}>Move</i></b> away</span>
                 {[0, 1, 2].map(idx => (
                   <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
                     <span
@@ -2705,9 +2705,9 @@ const LevelUpSubclassesCommander: React.FC<LevelUpSubclassesCommanderProps> = ({
 
           {/* Strike section */}
           <div style={{ marginTop: '1rem' }}>
-            <div style={{ fontWeight: 'bold', color: '#0b5394', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Strike</u></div>
+            <div style={{ fontWeight: 'bold', color: '#351c75', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Strike</u></div>
             <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
-              {generateTyrantStrikeJSX(tyrantStrikeDamageDots, tyrantStrikeDemorizeDots)}
+              {generateTyrantStrikeJSX(tyrantStrikeDamageDots, tyrantStrikeDemorizeDots, sheet?.classCardDots)}
             </div>
 
             {/* Strike XP progression table */}
@@ -2729,7 +2729,7 @@ const LevelUpSubclassesCommander: React.FC<LevelUpSubclassesCommanderProps> = ({
                 <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>10xp</span>
                 <span></span>
                 {/* Row 2: +1 Damage dice dots */}
-                <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>+1 Damage dice</span>
+                <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>+1 Damage die</span>
                 {[0, 1].map(idx => (
                   <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
                     <span
@@ -2791,9 +2791,9 @@ const LevelUpSubclassesCommander: React.FC<LevelUpSubclassesCommanderProps> = ({
 
           {/* Perks section */}
           <div style={{ marginTop: '1rem' }}>
-            <div style={{ fontWeight: 'bold', color: '#0b5394', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Perks</u></div>
+            <div style={{ fontWeight: 'bold', color: '#000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Perks</u></div>
             <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
-              <b>Skills.</b> Intimidation +2
+              <b>Skills.</b> <i>Intimidation</i> +2
             </div>
             <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
               <div style={{
@@ -2820,7 +2820,7 @@ const LevelUpSubclassesCommander: React.FC<LevelUpSubclassesCommanderProps> = ({
                   overflowWrap: 'break-word',
                   wordWrap: 'break-word'
                 }}>
-                  <b><i style={{ color: '#8b0000', fontSize: '1em' }}>Fearmonger.</i></b> Your presence automatically sets others on alert, and those weaker of heart are downright fearful of you. Gain an advantage on skill rolls related to any social interactions involving the use of fear.
+                  <b><i style={{ color: '#ce1f1f', fontSize: '1em' }}>Fearmonger.</i></b> Your presence automatically sets others on alert, and those weaker of heart are downright fearful of you. Gain an advantage on skill rolls related to any social interactions involving the use of fear.
                 </div>
                 <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start' }}>
                   <span

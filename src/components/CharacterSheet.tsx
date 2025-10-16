@@ -21,6 +21,7 @@ import { generateStaySharpJSX } from "../utils/commanderFeature";
 import { generateLoyalServantsJSX } from "../utils/beguilerFeature";
 import { generateInspiringPresenceJSX } from "../utils/galvanicFeature";
 import { generateTacticalOffensiveJSX } from "../utils/tacticianFeature";
+import { generateFearlessJSX } from "../utils/tyrantFeature";
 
 
 type Props = {
@@ -307,7 +308,14 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
   // Removed unused XP/SP fields
 
   // Combat fields
-  const speed = sheet?.speed || "";
+  // Calculate speed with Tactician Tactical Offensive bonus
+  const baseSpeed = 0; // Base speed is 0 for now (will be increased by Species/Subspecies/Items later)
+  const tacticianSpeedBonus = sheet?.subclass === 'Tactician' 
+    ? 1 + ((sheet?.subclassProgressionDots as any)?.tacticianFeatureSpeedDots?.filter(Boolean).length || 0)
+    : 0;
+  const totalSpeed = baseSpeed + tacticianSpeedBonus;
+  const speed = totalSpeed > 0 ? `${totalSpeed}` : "0";
+  
   const strikeDamage = sheet?.strikeDamage || "";
   const maxHitPoints = sheet?.maxHitPoints || 0;
   const [deathCount, setDeathCount] = useState(sheet?.deathCount || 0);
@@ -711,10 +719,10 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
   );
 
   // Add after tacticianFeatureJSX
-  const tyrantFeatureJSX = (
-    <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#ce1f1f' }}>Fearless.</i></b> You are <i>Immune</i> to the <b><i>Demoralize</i></b> condition, and so are any allies while they are within <b>[3]</b>hx of you.
-    </span>
+  const tyrantFeatureJSX = generateFearlessJSX(
+    sheet?.subclassProgressionDots?.tyrantFeatureHxDots,
+    sheet?.subclassProgressionDots?.tyrantFeatureConfuseImmunityDots,
+    sheet?.subclassProgressionDots?.tyrantFeatureMesmerizeImmunityDots
   );
 
   // Add after tyrantFeatureJSX
@@ -1216,6 +1224,14 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
       );
     }
     
+    // Add Blasters for Tyrant subclass
+    if (subclass === 'Tyrant') {
+      attacks.push(
+        { name: 'Blizzard Blast', type: 'Blaster', cost: 215 },
+        { name: 'Shock Gun', type: 'Blaster', cost: 195 }
+      );
+    }
+    
     return attacks;
   };
 
@@ -1348,6 +1364,12 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
           flares: newFlares,
           credits: credits - cost
         };
+      } else if (type === 'Blaster') {
+        const newBlasters = [...(sheet.blasters || []), attackName];
+        partialUpdate = { 
+          blasters: newBlasters,
+          credits: credits - cost
+        };
       } else {
         return;
       }
@@ -1400,6 +1422,11 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
         const newFlares = [...(sheet.flares || []), attackName];
         partialUpdate = { 
           flares: newFlares
+        };
+      } else if (type === 'Blaster') {
+        const newBlasters = [...(sheet.blasters || []), attackName];
+        partialUpdate = { 
+          blasters: newBlasters
         };
       } else {
         return;
@@ -1463,6 +1490,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                     if (subclass === "Beguiler" && skill === "Deception") return "rgba(31,33,206,0.5)";
                     if (subclass === "Galvanic" && skill === "Athletics") return "rgba(111,206,31,0.5)";
                     if (subclass === "Tactician" && skill === "Awareness") return "rgba(206,195,31,0.5)";
+                    if (subclass === "Tyrant" && skill === "Intimidation") return "rgba(206,31,195,0.5)";
                     
                     return null;
                   };
@@ -2208,7 +2236,8 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                 {generateCommanderStrikeJSX(
                   sheet?.classCardDots, 
                   'charactersheet',
-                  (sheet?.subclassProgressionDots as any)?.galvanicStrikeDamageDots
+                  (sheet?.subclassProgressionDots as any)?.galvanicStrikeDamageDots,
+                  (sheet?.subclassProgressionDots as any)?.tyrantStrikeDamageDots
                 )}
                 {subclass === 'Beguiler' && (
                   <>
@@ -2234,6 +2263,15 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                       <span style={{ color: '#a6965f', textDecoration: 'underline', fontWeight: 'bold', fontFamily: 'inherit', display: 'inline-flex', alignItems: 'center' }}>
                         Piercing
                         <img src="/Piercing.png" alt="Piercing" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+                      </span>
+                    </>
+                  )}
+                  {subclass === 'Tyrant' && (
+                    <>
+                      &nbsp;
+                      <span style={{ color: '#915927', textDecoration: 'underline', fontWeight: 'bold', fontFamily: 'inherit', display: 'inline-flex', alignItems: 'center' }}>
+                        Bludgeoning
+                        <img src="/Bludgeoning.png" alt="Bludgeoning" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
                       </span>
                     </>
                   )}
@@ -2291,7 +2329,9 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                     ? <span style={{ color: '#000', fontWeight: 'normal' }}><b><i>Mesmerize</i></b></span>
                   : (subclass === 'Galvanic' && ((sheet?.subclassProgressionDots as any)?.galvanicStrikeAoEDots?.filter(Boolean).length || 0) > 0)
                     ? <span style={{ color: '#000', fontWeight: 'normal' }}><i>AoE</i> <b>[{((sheet?.subclassProgressionDots as any)?.galvanicStrikeAoEDots?.filter(Boolean).length || 0)}]</b>hx-Radius</span>
-                  : strikeEffects
+                  : (subclass === 'Tyrant' && (sheet?.subclassProgressionDots as any)?.tyrantStrikeDemorizeDots?.[0])
+                    ? <span style={{ color: '#000', fontWeight: 'normal' }}><b><i>Demoralize</i></b></span>
+                    : strikeEffects
               }
           </div>
         </div>
@@ -2350,6 +2390,21 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
             {subclass === 'Poisoner' && sheet?.subclassProgressionDots?.poisonerChemicalImmunityDots?.[0] && (
               <span style={{ marginLeft: 8, display: 'inline-flex', alignItems: 'center', color: '#de7204', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                 <u>Chemical</u> <img src="/Chemical.png" alt="Chemical" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+              </span>
+            )}
+            {subclass === 'Tyrant' && (
+              <span style={{ marginLeft: 8, display: 'inline-flex', alignItems: 'center', color: '#000', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                <i>Demoralize</i>
+              </span>
+            )}
+            {subclass === 'Tyrant' && sheet?.subclassProgressionDots?.tyrantFeatureConfuseImmunityDots?.[0] && (
+              <span style={{ marginLeft: 8, display: 'inline-flex', alignItems: 'center', color: '#000', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                <i>Confuse</i>
+              </span>
+            )}
+            {subclass === 'Tyrant' && sheet?.subclassProgressionDots?.tyrantFeatureMesmerizeImmunityDots?.[0] && (
+              <span style={{ marginLeft: 8, display: 'inline-flex', alignItems: 'center', color: '#000', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                <i>Mesmerize</i>
               </span>
             )}
             {subclass === 'Coercive' && (
@@ -2530,6 +2585,13 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
             <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
               <span>
                 <b><i style={{ color: '#cec31f' }}>Three Moves Ahead.</i></b> <span style={{ color: '#000' }}>You are always thinking ahead and analyzing several possible outcomes based on the actions you and your allies make. Gain an advantage on skills related to creating or enacting a plan.</span>
+              </span>
+            </div>
+          )}
+            {subclass === 'Tyrant' && (sheet?.subclassProgressionDots as any)?.tyrantPerksSkillsDots?.[0] && (
+            <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <span>
+                <b><i style={{ color: '#ce1f1f' }}>Fearmonger.</i></b> <span style={{ color: '#000' }}>Your presence automatically sets others on alert, and those weaker of heart are downright fearful of you. Gain an advantage on skill rolls related to any social interactions involving the use of fear.</span>
               </span>
             </div>
           )}
@@ -2733,10 +2795,10 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                     textAlign: 'left',
                     minWidth: '180px'
                   }}
-                  value={pendingSecondaryAttack || (charClass === 'Coder' ? 'Algorithms' : subclass === 'Anatomist' ? 'Super Serums' : subclass === 'Grenadier' ? 'Grenades' : subclass === 'Necro' ? 'Chem Zombies' : subclass === 'Poisoner' ? 'Noxious Fumes' : subclass === 'Beguiler' ? 'Whips' : subclass === 'Galvanic' ? 'Sabres' : subclass === 'Tactician' ? 'Flares' : 'Select Secondary Attack')}
+                  value={pendingSecondaryAttack || (charClass === 'Coder' ? 'Algorithms' : subclass === 'Anatomist' ? 'Super Serums' : subclass === 'Grenadier' ? 'Grenades' : subclass === 'Necro' ? 'Chem Zombies' : subclass === 'Poisoner' ? 'Noxious Fumes' : subclass === 'Beguiler' ? 'Whips' : subclass === 'Galvanic' ? 'Sabres' : subclass === 'Tactician' ? 'Flares' : subclass === 'Tyrant' ? 'Blasters' : 'Select Secondary Attack')}
                   onChange={(e) => {
                     const value = e.target.value;
-                    if (value !== 'Algorithms' && value !== 'Super Serums' && value !== 'Grenades' && value !== 'Chem Zombies' && value !== 'Noxious Fumes' && value !== 'Whips' && value !== 'Sabres' && value !== 'Flares' && value !== 'Select Secondary Attack') {
+                    if (value !== 'Algorithms' && value !== 'Super Serums' && value !== 'Grenades' && value !== 'Chem Zombies' && value !== 'Noxious Fumes' && value !== 'Whips' && value !== 'Sabres' && value !== 'Flares' && value !== 'Blasters' && value !== 'Select Secondary Attack') {
                       setPendingSecondaryAttack(value);
                     }
                   }}
@@ -2796,7 +2858,14 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                       <option style={{ fontWeight: 'bold' }}>Flash Freeze</option>
                     </>
                   )}
-                  {charClass !== 'Coder' && subclass !== 'Anatomist' && subclass !== 'Grenadier' && subclass !== 'Necro' && subclass !== 'Poisoner' && subclass !== 'Beguiler' && subclass !== 'Galvanic' && subclass !== 'Tactician' && (
+                  {subclass === 'Tyrant' && (
+                    <>
+                      <option disabled style={{ fontWeight: 'bold' }}>Blasters</option>
+                      <option style={{ fontWeight: 'bold' }}>Blizzard Blast</option>
+                      <option style={{ fontWeight: 'bold' }}>Shock Gun</option>
+                    </>
+                  )}
+                  {charClass !== 'Coder' && subclass !== 'Anatomist' && subclass !== 'Grenadier' && subclass !== 'Necro' && subclass !== 'Poisoner' && subclass !== 'Beguiler' && subclass !== 'Galvanic' && subclass !== 'Tactician' && subclass !== 'Tyrant' && (
                     <option disabled style={{ fontWeight: 'bold' }}>Select Secondary Attack</option>
                   )}
                 </select>
@@ -3030,6 +3099,29 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                       ))}
                     </div>
                   )}
+                  {(sheet?.blasters && sheet.blasters.length > 0) && (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginLeft: '8px' }}>
+                      {sheet?.blasters?.map((blaster, idx) => (
+                        <span key={blaster + idx + 'blaster'} style={{ fontStyle: 'italic', display: 'flex', alignItems: 'center', background: '#f5f5f5', borderRadius: '6px', padding: '2px 8px' }}>
+                          {blaster}
+                          <button
+                            style={{ marginLeft: '6px', padding: '0 6px', borderRadius: '50%', border: 'none', background: '#d32f2f', color: 'white', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.9em' }}
+                            title={`Remove ${blaster}`}
+                            onClick={() => {
+                              if (sheet) {
+                                const newBlasters = sheet.blasters?.filter((_, i) => i !== idx) || [];
+                                const updatedSheet = { 
+                                  ...sheet, 
+                                  blasters: newBlasters
+                                };
+                                handleAutoSave(updatedSheet);
+                              }
+                            }}
+                          >×</button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -3212,7 +3304,34 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
             >
               👤 Character Sheet
             </button>
-            
+
+            <button
+              onClick={onCards}
+              style={{
+                background: '#28a745',
+                color: 'white',
+                border: 'none',
+                borderRadius: '25px',
+                padding: '12px 20px',
+                fontWeight: 'bold',
+                fontSize: '0.9em',
+                cursor: 'pointer',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                whiteSpace: 'nowrap',
+                transition: 'all 0.2s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'scale(1.05)';
+                e.currentTarget.style.boxShadow = '0 6px 16px rgba(0,0,0,0.2)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'scale(1)';
+                e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+              }}
+            >
+              🃏 Cards
+            </button> 
+
             <button
               onClick={onLevelUp}
               style={{
@@ -3239,33 +3358,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
             >
               ⬆️ Level Up
             </button>
-            
-            <button
-              onClick={onCards}
-              style={{
-                background: '#28a745',
-                color: 'white',
-                border: 'none',
-                borderRadius: '25px',
-                padding: '12px 20px',
-                fontWeight: 'bold',
-                fontSize: '0.9em',
-                cursor: 'pointer',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                whiteSpace: 'nowrap',
-                transition: 'all 0.2s ease'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'scale(1.05)';
-                e.currentTarget.style.boxShadow = '0 6px 16px rgba(0,0,0,0.2)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'scale(1)';
-                e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
-              }}
-            >
-              🃏 Cards
-            </button>
+
           </div>
         )}
         

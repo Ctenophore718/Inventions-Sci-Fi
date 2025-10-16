@@ -42,11 +42,7 @@ export function generateFearlessJSX(
   
   return (
     <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#ce1f1f' }}>Fearless.</i></b> You are <i>Immune</i> to the <b><i>Demoralize</i></b> condition, and so are any allies while they are within <b>[{range}]</b>hx of you.{hasConfuseImmunity && (
-        <> You and allies within <b>[{range}]</b>hx of you are <i>Immune</i> to the <b><i>Confuse</i></b> condition.</>
-      )}{hasMesmerizeImmunity && (
-        <> You and allies within <b>[{range}]</b>hx of you are <i>Immune</i> to the <b><i>Mesmerize</i></b> condition.</>
-      )}
+        <b><i style={{ color: '#ce1f1f' }}>Fearless.</i></b> You are <i>Immune</i> to the <b><i>Demoralize</i></b>, {hasConfuseImmunity ? <b>[<i>Confuse</i>]</b> : <b>[ - ]</b>} and {hasMesmerizeImmunity ? <b>[<i>Mesmerize</i>]</b> : <b>[ - ]</b>} condition(s), and so are any allies while they are within <b>[{range}]</b>hx of you.
     </span>
   );
 }
