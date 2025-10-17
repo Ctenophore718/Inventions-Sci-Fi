@@ -73,6 +73,12 @@ export type CharacterSheet = {
   // Rifles for Commander class
   rifles?: string[];
 
+  // Focuses for Contemplative class
+  focuses?: string[];
+
+  // Disciplines for Contemplative class (secondary attacks)
+  disciplines?: string[];
+
   // Algorithms for Coder class
   algorithms?: string[];
 

@@ -40,12 +40,76 @@ export function calculateContemplativeSecondaryAttackData(classCardDots?: boolea
 }
 
 /**
- * Generate the secondary attack stats for Contemplative
+ * Generate the secondary attack stats for Contemplative Discipline cards
  */
 export function generateContemplativeSecondaryAttackStatsJSX(
-  classCardDots?: boolean[][]
+  classCardDots?: boolean[][],
+  disciplineName?: string
 ): React.ReactElement {
   const { damageDice, dieSize, critThreshold } = calculateContemplativeSecondaryAttackData(classCardDots);
+  
+  // Determine damage types, colors, icons, and crit effects based on discipline
+  let primaryDamageType = '';
+  let primaryColor = '#000';
+  let primaryIcon = '';
+  let secondaryDamageType = '';
+  let secondaryColor = '#000';
+  let secondaryIcon = '';
+  let critEffect = '';
+  let hasAlternativeDamage = false;
+  let additionalEffect = '';
+  
+  if (disciplineName === 'Empty Mudra') {
+    primaryDamageType = 'Neural';
+    primaryColor = '#a929ff';
+    primaryIcon = '/Neural.png';
+    critEffect = ', Drain';
+  } else if (disciplineName === 'Mudra of Brilliance') {
+    primaryDamageType = 'Electric';
+    primaryColor = '#ffe700';
+    primaryIcon = '/Electric.png';
+    critEffect = ', Blind';
+  } else if (disciplineName === 'Way of Quicksilver') {
+    primaryDamageType = 'Bludgeoning';
+    primaryColor = '#915927';
+    primaryIcon = '/Bludgeoning.png';
+    secondaryDamageType = 'Piercing';
+    secondaryColor = '#a6965f';
+    secondaryIcon = '/Piercing.png';
+    hasAlternativeDamage = true;
+    critEffect = ' or Chemical ●';
+    additionalEffect = ', immediately make one more Secondary Attack that can\'t Crit';
+  } else if (disciplineName === 'Way of Sublimation') {
+    primaryDamageType = 'Force';
+    primaryColor = '#516fff';
+    primaryIcon = '/Force.png';
+    critEffect = ' or Force ●, Sleep';
+  } else if (disciplineName === 'Asana of Heaviness') {
+    primaryDamageType = 'Neural';
+    primaryColor = '#a929ff';
+    primaryIcon = '/Neural.png';
+    critEffect = ', Drain';
+  } else if (disciplineName === 'Passive Asana') {
+    primaryDamageType = 'Electric';
+    primaryColor = '#ffe700';
+    primaryIcon = '/Electric.png';
+    critEffect = ', Blind';
+  } else if (disciplineName === 'Bane Prana') {
+    primaryDamageType = 'Bludgeoning';
+    primaryColor = '#915927';
+    primaryIcon = '/Bludgeoning.png';
+    secondaryDamageType = 'Piercing';
+    secondaryColor = '#a6965f';
+    secondaryIcon = '/Piercing.png';
+    hasAlternativeDamage = true;
+    critEffect = ' or Chemical ●';
+    additionalEffect = ', immediately make one more Secondary Attack that can\'t Crit';
+  } else if (disciplineName === 'Night Prana') {
+    primaryDamageType = 'Force';
+    primaryColor = '#516fff';
+    primaryIcon = '/Force.png';
+    critEffect = ' or Force ●, Sleep';
+  }
   
   return (
     <div style={{ fontSize: '0.875em', width: '100%', height: 'fit-content', maxHeight: '100%', overflow: 'hidden' }}>
@@ -55,8 +119,35 @@ export function generateContemplativeSecondaryAttackStatsJSX(
       </div>
       <div>
         <b><u>Target</u></b> Single<br />
-        <b><u>Damage</u></b> <b>[{damageDice}]</b>d<b>[{dieSize}]</b><br />
-        <b><u>Crit Effect</u></b> <b>[{damageDice}]</b>d<b>[{dieSize}]</b>
+        <b><u>Damage</u></b> <b>[{damageDice}]</b>d<b>[{dieSize}]</b> {primaryDamageType && (
+          <>
+            <b style={{ color: primaryColor }}>
+              <u style={{ display: 'inline-flex', alignItems: 'center' }}>
+                {primaryDamageType}
+                <img src={primaryIcon} alt={primaryDamageType} style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+              </u>
+            </b>
+            {hasAlternativeDamage && secondaryDamageType && (
+              <>
+                {' or '}
+                <b style={{ color: secondaryColor }}>
+                  <u style={{ display: 'inline-flex', alignItems: 'center' }}>
+                    {secondaryDamageType}
+                    <img src={secondaryIcon} alt={secondaryDamageType} style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+                  </u>
+                </b>
+              </>
+            )}
+          </>
+        )}<br />
+        <b><u>Crit Effect</u></b> <b>[{damageDice}]</b>d<b>[{dieSize}]</b> {primaryDamageType && (
+          <b style={{ color: primaryColor }}>
+            <u style={{ display: 'inline-flex', alignItems: 'center' }}>
+              {primaryDamageType}
+              <img src={primaryIcon} alt={primaryDamageType} style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+            </u>
+          </b>
+        )}{critEffect}{additionalEffect}
       </div>
     </div>
   );

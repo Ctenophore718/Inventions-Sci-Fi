@@ -32,12 +32,46 @@ export function calculateContemplativePrimaryAttackData(classCardDots?: boolean[
 }
 
 /**
- * Generate the primary attack stats for Contemplative
+ * Generate the primary attack stats for Contemplative Focus cards
  */
 export function generateContemplativePrimaryAttackStatsJSX(
-  classCardDots?: boolean[][]
+  classCardDots?: boolean[][],
+  focusName?: string
 ): React.ReactElement {
   const { repeatCount, dieSize, critThreshold } = calculateContemplativePrimaryAttackData(classCardDots);
+  
+  // Determine damage type, color, icon, and crit effect based on focus
+  let damageType = '';
+  let damageColor = '#000';
+  let damageIcon = '';
+  let critEffect = '';
+  
+  if (focusName === 'Ensnaring Hand Wraps') {
+    damageType = 'Bludgeoning';
+    damageColor = '#915927';
+    damageIcon = '/Bludgeoning.png';
+    critEffect = ', pull the target up to 5hx toward you';
+  } else if (focusName === 'Mala of Mind Darts') {
+    damageType = 'Neural';
+    damageColor = '#a929ff';
+    damageIcon = '/Neural.png';
+    critEffect = ', Blind';
+  } else if (focusName === 'Singing Bowl') {
+    damageType = 'Neural';
+    damageColor = '#a929ff';
+    damageIcon = '/Neural.png';
+    critEffect = ', Sleep';
+  } else if (focusName === 'Telekinetic Knuckles') {
+    damageType = 'Force';
+    damageColor = '#516fff';
+    damageIcon = '/Force.png';
+    critEffect = ', Bounce 3hx';
+  } else if (focusName === 'Viperfang Ring') {
+    damageType = 'Toxic';
+    damageColor = '#02b900';
+    damageIcon = '/Toxic.png';
+    critEffect = ', Spike (Toxic ●)';
+  }
   
   return (
     <div style={{ fontSize: '0.875em', width: '100%', height: 'fit-content', maxHeight: '100%', overflow: 'hidden' }}>
@@ -46,10 +80,23 @@ export function generateContemplativePrimaryAttackStatsJSX(
         <span style={{ textAlign: 'right', minWidth: '80px' }}><b><u>Crit</u></b> <b>[{critThreshold}]</b>+</span>
       </div>
       <div>
-        <b><u>Target</u></b> Single<br />
-        <b><u>Repeat</u></b> <b>[{repeatCount}]</b><br />
-        <b><u>Damage</u></b> 1d<b>[{dieSize}]</b><br />
-        <b><u>Crit Effect</u></b> 1d<b>[{dieSize}]</b>
+        <b><u>Target</u></b> Single, Repeat <b>[{repeatCount}]</b><br />
+        <b><u>Damage</u></b> 1d<b>[{dieSize}]</b> {damageType && (
+          <b style={{ color: damageColor }}>
+            <u style={{ display: 'inline-flex', alignItems: 'center' }}>
+              {damageType}
+              <img src={damageIcon} alt={damageType} style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+            </u>
+          </b>
+        )}<br />
+        <b><u>Crit Effect</u></b> 1d<b>[{dieSize}]</b> {damageType && (
+          <b style={{ color: damageColor }}>
+            <u style={{ display: 'inline-flex', alignItems: 'center' }}>
+              {damageType}
+              <img src={damageIcon} alt={damageType} style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+            </u>
+          </b>
+        )}{critEffect}
       </div>
     </div>
   );

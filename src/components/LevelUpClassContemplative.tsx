@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import type { CharacterSheet } from "../types/CharacterSheet";
 import { generatePsychosomaticHarmonyJSX } from "../utils/contemplativeFeature";
 import { generateSwiftReactionJSX } from "../utils/contemplativeTechnique";
@@ -27,11 +27,13 @@ type LevelUpClassContemplativeProps = {
   charClass: string;
   _subclass: string;
   onXpSpChange?: (xpDelta: number, spDelta: number) => void;
+  onCreditsChange?: (creditsDelta: number) => void;
   onAutoSave?: (updates: Partial<CharacterSheet>) => void;
   xpTotal: number;
   spTotal: number;
   xpSpent: number;
   spSpent: number;
+  credits: number;
   setXpSpent: (xp: number) => void;
   setSpSpent: (sp: number) => void;
   setNotice: (notice: string) => void;
@@ -42,11 +44,13 @@ const LevelUpClassContemplative: React.FC<LevelUpClassContemplativeProps> = ({
   charClass,
   _subclass, 
   onXpSpChange,
+  onCreditsChange,
   onAutoSave,
   xpTotal,
   spTotal, 
   xpSpent,
   spSpent,
+  credits,
   setXpSpent,
   setSpSpent,
   setNotice
@@ -59,6 +63,34 @@ const LevelUpClassContemplative: React.FC<LevelUpClassContemplativeProps> = ({
       }
       return defaultContemplativeDots.map(row => [...row]);
     });
+
+    // Local state for selected focuses
+    const [selectedFocuses, setSelectedFocuses] = useState<string[]>(() => {
+      return sheet?.focuses || [];
+    });
+    // Local state for pending focus selection
+    const [pendingFocus, setPendingFocus] = useState<string>("");
+
+    // Local state for selected disciplines (secondary attacks)
+    const [selectedDisciplines, setSelectedDisciplines] = useState<string[]>(() => {
+      return sheet?.disciplines || [];
+    });
+    // Local state for pending discipline selection
+    const [pendingDiscipline, setPendingDiscipline] = useState<string>("");
+
+    // Sync selectedFocuses with sheet data when it changes
+    useEffect(() => {
+      if (sheet?.focuses) {
+        setSelectedFocuses(sheet.focuses);
+      }
+    }, [sheet?.focuses]);
+
+    // Sync selectedDisciplines with sheet data when it changes
+    useEffect(() => {
+      if (sheet?.disciplines) {
+        setSelectedDisciplines(sheet.disciplines);
+      }
+    }, [sheet?.disciplines]);
   
     // Helper function to safely access classCardDots array
     const safeGetDotsArray = (index: number): boolean[] => {
@@ -452,8 +484,143 @@ const LevelUpClassContemplative: React.FC<LevelUpClassContemplativeProps> = ({
                 <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
                   <div style={{ fontWeight: 'bold', color: '#990000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Attack</u></div>
                   <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
-                    <b><i>Primary <span style={{ color: '#990000' }}>Attack</span>.</i></b><br />
-                    <i>Focuses.</i> 10hx Range, Single Target, 18+ Crit, 1d6 Damage.
+                    <div style={{ marginBottom: '4px' }}>
+                      <b><i><span style={{ color: '#000' }}>Primary</span> <span style={{ color: '#990000' }}>Attack</span></i></b>.
+                    </div>
+                    <div style={{ marginBottom: '4px', textAlign: 'left' }}>
+                      <select 
+                        style={{ 
+                          fontSize: '1em', 
+                          padding: '2px 8px', 
+                          borderRadius: '6px', 
+                          border: '1px solid #ccc', 
+                          background: '#fff', 
+                          color: '#222',
+                          fontWeight: 'bold',
+                          marginBottom: '4px',
+                          textAlign: 'left',
+                          minWidth: '180px'
+                        }} 
+                        defaultValue="Focuses"
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          if (value !== "Focuses") {
+                            setPendingFocus(value);
+                            e.target.value = "Focuses"; // Reset dropdown
+                          }
+                        }}
+                      >
+                        <option disabled style={{ fontWeight: 'bold' }}>Focuses</option>
+                        <option style={{ fontWeight: 'bold' }}>Ensnaring Hand Wraps</option>
+                        <option style={{ fontWeight: 'bold' }}>Mala of Mind Darts</option>
+                        <option style={{ fontWeight: 'bold' }}>Singing Bowl</option>
+                        <option style={{ fontWeight: 'bold' }}>Telekinetic Knuckles</option>
+                        <option style={{ fontWeight: 'bold' }}>Viperfang Ring</option>
+                      </select>
+                      {/* Buy/Add dialog for Focus selection */}
+                      {pendingFocus && (
+                        <div style={{ marginTop: '4px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                          <div style={{ fontWeight: 'bold' }}>
+                            {pendingFocus}
+                            <span style={{ color: '#bf9000', fontWeight: 'bold', marginLeft: '8px' }}>
+                              {pendingFocus === 'Ensnaring Hand Wraps' && '165c'}
+                              {pendingFocus === 'Mala of Mind Darts' && '155c'}
+                              {pendingFocus === 'Singing Bowl' && '165c'}
+                              {pendingFocus === 'Telekinetic Knuckles' && '150c'}
+                              {pendingFocus === 'Viperfang Ring' && '155c'}
+                            </span>
+                          </div>
+                          <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                            <button
+                            style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #1976d2', background: '#1976d2', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}
+                            onClick={() => {
+                              // Determine cost
+                              let cost = 0;
+                              if (pendingFocus === 'Ensnaring Hand Wraps') cost = 165;
+                              else if (pendingFocus === 'Mala of Mind Darts') cost = 155;
+                              else if (pendingFocus === 'Singing Bowl') cost = 165;
+                              else if (pendingFocus === 'Telekinetic Knuckles') cost = 150;
+                              else if (pendingFocus === 'Viperfang Ring') cost = 155;
+                              // Check credits
+                              if (credits < cost) {
+                                setNotice('Not enough credits!');
+                                return;
+                              }
+                              // Atomic operation: update both focuses and credits
+                              const newFocuses = [...selectedFocuses, pendingFocus];
+                              const newCredits = credits - cost;
+                              setSelectedFocuses(newFocuses);
+                              
+                              if (sheet && onAutoSave) {
+                                onAutoSave({ 
+                                  focuses: newFocuses,
+                                  credits: newCredits
+                                });
+                              }
+                              
+                              // Update the LevelUp component's credits state (no auto-save)
+                              onCreditsChange?.(-cost);
+                              setPendingFocus("");
+                            }}
+                          >Buy</button>
+                          <button
+                            style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #28a745', background: '#28a745', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}
+                            onClick={() => {
+                              const newFocuses = [...selectedFocuses, pendingFocus];
+                              setSelectedFocuses(newFocuses);
+                              
+                              if (sheet && onAutoSave) {
+                                onAutoSave({ 
+                                  focuses: newFocuses,
+                                  credits: credits // Preserve current credits
+                                });
+                              }
+                              
+                              setPendingFocus("");
+                            }}
+                          >Add</button>
+                          <button
+                            style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #aaa', background: '#eee', color: '#333', fontWeight: 'bold', cursor: 'pointer' }}
+                            onClick={() => setPendingFocus("")}
+                          >Cancel</button>
+                          </div>
+                        </div>
+                      )}
+                      <div style={{ marginTop: '2px' }}>
+                        {selectedFocuses.length > 0 && (
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginLeft: '8px' }}>
+                            {selectedFocuses.map((focus, idx) => (
+                              <span key={focus + idx} style={{ fontStyle: 'italic', display: 'flex', alignItems: 'center', background: '#f5f5f5', borderRadius: '6px', padding: '2px 8px' }}>
+                                {focus}
+                                <button
+                                  style={{ marginLeft: '6px', padding: '0 6px', borderRadius: '50%', border: 'none', background: '#d32f2f', color: 'white', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.9em' }}
+                                  title={`Remove ${focus}`}
+                                  onClick={() => {
+                                    const newFocuses = selectedFocuses.filter((_, i) => i !== idx);
+                                    setSelectedFocuses(newFocuses);
+                                    
+                                    if (sheet && onAutoSave) {
+                                      onAutoSave({ 
+                                        focuses: newFocuses
+                                      });
+                                    }
+                                  }}
+                                >×</button>
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <div style={{ fontSize: '1em', width: '100%', height: 'fit-content', maxHeight: '100%', overflow: 'hidden' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <span><b><u>Range</u></b> 10hx</span>
+                        <span style={{ textAlign: 'right', minWidth: '80px' }}><b><u>Crit</u></b> <b>[{18 - safeGetDotsArray(7).filter(Boolean).length}]</b>+</span>
+                      </div>
+                    </div>
+                    <b><u>Target</u></b> Single, Repeat <b>[{safeGetDotsArray(5).filter(Boolean).length}]</b><br />
+                    <b><u>Damage</u></b> 1d<b>[{6 + (safeGetDotsArray(6).filter(Boolean).length * 2)}]</b><br />
+                    <b><u>Crit Effect</u></b> 1d<b>[{6 + (safeGetDotsArray(6).filter(Boolean).length * 2)}]</b>
                   </div>
                   {/* XP progression table for Primary Attack */}
                   <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px' }}>
@@ -606,8 +773,168 @@ const LevelUpClassContemplative: React.FC<LevelUpClassContemplativeProps> = ({
                     </div>
                   </div>
                   <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', marginTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
-                    <b><i>Secondary <span style={{ color: '#990000' }}>Attack</span> (Cooldown 4).</i></b><br />
-                    <i>Disciplines.</i> 1hx Range, Single Target, 18+ Crit, 2d8 Damage.
+                    <div style={{ marginBottom: '4px' }}>
+                      <b><i><span style={{ color: '#000' }}>Secondary</span> <span style={{ color: '#990000' }}>Attack</span> (Cooldown <b>[{4 - safeGetDotsArray(11).filter(Boolean).length}]</b>)</i></b>.
+                    </div>
+                    <div style={{ marginBottom: '4px', textAlign: 'left' }}>
+                      <select 
+                        style={{ 
+                          fontSize: '1em', 
+                          padding: '2px 8px', 
+                          borderRadius: '6px', 
+                          border: '1px solid #ccc', 
+                          background: '#fff', 
+                          color: '#222',
+                          fontWeight: 'bold',
+                          marginBottom: '4px',
+                          textAlign: 'left',
+                          minWidth: '180px'
+                        }} 
+                        defaultValue="Disciplines"
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          if (value !== "Disciplines") {
+                            setPendingDiscipline(value);
+                            e.target.value = "Disciplines"; // Reset dropdown
+                          }
+                        }}
+                      >
+                        <option disabled style={{ fontWeight: 'bold' }}>Disciplines</option>
+                        {_subclass === 'Kinetic' && (
+                          <>
+                            <option style={{ fontWeight: 'bold' }}>Empty Mudra</option>
+                            <option style={{ fontWeight: 'bold' }}>Mudra of Brilliance</option>
+                          </>
+                        )}
+                        {_subclass === 'Mercurial' && (
+                          <>
+                            <option style={{ fontWeight: 'bold' }}>Way of Quicksilver</option>
+                            <option style={{ fontWeight: 'bold' }}>Way of Sublimation</option>
+                          </>
+                        )}
+                        {_subclass === 'Inertial' && (
+                          <>
+                            <option style={{ fontWeight: 'bold' }}>Asana of Heaviness</option>
+                            <option style={{ fontWeight: 'bold' }}>Passive Asana</option>
+                          </>
+                        )}
+                        {_subclass === 'Vectorial' && (
+                          <>
+                            <option style={{ fontWeight: 'bold' }}>Bane Prana</option>
+                            <option style={{ fontWeight: 'bold' }}>Night Prana</option>
+                          </>
+                        )}
+                      </select>
+                      {/* Buy/Add dialog for Discipline selection */}
+                      {pendingDiscipline && (
+                        <div style={{ marginTop: '4px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                          <div style={{ fontWeight: 'bold' }}>
+                            {pendingDiscipline}
+                            <span style={{ color: '#bf9000', fontWeight: 'bold', marginLeft: '8px' }}>
+                              {(pendingDiscipline === 'Empty Mudra' || pendingDiscipline === 'Mudra of Brilliance' || 
+                                pendingDiscipline === 'Asana of Heaviness' || pendingDiscipline === 'Passive Asana') && '210c'}
+                              {(pendingDiscipline === 'Way of Sublimation') && '235c'}
+                              {(pendingDiscipline === 'Way of Quicksilver' || pendingDiscipline === 'Bane Prana' || 
+                                pendingDiscipline === 'Night Prana') && '240c'}
+                            </span>
+                          </div>
+                          <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                            <button
+                            style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #1976d2', background: '#1976d2', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}
+                            onClick={() => {
+                              // Determine cost
+                              let cost = 0;
+                              if (pendingDiscipline === 'Empty Mudra' || pendingDiscipline === 'Mudra of Brilliance' || 
+                                  pendingDiscipline === 'Asana of Heaviness' || pendingDiscipline === 'Passive Asana') {
+                                cost = 210;
+                              } else if (pendingDiscipline === 'Way of Sublimation') {
+                                cost = 235;
+                              } else if (pendingDiscipline === 'Way of Quicksilver' || pendingDiscipline === 'Bane Prana' || 
+                                         pendingDiscipline === 'Night Prana') {
+                                cost = 240;
+                              }
+                              // Check credits
+                              if (credits < cost) {
+                                setNotice('Not enough credits!');
+                                return;
+                              }
+                              // Atomic operation: update both disciplines and credits
+                              const newDisciplines = [...selectedDisciplines, pendingDiscipline];
+                              const newCredits = credits - cost;
+                              setSelectedDisciplines(newDisciplines);
+                              
+                              if (sheet && onAutoSave) {
+                                onAutoSave({ 
+                                  disciplines: newDisciplines,
+                                  credits: newCredits
+                                });
+                              }
+                              
+                              // Update the LevelUp component's credits state (no auto-save)
+                              onCreditsChange?.(-cost);
+                              setPendingDiscipline("");
+                            }}
+                          >Buy</button>
+                          <button
+                            style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #28a745', background: '#28a745', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}
+                            onClick={() => {
+                              const newDisciplines = [...selectedDisciplines, pendingDiscipline];
+                              setSelectedDisciplines(newDisciplines);
+                              
+                              if (sheet && onAutoSave) {
+                                onAutoSave({ 
+                                  disciplines: newDisciplines,
+                                  credits: credits // Preserve current credits
+                                });
+                              }
+                              
+                              setPendingDiscipline("");
+                            }}
+                          >Add</button>
+                          <button
+                            style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #aaa', background: '#eee', color: '#333', fontWeight: 'bold', cursor: 'pointer' }}
+                            onClick={() => setPendingDiscipline("")}
+                          >Cancel</button>
+                          </div>
+                        </div>
+                      )}
+                      <div style={{ marginTop: '2px' }}>
+                        {selectedDisciplines.length > 0 && (
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginLeft: '8px' }}>
+                            {selectedDisciplines.map((discipline, idx) => (
+                              <span key={discipline + idx} style={{ fontStyle: 'italic', display: 'flex', alignItems: 'center', background: '#f5f5f5', borderRadius: '6px', padding: '2px 8px' }}>
+                                {discipline}
+                                <button
+                                  style={{ marginLeft: '6px', padding: '0 6px', borderRadius: '50%', border: 'none', background: '#d32f2f', color: 'white', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.9em' }}
+                                  title={`Remove ${discipline}`}
+                                  onClick={() => {
+                                    const newDisciplines = selectedDisciplines.filter((_, i) => i !== idx);
+                                    setSelectedDisciplines(newDisciplines);
+                                    
+                                    if (sheet && onAutoSave) {
+                                      onAutoSave({ 
+                                        disciplines: newDisciplines
+                                      });
+                                    }
+                                  }}
+                                >×</button>
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+
+                    <div style={{ fontSize: '1em', width: '100%', height: 'fit-content', maxHeight: '100%', overflow: 'hidden' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <span><b><u>Range</u></b> 10hx</span>
+                        <span style={{ textAlign: 'right', minWidth: '80px' }}><b><u>Crit</u></b> <b>[{18 - safeGetDotsArray(10).filter(Boolean).length}]</b>+</span>
+                      </div>
+                    </div>
+                    <u><b>Target</b></u> Single<br />
+                    <u><b>Damage</b></u> <b>[{2 + safeGetDotsArray(9).filter(Boolean).length}]</b>d<b>[{8 + (safeGetDotsArray(8).filter(Boolean).length * 2)}]</b><br />
+                    <u><b>Crit Effect</b></u> <b>[{2 + safeGetDotsArray(9).filter(Boolean).length}]</b>d<b>[{8 + (safeGetDotsArray(8).filter(Boolean).length * 2)}]</b>
                   </div>
                   {/* XP progression table for Secondary Attack */}
                   <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px' }}>

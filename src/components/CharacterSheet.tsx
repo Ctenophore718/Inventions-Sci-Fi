@@ -1149,6 +1149,17 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
       );
     }
     
+    // Add Focuses for Contemplative class
+    if (charClass === 'Contemplative') {
+      attacks.push(
+        { name: 'Ensnaring Hand Wraps', type: 'Focus', cost: 165 },
+        { name: 'Mala of Mind Darts', type: 'Focus', cost: 155 },
+        { name: 'Singing Bowl', type: 'Focus', cost: 165 },
+        { name: 'Telekinetic Knuckles', type: 'Focus', cost: 150 },
+        { name: 'Viperfang Ring', type: 'Focus', cost: 155 }
+      );
+    }
+    
     return attacks;
   };
 
@@ -1226,6 +1237,35 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
       );
     }
     
+    // Add Disciplines for Contemplative subclasses
+    if (subclass === 'Kinetic') {
+      attacks.push(
+        { name: 'Empty Mudra', type: 'Discipline', cost: 210 },
+        { name: 'Mudra of Brilliance', type: 'Discipline', cost: 210 }
+      );
+    }
+    
+    if (subclass === 'Mercurial') {
+      attacks.push(
+        { name: 'Way of Quicksilver', type: 'Discipline', cost: 240 },
+        { name: 'Way of Sublimation', type: 'Discipline', cost: 235 }
+      );
+    }
+    
+    if (subclass === 'Inertial') {
+      attacks.push(
+        { name: 'Asana of Heaviness', type: 'Discipline', cost: 210 },
+        { name: 'Passive Asana', type: 'Discipline', cost: 210 }
+      );
+    }
+    
+    if (subclass === 'Vectorial') {
+      attacks.push(
+        { name: 'Bane Prana', type: 'Discipline', cost: 240 },
+        { name: 'Night Prana', type: 'Discipline', cost: 240 }
+      );
+    }
+    
     return attacks;
   };
 
@@ -1261,6 +1301,12 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
           rifles: newRifles,
           credits: credits - cost
         };        
+      } else if (type === 'Focus') {
+        const newFocuses = [...(sheet.focuses || []), attackName];
+        partialUpdate = { 
+          focuses: newFocuses,
+          credits: credits - cost
+        };
       } else {
         return;
       }
@@ -1292,6 +1338,11 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
         const newRifles = [...(sheet.rifles || []), attackName];
         partialUpdate = { 
           rifles: newRifles
+        };
+      } else if (type === 'Focus') {
+        const newFocuses = [...(sheet.focuses || []), attackName];
+        partialUpdate = { 
+          focuses: newFocuses
         };
       } else {
         return;
@@ -1364,6 +1415,12 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
           blasters: newBlasters,
           credits: credits - cost
         };
+      } else if (type === 'Discipline') {
+        const newDisciplines = [...(sheet.disciplines || []), attackName];
+        partialUpdate = { 
+          disciplines: newDisciplines,
+          credits: credits - cost
+        };
       } else {
         return;
       }
@@ -1421,6 +1478,11 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
         const newBlasters = [...(sheet.blasters || []), attackName];
         partialUpdate = { 
           blasters: newBlasters
+        };
+      } else if (type === 'Discipline') {
+        const newDisciplines = [...(sheet.disciplines || []), attackName];
+        partialUpdate = { 
+          disciplines: newDisciplines
         };
       } else {
         return;
@@ -2616,10 +2678,10 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                     textAlign: 'left',
                     minWidth: '180px'
                   }}
-                  value={pendingAttack || (charClass === 'Chemist' ? 'Dart Guns' : charClass === 'Coder' ? 'Lenses' : charClass === 'Commander' ? 'Rifles' : 'Select Primary Attack')}
+                  value={pendingAttack || (charClass === 'Chemist' ? 'Dart Guns' : charClass === 'Coder' ? 'Lenses' : charClass === 'Commander' ? 'Rifles' : charClass === 'Contemplative' ? 'Focuses' : 'Select Primary Attack')}
                   onChange={(e) => {
                     const value = e.target.value;
-                    if (value !== 'Dart Guns' && value !== 'Lenses' && value !== 'Rifles' && value !== 'Select Primary Attack') {
+                    if (value !== 'Dart Guns' && value !== 'Lenses' && value !== 'Rifles' && value !== 'Focuses' && value !== 'Select Primary Attack') {
                       setPendingAttack(value);
                     }
                   }}
@@ -2647,7 +2709,17 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                       <option style={{ fontWeight: 'bold' }}>Sapper Gun</option>
                     </>
                   )}
-                  {charClass !== 'Chemist' && charClass !== 'Coder' && charClass !== 'Commander' && (
+                  {charClass === 'Contemplative' && (
+                    <>
+                      <option disabled style={{ fontWeight: 'bold' }}>Focuses</option>
+                      <option style={{ fontWeight: 'bold' }}>Ensnaring Hand Wraps</option>
+                      <option style={{ fontWeight: 'bold' }}>Mala of Mind Darts</option>
+                      <option style={{ fontWeight: 'bold' }}>Singing Bowl</option>
+                      <option style={{ fontWeight: 'bold' }}>Telekinetic Knuckles</option>
+                      <option style={{ fontWeight: 'bold' }}>Viperfang Ring</option>
+                    </>
+                  )}
+                  {charClass !== 'Chemist' && charClass !== 'Coder' && charClass !== 'Commander' && charClass !== 'Contemplative' && (
                     <option disabled style={{ fontWeight: 'bold' }}>Select Primary Attack</option>
                   )}
                 </select>
@@ -2766,6 +2838,29 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                       ))}
                     </div>
                   )}
+                  {(sheet?.focuses && sheet.focuses.length > 0) && (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginLeft: '8px' }}>
+                      {sheet?.focuses?.map((focus, idx) => (
+                        <span key={focus + idx + 'focus'} style={{ fontStyle: 'italic', display: 'flex', alignItems: 'center', background: '#f5f5f5', borderRadius: '6px', padding: '2px 8px' }}>
+                          {focus}
+                          <button
+                            style={{ marginLeft: '6px', padding: '0 6px', borderRadius: '50%', border: 'none', background: '#d32f2f', color: 'white', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.9em' }}
+                            title={`Remove ${focus}`}
+                            onClick={() => {
+                              if (sheet) {
+                                const newFocuses = sheet.focuses?.filter((_, i) => i !== idx) || [];
+                                const updatedSheet = { 
+                                  ...sheet, 
+                                  focuses: newFocuses
+                                };
+                                handleAutoSave(updatedSheet);
+                              }
+                            }}
+                          >×</button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -2789,10 +2884,10 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                     textAlign: 'left',
                     minWidth: '180px'
                   }}
-                  value={pendingSecondaryAttack || (charClass === 'Coder' ? 'Algorithms' : subclass === 'Anatomist' ? 'Super Serums' : subclass === 'Grenadier' ? 'Grenades' : subclass === 'Necro' ? 'Chem Zombies' : subclass === 'Poisoner' ? 'Noxious Fumes' : subclass === 'Beguiler' ? 'Whips' : subclass === 'Galvanic' ? 'Sabres' : subclass === 'Tactician' ? 'Flares' : subclass === 'Tyrant' ? 'Blasters' : 'Select Secondary Attack')}
+                  value={pendingSecondaryAttack || (charClass === 'Coder' ? 'Algorithms' : subclass === 'Anatomist' ? 'Super Serums' : subclass === 'Grenadier' ? 'Grenades' : subclass === 'Necro' ? 'Chem Zombies' : subclass === 'Poisoner' ? 'Noxious Fumes' : subclass === 'Beguiler' ? 'Whips' : subclass === 'Galvanic' ? 'Sabres' : subclass === 'Tactician' ? 'Flares' : subclass === 'Tyrant' ? 'Blasters' : (subclass === 'Kinetic' || subclass === 'Mercurial' || subclass === 'Inertial' || subclass === 'Vectorial') ? 'Disciplines' : 'Select Secondary Attack')}
                   onChange={(e) => {
                     const value = e.target.value;
-                    if (value !== 'Algorithms' && value !== 'Super Serums' && value !== 'Grenades' && value !== 'Chem Zombies' && value !== 'Noxious Fumes' && value !== 'Whips' && value !== 'Sabres' && value !== 'Flares' && value !== 'Blasters' && value !== 'Select Secondary Attack') {
+                    if (value !== 'Algorithms' && value !== 'Super Serums' && value !== 'Grenades' && value !== 'Chem Zombies' && value !== 'Noxious Fumes' && value !== 'Whips' && value !== 'Sabres' && value !== 'Flares' && value !== 'Blasters' && value !== 'Disciplines' && value !== 'Select Secondary Attack') {
                       setPendingSecondaryAttack(value);
                     }
                   }}
@@ -2859,7 +2954,35 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                       <option style={{ fontWeight: 'bold' }}>Shock Gun</option>
                     </>
                   )}
-                  {charClass !== 'Coder' && subclass !== 'Anatomist' && subclass !== 'Grenadier' && subclass !== 'Necro' && subclass !== 'Poisoner' && subclass !== 'Beguiler' && subclass !== 'Galvanic' && subclass !== 'Tactician' && subclass !== 'Tyrant' && (
+                  {subclass === 'Kinetic' && (
+                    <>
+                      <option disabled style={{ fontWeight: 'bold' }}>Disciplines</option>
+                      <option style={{ fontWeight: 'bold' }}>Empty Mudra</option>
+                      <option style={{ fontWeight: 'bold' }}>Mudra of Brilliance</option>
+                    </>
+                  )}
+                  {subclass === 'Mercurial' && (
+                    <>
+                      <option disabled style={{ fontWeight: 'bold' }}>Disciplines</option>
+                      <option style={{ fontWeight: 'bold' }}>Way of Quicksilver</option>
+                      <option style={{ fontWeight: 'bold' }}>Way of Sublimation</option>
+                    </>
+                  )}
+                  {subclass === 'Inertial' && (
+                    <>
+                      <option disabled style={{ fontWeight: 'bold' }}>Disciplines</option>
+                      <option style={{ fontWeight: 'bold' }}>Asana of Heaviness</option>
+                      <option style={{ fontWeight: 'bold' }}>Passive Asana</option>
+                    </>
+                  )}
+                  {subclass === 'Vectorial' && (
+                    <>
+                      <option disabled style={{ fontWeight: 'bold' }}>Disciplines</option>
+                      <option style={{ fontWeight: 'bold' }}>Bane Prana</option>
+                      <option style={{ fontWeight: 'bold' }}>Night Prana</option>
+                    </>
+                  )}
+                  {charClass !== 'Coder' && subclass !== 'Anatomist' && subclass !== 'Grenadier' && subclass !== 'Necro' && subclass !== 'Poisoner' && subclass !== 'Beguiler' && subclass !== 'Galvanic' && subclass !== 'Tactician' && subclass !== 'Tyrant' && subclass !== 'Kinetic' && subclass !== 'Mercurial' && subclass !== 'Inertial' && subclass !== 'Vectorial' && (
                     <option disabled style={{ fontWeight: 'bold' }}>Select Secondary Attack</option>
                   )}
                 </select>
@@ -3107,6 +3230,29 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                                 const updatedSheet = { 
                                   ...sheet, 
                                   blasters: newBlasters
+                                };
+                                handleAutoSave(updatedSheet);
+                              }
+                            }}
+                          >×</button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  {(sheet?.disciplines && sheet.disciplines.length > 0) && (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginLeft: '8px' }}>
+                      {sheet?.disciplines?.map((discipline, idx) => (
+                        <span key={discipline + idx + 'discipline'} style={{ fontStyle: 'italic', display: 'flex', alignItems: 'center', background: '#f5f5f5', borderRadius: '6px', padding: '2px 8px' }}>
+                          {discipline}
+                          <button
+                            style={{ marginLeft: '6px', padding: '0 6px', borderRadius: '50%', border: 'none', background: '#d32f2f', color: 'white', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.9em' }}
+                            title={`Remove ${discipline}`}
+                            onClick={() => {
+                              if (sheet) {
+                                const newDisciplines = sheet.disciplines?.filter((_, i) => i !== idx) || [];
+                                const updatedSheet = { 
+                                  ...sheet, 
+                                  disciplines: newDisciplines
                                 };
                                 handleAutoSave(updatedSheet);
                               }

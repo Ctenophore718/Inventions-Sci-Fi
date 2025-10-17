@@ -21,6 +21,7 @@ import { generateSwiftReactionDescriptionJSX } from "../utils/contemplativeTechn
 import { CardsChemistAttacks } from "./CardsChemistAttacks";
 import { CardsCoderAttacks } from "./CardsCoderAttacks";
 import { CardsCommanderAttacks } from "./CardsCommanderAttacks";
+import { CardsContemplativeAttacks } from "./CardsContemplativeAttacks";
 import { calculateChemistFeatureData } from "../utils/chemistFeature";
 
 type CardsProps = {
@@ -1140,6 +1141,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
 
         {/* Commander Attack Cards */}
         {charClass === 'Commander' && <CardsCommanderAttacks sheet={localSheet} subclass={subclass} />}
+
+        {/* Contemplative Attack Cards */}
+        {charClass === 'Contemplative' && <CardsContemplativeAttacks sheet={localSheet} subclass={subclass} />}
 
       </div>
       
