@@ -17,6 +17,7 @@ import { generateSeduceDescriptionJSX } from "../utils/beguilerTechnique";
 import { generateBolsteringOratoryDescriptionJSX, calculateGalvanicTechniqueData } from "../utils/galvanicTechnique";
 import { calculateTacticianTechniqueData } from "../utils/tacticianTechnique";
 import { generateTyrannizeDescriptionJSX, calculateTyrantTechniqueData } from "../utils/tyrantTechnique";
+import { generateSwiftReactionDescriptionJSX } from "../utils/contemplativeTechnique";
 import { CardsChemistAttacks } from "./CardsChemistAttacks";
 import { CardsCoderAttacks } from "./CardsCoderAttacks";
 import { CardsCommanderAttacks } from "./CardsCommanderAttacks";
@@ -540,17 +541,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, charCla
                       {generateCombatDelegationCardJSX(localSheet?.classCardDots)}
                     </div>
                   ) : charClass === 'Contemplative' ? (
-                    (() => {
-                      let hx = 3;
-                      if (localSheet && Array.isArray(localSheet.classCardDots) && Array.isArray(localSheet.classCardDots[3])) {
-                        hx = 3 + localSheet.classCardDots[3].filter(Boolean).length;
-                      }
-                      return (
-                        <>
-                          Until the beginning of the next round, you and all allies within <b>[{hx}]</b>hx can <b><i style={{ color: '#38761d' }}>Move</i></b> their <b><i style={{ color: '#38761d' }}>Speed</i></b> whenever they take Damage from an <b><i><span style={{ color: '#990000' }}>Attack</span></i></b>. You can <b><i style={{ color: '#351c75' }}>Strike</i></b> during this <b><i style={{ color: '#38761d' }}>Movement</i></b>.
-                        </>
-                      );
-                    })()
+                    <div style={{ display: 'flex', alignItems: 'flex-start', flexWrap: 'wrap' }}>
+                      {generateSwiftReactionDescriptionJSX(localSheet?.classCardDots)}
+                    </div>
                   ) : charClass === 'Elementalist' ? (() => {
                     // Elementalist Commune card logic
                     // If classCardDots[2][0] (Triple Damage dice) is selected, show [triple] instead of [double]

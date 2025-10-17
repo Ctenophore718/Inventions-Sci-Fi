@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import type { CharacterSheet } from "../types/CharacterSheet";
+import { generatePsychosomaticHarmonyJSX } from "../utils/contemplativeFeature";
+import { generateSwiftReactionJSX } from "../utils/contemplativeTechnique";
 
 
 
@@ -167,9 +169,7 @@ const LevelUpClassContemplative: React.FC<LevelUpClassContemplativeProps> = ({
                 <div style={{ color: '#0b5394', fontWeight: 'bold', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '8px' }}>
                   <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32, fontFamily: 'Arial, Helvetica, sans-serif' }}>
                     <div style={{ fontWeight: 'bold', color: '#0b5394', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Feature</u></div>
-                    <span style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
-                      <b><i style={{ color: '#116372', fontSize: '1em' }}>Psychosomatic Harmony.</i></b> <span style={{ fontSize: '1em', fontWeight: 400 }}>You are <i>Resistant</i> to <b><u style={{ color: '#a929ff', display: 'inline-flex', alignItems: 'center' }}>Neural<img src="/Neural.png" alt="Neural" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> and can <b><i style={{ color: '#351c75' }}>Strike</i></b> one extra time per turn.</span>
-                    </span>
+                    {generatePsychosomaticHarmonyJSX(classCardDots)}
                   </span>
                 </div>
                 {/* XP progression table - interactive dots */}
@@ -339,7 +339,7 @@ const LevelUpClassContemplative: React.FC<LevelUpClassContemplativeProps> = ({
                 <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
                   <div style={{ fontWeight: 'bold', color: '#bf9000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Technique</u></div>
                   <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
-                    <i style={{ color: '#116372' }}><b>Swift Reaction</b> (Cooldown 4).</i> Until the beginning of the next round, you and all allies within 3hx can <b><i style={{ color: '#38761d' }}>Move</i></b> their <b><i style={{ color: '#38761d' }}>Speed</i></b> whenever they take Damage from an <b><i><span style={{ color: '#990000' }}>Attack</span></i></b>. You can <b><i style={{ color: '#351c75' }}>Strike</i></b> during this <b><i style={{ color: '#38761d' }}>Movement</i></b>.
+                    {generateSwiftReactionJSX(classCardDots)}
                   </div>
                   {/* XP progression table for Technique */}
                   <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px' }}>

@@ -22,6 +22,7 @@ import { generateLoyalServantsJSX } from "../utils/beguilerFeature";
 import { generateInspiringPresenceJSX } from "../utils/galvanicFeature";
 import { generateTacticalOffensiveJSX } from "../utils/tacticianFeature";
 import { generateFearlessJSX } from "../utils/tyrantFeature";
+import { generatePsychosomaticHarmonyJSX } from "../utils/contemplativeFeature";
 
 
 type Props = {
@@ -226,14 +227,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
     </span>
   );
   const commanderFeatureJSX = generateStaySharpJSX(sheet?.classCardDots);
-  const contemplativeFeatureJSX = (
-    <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#116372' }}>Psychosomatic Harmony.</i></b> You are <b>[resistant]</b> to <b><u style={{ color: '#a929ff', display: 'inline-flex', alignItems: 'center' }}>
-        Neural
-        <img src="/Neural.png" alt="Neural" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
-      </u></b> and can <b><i style={{ color: '#351c75' }}>Strike</i></b> <b>[{sheet?.classCardDots?.[1]?.[0] ? 2 : 1}]</b> extra time per turn.
-    </span>
-  );
+  const contemplativeFeatureJSX = generatePsychosomaticHarmonyJSX(sheet?.classCardDots);
   const devoutFeatureJSX = (
     <span style={{ color: '#000', fontWeight: 400 }}>
       <b><i style={{ color: '#6b1172' }}>Blood Trade.</i></b> Whenever you take Damage, you gain +<b>[{1 + (charClass === 'Devout' && sheet?.classCardDots?.[0] ? sheet.classCardDots[0].filter(Boolean).length : 0)}]</b>d6 Damage on your next <b><i><span style={{ color: '#351c75' }}>Strike</span></i></b> or <b><i><span style={{ color: '#990000' }}>Attack</span></i></b>. The Damage type matches your next <b><i><span style={{ color: '#351c75' }}>Strike</span></i></b>  or <b><i><span style={{ color:'#990000' }}>Attack</span></i></b> and doesn’t stack if you are Damaged multiple times.   
