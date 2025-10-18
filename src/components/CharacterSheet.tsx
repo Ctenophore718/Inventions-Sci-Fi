@@ -24,6 +24,7 @@ import { generateTacticalOffensiveJSX } from "../utils/tacticianFeature";
 import { generateFearlessJSX } from "../utils/tyrantFeature";
 import { generatePsychosomaticHarmonyJSX } from "../utils/contemplativeFeature";
 import { generateTelekineticShieldJSX } from "../utils/inertialFeature";
+import { generateInertialStrikeJSX, generateInertialStrikeDamageJSX, generateInertialStrikeEffectsJSX } from "../utils/inertialStrike";
 
 
 type Props = {
@@ -1548,7 +1549,9 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                     if (subclass === "Galvanic" && skill === "Athletics") return "rgba(111,206,31,0.5)";
                     if (subclass === "Tactician" && skill === "Awareness") return "rgba(206,195,31,0.5)";
                     if (subclass === "Tyrant" && skill === "Intimidation") return "rgba(206,31,195,0.5)";
-                    
+                    if (subclass === "Tyrant" && skill === "Intimidation") return "rgba(206,31,195,0.5)";
+                    if (subclass === "Inertial" && skill === "Diplomacy") return "rgba(28,148,94,0.5)";
+
                     return null;
                   };
                   
@@ -2353,6 +2356,10 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                   <img src="/Neural.png" alt="Neural" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
                 </span>
               </span>
+            ) : subclass === 'Inertial' ? (
+              <span style={{ fontWeight: 'bold', fontFamily: 'inherit', color: '#000', marginLeft: 4, display: 'flex', alignItems: 'center' }}>
+                {generateInertialStrikeDamageJSX(sheet)}
+              </span>
             ) : <span style={{ fontWeight: 'bold', fontFamily: 'inherit', color: '#000', marginLeft: 4 }}>{strikeDamage}</span>}
           </div>
           <div className={styles.horizontalLabel} style={{ color: '#351c75', fontWeight: 'bold' }}>Multi Strike <span style={{ color: '#000' }}>{
@@ -2388,6 +2395,8 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                     ? <span style={{ color: '#000', fontWeight: 'normal' }}><i>AoE</i> <b>[{((sheet?.subclassProgressionDots as any)?.galvanicStrikeAoEDots?.filter(Boolean).length || 0)}]</b>hx-Radius</span>
                   : (subclass === 'Tyrant' && (sheet?.subclassProgressionDots as any)?.tyrantStrikeDemorizeDots?.[0])
                     ? <span style={{ color: '#000', fontWeight: 'normal' }}><b><i>Demoralize</i></b></span>
+                  : (subclass === 'Inertial')
+                    ? generateInertialStrikeEffectsJSX(sheet) || strikeEffects
                     : strikeEffects
               }
           </div>
@@ -2654,6 +2663,13 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
             <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
               <span>
                 <b><i style={{ color: '#ce1f1f' }}>Fearmonger.</i></b> <span style={{ color: '#000' }}>Your presence automatically sets others on alert, and those weaker of heart are downright fearful of you. Gain an advantage on skill rolls related to any social interactions involving the use of fear.</span>
+              </span>
+            </div>
+          )}
+            {subclass === 'Inertial' && (sheet?.subclassProgressionDots as any)?.inertialPerksSkillsDots?.[0] && (
+            <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <span>
+                <b><i style={{ color: '#1c945e' }}>De-escalator.</i></b> <span style={{ color: '#000' }}>Your discipline extends beyond the battlefield and into the social realm. You can shut down conversations, rampant emotions or other problematic situations before they get a chance to explode into violence. Gain an advantage on related skills.</span>
               </span>
             </div>
           )}
