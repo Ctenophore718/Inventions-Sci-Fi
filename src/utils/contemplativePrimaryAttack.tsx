@@ -1,9 +1,10 @@
 import React from 'react';
 
 export interface ContemplativePrimaryAttackData {
-  repeatCount: number;
+  repeatDots: number;
   dieSizeDots: number;
   critDots: number;
+  repeatCount: number;
   dieSize: number;
   critThreshold: number;
 }
@@ -14,21 +15,17 @@ export interface ContemplativePrimaryAttackData {
 export function calculateContemplativePrimaryAttackData(classCardDots?: boolean[][]): ContemplativePrimaryAttackData {
   // Get repeat dots (array index 5)
   const repeatDots = classCardDots?.[5]?.filter(Boolean).length || 0;
-  const repeatCount = 1 + repeatDots; // Base 1 + repeat dots
-  
   // Get die size dots (array index 6)
   const dieSizeDots = classCardDots?.[6]?.filter(Boolean).length || 0;
-  
   // Get crit dots in Primary Attack section (array index 7)
   const critDots = classCardDots?.[7]?.filter(Boolean).length || 0;
-  
+  // Calculate repeat count: base 1 + repeat dots
+  const repeatCount = 1 + repeatDots;
   // Calculate die size: base 6, +2 per dot
   const dieSize = 6 + dieSizeDots * 2;
-  
   // Calculate crit threshold: 18 minus crit dots
   const critThreshold = 18 - critDots;
-  
-  return { repeatCount, dieSizeDots, critDots, dieSize, critThreshold };
+  return { repeatDots, dieSizeDots, critDots, repeatCount, dieSize, critThreshold };
 }
 
 /**
@@ -36,42 +33,11 @@ export function calculateContemplativePrimaryAttackData(classCardDots?: boolean[
  */
 export function generateContemplativePrimaryAttackStatsJSX(
   classCardDots?: boolean[][],
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _cost?: number,
   focusName?: string
 ): React.ReactElement {
   const { repeatCount, dieSize, critThreshold } = calculateContemplativePrimaryAttackData(classCardDots);
-  
-  // Determine damage type, color, icon, and crit effect based on focus
-  let damageType = '';
-  let damageColor = '#000';
-  let damageIcon = '';
-  let critEffect = '';
-  
-  if (focusName === 'Ensnaring Hand Wraps') {
-    damageType = 'Bludgeoning';
-    damageColor = '#915927';
-    damageIcon = '/Bludgeoning.png';
-    critEffect = ', pull the target up to 5hx toward you';
-  } else if (focusName === 'Mala of Mind Darts') {
-    damageType = 'Neural';
-    damageColor = '#a929ff';
-    damageIcon = '/Neural.png';
-    critEffect = ', Blind';
-  } else if (focusName === 'Singing Bowl') {
-    damageType = 'Neural';
-    damageColor = '#a929ff';
-    damageIcon = '/Neural.png';
-    critEffect = ', Sleep';
-  } else if (focusName === 'Telekinetic Knuckles') {
-    damageType = 'Force';
-    damageColor = '#516fff';
-    damageIcon = '/Force.png';
-    critEffect = ', Bounce 3hx';
-  } else if (focusName === 'Viperfang Ring') {
-    damageType = 'Toxic';
-    damageColor = '#02b900';
-    damageIcon = '/Toxic.png';
-    critEffect = ', Spike (Toxic ●)';
-  }
   
   return (
     <div style={{ fontSize: '0.875em', width: '100%', height: 'fit-content', maxHeight: '100%', overflow: 'hidden' }}>
@@ -81,23 +47,67 @@ export function generateContemplativePrimaryAttackStatsJSX(
       </div>
       <div>
         <b><u>Target</u></b> Single, Repeat <b>[{repeatCount}]</b><br />
-        <b><u>Damage</u></b> 1d<b>[{dieSize}]</b> {damageType && (
-          <b style={{ color: damageColor }}>
-            <u style={{ display: 'inline-flex', alignItems: 'center' }}>
-              {damageType}
-              <img src={damageIcon} alt={damageType} style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
-            </u>
-          </b>
-        )}<br />
-        <b><u>Crit Effect</u></b> 1d<b>[{dieSize}]</b> {damageType && (
-          <b style={{ color: damageColor }}>
-            <u style={{ display: 'inline-flex', alignItems: 'center' }}>
-              {damageType}
-              <img src={damageIcon} alt={damageType} style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
-            </u>
-          </b>
-        )}{critEffect}
+        {focusName === 'Ensnaring Hand Wraps' ? (
+          <>
+            <b><u>Damage</u></b> 1d<b>[{dieSize}]</b> <b><u style={{ color: '#516fff', display: 'inline-flex', alignItems: 'center' }}>
+            Force<img src="/Force.png" alt="Force" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b><br />
+            <b><u>Crit Effect</u></b> 1d<b>[{dieSize}]</b> <b><u style={{ color: '#516fff', display: 'inline-flex', alignItems: 'center' }}>
+            Force<img src="/Force.png" alt="Force" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} /></u></b>, pull the 
+            <span style={{ display: 'block', textAlign: 'right' }}>target up to 5hx toward you<br /></span>
+
+          </>
+        ) : focusName === 'Mala of Mind Darts' ? (
+          <>
+            <b><u>Damage</u></b> 1d<b>[{dieSize}]</b> <b><u style={{ color: '#a929ff', display: 'inline-flex', alignItems: 'center' }}>
+            Neural<img src="/Neural.png" alt="Neural" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b><br />
+            <b><u>Crit Effect</u></b> 1d<b>[{dieSize}]</b> <b><u style={{ color: '#a929ff', display: 'inline-flex', alignItems: 'center' }}>
+            Neural<img src="/Neural.png" alt="Neural" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} /></u></b>, <b><i>Blind</i></b>
+          </>
+        ) : focusName === 'Singing Bowl' ? (
+          <>
+            <b><u>Damage</u></b> 1d<b>[{dieSize}]</b> <b><u style={{ color: '#a929ff', display: 'inline-flex', alignItems: 'center' }}>
+            Neural<img src="/Neural.png" alt="Neural" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b><br />
+            <b><u>Crit Effect</u></b> 1d<b>[{dieSize}]</b> <b><u style={{ color: '#a929ff', display: 'inline-flex', alignItems: 'center' }}>
+            Neural<img src="/Neural.png" alt="Neural" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} /></u></b>, <b><i>Sleep</i></b>
+          </>
+        ) : focusName === 'Telekinetic Knuckles' ? (
+          <>
+            <b><u>Damage</u></b> 1d<b>[{dieSize}]</b> <b><u style={{ color: '#516fff', display: 'inline-flex', alignItems: 'center' }}>
+            Force<img src="/Force.png" alt="Force" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b><br />
+            <b><u>Crit Effect</u></b> 1d<b>[{dieSize}]</b> <b><u style={{ color: '#516fff', display: 'inline-flex', alignItems: 'center' }}>
+            Force<img src="/Force.png" alt="Force" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} /></u></b>, <b><i>Bounce</i></b> 3hx
+          </>
+        ) : focusName === 'Viperfang Ring' ? (
+          <>
+            <b><u>Damage</u></b> 1d<b>[{dieSize}]</b> <b><u style={{ color: '#02b900', display: 'inline-flex', alignItems: 'center' }}>
+            Toxic<img src="/Toxic.png" alt="Toxic" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b><br />
+            <b><u>Crit Effect</u></b> 1d<b>[{dieSize}]</b> <b><u style={{ color: '#02b900', display: 'inline-flex', alignItems: 'center' }}>
+            Toxic<img src="/Toxic.png" alt="Toxic" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} /></u></b>, <b><i>Spike</i></b> 
+            <span style={{ display: 'block', textAlign: 'right' }}><b>(<u style={{ color: '#02b900', display: 'inline-flex', alignItems: 'center' }}>
+            Toxic<img src="/Toxic.png" alt="Toxic" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} /></u>)</b><br /></span>
+          </>
+        ) : (
+          <>
+            <b><u>Damage</u></b> 1d<b>[{dieSize}]</b> <br />
+            <b><u>Crit Effect</u></b> 1d<b>[{dieSize}]</b>
+          </>
+        )}
       </div>
     </div>
   );
 }
+
+/**
+ * Get the focus cost
+ */
+export function getFocusCost(focusName: string): number {
+  switch (focusName) {
+    case 'Ensnaring Hand Wraps': return 150;
+    case 'Mala of Mind Darts': return 150;
+    case 'Singing Bowl': return 150;
+    case 'Telekinetic Knuckles': return 150;
+    case 'Viperfang Ring': return 150;
+    default: return 0;
+  }
+}
+

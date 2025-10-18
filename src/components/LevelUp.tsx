@@ -15,6 +15,7 @@ import LevelUpClassTechnician from "./LevelUpClassTechnician";
 import LevelUpSubclassesChemist from "./LevelUpSubclassesChemist";
 import LevelUpSubclassesCoder from "./LevelUpSubclassesCoder";
 import LevelUpSubclassesCommander from "./LevelUpSubclassesCommander";
+import LevelUpSubclassesContemplative from "./LevelUpSubclassesContemplative";
 import { calculateChemistFeatureData } from "../utils/chemistFeature";
 
 
@@ -154,6 +155,9 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
     if (charClass === "Exospecialist") {
       effectiveHP += 20;
     }
+    
+    // Inertial subclass gets +5 Hit Points per dot (already included in baseHP/maxHitPoints)
+    // No need to add here as it's updated directly in maxHitPoints when dots are selected
     
     return effectiveHP;
   };
@@ -1470,6 +1474,23 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
             {/* Commander Subclass Content */}
             {charClass === "Commander" && subclass && (
               <LevelUpSubclassesCommander
+                sheet={sheet}
+                charClass={charClass}
+                subclass={subclass}
+                onAutoSave={handleAutoSave}
+                xpTotal={xpTotal}
+                spTotal={spTotal}
+                xpSpent={xpSpent}
+                spSpent={spSpent}
+                setXpSpent={setXpSpent}
+                setSpSpent={setSpSpent}
+                setNotice={setNotice}
+              />
+            )}
+
+            {/* Contemplative Subclass Content */}
+            {charClass === "Contemplative" && subclass && (
+              <LevelUpSubclassesContemplative
                 sheet={sheet}
                 charClass={charClass}
                 subclass={subclass}

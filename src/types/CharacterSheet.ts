@@ -233,6 +233,15 @@ export type CharacterSheet = {
     tyrantStrikeDamageDots?: boolean[];
     tyrantStrikeDemorizeDots?: boolean[];
     tyrantPerksSkillsDots?: boolean[];
+    // Inertial subclass progression (Contemplative)
+    inertialFeatureReflectDots?: boolean[];
+    inertialTechniqueRangeDots?: boolean[];
+    inertialTechniqueCooldownDots?: boolean[];
+    inertialHitPointsDots?: boolean[];
+    inertialStrikeDamageDots?: boolean[];
+    inertialStrikeRestrainDots?: boolean[];
+    inertialStrikeSleepDots?: boolean[];
+    inertialPerksSkillsDots?: boolean[];
     // Add other subclasses as needed
   };
 };

@@ -11,7 +11,7 @@ interface CardsContemplativeAttacksProps {
 function getFocusFlavorText(focus: string): string {
   switch (focus) {
     case 'Ensnaring Hand Wraps':
-      return 'Oikomagically infused linen lashes out at the target at the wielder\'s command. Enveloping and dragging foes closer to their doom.';
+      return 'Oikomagically infused linen lashes out at the target at the wielder\'s command, enveloping and dragging foes closer to their doom.';
     case 'Mala of Mind Darts':
       return 'How \'bout the power to kill a yak from 200 yards away... with mind bullets? That\'s telekinesis, Kyle.';
     case 'Singing Bowl':
@@ -19,30 +19,30 @@ function getFocusFlavorText(focus: string): string {
     case 'Telekinetic Knuckles':
       return 'Careful... I can throw a punch much farther than you\'d expect." --Arno Stonefast, Petran Kinetic';
     case 'Viperfang Ring':
-      return 'Don\'t let the beauty of the bejeweled Contemplative Viperfang Ring saps victims of their health when wielded by a competent Contemplative.';
+      return 'Cast by the monks of the Serpentine Monastery, the Viperfang Ring saps victims of their health when wielded by a competent Contemplative.';
     default:
       return 'A focused implement for primary attacks.';
   }
 }
 
-function getDisciplineFlavorText(discipline: string): string {
+function getDisciplineFlavorText(discipline: string): React.ReactNode {
   switch (discipline) {
     case 'Empty Mudra':
-      return 'This complicated mudra represents the empty space and it naturally drains its target of its life force, filling the one within the Kinetic applying it.';
+      return 'This complicated mudra represents empty space, and it naturally drains its target of its life force, filling the void within the Kinetic applying it.';
     case 'Mudra of Brilliance':
-      return 'With an oikomagically infused outburst followed by a slap of the palms and deliberately laced fingers, the Contemplative\'s opponent is often blinded.';
+      return 'With an oikomagically infused outbreath followed by a slap of the palms and delicately laced fingers, the Contemplative\'s opponent is often blinded.';
     case 'Way of Quicksilver':
-      return 'Disciples of the Way of Quicksilver wield his renowned Mercury Blade, which can instantly replicate misoconnics to their advantage from a distance. They can immediately make one more Secondary Attack that can\'t Crit';
+      return <span style={{ fontSize: '0.94em' }}>Disciples of the Way of Quicksilver wield the renowned Mercury Blade which can instantly reshape mid-combat to whatever instrument of death the Mercurial desires.</span>;
     case 'Way of Sublimation':
-      return '"The Sublime Discipline is a study of the fusion of opposites, both in physical and experiential matters." --Mercy Jo-Ray, Mercurial';
+      return '"The Sublime Discipline is a study of the fusion of opposites, both in physical and experiential matters." --Wrev, X-Ray Mercurial';
     case 'Asana of Heaviness':
-      return 'This complicated mudra represents the empty space and it naturally drains its target of its life force, filling the one within the Kinetic applying it.';
+      return '“Your whole body will feel the weight of the world until you simply will not be able to take it anymore and give up entirely.” --Ako, Human Inertial';
     case 'Passive Asana':
-      return 'With an oikomagically infused outburst followed by a slap of the palms and deliberately laced fingers, the Contemplative\'s opponent is often blinded.';
+      return '“A momentary satori causes even the most brutish foe to understand one simple thing: hurting another hurts oneself.” --K’bet Galpo, Human Contemplative ';
     case 'Bane Prana':
-      return 'Disciples of the Way of Quicksilver wield his renowned Mercury Blade, which can instantly replicate misoconnics to their advantage from a distance. They can immediately make one more Secondary Attack that can\'t Crit';
+      return '“The energetics of my dance is the mirror image of your waning strength and life.” --Yorjea Frellix, Lumenaren Vectorial';
     case 'Night Prana':
-      return '"The Sublime Discipline is a study of the fusion of opposites, both in physical and experiential matters." --Mercy Jo-Ray, Mercurial';
+      return '“The energy of nightmares will invade your entire being, causing you to stumble along blindly in a mind-induced darkness.” --Sliver, Nocturne Vectorial';
     default:
       return 'A specialized discipline for secondary attacks.';
   }
@@ -196,7 +196,7 @@ export const CardsContemplativeAttacks: React.FC<CardsContemplativeAttacksProps>
               zIndex: 2,
               lineHeight: 1.2
             }}>
-              {generateContemplativePrimaryAttackStatsJSX(sheet?.classCardDots, focus)}
+              {generateContemplativePrimaryAttackStatsJSX(sheet?.classCardDots, undefined, focus)}
             </div>
             
             {/* Flavor Text */}
@@ -228,9 +228,9 @@ export const CardsContemplativeAttacks: React.FC<CardsContemplativeAttacksProps>
         let subclassColor = '#116372'; // Default Contemplative color
         const disciplineType = getDisciplineSubclass(discipline);
         if (disciplineType.includes('Kinetic')) subclassColor = '#6fce1f';
-        else if (disciplineType.includes('Mercurial')) subclassColor = '#2b5f59';
+        else if (disciplineType.includes('Mercurial')) subclassColor = '#941c6c';
         else if (disciplineType.includes('Inertial')) subclassColor = '#1c945e';
-        else if (disciplineType.includes('Vectorial')) subclassColor = '#314f92';
+        else if (disciplineType.includes('Vectorial')) subclassColor = '#531c94';
         
         return (
           <div key={`${discipline}-${index}`} style={{ 
@@ -309,7 +309,7 @@ export const CardsContemplativeAttacks: React.FC<CardsContemplativeAttacksProps>
               }}
             />
             
-            {/* Card Type */}
+            {/* Card Type and Cooldown */}
             <div style={{
               position: 'absolute',
               top: 'calc(50% - 15px)',
@@ -318,13 +318,14 @@ export const CardsContemplativeAttacks: React.FC<CardsContemplativeAttacksProps>
               display: 'flex',
               flexDirection: 'row',
               alignItems: 'center',
-              justifyContent: 'flex-start',
+              justifyContent: 'space-between',
               paddingLeft: 10,
               paddingRight: 10,
               zIndex: 3
             }}>
-              <span style={{ color: '#990000', fontFamily: 'Arial, Helvetica, sans-serif', fontWeight: 'bold', fontSize: '1.1em', textAlign: 'left' }}>
-                Secondary Attack <span style={{ color: '#000' }}>(Cooldown <b>[{cooldownValue}]</b>)</span>
+              <span style={{ color: '#990000', fontFamily: 'Arial, Helvetica, sans-serif', fontWeight: 'bold', fontSize: '1.1em', textAlign: 'left' }}>Secondary Attack</span>
+              <span style={{ color: '#990000', fontFamily: 'Arial, Helvetica, sans-serif', fontWeight: 'bold', fontSize: '0.875em', marginRight: 22, whiteSpace: 'nowrap', maxWidth: 'calc(100% - 120px)', overflow: 'hidden', textOverflow: 'ellipsis', textAlign: 'right' }}>
+                <span style={{ fontWeight: 'normal', fontStyle: 'italic' }}>Cooldown</span> <span style={{ fontWeight: 'bold', fontStyle: 'normal' }}>[{cooldownValue}]</span>
               </span>
             </div>
             
@@ -346,7 +347,7 @@ export const CardsContemplativeAttacks: React.FC<CardsContemplativeAttacksProps>
               zIndex: 2,
               lineHeight: 1.2
             }}>
-              {generateContemplativeSecondaryAttackStatsJSX(sheet?.classCardDots, discipline)}
+              {generateContemplativeSecondaryAttackStatsJSX(sheet?.classCardDots, undefined, discipline)}
             </div>
             
             {/* Flavor Text */}

@@ -23,6 +23,7 @@ import { generateInspiringPresenceJSX } from "../utils/galvanicFeature";
 import { generateTacticalOffensiveJSX } from "../utils/tacticianFeature";
 import { generateFearlessJSX } from "../utils/tyrantFeature";
 import { generatePsychosomaticHarmonyJSX } from "../utils/contemplativeFeature";
+import { generateTelekineticShieldJSX } from "../utils/inertialFeature";
 
 
 type Props = {
@@ -722,7 +723,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
   // Add after tyrantFeatureJSX
   const inertialFeatureJSX = (
     <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#1c945e' }}>Telekinetic Shield.</i></b> You <i>Resist</i> all Damage while you are not suffering the <b><i>Sleep</i></b> condition.
+      {generateTelekineticShieldJSX(sheet)}
     </span>
   );
 
@@ -2410,6 +2411,11 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                   <span style={{ display: 'inline-flex', alignItems: 'center', color: '#808080', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                     <u>Slashing</u> <img src="/Slashing.png" alt="Slashing" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
                   </span>
+                </span>
+              )}
+              {subclass === 'Inertial' && (
+                <span style={{ marginLeft: 8, fontStyle: 'normal', color: '#000', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                  all Damage (when not suffering <i>Sleep</i>)
                 </span>
               )}
               {charClass === 'Contemplative' && !(sheet?.classCardDots?.[0]?.[0]) && (

@@ -774,7 +774,7 @@ const LevelUpClassContemplative: React.FC<LevelUpClassContemplativeProps> = ({
                   </div>
                   <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', marginTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
                     <div style={{ marginBottom: '4px' }}>
-                      <b><i><span style={{ color: '#000' }}>Secondary</span> <span style={{ color: '#990000' }}>Attack</span> (Cooldown <b>[{4 - safeGetDotsArray(11).filter(Boolean).length}]</b>)</i></b>.
+                      <b><i><span style={{ color: '#000' }}>Secondary</span> <span style={{ color: '#990000' }}>Attack</span></i></b> <i>(Cooldown </i><b>[{4 - safeGetDotsArray(11).filter(Boolean).length}]</b><i>)</i>.
                     </div>
                     <div style={{ marginBottom: '4px', textAlign: 'left' }}>
                       <select 
@@ -928,12 +928,12 @@ const LevelUpClassContemplative: React.FC<LevelUpClassContemplativeProps> = ({
 
                     <div style={{ fontSize: '1em', width: '100%', height: 'fit-content', maxHeight: '100%', overflow: 'hidden' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <span><b><u>Range</u></b> 10hx</span>
+                        <span><b><u>Range</u></b> 1hx</span>
                         <span style={{ textAlign: 'right', minWidth: '80px' }}><b><u>Crit</u></b> <b>[{18 - safeGetDotsArray(10).filter(Boolean).length}]</b>+</span>
                       </div>
                     </div>
                     <u><b>Target</b></u> Single<br />
-                    <u><b>Damage</b></u> <b>[{2 + safeGetDotsArray(9).filter(Boolean).length}]</b>d<b>[{8 + (safeGetDotsArray(8).filter(Boolean).length * 2)}]</b><br />
+                    <u><b>Damage</b></u> <b>[{2 + safeGetDotsArray(9).filter(Boolean).length}]</b>d<b>[{8 + (safeGetDotsArray(8).filter(Boolean).length * 2)}]</b>, status effect<br />
                     <u><b>Crit Effect</b></u> <b>[{2 + safeGetDotsArray(9).filter(Boolean).length}]</b>d<b>[{8 + (safeGetDotsArray(8).filter(Boolean).length * 2)}]</b>
                   </div>
                   {/* XP progression table for Secondary Attack */}
