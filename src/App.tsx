@@ -406,6 +406,7 @@ const App = () => {
           onBack={handleBackToEditor}
           onLevelUp={handleLevelUp}
           onHome={handleBackToHome}
+          onAutoSave={updateCurrentSheet}
           charClass={charClass}
           subclass={subclass}
         />

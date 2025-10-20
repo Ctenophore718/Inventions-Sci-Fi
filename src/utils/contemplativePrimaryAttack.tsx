@@ -19,8 +19,8 @@ export function calculateContemplativePrimaryAttackData(classCardDots?: boolean[
   const dieSizeDots = classCardDots?.[6]?.filter(Boolean).length || 0;
   // Get crit dots in Primary Attack section (array index 7)
   const critDots = classCardDots?.[7]?.filter(Boolean).length || 0;
-  // Calculate repeat count: base 1 + repeat dots
-  const repeatCount = 1 + repeatDots;
+  // Calculate repeat count: just the number of repeat dots (matching Level Up page)
+  const repeatCount = repeatDots;
   // Calculate die size: base 6, +2 per dot
   const dieSize = 6 + dieSizeDots * 2;
   // Calculate crit threshold: 18 minus crit dots

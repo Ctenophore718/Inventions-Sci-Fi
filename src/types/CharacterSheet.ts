@@ -242,6 +242,19 @@ export type CharacterSheet = {
     inertialStrikeRestrainDots?: boolean[];
     inertialStrikeSleepDots?: boolean[];
     inertialPerksSkillsDots?: boolean[];
+    // Kinetic subclass progression (Contemplative)
+    kineticFeatureStrikeDamageDots?: boolean[];
+    kineticFeatureMoveHxDots?: boolean[];
+    kineticTechniqueBounceHxDots?: boolean[];
+    kineticTechniqueDamageDots?: boolean[];
+    kineticTechniqueCooldownDots?: boolean[];
+    kineticMovementSpeedDots?: boolean[];
+    kineticMovementCreatureJumpDots?: boolean[];
+    kineticStrikeDamageDots?: boolean[];
+    kineticStrikeRangeDots?: boolean[];
+    kineticStrikeSlamHxDots?: boolean[];
+    kineticStrikeMultiStrikeDots?: boolean[];
+    kineticPerksSkillsDots?: boolean[];
     // Add other subclasses as needed
   };
 };

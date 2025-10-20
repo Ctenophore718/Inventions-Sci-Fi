@@ -25,6 +25,8 @@ import { generateFearlessJSX } from "../utils/tyrantFeature";
 import { generatePsychosomaticHarmonyJSX } from "../utils/contemplativeFeature";
 import { generateTelekineticShieldJSX } from "../utils/inertialFeature";
 import { generateInertialStrikeJSX, generateInertialStrikeDamageJSX, generateInertialStrikeEffectsJSX } from "../utils/inertialStrike";
+import { generateFinalFistsJSX } from "../utils/kineticFeature";
+import { generateKineticStrikeJSX, generateKineticStrikeDamageJSX, generateKineticStrikeEffectsJSX } from "../utils/kineticStrike";
 
 
 type Props = {
@@ -309,8 +311,19 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
   const tacticianSpeedBonus = sheet?.subclass === 'Tactician' 
     ? 1 + ((sheet?.subclassProgressionDots as any)?.tacticianFeatureSpeedDots?.filter(Boolean).length || 0)
     : 0;
-  const totalSpeed = baseSpeed + tacticianSpeedBonus;
+  const kineticSpeedBonus = sheet?.subclass === 'Kinetic'
+    ? ((sheet?.subclassProgressionDots as any)?.kineticMovementSpeedDots?.filter(Boolean).length || 0)
+    : 0;
+  const totalSpeed = baseSpeed + tacticianSpeedBonus + kineticSpeedBonus;
   const speed = totalSpeed > 0 ? `${totalSpeed}` : "0";
+  
+  // Calculate jump speed and jump amount for Kinetic subclass
+  const kineticJumpSpeedBonus = sheet?.subclass === 'Kinetic' && (sheet?.subclassProgressionDots as any)?.kineticMovementCreatureJumpDots?.[0]
+    ? 3
+    : 0;
+  const kineticJumpAmountBonus = sheet?.subclass === 'Kinetic' && (sheet?.subclassProgressionDots as any)?.kineticMovementCreatureJumpDots?.[0]
+    ? 1
+    : 0;
   
   const strikeDamage = sheet?.strikeDamage || "";
   const maxHitPoints = sheet?.maxHitPoints || 0;
@@ -731,7 +744,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
   // Add after inertialFeatureJSX
   const kineticFeatureJSX = (
     <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#7b941c' }}>Final Fists.</i></b> Whenever you reach 0 <b><i style={{ color: '#990000' }}>Hit Points</i></b> in a battle, you can immediately <b><i style={{ color: '#38761d' }}>Move</i></b> up to your <b><i style={{ color: '#38761d' }}>Speed</i></b> and <b><i style={{ color: '#351c75' }}>Strike</i></b> up to your <b><i style={{ color: '#351c75' }}>Strike</i></b> amount before falling unconscious.
+      {generateFinalFistsJSX(sheet)}
     </span>
   );
 
@@ -1551,6 +1564,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                     if (subclass === "Tyrant" && skill === "Intimidation") return "rgba(206,31,195,0.5)";
                     if (subclass === "Tyrant" && skill === "Intimidation") return "rgba(206,31,195,0.5)";
                     if (subclass === "Inertial" && skill === "Diplomacy") return "rgba(28,148,94,0.5)";
+                    if (subclass === "Kinetic" && skill === "Athletics") return "rgba(123,148,28,0.5)";
 
                     return null;
                   };
@@ -2260,10 +2274,10 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
       <div className={styles.movementStrikeCard}>
   <h3 style={{ fontFamily: 'Arial, sans-serif' }}>Movement</h3>
         <div className={styles.cardContent}>
-          <div className={styles.horizontalLabel} style={{ color: '#38761d', fontWeight: 'bold' }}>Speed {speed}</div>
+          <div className={styles.horizontalLabel} style={{ color: '#38761d', fontWeight: 'bold' }}>Speed {speed}{speed !== "0" ? "hx" : ""}</div>
           <div className={styles.horizontalLabel} style={{ color: '#38761d', fontWeight: 'bold' }}>Speed Types {movement}</div>
-          <div className={styles.horizontalLabel} style={{ color: '#38761d', fontWeight: 'bold' }}>Jump Speed {strike}</div>
-          <div className={styles.horizontalLabel} style={{ color: '#38761d', fontWeight: 'bold' }}>Jump Amount </div>
+          <div className={styles.horizontalLabel} style={{ color: '#38761d', fontWeight: 'bold' }}>Jump Speed {kineticJumpSpeedBonus > 0 ? kineticJumpSpeedBonus + "hx" : ""}</div>
+          <div className={styles.horizontalLabel} style={{ color: '#38761d', fontWeight: 'bold' }}>Jump Amount {kineticJumpAmountBonus > 0 ? kineticJumpAmountBonus : ""}</div>
           <div className={styles.horizontalLabel} style={{ color: '#38761d', fontWeight: 'bold' }}>Speed Effects {resistances}</div>
         </div>
       </div>
@@ -2360,11 +2374,15 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
               <span style={{ fontWeight: 'bold', fontFamily: 'inherit', color: '#000', marginLeft: 4, display: 'flex', alignItems: 'center' }}>
                 {generateInertialStrikeDamageJSX(sheet)}
               </span>
+            ) : subclass === 'Kinetic' ? (
+              <span style={{ fontWeight: 'bold', fontFamily: 'inherit', color: '#000', marginLeft: 4, display: 'flex', alignItems: 'center' }}>
+                {generateKineticStrikeDamageJSX(sheet)}
+              </span>
             ) : <span style={{ fontWeight: 'bold', fontFamily: 'inherit', color: '#000', marginLeft: 4 }}>{strikeDamage}</span>}
           </div>
           <div className={styles.horizontalLabel} style={{ color: '#351c75', fontWeight: 'bold' }}>Multi Strike <span style={{ color: '#000' }}>{
             charClass === 'Contemplative'
-              ? (2 + (sheet?.classCardDots?.[1]?.[0] ? 1 : 0))
+              ? (2 + (sheet?.classCardDots?.[1]?.[0] ? 1 : 0) + ((sheet?.subclassProgressionDots as any)?.kineticStrikeMultiStrikeDots?.[0] ? 1 : 0))
               : (subclass === 'Beguiler' && sheet?.subclassProgressionDots?.beguilerStrikeStrikeDots?.[0])
                 ? 2
                 : (subclass === 'Galvanic' && (sheet?.subclassProgressionDots as any)?.galvanicStrikeStrikeDots?.[0])
@@ -2397,6 +2415,8 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                     ? <span style={{ color: '#000', fontWeight: 'normal' }}><b><i>Demoralize</i></b></span>
                   : (subclass === 'Inertial')
                     ? generateInertialStrikeEffectsJSX(sheet) || strikeEffects
+                  : (subclass === 'Kinetic')
+                    ? generateKineticStrikeEffectsJSX(sheet) || strikeEffects
                     : strikeEffects
               }
           </div>
@@ -2673,6 +2693,13 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
               </span>
             </div>
           )}
+            {subclass === 'Kinetic' && (sheet?.subclassProgressionDots as any)?.kineticPerksSkillsDots?.[0] && (
+            <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <span>
+                <b><i style={{ color: '#7b941c' }}>Martial Artist.</i></b> <span style={{ color: '#000' }}>Years of disciplined practice have made you into a talented martial artist. Gain an advantage on related skill rolls when performing difficult maneuvers.</span>
+              </span>
+            </div>
+          )}          
         </div>
       </div>
 
