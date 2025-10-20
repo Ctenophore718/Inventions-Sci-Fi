@@ -79,6 +79,12 @@ export type CharacterSheet = {
   // Disciplines for Contemplative class (secondary attacks)
   disciplines?: string[];
 
+  // Incantations for Devout class (primary attacks)
+  incantations?: string[];
+
+  // Relics for Devout class (secondary attacks)
+  relics?: string[];
+
   // Algorithms for Coder class
   algorithms?: string[];
 

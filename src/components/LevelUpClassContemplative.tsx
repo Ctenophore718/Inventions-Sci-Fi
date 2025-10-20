@@ -614,11 +614,27 @@ const LevelUpClassContemplative: React.FC<LevelUpClassContemplativeProps> = ({
                     </div>
                     <div style={{ fontSize: '1em', width: '100%', height: 'fit-content', maxHeight: '100%', overflow: 'hidden' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <span><b><u>Range</u></b> 10hx</span>
-                        <span style={{ textAlign: 'right', minWidth: '80px' }}><b><u>Crit</u></b> <b>[{18 - safeGetDotsArray(7).filter(Boolean).length}]</b>+</span>
+                        <span>
+                          <b><u>Range</u></b> {_subclass === 'Vectorial' ? (
+                            <>
+                              <b>[{10 + 6 + ((sheet?.subclassProgressionDots as any)?.vectorialFeatureRangeDots?.filter(Boolean).length || 0)}]</b>hx
+                            </>
+                          ) : '10hx'}
+                        </span>
+                        <span style={{ textAlign: 'right', minWidth: '80px' }}>
+                          <b><u>Crit</u></b> <b>[{18 - safeGetDotsArray(7).filter(Boolean).length - (_subclass === 'Vectorial' ? ((sheet?.subclassProgressionDots as any)?.vectorialFeatureCritDots?.filter(Boolean).length || 0) : 0)}]</b>+
+                        </span>
                       </div>
                     </div>
-                    <b><u>Target</u></b> Single, Repeat <b>[{safeGetDotsArray(5).filter(Boolean).length}]</b><br />
+                    <b><u>Target</u></b> Single, Repeat <b>[{safeGetDotsArray(5).filter(Boolean).length}]</b>
+                    {_subclass === 'Vectorial' && (
+                      <>
+                        {((sheet?.subclassProgressionDots as any)?.vectorialFeatureIgnoreCoverDots?.[0]) 
+                          ? <>, treat <b>[all]</b> Cover as <b>[no]</b> Cover</> 
+                          : <>, treat <b>[100%]</b> Cover as <b>[50%]</b> Cover</>}
+                      </>
+                    )}
+                    <br />
                     <b><u>Damage</u></b> 1d<b>[{6 + (safeGetDotsArray(6).filter(Boolean).length * 2)}]</b><br />
                     <b><u>Crit Effect</u></b> 1d<b>[{6 + (safeGetDotsArray(6).filter(Boolean).length * 2)}]</b>
                   </div>
@@ -928,11 +944,27 @@ const LevelUpClassContemplative: React.FC<LevelUpClassContemplativeProps> = ({
 
                     <div style={{ fontSize: '1em', width: '100%', height: 'fit-content', maxHeight: '100%', overflow: 'hidden' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <span><b><u>Range</u></b> 1hx</span>
-                        <span style={{ textAlign: 'right', minWidth: '80px' }}><b><u>Crit</u></b> <b>[{18 - safeGetDotsArray(10).filter(Boolean).length}]</b>+</span>
+                        <span>
+                          <b><u>Range</u></b> {_subclass === 'Vectorial' && (selectedDisciplines.includes('Bane Prana') || selectedDisciplines.includes('Night Prana')) ? (
+                            <>
+                              <b>[{1 + 6 + ((sheet?.subclassProgressionDots as any)?.vectorialFeatureRangeDots?.filter(Boolean).length || 0)}]</b>hx
+                            </>
+                          ) : '1hx'}
+                        </span>
+                        <span style={{ textAlign: 'right', minWidth: '80px' }}>
+                          <b><u>Crit</u></b> <b>[{18 - safeGetDotsArray(10).filter(Boolean).length - (_subclass === 'Vectorial' ? ((sheet?.subclassProgressionDots as any)?.vectorialFeatureCritDots?.filter(Boolean).length || 0) : 0)}]</b>+
+                        </span>
                       </div>
                     </div>
-                    <u><b>Target</b></u> Single<br />
+                    <u><b>Target</b></u> Single
+                    {_subclass === 'Vectorial' && (
+                      <>
+                        {((sheet?.subclassProgressionDots as any)?.vectorialFeatureIgnoreCoverDots?.[0]) 
+                          ? <>, treat <b>[all]</b> Cover as <b>[no]</b> Cover</> 
+                          : <>, treat <b>[100%]</b> Cover as <b>[50%]</b> Cover</>}
+                      </>
+                    )}
+                    <br />
                     <u><b>Damage</b></u> <b>[{2 + safeGetDotsArray(9).filter(Boolean).length}]</b>d<b>[{8 + (safeGetDotsArray(8).filter(Boolean).length * 2)}]</b>, status effect<br />
                     <u><b>Crit Effect</b></u> <b>[{2 + safeGetDotsArray(9).filter(Boolean).length}]</b>d<b>[{8 + (safeGetDotsArray(8).filter(Boolean).length * 2)}]</b>
                   </div>

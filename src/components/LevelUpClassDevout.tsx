@@ -1,5 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import type { CharacterSheet } from "../types/CharacterSheet";
+import { generateBloodTradeJSX } from "../utils/devoutFeature";
+import { generateFlagellationJSX } from "../utils/devoutTechnique";
+import { generateDevoutPrimaryAttackStatsJSX, generateDevoutPrimaryAttackDescriptionJSX } from "../utils/devoutPrimaryAttack";
+import { generateDevoutSecondaryAttackStatsJSX, generateDevoutSecondaryAttackDescriptionJSX } from "../utils/devoutSecondaryAttack";
 
 
 
@@ -8,11 +12,13 @@ type LevelUpClassDevoutProps = {
   charClass: string;
   _subclass: string;
   onXpSpChange?: (xpDelta: number, spDelta: number) => void;
+  onCreditsChange?: (creditsDelta: number) => void;
   onAutoSave?: (updates: Partial<CharacterSheet>) => void;
   xpTotal: number;
   spTotal: number;
   xpSpent: number;
   spSpent: number;
+  credits: number;
   setXpSpent: (xp: number) => void;
   setSpSpent: (sp: number) => void;
   setNotice: (notice: string) => void;
@@ -38,11 +44,13 @@ const LevelUpClassDevout: React.FC<LevelUpClassDevoutProps> = ({
   charClass,
   _subclass, 
   onXpSpChange,
+  onCreditsChange,
   onAutoSave,
   xpTotal,
   spTotal, 
   xpSpent,
   spSpent,
+  credits,
   setXpSpent,
   setSpSpent,
   setNotice
@@ -55,6 +63,34 @@ const LevelUpClassDevout: React.FC<LevelUpClassDevoutProps> = ({
       }
       return defaultDevoutDots.map(row => [...row]);
     });
+
+    // Local state for selected incantations (primary attacks)
+    const [selectedIncantations, setSelectedIncantations] = useState<string[]>(() => {
+      return sheet?.incantations || [];
+    });
+    // Local state for pending incantation selection
+    const [pendingIncantation, setPendingIncantation] = useState<string>("");
+
+    // Local state for selected relics (secondary attacks)
+    const [selectedRelics, setSelectedRelics] = useState<string[]>(() => {
+      return sheet?.relics || [];
+    });
+    // Local state for pending relic selection
+    const [pendingRelic, setPendingRelic] = useState<string>("");
+
+    // Sync selectedIncantations with sheet data when it changes
+    useEffect(() => {
+      if (sheet?.incantations) {
+        setSelectedIncantations(sheet.incantations);
+      }
+    }, [sheet?.incantations]);
+
+    // Sync selectedRelics with sheet data when it changes
+    useEffect(() => {
+      if (sheet?.relics) {
+        setSelectedRelics(sheet.relics);
+      }
+    }, [sheet?.relics]);
   
     // Helper function to safely access classCardDots array
     const safeGetDotsArray = (index: number): boolean[] => {
@@ -165,9 +201,7 @@ const LevelUpClassDevout: React.FC<LevelUpClassDevoutProps> = ({
                 <div style={{ color: '#0b5394', fontWeight: 'bold', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '8px' }}>
                   <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32, fontFamily: 'Arial, Helvetica, sans-serif' }}>
                     <div style={{ fontWeight: 'bold', color: '#0b5394', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Feature</u></div>
-                    <span style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
-                      <b><i style={{ color: '#6b1172', fontSize: '1em' }}>Blood Trade.</i></b> <span style={{ fontSize: '1em', fontWeight: 400 }}>Whenever you take Damage, you gain +1d6 Damage on your next <b><i><span style={{ color: '#351c75' }}>Strike</span></i></b> or <b><i><span style={{ color: '#990000' }}>Attack</span></i></b>. The Damage type matches your next <b><i><span style={{ color: '#351c75' }}>Strike</span></i></b> or <b><i><span style={{ color: '#990000' }}>Attack</span></i></b> and doesn't stack if you are Damaged multiple times.</span>
-                    </span>
+                    {generateBloodTradeJSX(classCardDots)}
                   </span>
                 </div>
                 {/* XP progression table - interactive dots */}
@@ -175,10 +209,13 @@ const LevelUpClassDevout: React.FC<LevelUpClassDevoutProps> = ({
                   <div style={{
                     display: 'grid',
                     gridTemplateColumns: '1fr 24px 24px',
-                    gridTemplateRows: 'repeat(3, auto)',
-                    gap: '4px',
+                    gridTemplateRows: 'repeat(2, auto)',
+                    columnGap: '6px',
+                    rowGap: '2px',
                     alignItems: 'start',
-                    marginBottom: '12px'
+                    marginBottom: '2px',
+                    width: '100%',
+                    paddingLeft: '4px'
                   }}>
                     {/* Row 1: XP costs */}
                     <span></span>
@@ -231,20 +268,23 @@ const LevelUpClassDevout: React.FC<LevelUpClassDevoutProps> = ({
                 <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
                   <div style={{ fontWeight: 'bold', color: '#bf9000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Technique</u></div>
                   <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
-                    <b><i style={{ color: '#6b1172' }}>Flagellation</i></b> <i style={{ color: '#6b1172' }}>(Cooldown 4)</i>. You choose to deal 1d4 to 5d4 untyped Damage to yourself that cannot be reduced in any way. As a result, you gain a +2 Crit to your next <b><i><span style={{ color: '#990000' }}>Attack</span></i></b> for each die of Damage you dealt yourself.
+                    {generateFlagellationJSX(classCardDots)}
                   </div>
                   
-                  {/* +1hx Attack Range */}
+                  {/* XP progression table for Technique */}
                   <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px' }}>
                     <div style={{
                       display: 'grid',
                       gridTemplateColumns: '1fr 24px',
-                      gridTemplateRows: 'repeat(2, auto)',
-                      gap: '4px',
+                      gridTemplateRows: 'repeat(6, auto)',
+                      columnGap: '6px',
+                      rowGap: '2px',
                       alignItems: 'start',
-                      marginBottom: '12px'
+                      marginBottom: '2px',
+                      width: '100%',
+                      paddingLeft: '4px'
                     }}>
-                      {/* Row 1: XP cost */}
+                      {/* Row 1: 10xp header */}
                       <span></span>
                       <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>10xp</span>
                       {/* Row 2: +1hx Attack Range dot */}
@@ -283,23 +323,10 @@ const LevelUpClassDevout: React.FC<LevelUpClassDevoutProps> = ({
                           </span>
                         );
                       })()}
-                    </div>
-                  </div>
-
-                  {/* +1d6 Attack Damage */}
-                  <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px' }}>
-                    <div style={{
-                      display: 'grid',
-                      gridTemplateColumns: '1fr 24px',
-                      gridTemplateRows: 'repeat(2, auto)',
-                      gap: '4px',
-                      alignItems: 'start',
-                      marginBottom: '12px'
-                    }}>
-                      {/* Row 1: XP cost */}
+                      {/* Row 3: 20xp header */}
                       <span></span>
                       <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>20xp</span>
-                      {/* Row 2: +1d6 Attack Damage dot */}
+                      {/* Row 4: +1d6 Attack Damage dot */}
                       <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>+1d6 <b><i style={{ color: '#990000' }}>Attack</i></b> Damage for each point</span>
                       {(() => {
                         const arr = safeGetDotsArray(2);
@@ -335,33 +362,20 @@ const LevelUpClassDevout: React.FC<LevelUpClassDevoutProps> = ({
                           </span>
                         );
                       })()}
-                    </div>
-                  </div>
-
-                  {/* -1 Cooldown */}
-                  <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px' }}>
-                    <div style={{
-                      display: 'grid',
-                      gridTemplateColumns: '1fr 24px 24px',
-                      gridTemplateRows: 'repeat(2, auto)',
-                      gap: '4px',
-                      alignItems: 'start',
-                      marginBottom: '12px'
-                    }}>
-                      {/* Row 1: XP costs */}
+                      {/* Row 5: 4xp 7xp header */}
                       <span></span>
                       <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>4xp</span>
-                      <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>7xp</span>
-                      {/* Row 2: -1 Cooldown dots */}
-                      <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>-1 <i>Cooldown</i></span>
-                      {[0,1].map(idx => {
+                      {/* Row 6: -1 Cooldown dots */}
+                      <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>-1 Cooldown</span>
+                      {(() => {
                         const arr = safeGetDotsArray(3);
+                        const idx = 0;
                         const canCheck = idx === 0 || arr.slice(0, idx).every(Boolean);
                         const rightmostChecked = arr.lastIndexOf(true);
                         const canUncheck = arr[idx] && idx === rightmostChecked;
                         const xpCosts = [4, 7];
                         return (
-                          <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
+                          <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
                             <span
                               onClick={() => {
                                 if (!arr[idx] && canCheck) {
@@ -391,32 +405,164 @@ const LevelUpClassDevout: React.FC<LevelUpClassDevoutProps> = ({
                             ></span>
                           </span>
                         );
-                      })}
+                      })()}
                     </div>
                   </div>
                 </div>
 
                 {/* Attack section */}
                 <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
-                  <div style={{ fontWeight: 'bold', color: '#0b5394', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Attack</u></div>
+                  <div style={{ fontWeight: 'bold', color: '#990000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Attack</u></div>
                   
                   {/* Primary Attack */}
                   <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
-                    <b><i>Primary <span style={{ color: '#990000' }}>Attack</span>.</i></b><br />
-                    <i>Incantations.</i> 10hx Range, Single Target, Arcing, 18+ Crit, 1d6 Damage.
+                    <div style={{ marginBottom: '4px' }}>
+                      <b><i><span style={{ color: '#000' }}>Primary</span> <span style={{ color: '#990000' }}>Attack</span></i></b>.
+                    </div>
+                    <div style={{ marginBottom: '4px', textAlign: 'left' }}>
+                      <select 
+                        style={{ 
+                          fontSize: '1em', 
+                          padding: '2px 8px', 
+                          borderRadius: '6px', 
+                          border: '1px solid #ccc', 
+                          background: '#fff', 
+                          color: '#222',
+                          fontWeight: 'bold',
+                          marginBottom: '4px',
+                          textAlign: 'left',
+                          minWidth: '180px'
+                        }} 
+                        defaultValue="Incantations"
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          if (value !== "Incantations") {
+                            setPendingIncantation(value);
+                            e.target.value = "Incantations"; // Reset dropdown
+                          }
+                        }}
+                      >
+                        <option disabled style={{ fontWeight: 'bold' }}>Incantations</option>
+                        <option style={{ fontWeight: 'bold' }}>Astral Bolt</option>
+                        <option style={{ fontWeight: 'bold' }}>Chaos Vortex</option>
+                        <option style={{ fontWeight: 'bold' }}>Order Strike</option>
+                        <option style={{ fontWeight: 'bold' }}>Void Beam</option>
+                      </select>
+                      {/* Buy/Add dialog for Incantation selection */}
+                      {pendingIncantation && (
+                        <div style={{ marginTop: '4px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                          <div style={{ fontWeight: 'bold' }}>
+                            {pendingIncantation}
+                            <span style={{ color: '#bf9000', fontWeight: 'bold', marginLeft: '8px' }}>
+                              {pendingIncantation === 'Astral Bolt' && '155c'}
+                              {pendingIncantation === 'Chaos Vortex' && '160c'}
+                              {pendingIncantation === 'Order Strike' && '155c'}
+                              {pendingIncantation === 'Void Beam' && '160c'}
+                            </span>
+                          </div>
+                          <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                            <button
+                              style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #1976d2', background: '#1976d2', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}
+                              onClick={() => {
+                                // Determine cost
+                                let cost = 0;
+                                if (pendingIncantation === 'Astral Bolt') cost = 155;
+                                else if (pendingIncantation === 'Chaos Vortex') cost = 160;
+                                else if (pendingIncantation === 'Order Strike') cost = 155;
+                                else if (pendingIncantation === 'Void Beam') cost = 160;
+                                // Check credits
+                                if (credits < cost) {
+                                  setNotice('Not enough credits!');
+                                  return;
+                                }
+                                // Atomic operation: update both incantations and credits
+                                const newIncantations = [...selectedIncantations, pendingIncantation];
+                                const newCredits = credits - cost;
+                                setSelectedIncantations(newIncantations);
+                                
+                                if (sheet && onAutoSave) {
+                                  onAutoSave({ 
+                                    incantations: newIncantations,
+                                    credits: newCredits
+                                  });
+                                }
+                                
+                                // Update the LevelUp component's credits state
+                                onCreditsChange?.(-cost);
+                                setPendingIncantation("");
+                              }}
+                            >Buy</button>
+                            <button
+                              style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #28a745', background: '#28a745', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}
+                              onClick={() => {
+                                const newIncantations = [...selectedIncantations, pendingIncantation];
+                                setSelectedIncantations(newIncantations);
+                                
+                                if (sheet && onAutoSave) {
+                                  onAutoSave({ 
+                                    incantations: newIncantations,
+                                    credits: credits // Preserve current credits
+                                  });
+                                }
+                                
+                                setPendingIncantation("");
+                              }}
+                            >Add</button>
+                            <button
+                              style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #aaa', background: '#eee', color: '#333', fontWeight: 'bold', cursor: 'pointer' }}
+                              onClick={() => setPendingIncantation("")}
+                            >Cancel</button>
+                          </div>
+                        </div>
+                      )}
+                      <div style={{ marginTop: '2px' }}>
+                        {selectedIncantations.length > 0 && (
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginLeft: '8px' }}>
+                            {selectedIncantations.map((incantation, idx) => (
+                              <span key={incantation + idx} style={{ fontStyle: 'italic', display: 'flex', alignItems: 'center', background: '#f5f5f5', borderRadius: '6px', padding: '2px 8px' }}>
+                                {incantation}
+                                <button
+                                  style={{ marginLeft: '6px', padding: '0 6px', borderRadius: '50%', border: 'none', background: '#d32f2f', color: 'white', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.9em' }}
+                                  title={`Remove ${incantation}`}
+                                  onClick={() => {
+                                    const newIncantations = selectedIncantations.filter((_, i) => i !== idx);
+                                    setSelectedIncantations(newIncantations);
+                                    
+                                    if (sheet && onAutoSave) {
+                                      onAutoSave({ 
+                                        incantations: newIncantations
+                                      });
+                                    }
+                                  }}
+                                >×</button>
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    {generateDevoutPrimaryAttackStatsJSX(classCardDots)}
+                    {selectedIncantations.map((incantation, idx) => (
+                      <div key={incantation + idx}>
+                        {generateDevoutPrimaryAttackDescriptionJSX(incantation)}
+                      </div>
+                    ))}
                   </div>
                   
-                  {/* Increase die size */}
+                  {/* XP progression table for Primary Attack */}
                   <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px' }}>
                     <div style={{
                       display: 'grid',
                       gridTemplateColumns: '1fr 24px 24px 24px',
-                      gridTemplateRows: 'repeat(2, auto)',
-                      gap: '4px',
+                      gridTemplateRows: 'repeat(4, auto)',
+                      columnGap: '6px',
+                      rowGap: '2px',
                       alignItems: 'start',
-                      marginBottom: '12px'
+                      marginBottom: '2px',
+                      width: '100%',
+                      paddingLeft: '4px'
                     }}>
-                      {/* Row 1: XP costs */}
+                      {/* Row 1: 5xp 8xp 12xp header */}
                       <span></span>
                       <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>5xp</span>
                       <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>8xp</span>
@@ -461,25 +607,12 @@ const LevelUpClassDevout: React.FC<LevelUpClassDevoutProps> = ({
                           </span>
                         );
                       })}
-                    </div>
-                  </div>
-
-                  {/* +1 Crit */}
-                  <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px' }}>
-                    <div style={{
-                      display: 'grid',
-                      gridTemplateColumns: '1fr 24px 24px 24px',
-                      gridTemplateRows: 'repeat(2, auto)',
-                      gap: '4px',
-                      alignItems: 'start',
-                      marginBottom: '12px'
-                    }}>
-                      {/* Row 1: XP costs */}
+                      {/* Row 3: 2xp 4xp 6xp header */}
                       <span></span>
                       <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>2xp</span>
                       <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>4xp</span>
                       <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>6xp</span>
-                      {/* Row 2: +1 Crit dots */}
+                      {/* Row 4: +1 Crit dots */}
                       <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>+1 Crit</span>
                       {[0,1,2].map(idx => {
                         const arr = safeGetDotsArray(5);
@@ -521,24 +654,156 @@ const LevelUpClassDevout: React.FC<LevelUpClassDevoutProps> = ({
                       })}
                     </div>
                   </div>
-
+                  
                   {/* Secondary Attack */}
-                  <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', marginTop: '16px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
-                    <i><b>Secondary <span style={{ color: '#990000' }}>Attack</span></b> (Cooldown 4).</i><br />
-                    <i>Relics.</i> 1hx Range, <i>AoE</i> 3hx-cone, 18+ Crit, 1d6 Damage.
+                  <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', marginTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+                    <div style={{ marginBottom: '4px' }}>
+                      <b><i><span style={{ color: '#000' }}>Secondary</span> <span style={{ color: '#990000' }}>Attack</span></i></b>.
+                    </div>
+                    <div style={{ marginBottom: '4px', textAlign: 'left' }}>
+                      <select 
+                        style={{ 
+                          fontSize: '1em', 
+                          padding: '2px 8px', 
+                          borderRadius: '6px', 
+                          border: '1px solid #ccc', 
+                          background: '#fff', 
+                          color: '#222',
+                          fontWeight: 'bold',
+                          marginBottom: '4px',
+                          textAlign: 'left',
+                          minWidth: '180px'
+                        }} 
+                        defaultValue="Relics"
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          if (value !== "Relics") {
+                            setPendingRelic(value);
+                            e.target.value = "Relics"; // Reset dropdown
+                          }
+                        }}
+                      >
+                        <option disabled style={{ fontWeight: 'bold' }}>Relics</option>
+                        <option style={{ fontWeight: 'bold' }}>Astral Prism</option>
+                        <option style={{ fontWeight: 'bold' }}>Chaos Orb</option>
+                        <option style={{ fontWeight: 'bold' }}>Order Seal</option>
+                        <option style={{ fontWeight: 'bold' }}>Void Crystal</option>
+                      </select>
+                      {/* Buy/Add dialog for Relic selection */}
+                      {pendingRelic && (
+                        <div style={{ marginTop: '4px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                          <div style={{ fontWeight: 'bold' }}>
+                            {pendingRelic}
+                            <span style={{ color: '#bf9000', fontWeight: 'bold', marginLeft: '8px' }}>
+                              {pendingRelic === 'Astral Prism' && '215c'}
+                              {pendingRelic === 'Chaos Orb' && '225c'}
+                              {pendingRelic === 'Order Seal' && '215c'}
+                              {pendingRelic === 'Void Crystal' && '225c'}
+                            </span>
+                          </div>
+                          <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                            <button
+                              style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #1976d2', background: '#1976d2', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}
+                              onClick={() => {
+                                // Determine cost
+                                let cost = 0;
+                                if (pendingRelic === 'Astral Prism') cost = 215;
+                                else if (pendingRelic === 'Chaos Orb') cost = 225;
+                                else if (pendingRelic === 'Order Seal') cost = 215;
+                                else if (pendingRelic === 'Void Crystal') cost = 225;
+                                // Check credits
+                                if (credits < cost) {
+                                  setNotice('Not enough credits!');
+                                  return;
+                                }
+                                // Atomic operation: update both relics and credits
+                                const newRelics = [...selectedRelics, pendingRelic];
+                                const newCredits = credits - cost;
+                                setSelectedRelics(newRelics);
+                                
+                                if (sheet && onAutoSave) {
+                                  onAutoSave({ 
+                                    relics: newRelics,
+                                    credits: newCredits
+                                  });
+                                }
+                                
+                                // Update the LevelUp component's credits state
+                                onCreditsChange?.(-cost);
+                                setPendingRelic("");
+                              }}
+                            >Buy</button>
+                            <button
+                              style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #28a745', background: '#28a745', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}
+                              onClick={() => {
+                                const newRelics = [...selectedRelics, pendingRelic];
+                                setSelectedRelics(newRelics);
+                                
+                                if (sheet && onAutoSave) {
+                                  onAutoSave({ 
+                                    relics: newRelics,
+                                    credits: credits // Preserve current credits
+                                  });
+                                }
+                                
+                                setPendingRelic("");
+                              }}
+                            >Add</button>
+                            <button
+                              style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #aaa', background: '#eee', color: '#333', fontWeight: 'bold', cursor: 'pointer' }}
+                              onClick={() => setPendingRelic("")}
+                            >Cancel</button>
+                          </div>
+                        </div>
+                      )}
+                      <div style={{ marginTop: '2px' }}>
+                        {selectedRelics.length > 0 && (
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginLeft: '8px' }}>
+                            {selectedRelics.map((relic, idx) => (
+                              <span key={relic + idx} style={{ fontStyle: 'italic', display: 'flex', alignItems: 'center', background: '#f5f5f5', borderRadius: '6px', padding: '2px 8px' }}>
+                                {relic}
+                                <button
+                                  style={{ marginLeft: '6px', padding: '0 6px', borderRadius: '50%', border: 'none', background: '#d32f2f', color: 'white', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.9em' }}
+                                  title={`Remove ${relic}`}
+                                  onClick={() => {
+                                    const newRelics = selectedRelics.filter((_, i) => i !== idx);
+                                    setSelectedRelics(newRelics);
+                                    
+                                    if (sheet && onAutoSave) {
+                                      onAutoSave({ 
+                                        relics: newRelics
+                                      });
+                                    }
+                                  }}
+                                >×</button>
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    {generateDevoutSecondaryAttackStatsJSX(classCardDots)}
+                    {selectedRelics.map((relic, idx) => (
+                      <div key={relic + idx}>
+                        {generateDevoutSecondaryAttackDescriptionJSX(relic)}
+                      </div>
+                    ))}
                   </div>
                   
-                  {/* +1 Damage die */}
+                  {/* XP progression table for Secondary Attack */}
                   <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px' }}>
                     <div style={{
                       display: 'grid',
                       gridTemplateColumns: '1fr 24px 24px 24px',
-                      gridTemplateRows: 'repeat(2, auto)',
-                      gap: '4px',
+                      gridTemplateRows: 'repeat(8, auto)',
+                      columnGap: '6px',
+                      rowGap: '2px',
                       alignItems: 'start',
-                      marginBottom: '12px'
+                      marginBottom: '2px',
+                      width: '100%',
+                      paddingLeft: '4px'
                     }}>
-                      {/* Row 1: XP costs */}
+                      {/* Row 1: 5xp 8xp 15xp header */}
                       <span></span>
                       <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>5xp</span>
                       <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>8xp</span>
@@ -583,25 +848,12 @@ const LevelUpClassDevout: React.FC<LevelUpClassDevoutProps> = ({
                           </span>
                         );
                       })}
-                    </div>
-                  </div>
-
-                  {/* +1hx-Cone AoE */}
-                  <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px' }}>
-                    <div style={{
-                      display: 'grid',
-                      gridTemplateColumns: '1fr 24px 24px 24px',
-                      gridTemplateRows: 'repeat(2, auto)',
-                      gap: '4px',
-                      alignItems: 'start',
-                      marginBottom: '12px'
-                    }}>
-                      {/* Row 1: XP costs */}
+                      {/* Row 3: 5xp 8xp 15xp header */}
                       <span></span>
                       <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>5xp</span>
                       <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>8xp</span>
                       <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>15xp</span>
-                      {/* Row 2: +1hx-Cone AoE dots */}
+                      {/* Row 4: +1hx-Cone AoE dots */}
                       <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>+1hx-Cone <i>AoE</i></span>
                       {[0,1,2].map(idx => {
                         const arr = safeGetDotsArray(7);
@@ -641,25 +893,12 @@ const LevelUpClassDevout: React.FC<LevelUpClassDevoutProps> = ({
                           </span>
                         );
                       })}
-                    </div>
-                  </div>
-
-                  {/* Secondary Attack +1 Crit */}
-                  <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px' }}>
-                    <div style={{
-                      display: 'grid',
-                      gridTemplateColumns: '1fr 24px 24px 24px',
-                      gridTemplateRows: 'repeat(2, auto)',
-                      gap: '4px',
-                      alignItems: 'start',
-                      marginBottom: '12px'
-                    }}>
-                      {/* Row 1: XP costs */}
+                      {/* Row 5: 3xp 5xp 8xp header */}
                       <span></span>
                       <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>3xp</span>
                       <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>5xp</span>
                       <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>8xp</span>
-                      {/* Row 2: +1 Crit dots */}
+                      {/* Row 6: +1 Crit dots */}
                       <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>+1 Crit</span>
                       {[0,1,2].map(idx => {
                         const arr = safeGetDotsArray(8);
@@ -699,25 +938,13 @@ const LevelUpClassDevout: React.FC<LevelUpClassDevoutProps> = ({
                           </span>
                         );
                       })}
-                    </div>
-                  </div>
-
-                  {/* Secondary Attack -1 Cooldown */}
-                  <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px' }}>
-                    <div style={{
-                      display: 'grid',
-                      gridTemplateColumns: '1fr 24px 24px',
-                      gridTemplateRows: 'repeat(2, auto)',
-                      gap: '4px',
-                      alignItems: 'start',
-                      marginBottom: '12px'
-                    }}>
-                      {/* Row 1: XP costs */}
+                      {/* Row 7: 5xp 6xp header */}
                       <span></span>
                       <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>5xp</span>
                       <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>6xp</span>
-                      {/* Row 2: -1 Cooldown dots */}
-                      <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>-1 <i>Cooldown</i></span>
+                      <span></span>
+                      {/* Row 8: -1 Cooldown dots */}
+                      <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>-1 Cooldown</span>
                       {[0,1].map(idx => {
                         const arr = safeGetDotsArray(9);
                         const canCheck = idx === 0 || arr.slice(0, idx).every(Boolean);
@@ -756,6 +983,7 @@ const LevelUpClassDevout: React.FC<LevelUpClassDevoutProps> = ({
                           </span>
                         );
                       })}
+                      <span></span>
                     </div>
                   </div>
                 </div>

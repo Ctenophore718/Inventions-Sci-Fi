@@ -1,4 +1,5 @@
 import React from 'react';
+import type { CharacterSheet } from '../types/CharacterSheet';
 
 export interface ContemplativePrimaryAttackData {
   repeatDots: number;
@@ -35,18 +36,51 @@ export function generateContemplativePrimaryAttackStatsJSX(
   classCardDots?: boolean[][],
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _cost?: number,
-  focusName?: string
+  focusName?: string,
+  sheet?: CharacterSheet | null
 ): React.ReactElement {
   const { repeatCount, dieSize, critThreshold } = calculateContemplativePrimaryAttackData(classCardDots);
+  
+  // Calculate Vectorial Unreasonable Accuracy range bonus
+  const subclass = sheet?.subclass || '';
+  const isVectorial = subclass === 'Vectorial';
+  const vectorialFeatureRangeDots = (sheet?.subclassProgressionDots as any)?.vectorialFeatureRangeDots || [false, false, false];
+  const rangeBonus = isVectorial ? 6 + vectorialFeatureRangeDots.filter(Boolean).length : 0;
+  const baseRange = 10;
+  const totalRange = baseRange + rangeBonus;
+  
+  // Calculate Vectorial Crit bonus
+  const vectorialFeatureCritDots = (sheet?.subclassProgressionDots as any)?.vectorialFeatureCritDots || [false, false, false];
+  const vectorialCritBonus = isVectorial ? vectorialFeatureCritDots.filter(Boolean).length : 0;
+  const totalCritThreshold = critThreshold - vectorialCritBonus;
+  
+  // Calculate Cover treatment text
+  const vectorialFeatureIgnoreCoverDots = (sheet?.subclassProgressionDots as any)?.vectorialFeatureIgnoreCoverDots || [false];
+  const ignoreAllCover = vectorialFeatureIgnoreCoverDots[0];
   
   return (
     <div style={{ fontSize: '0.875em', width: '100%', height: 'fit-content', maxHeight: '100%', overflow: 'hidden' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-        <span><b><u>Range</u></b> 10hx</span>
-        <span style={{ textAlign: 'right', minWidth: '80px' }}><b><u>Crit</u></b> <b>[{critThreshold}]</b>+</span>
+        <span><b><u>Range</u></b> {isVectorial ? <><b>[{totalRange}]</b>hx</> : `${baseRange}hx`}</span>
+        <span style={{ textAlign: 'right', minWidth: '80px' }}><b><u>Crit</u></b> <b>[{totalCritThreshold}]</b>+</span>
       </div>
       <div>
-        <b><u>Target</u></b> Single, Repeat <b>[{repeatCount}]</b><br />
+        <b><u>Target</u></b> Single, Repeat <b>[{repeatCount}]</b>
+        {isVectorial && (
+          <>
+            , treat {ignoreAllCover ? <><b>[all]</b> </> : <><b>[100%]</b></>} <br />
+
+
+
+                        <span style={{ display: 'block', textAlign: 'right' }}>
+              Cover as {ignoreAllCover ? <><b>[no]</b> </> : <><b>[50%]</b> </>} Cover</span>
+            
+            
+              
+            
+          </>
+        )}
+        {!isVectorial && <br />}
         {focusName === 'Ensnaring Hand Wraps' ? (
           <>
             <b><u>Damage</u></b> 1d<b>[{dieSize}]</b> <b><u style={{ color: '#516fff', display: 'inline-flex', alignItems: 'center' }}>

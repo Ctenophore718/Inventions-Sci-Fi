@@ -196,7 +196,7 @@ export const CardsContemplativeAttacks: React.FC<CardsContemplativeAttacksProps>
               zIndex: 2,
               lineHeight: 1.2
             }}>
-              {generateContemplativePrimaryAttackStatsJSX(sheet?.classCardDots, undefined, focus)}
+              {generateContemplativePrimaryAttackStatsJSX(sheet?.classCardDots, undefined, focus, sheet)}
             </div>
             
             {/* Flavor Text */}
@@ -347,7 +347,7 @@ export const CardsContemplativeAttacks: React.FC<CardsContemplativeAttacksProps>
               zIndex: 2,
               lineHeight: 1.2
             }}>
-              {generateContemplativeSecondaryAttackStatsJSX(sheet?.classCardDots, undefined, discipline)}
+              {generateContemplativeSecondaryAttackStatsJSX(sheet?.classCardDots, undefined, discipline, sheet)}
             </div>
             
             {/* Flavor Text */}

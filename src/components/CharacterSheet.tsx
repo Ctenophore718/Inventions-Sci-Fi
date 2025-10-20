@@ -27,6 +27,11 @@ import { generateTelekineticShieldJSX } from "../utils/inertialFeature";
 import { generateInertialStrikeJSX, generateInertialStrikeDamageJSX, generateInertialStrikeEffectsJSX } from "../utils/inertialStrike";
 import { generateFinalFistsJSX } from "../utils/kineticFeature";
 import { generateKineticStrikeJSX, generateKineticStrikeDamageJSX, generateKineticStrikeEffectsJSX } from "../utils/kineticStrike";
+import { generateMercurialStrikeDamageJSX, generateMercurialStrikeEffectsJSX } from "../utils/mercurialStrike";
+import { generateUnreasonableAccuracyJSX } from "../utils/vectorialFeature";
+import { generateVectorialStrikeDamageJSX, generateVectorialStrikeRangeJSX } from "../utils/vectorialStrike";
+import { generateBloodTradeJSX } from "../utils/devoutFeature";
+
 
 
 type Props = {
@@ -232,11 +237,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
   );
   const commanderFeatureJSX = generateStaySharpJSX(sheet?.classCardDots);
   const contemplativeFeatureJSX = generatePsychosomaticHarmonyJSX(sheet?.classCardDots);
-  const devoutFeatureJSX = (
-    <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#6b1172' }}>Blood Trade.</i></b> Whenever you take Damage, you gain +<b>[{1 + (charClass === 'Devout' && sheet?.classCardDots?.[0] ? sheet.classCardDots[0].filter(Boolean).length : 0)}]</b>d6 Damage on your next <b><i><span style={{ color: '#351c75' }}>Strike</span></i></b> or <b><i><span style={{ color: '#990000' }}>Attack</span></i></b>. The Damage type matches your next <b><i><span style={{ color: '#351c75' }}>Strike</span></i></b>  or <b><i><span style={{ color:'#990000' }}>Attack</span></i></b> and doesn’t stack if you are Damaged multiple times.   
-    </span>
-  );  
+  const devoutFeatureJSX = generateBloodTradeJSX(sheet?.classCardDots);
   const elementalistFeatureJSX = (
     <span style={{ color: '#000', fontWeight: 400 }}>
       <b><i style={{ color: '#231172' }}>Elemental Excitement.</i></b> When another creature within <b>[{3 + (charClass === 'Elementalist' && sheet?.classCardDots?.[0] ? sheet.classCardDots[0].filter(Boolean).length : 0)}]</b>hx of you takes {
@@ -314,15 +315,28 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
   const kineticSpeedBonus = sheet?.subclass === 'Kinetic'
     ? ((sheet?.subclassProgressionDots as any)?.kineticMovementSpeedDots?.filter(Boolean).length || 0)
     : 0;
-  const totalSpeed = baseSpeed + tacticianSpeedBonus + kineticSpeedBonus;
+  const mercurialSpeedBonus = sheet?.subclass === 'Mercurial'
+    ? ((sheet?.subclassProgressionDots as any)?.mercurialMovementSpeedDots?.filter(Boolean).length || 0)
+    : 0;
+  const totalSpeed = baseSpeed + tacticianSpeedBonus + kineticSpeedBonus + mercurialSpeedBonus;
   const speed = totalSpeed > 0 ? `${totalSpeed}` : "0";
   
   // Calculate jump speed and jump amount for Kinetic subclass
+  // Kinetic subclass
   const kineticJumpSpeedBonus = sheet?.subclass === 'Kinetic' && (sheet?.subclassProgressionDots as any)?.kineticMovementCreatureJumpDots?.[0]
     ? 3
     : 0;
   const kineticJumpAmountBonus = sheet?.subclass === 'Kinetic' && (sheet?.subclassProgressionDots as any)?.kineticMovementCreatureJumpDots?.[0]
     ? 1
+    : 0;
+
+  // Mercurial subclass
+  // Mercurial subclass
+  const mercurialJumpSpeedBonus = sheet?.subclass === 'Mercurial'
+    ? ((sheet?.subclassProgressionDots as any)?.mercurialMovementJumpSpeedDots?.filter(Boolean).length || 0) + ((sheet?.subclassProgressionDots as any)?.mercurialMovementCreatureJumpDots?.[0] ? 3 : 0)
+    : 0;
+  const mercurialJumpAmountBonus = sheet?.subclass === 'Mercurial'
+    ? ((sheet?.subclassProgressionDots as any)?.mercurialMovementCreatureDots?.[0] ? 1 : 0) + ((sheet?.subclassProgressionDots as any)?.mercurialMovementCreatureJumpDots?.[0] ? 1 : 0)
     : 0;
   
   const strikeDamage = sheet?.strikeDamage || "";
@@ -758,7 +772,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
   // Add after mercurialFeatureJSX
   const vectorialFeatureJSX = (
     <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#531c94' }}>Unreasonable Accuracy.</i></b> You treat 100% Cover as 50% Cover when making <b><i><span style={{ color: '#990000' }}>Attacks</span></i></b>. Additionally, all your <b><i><span style={{ color: '#990000' }}>Attacks</span></i></b> have a +<b>[6]</b>hx Range.
+      {generateUnreasonableAccuracyJSX(sheet)}
     </span>
   );
 
@@ -1565,7 +1579,8 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                     if (subclass === "Tyrant" && skill === "Intimidation") return "rgba(206,31,195,0.5)";
                     if (subclass === "Inertial" && skill === "Diplomacy") return "rgba(28,148,94,0.5)";
                     if (subclass === "Kinetic" && skill === "Athletics") return "rgba(123,148,28,0.5)";
-
+                    if (subclass === "Mercurial" && skill === "Acrobatics") return "rgba(148,28,108,0.5)";
+                    if (subclass === "Vectorial" && skill === "Piloting") return "rgba(83,28,148,0.5)";
                     return null;
                   };
                   
@@ -2276,8 +2291,8 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
         <div className={styles.cardContent}>
           <div className={styles.horizontalLabel} style={{ color: '#38761d', fontWeight: 'bold' }}>Speed {speed}{speed !== "0" ? "hx" : ""}</div>
           <div className={styles.horizontalLabel} style={{ color: '#38761d', fontWeight: 'bold' }}>Speed Types {movement}</div>
-          <div className={styles.horizontalLabel} style={{ color: '#38761d', fontWeight: 'bold' }}>Jump Speed {kineticJumpSpeedBonus > 0 ? kineticJumpSpeedBonus + "hx" : ""}</div>
-          <div className={styles.horizontalLabel} style={{ color: '#38761d', fontWeight: 'bold' }}>Jump Amount {kineticJumpAmountBonus > 0 ? kineticJumpAmountBonus : ""}</div>
+          <div className={styles.horizontalLabel} style={{ color: '#38761d', fontWeight: 'bold' }}>Jump Speed {(kineticJumpSpeedBonus > 0 ? kineticJumpSpeedBonus : mercurialJumpSpeedBonus > 0 ? mercurialJumpSpeedBonus : "") + (kineticJumpSpeedBonus > 0 || mercurialJumpSpeedBonus > 0 ? "hx" : "")}</div>
+          <div className={styles.horizontalLabel} style={{ color: '#38761d', fontWeight: 'bold' }}>Jump Amount {kineticJumpAmountBonus > 0 ? kineticJumpAmountBonus : mercurialJumpAmountBonus > 0 ? mercurialJumpAmountBonus : ""}</div>
           <div className={styles.horizontalLabel} style={{ color: '#38761d', fontWeight: 'bold' }}>Speed Effects {resistances}</div>
         </div>
       </div>
@@ -2378,11 +2393,19 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
               <span style={{ fontWeight: 'bold', fontFamily: 'inherit', color: '#000', marginLeft: 4, display: 'flex', alignItems: 'center' }}>
                 {generateKineticStrikeDamageJSX(sheet)}
               </span>
+            ) : subclass === 'Mercurial' ? (
+              <span style={{ fontWeight: 'bold', fontFamily: 'inherit', color: '#000', marginLeft: 4, display: 'flex', alignItems: 'center' }}>
+                {generateMercurialStrikeDamageJSX(sheet)}&nbsp;<span style={{ fontWeight: 'normal' }}>(equipped <i style={{ color: '#941c6c' }}>Mercurial Discipline</i> Damage type)</span>
+              </span>
+            ) : subclass === 'Vectorial' ? (
+              <span style={{ fontWeight: 'bold', fontFamily: 'inherit', color: '#000', marginLeft: 4 }}>
+                {generateVectorialStrikeDamageJSX(sheet)} <span style={{ fontWeight: 'normal' }}>(equipped <i style={{ color: '#116372' }}>Focus</i> Damage Type)</span>
+              </span>
             ) : <span style={{ fontWeight: 'bold', fontFamily: 'inherit', color: '#000', marginLeft: 4 }}>{strikeDamage}</span>}
           </div>
           <div className={styles.horizontalLabel} style={{ color: '#351c75', fontWeight: 'bold' }}>Multi Strike <span style={{ color: '#000' }}>{
             charClass === 'Contemplative'
-              ? (2 + (sheet?.classCardDots?.[1]?.[0] ? 1 : 0) + ((sheet?.subclassProgressionDots as any)?.kineticStrikeMultiStrikeDots?.[0] ? 1 : 0))
+              ? (2 + (sheet?.classCardDots?.[1]?.[0] ? 1 : 0) + ((sheet?.subclassProgressionDots as any)?.kineticStrikeMultiStrikeDots?.[0] ? 1 : 0) + ((sheet?.subclassProgressionDots as any)?.mercurialStrikeMultiStrikeDots?.[0] ? 1 : 0) + ((sheet?.subclassProgressionDots as any)?.vectorialStrikeMultiStrikeDots?.[0] ? 1 : 0))
               : (subclass === 'Beguiler' && sheet?.subclassProgressionDots?.beguilerStrikeStrikeDots?.[0])
                 ? 2
                 : (subclass === 'Galvanic' && (sheet?.subclassProgressionDots as any)?.galvanicStrikeStrikeDots?.[0])
@@ -2417,6 +2440,10 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                     ? generateInertialStrikeEffectsJSX(sheet) || strikeEffects
                   : (subclass === 'Kinetic')
                     ? generateKineticStrikeEffectsJSX(sheet) || strikeEffects
+                  : (subclass === 'Mercurial')
+                    ? generateMercurialStrikeEffectsJSX(sheet) || strikeEffects
+                  : (subclass === 'Vectorial')
+                    ? <span style={{ color: '#000', fontWeight: 'normal' }}><b>[{generateVectorialStrikeRangeJSX(sheet)}]</b>hx <b><i style={{ color: '#351c75' }}>Strike</i></b> Range</span>
                     : strikeEffects
               }
           </div>
@@ -2697,6 +2724,20 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
             <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
               <span>
                 <b><i style={{ color: '#7b941c' }}>Martial Artist.</i></b> <span style={{ color: '#000' }}>Years of disciplined practice have made you into a talented martial artist. Gain an advantage on related skill rolls when performing difficult maneuvers.</span>
+              </span>
+            </div>
+          )}  
+            {subclass === 'Mercurial' && (sheet?.subclassProgressionDots as any)?.mercurialPerksSkillsDots?.[0] && (
+            <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <span>
+                <b><i style={{ color: '#941c6c' }}>Quicksilver Implement.</i></b> <span style={{ color: '#000' }}>Your mastery of the <i>Mercury Blade</i> extends beyond the battlefield, and you can manipulate the blade into various small tools that you can levitate and utilize up to 3hx away from you.</span>
+              </span>
+            </div>
+          )}  
+            {subclass === 'Vectorial' && (sheet?.subclassProgressionDots as any)?.vectorialPerksSkillsDots?.[0] && (
+            <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <span>
+                <b><i style={{ color: '#531c94' }}>Throw Image.</i></b> <span style={{ color: '#000' }}>You can briefly Oikomagically clone yourself and exist in two places at once outside of combat. You summon the clone adjacent to you and it lasts for 10 seconds. Otherwise, it functions exactly as you can.</span>
               </span>
             </div>
           )}          

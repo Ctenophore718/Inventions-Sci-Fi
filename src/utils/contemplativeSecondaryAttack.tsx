@@ -1,4 +1,5 @@
 import React from 'react';
+import type { CharacterSheet } from '../types/CharacterSheet';
 
 export interface ContemplativeSecondaryAttackData {
   dieSizeDots: number;
@@ -40,18 +41,48 @@ export function generateContemplativeSecondaryAttackStatsJSX(
   classCardDots?: boolean[][],
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _cost?: number,
-  disciplineName?: string
+  disciplineName?: string,
+  sheet?: CharacterSheet | null
 ): React.ReactElement {
   const { damageDice, dieSize, critValue } = calculateContemplativeSecondaryAttackData(classCardDots);
+  
+  // Calculate Vectorial Unreasonable Accuracy range bonus for Vectorial Disciplines only
+  const subclass = sheet?.subclass || '';
+  const isVectorialDiscipline = disciplineName === 'Bane Prana' || disciplineName === 'Night Prana';
+  const isVectorial = subclass === 'Vectorial';
+  const shouldApplyBonus = isVectorial && isVectorialDiscipline;
+  const vectorialFeatureRangeDots = (sheet?.subclassProgressionDots as any)?.vectorialFeatureRangeDots || [false, false, false];
+  const rangeBonus = shouldApplyBonus ? 6 + vectorialFeatureRangeDots.filter(Boolean).length : 0;
+  const baseRange = 1;
+  const totalRange = baseRange + rangeBonus;
+  
+  // Calculate Vectorial Crit bonus (applies to all attacks when Vectorial)
+  const vectorialFeatureCritDots = (sheet?.subclassProgressionDots as any)?.vectorialFeatureCritDots || [false, false, false];
+  const vectorialCritBonus = isVectorial ? vectorialFeatureCritDots.filter(Boolean).length : 0;
+  const totalCritValue = critValue - vectorialCritBonus;
+  
+  // Calculate Cover treatment text (applies to all attacks when Vectorial)
+  const vectorialFeatureIgnoreCoverDots = (sheet?.subclassProgressionDots as any)?.vectorialFeatureIgnoreCoverDots || [false];
+  const ignoreAllCover = vectorialFeatureIgnoreCoverDots[0];
   
   return (
     <div style={{ fontSize: '0.875em', width: '100%', height: 'fit-content', maxHeight: '100%', overflow: 'hidden' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-        <span><b><u>Range</u></b> 1hx</span>
-        <span style={{ textAlign: 'right', minWidth: '80px' }}><b><u>Crit</u></b> <b>[{critValue}]</b>+</span>
+        <span><b><u>Range</u></b> {shouldApplyBonus ? <><b>[{totalRange}]</b>hx</> : `${baseRange}hx`}</span>
+        <span style={{ textAlign: 'right', minWidth: '80px' }}><b><u>Crit</u></b> <b>[{totalCritValue}]</b>+</span>
       </div>
       <div>
-        <b><u>Target</u></b> Single<br />
+        <b><u>Target</u></b> Single
+        {isVectorial && (
+          <>
+            , treat {ignoreAllCover ? <><b>[all]</b></> : <><b>[100%]</b></>} Cover as 
+            <br />
+            <span style={{ display: 'block', textAlign: 'right' }}>
+              {ignoreAllCover ? <><b>[no]</b> Cover</> : <><b>[50%]</b> Cover</>}
+            </span>
+          </>
+        )}
+        {!isVectorial && <br />}
         {disciplineName === 'Empty Mudra' ? (
           <>
             <b><u>Damage</u></b> <b>[{damageDice}]</b>d<b>[{dieSize}]</b> <b><u style={{ color: '#02b900', display: 'inline-flex', alignItems: 'center' }}>
