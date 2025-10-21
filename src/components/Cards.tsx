@@ -1,4 +1,8 @@
 import { generateFlagellationJSX, generateFlagellationCardStatsJSX } from "../utils/devoutTechnique";
+import { generateBenefactionCardJSX } from "../utils/astralTechnique";
+import { generateSavageryCardJSX } from "../utils/chaosTechnique";
+import { generateBulwarkCardJSX } from "../utils/orderTechnique";
+import { generateWeakenCardJSX } from "../utils/voidTechnique";
 import React from "react";
 import type { CharacterSheet } from "../types/CharacterSheet";
 import { loadSheetById, saveCharacterSheet } from "../utils/storage";
@@ -688,7 +692,7 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                 fontFamily: 'Arial, Helvetica, sans-serif',
                 fontWeight: 'bold',
                 fontSize: 'clamp(0.8em, 4vw, 1.25em)',
-                color: localSheet?.subclass === 'Anatomist' ? '#66cf00' : localSheet?.subclass === 'Grenadier' ? '#cf0000' : localSheet?.subclass === 'Necro' ? '#0033cf' : localSheet?.subclass === 'Poisoner' ? '#cf7600' : localSheet?.subclass === 'Coercive' ? '#43c9ff' : localSheet?.subclass === 'Divinist' ? '#ff4343' : localSheet?.subclass === 'Naturalist' ? '#66cf00' : localSheet?.subclass === 'Technologist' ? '#8c43ff' : localSheet?.subclass === 'Beguiler' ? '#1f21ce' : localSheet?.subclass === 'Galvanic' ? '#6fce1f' : localSheet?.subclass === 'Tactician' ? '#cec31f' : localSheet?.subclass === 'Tyrant' ? '#ce1f1f' : localSheet?.subclass === 'Inertial' ? '#1c945e' : localSheet?.subclass === 'Kinetic' ? '#7b941c' : localSheet?.subclass === 'Mercurial' ? '#941c6c' : localSheet?.subclass === 'Vectorial' ? '#531c94' : 'black',
+                color: localSheet?.subclass === 'Anatomist' ? '#66cf00' : localSheet?.subclass === 'Grenadier' ? '#cf0000' : localSheet?.subclass === 'Necro' ? '#0033cf' : localSheet?.subclass === 'Poisoner' ? '#cf7600' : localSheet?.subclass === 'Coercive' ? '#43c9ff' : localSheet?.subclass === 'Divinist' ? '#ff4343' : localSheet?.subclass === 'Naturalist' ? '#66cf00' : localSheet?.subclass === 'Technologist' ? '#8c43ff' : localSheet?.subclass === 'Beguiler' ? '#1f21ce' : localSheet?.subclass === 'Galvanic' ? '#6fce1f' : localSheet?.subclass === 'Tactician' ? '#cec31f' : localSheet?.subclass === 'Tyrant' ? '#ce1f1f' : localSheet?.subclass === 'Inertial' ? '#1c945e' : localSheet?.subclass === 'Kinetic' ? '#7b941c' : localSheet?.subclass === 'Mercurial' ? '#941c6c' : localSheet?.subclass === 'Vectorial' ? '#531c94' : localSheet?.subclass === 'Astral' ? '#5bb1af' : localSheet?.subclass === 'Chaos' ? '#b15b6c' : localSheet?.subclass === 'Order' ? '#aeb15b' : localSheet?.subclass === 'Void' ? '#5b73b1' : 'black',
                 lineHeight: 1,
                 textAlign: 'left',
                 whiteSpace: 'nowrap',
@@ -697,13 +701,13 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                 flexShrink: 1,
                 marginRight: '5px'
               }}>
-                {localSheet?.subclass === 'Anatomist' ? 'The "Good Stuff"' : localSheet?.subclass === 'Grenadier' ? 'The "Big One"' : localSheet?.subclass === 'Necro' ? 'Grasp of the Grave' : localSheet?.subclass === 'Poisoner' ? 'Toxic Takedown' : localSheet?.subclass === 'Coercive' ? 'Enemies On All Sides' : localSheet?.subclass === 'Divinist' ? 'Fate Reader' : localSheet?.subclass === 'Naturalist' ? 'Bed of Rejuvenation' : localSheet?.subclass === 'Technologist' ? 'Force Field' : localSheet?.subclass === 'Beguiler' ? 'Seduce' : localSheet?.subclass === 'Galvanic' ? 'Bolstering Oratory' : localSheet?.subclass === 'Tactician' ? 'Strategery' : localSheet?.subclass === 'Tyrant' ? 'Tyrannize' : localSheet?.subclass === 'Inertial' ? 'Gravity Well' : localSheet?.subclass === 'Kinetic' ? <span style={{ color: '#7b941c' }}>Grand Slam</span> : localSheet?.subclass === 'Mercurial' ? <span style={{ color: '#941c6c' }}>Haste</span> : localSheet?.subclass === 'Vectorial' ? <span style={{ color: '#531c94' }}>Vector Clone</span> : 'Subclass Card Name'}
+                {localSheet?.subclass === 'Anatomist' ? 'The "Good Stuff"' : localSheet?.subclass === 'Grenadier' ? 'The "Big One"' : localSheet?.subclass === 'Necro' ? 'Grasp of the Grave' : localSheet?.subclass === 'Poisoner' ? 'Toxic Takedown' : localSheet?.subclass === 'Coercive' ? 'Enemies On All Sides' : localSheet?.subclass === 'Divinist' ? 'Fate Reader' : localSheet?.subclass === 'Naturalist' ? 'Bed of Rejuvenation' : localSheet?.subclass === 'Technologist' ? 'Force Field' : localSheet?.subclass === 'Beguiler' ? 'Seduce' : localSheet?.subclass === 'Galvanic' ? 'Bolstering Oratory' : localSheet?.subclass === 'Tactician' ? 'Strategery' : localSheet?.subclass === 'Tyrant' ? 'Tyrannize' : localSheet?.subclass === 'Inertial' ? 'Gravity Well' : localSheet?.subclass === 'Kinetic' ? <span style={{ color: '#7b941c' }}>Grand Slam</span> : localSheet?.subclass === 'Mercurial' ? <span style={{ color: '#941c6c' }}>Haste</span> : localSheet?.subclass === 'Vectorial' ? <span style={{ color: '#531c94' }}>Vector Clone</span> : localSheet?.subclass === 'Astral' ? 'Benefaction' : localSheet?.subclass === 'Chaos' ? 'Savagery' : localSheet?.subclass === 'Order' ? 'Bulwark' : localSheet?.subclass === 'Void' ? 'Weaken' : 'Subclass Card Name'}
               </span>
               <span style={{
                 fontFamily: 'Arial, Helvetica, sans-serif',
                 fontStyle: 'italic',
                 fontSize: '0.75em',
-                color: localSheet?.subclass === 'Anatomist' ? '#66cf00' : localSheet?.subclass === 'Grenadier' ? '#cf0000' : localSheet?.subclass === 'Necro' ? '#0033cf' : localSheet?.subclass === 'Poisoner' ? '#cf7600' : localSheet?.subclass === 'Coercive' ? '#43c9ff' : localSheet?.subclass === 'Divinist' ? '#ff4343' : localSheet?.subclass === 'Naturalist' ? '#66cf00' : localSheet?.subclass === 'Technologist' ? '#8c43ff' : localSheet?.subclass === 'Beguiler' ? '#1f21ce' : localSheet?.subclass === 'Galvanic' ? '#6fce1f' : localSheet?.subclass === 'Tactician' ? '#cec31f' : localSheet?.subclass === 'Tyrant' ? '#ce1f1f' : localSheet?.subclass === 'Inertial' ? '#1c945e' : localSheet?.subclass === 'Kinetic' ? '#6A0D91' : localSheet?.subclass === 'Mercurial' ? '#941c6c' : localSheet?.subclass === 'Vectorial' ? '#531c94' : 'black',
+                color: localSheet?.subclass === 'Anatomist' ? '#66cf00' : localSheet?.subclass === 'Grenadier' ? '#cf0000' : localSheet?.subclass === 'Necro' ? '#0033cf' : localSheet?.subclass === 'Poisoner' ? '#cf7600' : localSheet?.subclass === 'Coercive' ? '#43c9ff' : localSheet?.subclass === 'Divinist' ? '#ff4343' : localSheet?.subclass === 'Naturalist' ? '#66cf00' : localSheet?.subclass === 'Technologist' ? '#8c43ff' : localSheet?.subclass === 'Beguiler' ? '#1f21ce' : localSheet?.subclass === 'Galvanic' ? '#6fce1f' : localSheet?.subclass === 'Tactician' ? '#cec31f' : localSheet?.subclass === 'Tyrant' ? '#ce1f1f' : localSheet?.subclass === 'Inertial' ? '#1c945e' : localSheet?.subclass === 'Kinetic' ? '#6A0D91' : localSheet?.subclass === 'Mercurial' ? '#941c6c' : localSheet?.subclass === 'Vectorial' ? '#531c94' : localSheet?.subclass === 'Astral' ? '#5bb1af' : localSheet?.subclass === 'Chaos' ? '#b15b6c' : localSheet?.subclass === 'Order' ? '#aeb15b' : localSheet?.subclass === 'Void' ? '#5b73b1' : 'black',
                 lineHeight: 1,
                 whiteSpace: 'normal',
                 wordBreak: 'keep-all',
@@ -711,11 +715,11 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                 maxWidth: '72px',
                 display: 'inline-block',
                 textAlign: 'right'
-              }}>{localSheet?.subclass === 'Anatomist' ? 'Anatomist' : localSheet?.subclass === 'Grenadier' ? 'Grenadier' : localSheet?.subclass === 'Necro' ? 'Necro' : localSheet?.subclass === 'Poisoner' ? 'Poisoner' : localSheet?.subclass === 'Coercive' ? 'Coercive' : localSheet?.subclass === 'Divinist' ? 'Divinist' : localSheet?.subclass === 'Naturalist' ? 'Naturalist' : localSheet?.subclass === 'Technologist' ? 'Technologist' : localSheet?.subclass === 'Beguiler' ? 'Beguiler' : localSheet?.subclass === 'Galvanic' ? 'Galvanic' : localSheet?.subclass === 'Tactician' ? 'Tactician' : localSheet?.subclass === 'Tyrant' ? 'Tyrant' : localSheet?.subclass === 'Inertial' ? 'Inertial' : localSheet?.subclass === 'Kinetic' ? <span style={{ color: '#7b941c' }}>Kinetic</span> : localSheet?.subclass === 'Mercurial' ? <span style={{ color: '#941c6c' }}>Mercurial</span> : localSheet?.subclass === 'Vectorial' ? <span style={{ color: '#531c94' }}>Vectorial</span> : 'Subclass'}</span>
+              }}>{localSheet?.subclass === 'Anatomist' ? 'Anatomist' : localSheet?.subclass === 'Grenadier' ? 'Grenadier' : localSheet?.subclass === 'Necro' ? 'Necro' : localSheet?.subclass === 'Poisoner' ? 'Poisoner' : localSheet?.subclass === 'Coercive' ? 'Coercive' : localSheet?.subclass === 'Divinist' ? 'Divinist' : localSheet?.subclass === 'Naturalist' ? 'Naturalist' : localSheet?.subclass === 'Technologist' ? 'Technologist' : localSheet?.subclass === 'Beguiler' ? 'Beguiler' : localSheet?.subclass === 'Galvanic' ? 'Galvanic' : localSheet?.subclass === 'Tactician' ? 'Tactician' : localSheet?.subclass === 'Tyrant' ? 'Tyrant' : localSheet?.subclass === 'Inertial' ? 'Inertial' : localSheet?.subclass === 'Kinetic' ? <span style={{ color: '#7b941c' }}>Kinetic</span> : localSheet?.subclass === 'Mercurial' ? <span style={{ color: '#941c6c' }}>Mercurial</span> : localSheet?.subclass === 'Vectorial' ? <span style={{ color: '#531c94' }}>Vectorial</span> : localSheet?.subclass === 'Astral' ? 'Astral' : localSheet?.subclass === 'Chaos' ? 'Chaos' : localSheet?.subclass === 'Order' ? 'Order' : localSheet?.subclass === 'Void' ? 'Void' : 'Subclass'}</span>
             </div>
             <img 
-              src={localSheet?.subclass === 'Anatomist' ? "/The Good Stuff.png" : localSheet?.subclass === 'Grenadier' ? "/The Big One.png" : localSheet?.subclass === 'Necro' ? "/Grasp of the Grave.png" : localSheet?.subclass === 'Poisoner' ? "/Toxic Takedown.png" : localSheet?.subclass === 'Coercive' ? "/Enemies On All Sides.png" : localSheet?.subclass === 'Divinist' ? "/Fate Reader.png" : localSheet?.subclass === 'Naturalist' ? "/Bed of Rejuvenation.png" : localSheet?.subclass === 'Technologist' ? "/Force Field.png" : localSheet?.subclass === 'Beguiler' ? "/Seduce.png" : localSheet?.subclass === 'Galvanic' ? "/Bolstering Oratory.png" : localSheet?.subclass === 'Tactician' ? "/Strategery.png" : localSheet?.subclass === 'Tyrant' ? "/Tyrannize.png" : localSheet?.subclass === 'Inertial' ? "/Gravity Well.png" : localSheet?.subclass === 'Kinetic' ? "/Grand Slam.png" : localSheet?.subclass === 'Mercurial' ? "/Haste.png" : localSheet?.subclass === 'Vectorial' ? "/Vector Clone.png" : "/Blank Card.png"}
-              alt={localSheet?.subclass === 'Anatomist' ? "The Good Stuff" : localSheet?.subclass === 'Grenadier' ? "The Big One" : localSheet?.subclass === 'Necro' ? "Grasp of the Grave" : localSheet?.subclass === 'Poisoner' ? "Toxic Takedown" : localSheet?.subclass === 'Coercive' ? "Enemies On All Sides" : localSheet?.subclass === 'Divinist' ? "Fate Reader" : localSheet?.subclass === 'Naturalist' ? "Bed of Rejuvenation" : localSheet?.subclass === 'Technologist' ? "Force Field" : localSheet?.subclass === 'Beguiler' ? "Seduce" : localSheet?.subclass === 'Galvanic' ? "Bolstering Oratory" : localSheet?.subclass === 'Tactician' ? "Strategery" : localSheet?.subclass === 'Tyrant' ? "Tyrannize" : localSheet?.subclass === 'Inertial' ? "Gravity Well" : localSheet?.subclass === 'Kinetic' ? "Grand Slam" : localSheet?.subclass === 'Mercurial' ? "Haste" : localSheet?.subclass === 'Vectorial' ? "Vector Clone" : "Blank Card"}
+              src={localSheet?.subclass === 'Anatomist' ? "/The Good Stuff.png" : localSheet?.subclass === 'Grenadier' ? "/The Big One.png" : localSheet?.subclass === 'Necro' ? "/Grasp of the Grave.png" : localSheet?.subclass === 'Poisoner' ? "/Toxic Takedown.png" : localSheet?.subclass === 'Coercive' ? "/Enemies On All Sides.png" : localSheet?.subclass === 'Divinist' ? "/Fate Reader.png" : localSheet?.subclass === 'Naturalist' ? "/Bed of Rejuvenation.png" : localSheet?.subclass === 'Technologist' ? "/Force Field.png" : localSheet?.subclass === 'Beguiler' ? "/Seduce.png" : localSheet?.subclass === 'Galvanic' ? "/Bolstering Oratory.png" : localSheet?.subclass === 'Tactician' ? "/Strategery.png" : localSheet?.subclass === 'Tyrant' ? "/Tyrannize.png" : localSheet?.subclass === 'Inertial' ? "/Gravity Well.png" : localSheet?.subclass === 'Kinetic' ? "/Grand Slam.png" : localSheet?.subclass === 'Mercurial' ? "/Haste.png" : localSheet?.subclass === 'Vectorial' ? "/Vector Clone.png" : localSheet?.subclass === 'Astral' ? "/Benefaction.png" : localSheet?.subclass === 'Chaos' ? "/Savagery.png" : localSheet?.subclass === 'Order' ? "/Bulwark.png" : localSheet?.subclass === 'Void' ? "/Weaken.png" : "/Blank Card.png"}
+              alt={localSheet?.subclass === 'Anatomist' ? "The Good Stuff" : localSheet?.subclass === 'Grenadier' ? "The Big One" : localSheet?.subclass === 'Necro' ? "Grasp of the Grave" : localSheet?.subclass === 'Poisoner' ? "Toxic Takedown" : localSheet?.subclass === 'Coercive' ? "Enemies On All Sides" : localSheet?.subclass === 'Divinist' ? "Fate Reader" : localSheet?.subclass === 'Naturalist' ? "Bed of Rejuvenation" : localSheet?.subclass === 'Technologist' ? "Force Field" : localSheet?.subclass === 'Beguiler' ? "Seduce" : localSheet?.subclass === 'Galvanic' ? "Bolstering Oratory" : localSheet?.subclass === 'Tactician' ? "Strategery" : localSheet?.subclass === 'Tyrant' ? "Tyrannize" : localSheet?.subclass === 'Inertial' ? "Gravity Well" : localSheet?.subclass === 'Kinetic' ? "Grand Slam" : localSheet?.subclass === 'Mercurial' ? "Haste" : localSheet?.subclass === 'Vectorial' ? "Vector Clone" : localSheet?.subclass === 'Astral' ? "Benefaction" : localSheet?.subclass === 'Chaos' ? "Savagery" : localSheet?.subclass === 'Order' ? "Bulwark" : localSheet?.subclass === 'Void' ? "Weaken" : "Blank Card"}
               style={{
                 position: 'absolute',
                 top: 35,
@@ -790,6 +794,14 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                   ? <>Cooldown <span style={{ fontWeight: 'bold', fontStyle: 'normal' }}>[{4 - ((localSheet?.subclassProgressionDots as any)?.mercurialTechniqueCooldownDots?.filter(Boolean).length || 0)}]</span></>
                   : localSheet?.subclass === 'Vectorial'
                   ? <>Cooldown <span style={{ fontWeight: 'bold', fontStyle: 'normal' }}>[{4 - ((localSheet?.subclassProgressionDots as any)?.vectorialTechniqueCooldownDots?.filter(Boolean).length || 0)}]</span></>
+                  : localSheet?.subclass === 'Astral'
+                  ? <>Cooldown <span style={{ fontWeight: 'bold', fontStyle: 'normal' }}>[{4 - ((localSheet?.subclassProgressionDots as any)?.astralTechniqueCooldownDots?.filter(Boolean).length || 0)}]</span></>
+                  : localSheet?.subclass === 'Chaos'
+                  ? <>Cooldown <span style={{ fontWeight: 'bold', fontStyle: 'normal' }}>[{4 - ((localSheet?.subclassProgressionDots as any)?.chaosTechniqueCooldownDots?.filter(Boolean).length || 0)}]</span></>
+                  : localSheet?.subclass === 'Order'
+                  ? <>Cooldown <span style={{ fontWeight: 'bold', fontStyle: 'normal' }}>[{4 - ((localSheet?.subclassProgressionDots as any)?.orderTechniqueCooldownDots?.filter(Boolean).length || 0)}]</span></>
+                  : localSheet?.subclass === 'Void'
+                  ? <>Cooldown <span style={{ fontWeight: 'bold', fontStyle: 'normal' }}>[{4 - ((localSheet?.subclassProgressionDots as any)?.voidTechniqueCooldownDots?.filter(Boolean).length || 0)}]</span></>
                   : <>Cooldown <span style={{ fontWeight: 'bold', fontStyle: 'normal' }}>[{localSheet?.subclass === 'Anatomist' ? calculateAnatomistTechniqueData(localSheet?.subclassProgressionDots).cooldown : '#'}]</span></>}
               </span>
             </div>
@@ -882,6 +894,14 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                   ? generateHasteCardJSX(localSheet)
                   : localSheet?.subclass === 'Vectorial'
                   ? generateVectorCloneCardJSX(localSheet)
+                  : localSheet?.subclass === 'Astral'
+                  ? generateBenefactionCardJSX(localSheet)
+                  : localSheet?.subclass === 'Chaos'
+                  ? generateSavageryCardJSX(localSheet)
+                  : localSheet?.subclass === 'Order'
+                  ? generateBulwarkCardJSX(localSheet)
+                  : localSheet?.subclass === 'Void'
+                  ? generateWeakenCardJSX(localSheet)
                   : 'Card stats.'}
               </div>
             </div>
@@ -894,7 +914,7 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
               color: '#000',
               fontFamily: 'Arial, Helvetica, sans-serif',
               fontStyle: 'italic',
-              fontSize: localSheet?.subclass === 'Grenadier' ? '0.69em' : localSheet?.subclass === 'Anatomist' ? '0.69em' : localSheet?.subclass === 'Necro' ? '0.69em' : localSheet?.subclass === 'Poisoner' ? '0.69em' : localSheet?.subclass === 'Coercive' ? '0.69em' : localSheet?.subclass === 'Divinist' ? '0.69em' : localSheet?.subclass === 'Naturalist' ? '0.69em' : localSheet?.subclass === 'Technologist' ? '0.69em' : localSheet?.subclass === 'Beguiler' ? '0.69em' : localSheet?.subclass === 'Galvanic' ? '0.69em' : localSheet?.subclass === 'Tactician' ? '0.69em' : localSheet?.subclass === 'Tyrant' ? '0.69em' : localSheet?.subclass === 'Inertial' ? '0.69em' : localSheet?.subclass === 'Kinetic' ? '0.69em' : localSheet?.subclass === 'Mercurial' ? '0.69em' : localSheet?.subclass === 'Vectorial' ? '0.69em' : '0.70em',
+              fontSize: localSheet?.subclass === 'Grenadier' ? '0.69em' : localSheet?.subclass === 'Anatomist' ? '0.69em' : localSheet?.subclass === 'Necro' ? '0.69em' : localSheet?.subclass === 'Poisoner' ? '0.69em' : localSheet?.subclass === 'Coercive' ? '0.69em' : localSheet?.subclass === 'Divinist' ? '0.69em' : localSheet?.subclass === 'Naturalist' ? '0.69em' : localSheet?.subclass === 'Technologist' ? '0.69em' : localSheet?.subclass === 'Beguiler' ? '0.69em' : localSheet?.subclass === 'Galvanic' ? '0.69em' : localSheet?.subclass === 'Tactician' ? '0.69em' : localSheet?.subclass === 'Tyrant' ? '0.69em' : localSheet?.subclass === 'Inertial' ? '0.69em' : localSheet?.subclass === 'Kinetic' ? '0.69em' : localSheet?.subclass === 'Mercurial' ? '0.69em' : localSheet?.subclass === 'Vectorial' ? '0.69em' : localSheet?.subclass === 'Astral' ? '0.69em' : localSheet?.subclass === 'Chaos' ? '0.69em' : localSheet?.subclass === 'Order' ? '0.69em' : localSheet?.subclass === 'Void' ? '0.69em' : '0.70em',
               fontWeight: 400,
               zIndex: 3,
               textAlign: 'left'
@@ -931,6 +951,14 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                 ? 'It’s not so much that our bodies move faster, it’s that the world around us moves slower.'
               : localSheet?.subclass === 'Vectorial'
                 ? 'The Vectorial briefly clones herself to throw not only her punches, but her very essence into the battlefield, causing exponential havoc and chaos.'
+              : localSheet?.subclass === 'Astral'
+                ? '"My holy light heals those who would further all beneficent causes and blinds those who would seek their ruin." --Kalofos, Lord of Light'
+              : localSheet?.subclass === 'Chaos'
+                ? '"I am the violence and rage that dwells within every creature\'s heart; see how I dance." --Agria, Queen of Wrath'
+              : localSheet?.subclass === 'Order'
+                ? 'One of the primary tenets of civilizational order is the protection of those in need. Without such defense, order will be lost.'
+              : localSheet?.subclass === 'Void'
+                ? '"I am the essence of emptiness. All that feel my touch feel nothing but absolute loss." --Kenos, the Positive Nothingness'
               : 'Flavor text.'}
             </div>
         </div>

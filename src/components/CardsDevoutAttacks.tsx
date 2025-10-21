@@ -11,21 +11,21 @@ interface CardsDevoutAttacksProps {
 function getIncantationFlavorText(incantation: string): string {
   switch (incantation) {
     case 'Cleanse':
-      return '"By the light of the astral plane, I purge the darkness from within and without." --Seraph Lightbringer, Defteran Astral Devout';
+      return '“A good mouth washing is often what is called for when curses keep wantonly spilling out.” --Kathar, Felid Astral Devout';
     case 'Enlighten':
-      return '"True enlightenment comes not from within, but from channeling the infinite wisdom of the astral realm to guide your allies." --Celeste Morningstar, Human Astral Devout';
+      return '“The light of my lord will either make you a true believer or one who may never see the truth again.” --Darrien Skye, Lithe Human Astral Devout';
     case 'Comply':
-      return '"Order must be maintained. Your will is no longer your own—submit to the greater design." --Magistrate Ironheart, Petran Order Devout';
+      return '“A good Order Devout often commands their enemies before they realize what the hell’s happened.” --Defteran saying';
     case 'Detain':
-      return '"The chains of order are not physical, but they bind more thoroughly than any iron ever could." --Warden Steelgrasp, Apocritan Order Devout';
+      return '“‘Tis less a matter of forcing against one’s will and more a matter of negating will entirely.” --Regulus Antioch, Android Order Devout ';
     case 'Rampage':
-      return '"Let chaos flow through you! Feel the madness, embrace the fury, and unleash it upon your foes!" --Havoc Bloodrage, X-Ray Chaos Devout';
+      return '“The primal wrath that dwells within every soul can be teased up to the surface with just a single word.” --Kren, Ursid Chaos Devout';
     case 'Terrify':
-      return '"Fear is the truest form of chaos. When the mind breaks, all order crumbles." --Dread Whisper, Nocturne Chaos Devout';
+      return 'Spoken in the Xenovox dialect originating from Kako, this word invades the target’s mind, conjuring cacophonous screams within.';
     case 'Erase':
-      return '"The void consumes all things. Your memory, your presence, your very existence—all shall be erased." --Nullmind, Lumenaren Void Devout';
+      return '“One word of erasure dissolves both mind and body until nothing but the fleeting memory of excruciating pain remains.” --Remnus, Android Void Devout';
     case 'Exhaust':
-      return '"The void drains not just your body, but your will to continue. Soon, you will have nothing left." --Entropy, Felid Void Devout';
+      return '“The Void is the ultimate well into which goes everything, including your very desire for life.” --Serres, Chloroptid Void Devout';
     default:
       return 'A divine incantation channeled through faith and sacrifice.';
   }
@@ -33,14 +33,24 @@ function getIncantationFlavorText(incantation: string): string {
 
 function getRelicFlavorText(relic: string): string {
   switch (relic) {
-    case 'Astral Prism':
-      return '"The prism focuses astral light into a devastating beam that shatters the material world." --Lumina Starshard, Lumenaren Astral Devout';
-    case 'Chaos Orb':
-      return '"Contained within this orb is pure, unrefined chaos. Release it at your peril—or your enemy\'s." --Vex Mayhem, Human Chaos Devout';
-    case 'Order Seal':
-      return '"This seal bears the mark of absolute law. Those who oppose order will face its judgment." --Justicar Sterling, Defteran Order Devout';
-    case 'Void Crystal':
-      return '"Peer into the crystal and see the void staring back. Feel it draw everything into its endless hunger." --Abyssal, Nocturne Void Devout';
+    case "Aktinovo's Lantern":
+      return '“The light of my lantern guides the faithful and burns away all falsities and wickedness from the world.” --Aktinovo, the Illuminator';
+    case "Agathe's Halo":
+      return '“All the children of the darkened world will know peace and light in the end.” --Agathe, Goddess of Benevolence';
+    case "Entropos' Maw":
+      return '“Everyone’s civil until hunger truly sets in.” --Entropos, the Devourer';
+    case "Kako's Bloodshot Eye":
+      return '“Anyone who looks upon my eye will see that it all truly is a mess, a beautiful, glorious mess.” --Kako, King of Chaos';
+    case "Storvald's Rimehold Hand":
+      return '“My grip is all-consuming, squeezing the life out of any warmth, sealing it in a frigid tomb.” --Storvald, the Rime Titan';
+    case 'Scepter of Ethos':
+      return '“Order must provide for all in fairness, else a brutish few intervene and create Chaos for all.” --Ethos, Adjudicator of Principles';
+    case "Fylakas' Censor":
+      return '“A burning at the stake is much more effective as a warning to others when the stake is no longer necessary.” --Fylakas, World Warden';
+    case "Kenos' Scythe":
+      return '“What is sewn in life is always reaped in death. For the Void is the true home of all that was, is, and ever will be.” --Kenos, the Nothing That Is';
+    case 'Orb of Mitra':
+      return '“I am the beginning. I am the end. I am the Great Womb, the Receiver of All Things.” --Mitra, the Great Womb';
     default:
       return 'A sacred relic channeling divine power.';
   }
@@ -67,13 +77,18 @@ function getIncantationSubclass(incantation: string): string {
 
 function getRelicSubclass(relic: string): string {
   switch (relic) {
-    case 'Astral Prism':
+    case "Aktinovo's Lantern":
+    case "Agathe's Halo":
       return 'Astral Relic';
-    case 'Chaos Orb':
+    case "Entropos' Maw":
+    case "Kako's Bloodshot Eye":
+    case "Storvald's Rimehold Hand":
       return 'Chaos Relic';
-    case 'Order Seal':
+    case 'Scepter of Ethos':
+    case "Fylakas' Censor":
       return 'Order Relic';
-    case 'Void Crystal':
+    case "Kenos' Scythe":
+    case 'Orb of Mitra':
       return 'Void Relic';
     default:
       return 'Relic';
@@ -81,11 +96,21 @@ function getRelicSubclass(relic: string): string {
 }
 
 function getSubclassColor(incantationOrRelic: string): string {
-  const subclassType = getIncantationSubclass(incantationOrRelic) || getRelicSubclass(incantationOrRelic);
-  if (subclassType.includes('Astral')) return '#516fff';
-  if (subclassType.includes('Order')) return '#ffe700';
-  if (subclassType.includes('Chaos')) return '#a929ff';
-  if (subclassType.includes('Void')) return '#3ebbff';
+  // Prefer Relic subclass if it matches, otherwise fallback to Incantation subclass
+  const relicSubclass = getRelicSubclass(incantationOrRelic);
+  if (relicSubclass && relicSubclass !== 'Relic') {
+    if (relicSubclass.includes('Astral')) return '#5bb1af';
+    if (relicSubclass.includes('Order')) return '#aeb15b';
+    if (relicSubclass.includes('Chaos')) return '#b15b6c';
+    if (relicSubclass.includes('Void')) return '#5b73b1';
+  }
+  const incantationSubclass = getIncantationSubclass(incantationOrRelic);
+  if (incantationSubclass && incantationSubclass !== 'Incantation') {
+    if (incantationSubclass.includes('Astral')) return '#5bb1af';
+    if (incantationSubclass.includes('Order')) return '#aeb15b';
+    if (incantationSubclass.includes('Chaos')) return '#b15b6c';
+    if (incantationSubclass.includes('Void')) return '#5b73b1';
+  }
   return '#6b1172'; // Default Devout color
 }
 
@@ -276,7 +301,7 @@ export const CardsDevoutAttacks: React.FC<CardsDevoutAttacksProps> = ({ sheet })
               <span style={{
                 fontFamily: 'Arial, Helvetica, sans-serif',
                 fontWeight: 'bold',
-                fontSize: 'clamp(0.8em, 4vw, 1.25em)',
+                fontSize: relic === "Storvald's Rimehold Hand" ? 'clamp(0.72em, 3.6vw, 1.1em)' : 'clamp(0.8em, 4vw, 1.25em)',
                 color: subclassColor,
                 lineHeight: 1,
                 textAlign: 'left',
@@ -288,19 +313,30 @@ export const CardsDevoutAttacks: React.FC<CardsDevoutAttacksProps> = ({ sheet })
               }}>
                 {relic}
               </span>
+              {/* Relic Subheader: two lines, e.g. Astral [newline] Relic */}
               <span style={{
                 fontFamily: 'Arial, Helvetica, sans-serif',
                 fontStyle: 'italic',
                 fontSize: '0.75em',
                 color: subclassColor,
                 lineHeight: 1,
-                whiteSpace: 'normal',
+                whiteSpace: 'pre-line',
                 wordBreak: 'keep-all',
                 overflowWrap: 'anywhere',
                 maxWidth: '72px',
                 display: 'inline-block',
                 textAlign: 'right'
-              }}>{getRelicSubclass(relic)}</span>
+              }}>
+                {(() => {
+                  const subclass = getRelicSubclass(relic);
+                  if (subclass.endsWith('Relic') && subclass !== 'Relic') {
+                    // Split e.g. 'Astral Relic' -> 'Astral' + newline + 'Relic'
+                    const [type, label] = subclass.split(' ');
+                    return `${type}\n${label}`;
+                  }
+                  return subclass;
+                })()}
+              </span>
             </div>
 
             {/* Card Image */}
@@ -358,7 +394,7 @@ export const CardsDevoutAttacks: React.FC<CardsDevoutAttacksProps> = ({ sheet })
               zIndex: 2,
               lineHeight: 1.2
             }}>
-              {generateDevoutSecondaryAttackStatsJSX(sheet?.classCardDots, undefined, relic)}
+              {generateDevoutSecondaryAttackStatsJSX(sheet?.classCardDots, undefined, relic, sheet, '0.875em')}
             </div>
             
             {/* Flavor Text */}

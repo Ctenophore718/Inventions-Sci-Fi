@@ -30,7 +30,17 @@ import { generateKineticStrikeJSX, generateKineticStrikeDamageJSX, generateKinet
 import { generateMercurialStrikeDamageJSX, generateMercurialStrikeEffectsJSX } from "../utils/mercurialStrike";
 import { generateUnreasonableAccuracyJSX } from "../utils/vectorialFeature";
 import { generateVectorialStrikeDamageJSX, generateVectorialStrikeRangeJSX } from "../utils/vectorialStrike";
+
 import { generateBloodTradeJSX } from "../utils/devoutFeature";
+import { generateFatigueJSX } from "../utils/voidFeature";
+import { generateVoidStrikeDamageJSX } from "../utils/voidStrike";
+
+import { generateMartyrJSX } from "../utils/astralFeature";
+import { generateAstralStrikeDamageJSX } from "../utils/astralStrike";
+import { generateAggressionJSX } from "../utils/chaosFeature";
+import { generateChaosStrikeDamageJSX } from "../utils/chaosStrike";
+import { generateOrderStrikeDamageJSX } from "../utils/orderStrike";
+import { generateArmoredGuardJSX } from "../utils/orderFeature";
 
 
 
@@ -779,28 +789,27 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
   // Add after vectorialFeatureJSX
   const astralFeatureJSX = (
     <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#5bb1af' }}>Martyr.</i></b> Whenever you take Damage, <b>[1]</b> ally within <b>[5]</b>hx gains <b>[2]</b>d6 <b><i style={{ color: '#990000' }}>Hit Points</i></b>.
+      {generateMartyrJSX(sheet)}
     </span>
   );
 
   // Add after astralFeatureJSX
   const chaosFeatureJSX = (
     <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#b15b6c' }}>Aggression.</i></b> Whenever you take Damage, you can immediately <b><i style={{ color: '#38761d' }}>Move</i></b> <b>[2]</b>hx.
+      {generateAggressionJSX(sheet)}
     </span>
   );
-
   // Add after chaosFeatureJSX
   const orderFeatureJSX = (
     <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#aeb15b' }}>Armored Guard.</i></b> Whenever an ally within <b>[3]</b>hx of you takes Damage, you can immediately <b><i style={{ color: '#38761d' }}>Move</i></b> to a hx adjacent to the ally and take the Damage instead.
+      {generateArmoredGuardJSX(sheet)}
     </span>
   );
 
   // Add after orderFeatureJSX
   const voidFeatureJSX = (
     <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#5b73b1' }}>Fatigue.</i></b> Whenever you take Damage, you inflict the <b><i>Demoralize</i></b> condition to one creature within <b>[8]</b>hx.
+      {generateFatigueJSX(sheet)}
     </span>
   );
 
@@ -1228,6 +1237,32 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
       );
     }
     
+    // Add Relics for Devout class
+    if (charClass === 'Devout') {
+      if (subclass === 'Astral') {
+        attacks.push(
+          { name: "Aktinovo's Lantern", type: 'Relic', cost: 275 },
+          { name: "Agathe's Halo", type: 'Relic', cost: 275 }
+        );
+      } else if (subclass === 'Chaos') {
+        attacks.push(
+          { name: "Entropos' Maw", type: 'Relic', cost: 265 },
+          { name: "Kako's Bloodshot Eye", type: 'Relic', cost: 265 },
+          { name: "Storvald's Rimehold Hand", type: 'Relic', cost: 255 }
+        );
+      } else if (subclass === 'Order') {
+        attacks.push(
+          { name: 'Scepter of Ethos', type: 'Relic', cost: 275 },
+          { name: "Fylakas' Censor", type: 'Relic', cost: 290 }
+        );
+      } else if (subclass === 'Void') {
+        attacks.push(
+          { name: "Kenos' Scythe", type: 'Relic', cost: 255 },
+          { name: 'Orb of Mitra', type: 'Relic', cost: 275 }
+        );
+      }
+    }
+    
     // Add Super Serums for Anatomist subclass
     if (subclass === 'Anatomist') {
       attacks.push(
@@ -1432,6 +1467,12 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
           algorithms: newAlgorithms,
           credits: credits - cost
         };
+      } else if (type === 'Relic') {
+        const newRelics = [...(sheet.relics || []), attackName];
+        partialUpdate = { 
+          relics: newRelics,
+          credits: credits - cost
+        };
       } else if (type === 'Super Serum') {
         const newSuperSerums = [...(sheet.superSerums || []), attackName];
         partialUpdate = { 
@@ -1503,6 +1544,11 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
         const newAlgorithms = [...(sheet.algorithms || []), attackName];
         partialUpdate = { 
           algorithms: newAlgorithms
+        };
+      } else if (type === 'Relic') {
+        const newRelics = [...(sheet.relics || []), attackName];
+        partialUpdate = { 
+          relics: newRelics
         };
       } else if (type === 'Super Serum') {
         const newSuperSerums = [...(sheet.superSerums || []), attackName];
@@ -1612,11 +1658,14 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                     if (subclass === "Galvanic" && skill === "Athletics") return "rgba(111,206,31,0.5)";
                     if (subclass === "Tactician" && skill === "Awareness") return "rgba(206,195,31,0.5)";
                     if (subclass === "Tyrant" && skill === "Intimidation") return "rgba(206,31,195,0.5)";
-                    if (subclass === "Tyrant" && skill === "Intimidation") return "rgba(206,31,195,0.5)";
                     if (subclass === "Inertial" && skill === "Diplomacy") return "rgba(28,148,94,0.5)";
                     if (subclass === "Kinetic" && skill === "Athletics") return "rgba(123,148,28,0.5)";
                     if (subclass === "Mercurial" && skill === "Acrobatics") return "rgba(148,28,108,0.5)";
                     if (subclass === "Vectorial" && skill === "Piloting") return "rgba(83,28,148,0.5)";
+                    if (subclass === "Astral" && skill === "Medicine") return "rgba(91,177,175,0.5)";
+                    if (subclass === "Chaos" && skill === "Intimidation") return "rgba(177,91,108,0.5)";
+                    if (subclass === "Order" && skill === "Culture") return "rgba(174,177,91,0.5)";
+                    if (subclass === "Void" && skill === "Stealth") return "rgba(91,115,177,0.5)";
                     return null;
                   };
                   
@@ -2329,7 +2378,21 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
           <div className={styles.horizontalLabel} style={{ color: '#38761d', fontWeight: 'bold' }}>Speed Types {movement}</div>
           <div className={styles.horizontalLabel} style={{ color: '#38761d', fontWeight: 'bold' }}>Jump Speed {(kineticJumpSpeedBonus > 0 ? kineticJumpSpeedBonus : mercurialJumpSpeedBonus > 0 ? mercurialJumpSpeedBonus : "") + (kineticJumpSpeedBonus > 0 || mercurialJumpSpeedBonus > 0 ? "hx" : "")}</div>
           <div className={styles.horizontalLabel} style={{ color: '#38761d', fontWeight: 'bold' }}>Jump Amount {kineticJumpAmountBonus > 0 ? kineticJumpAmountBonus : mercurialJumpAmountBonus > 0 ? mercurialJumpAmountBonus : ""}</div>
-          <div className={styles.horizontalLabel} style={{ color: '#38761d', fontWeight: 'bold' }}>Speed Effects {resistances}</div>
+          <div className={styles.horizontalLabel} style={{ color: '#38761d', fontWeight: 'bold' }}>
+            Speed Effects {
+              subclass === 'Chaos' 
+                ? (() => {
+                    const chaosFeatureMoveDots = (sheet?.subclassProgressionDots as any)?.chaosFeatureMoveDots || [false, false, false];
+                    const moveDistance = 2 + chaosFeatureMoveDots.filter(Boolean).length;
+                    return (
+                      <span style={{ fontWeight: 'normal', color: '#000' }}>
+                        Immediately <b><i style={{ color: '#38761d' }}>Move</i></b> <b>[{moveDistance}]</b>hx after taking Damage
+                      </span>
+                    );
+                  })()
+                : resistances
+            }
+          </div>
         </div>
       </div>
 
@@ -2437,6 +2500,22 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
               <span style={{ fontWeight: 'bold', fontFamily: 'inherit', color: '#000', marginLeft: 4 }}>
                 {generateVectorialStrikeDamageJSX(sheet)} <span style={{ fontWeight: 'normal' }}>(equipped <i style={{ color: '#116372' }}>Focus</i> Damage Type)</span>
               </span>
+            ) : subclass === 'Astral' ? (
+              <span style={{ fontWeight: 'bold', fontFamily: 'inherit', color: '#000', marginLeft: 4, display: 'flex', alignItems: 'center' }}>
+                {generateAstralStrikeDamageJSX(sheet)}
+              </span>
+            ) : subclass === 'Chaos' ? (
+              <span style={{ fontWeight: 'bold', fontFamily: 'inherit', color: '#000', marginLeft: 4, display: 'flex', alignItems: 'center' }}>
+                {generateChaosStrikeDamageJSX(sheet)}
+              </span>
+            ) : subclass === 'Order' ? (
+              <span style={{ fontWeight: 'bold', fontFamily: 'inherit', color: '#000', marginLeft: 4, display: 'flex', alignItems: 'center' }}>
+                {generateOrderStrikeDamageJSX(sheet)}
+              </span>
+            ) : subclass === 'Void' ? (
+              <span style={{ fontWeight: 'bold', fontFamily: 'inherit', color: '#000', marginLeft: 4, display: 'flex', alignItems: 'center' }}>
+                {generateVoidStrikeDamageJSX(sheet)}
+              </span>
             ) : <span style={{ fontWeight: 'bold', fontFamily: 'inherit', color: '#000', marginLeft: 4 }}>{strikeDamage}</span>}
           </div>
           <div className={styles.horizontalLabel} style={{ color: '#351c75', fontWeight: 'bold' }}>Multi Strike <span style={{ color: '#000' }}>{
@@ -2448,7 +2527,9 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                   ? 2
                   : (subclass === 'Tactician' && (sheet?.subclassProgressionDots as any)?.tacticianStrikeStrikeDots?.[0])
                     ? 2
-                    : (multiStrike > 0 ? multiStrike : <span style={{ visibility: 'hidden' }}>0</span>)
+                    : (subclass === 'Chaos' && (sheet?.subclassProgressionDots as any)?.chaosStrikeMultiStrikeDots?.[0])
+                      ? 2
+                      : (multiStrike > 0 ? multiStrike : <span style={{ visibility: 'hidden' }}>0</span>)
           }</span></div>
           <div className={styles.horizontalLabel} style={{ color: '#351c75', fontWeight: 'bold' }}>
               Strike Effects {
@@ -2480,6 +2561,8 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                     ? generateMercurialStrikeEffectsJSX(sheet) || strikeEffects
                   : (subclass === 'Vectorial')
                     ? <span style={{ color: '#000', fontWeight: 'normal' }}><b>[{generateVectorialStrikeRangeJSX(sheet)}]</b>hx <b><i style={{ color: '#351c75' }}>Strike</i></b> Range</span>
+                  : (subclass === 'Void' && (sheet?.subclassProgressionDots as any)?.voidStrikeInflictDrainDots?.[0])
+                    ? <span style={{ color: '#000', fontWeight: 'normal' }}><b><i>Drain</i></b></span>
                     : strikeEffects
               }
           </div>
@@ -2776,7 +2859,35 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                 <b><i style={{ color: '#531c94' }}>Throw Image.</i></b> <span style={{ color: '#000' }}>You can briefly Oikomagically clone yourself and exist in two places at once outside of combat. You summon the clone adjacent to you and it lasts for 10 seconds. Otherwise, it functions exactly as you can.</span>
               </span>
             </div>
-          )}          
+          )} 
+          {subclass === 'Astral' && (sheet?.subclassProgressionDots as any)?.astralPerksSkillsDots?.[0] && (
+          <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <span>
+              <b><i style={{ color: '#5bb1af' }}>Uplifiting Presence.</i></b> <span style={{ color: '#000' }}>Your connection to a divine benevolence practically makes you glow with an otherworldly charisma. Gain an advantage on social-based skill rolls when speaking kindly, honorably, or otherwise in sincere goodness.</span>
+            </span>
+          </div>
+          )}
+          {subclass === 'Chaos' && (sheet?.subclassProgressionDots as any)?.chaosPerksSkillsDots?.[0] && (
+          <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <span>
+              <b><i style={{ color: '#b15b6c' }}>Impulsive Intuition.</i></b> <span style={{ color: '#000' }}>You are adept at leaping before looking when the stakes are high, and you tend to do well in chaotic situations both physical and social. Gain an advantage on any related skill roll.</span>
+            </span>
+          </div>
+          )}  
+          {subclass === 'Order' && (sheet?.subclassProgressionDots as any)?.orderPerksSkillsDots?.[0] && (
+          <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <span>
+              <b><i style={{ color: '#aeb15b' }}>Law of the Land.</i></b> <span style={{ color: '#000' }}>You have a preternatural sense of law and order within any community you encounter and intuitively know the societal rules that govern them. Gain an advantage on any related skill roll.</span>
+            </span>
+          </div>
+          )} 
+          {subclass === 'Void' && (sheet?.subclassProgressionDots as any)?.voidPerksSkillsDots?.[0] && (
+          <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <span>
+              <b><i style={{ color: '#5b73b1' }}>Spine-Chiller.</i></b> <span style={{ color: '#000' }}>Your vibe is just downright creepy, and your connection to the Void realm influences others in an imperceptible and emotional way. Gain an advantage on social-based skill rolls when scaring, intimidating or otherwise unnerving others.</span>
+            </span>
+          </div>
+          )}                          
         </div>
       </div>
 
@@ -3062,10 +3173,10 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                     textAlign: 'left',
                     minWidth: '180px'
                   }}
-                  value={pendingSecondaryAttack || (charClass === 'Coder' ? 'Algorithms' : subclass === 'Anatomist' ? 'Super Serums' : subclass === 'Grenadier' ? 'Grenades' : subclass === 'Necro' ? 'Chem Zombies' : subclass === 'Poisoner' ? 'Noxious Fumes' : subclass === 'Beguiler' ? 'Whips' : subclass === 'Galvanic' ? 'Sabres' : subclass === 'Tactician' ? 'Flares' : subclass === 'Tyrant' ? 'Blasters' : (subclass === 'Kinetic' || subclass === 'Mercurial' || subclass === 'Inertial' || subclass === 'Vectorial') ? 'Disciplines' : 'Select Secondary Attack')}
+                  value={pendingSecondaryAttack || (charClass === 'Coder' ? 'Algorithms' : charClass === 'Devout' ? 'Relics' : subclass === 'Anatomist' ? 'Super Serums' : subclass === 'Grenadier' ? 'Grenades' : subclass === 'Necro' ? 'Chem Zombies' : subclass === 'Poisoner' ? 'Noxious Fumes' : subclass === 'Beguiler' ? 'Whips' : subclass === 'Galvanic' ? 'Sabres' : subclass === 'Tactician' ? 'Flares' : subclass === 'Tyrant' ? 'Blasters' : (subclass === 'Kinetic' || subclass === 'Mercurial' || subclass === 'Inertial' || subclass === 'Vectorial') ? 'Disciplines' : 'Select Secondary Attack')}
                   onChange={(e) => {
                     const value = e.target.value;
-                    if (value !== 'Algorithms' && value !== 'Super Serums' && value !== 'Grenades' && value !== 'Chem Zombies' && value !== 'Noxious Fumes' && value !== 'Whips' && value !== 'Sabres' && value !== 'Flares' && value !== 'Blasters' && value !== 'Disciplines' && value !== 'Select Secondary Attack') {
+                    if (value !== 'Algorithms' && value !== 'Relics' && value !== 'Super Serums' && value !== 'Grenades' && value !== 'Chem Zombies' && value !== 'Noxious Fumes' && value !== 'Whips' && value !== 'Sabres' && value !== 'Flares' && value !== 'Blasters' && value !== 'Disciplines' && value !== 'Select Secondary Attack') {
                       setPendingSecondaryAttack(value);
                     }
                   }}
@@ -3075,6 +3186,35 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                       <option disabled style={{ fontWeight: 'bold' }}>Algorithms</option>
                       <option style={{ fontWeight: 'bold' }}>Digital Wave</option>
                       <option style={{ fontWeight: 'bold' }}>Soul Tracer</option>
+                    </>
+                  )}
+                  {charClass === 'Devout' && subclass === "Astral" && (
+                    <>
+                      <option disabled style={{ fontWeight: 'bold' }}>Relics</option>
+                      <option style={{ fontWeight: 'bold' }}>Aktinovo's Lantern</option>
+                      <option style={{ fontWeight: 'bold' }}>Agathe's Halo</option>
+                    </>
+                  )}
+                  {charClass === 'Devout' && subclass === "Chaos" && (
+                    <>
+                      <option disabled style={{ fontWeight: 'bold' }}>Relics</option>
+                      <option style={{ fontWeight: 'bold' }}>Entropos' Maw</option>
+                      <option style={{ fontWeight: 'bold' }}>Kako's Bloodshot Eye</option>
+                      <option style={{ fontWeight: 'bold' }}>Storvald's Rimehold Hand</option>
+                    </>
+                  )}
+                  {charClass === 'Devout' && subclass === "Order" && (
+                    <>
+                      <option disabled style={{ fontWeight: 'bold' }}>Relics</option>
+                      <option style={{ fontWeight: 'bold' }}>Scepter of Ethos</option>
+                      <option style={{ fontWeight: 'bold' }}>Fylakas' Censor</option>
+                    </>
+                  )}
+                  {charClass === 'Devout' && subclass === "Void" && (
+                    <>
+                      <option disabled style={{ fontWeight: 'bold' }}>Relics</option>
+                      <option style={{ fontWeight: 'bold' }}>Kenos' Scythe</option>
+                      <option style={{ fontWeight: 'bold' }}>Orb of Mitra</option>
                     </>
                   )}
                   {subclass === 'Anatomist' && (
@@ -3160,7 +3300,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                       <option style={{ fontWeight: 'bold' }}>Night Prana</option>
                     </>
                   )}
-                  {charClass !== 'Coder' && subclass !== 'Anatomist' && subclass !== 'Grenadier' && subclass !== 'Necro' && subclass !== 'Poisoner' && subclass !== 'Beguiler' && subclass !== 'Galvanic' && subclass !== 'Tactician' && subclass !== 'Tyrant' && subclass !== 'Kinetic' && subclass !== 'Mercurial' && subclass !== 'Inertial' && subclass !== 'Vectorial' && (
+                  {charClass !== 'Coder' && charClass !== 'Devout' && subclass !== 'Anatomist' && subclass !== 'Grenadier' && subclass !== 'Necro' && subclass !== 'Poisoner' && subclass !== 'Beguiler' && subclass !== 'Galvanic' && subclass !== 'Tactician' && subclass !== 'Tyrant' && subclass !== 'Kinetic' && subclass !== 'Mercurial' && subclass !== 'Inertial' && subclass !== 'Vectorial' && (
                     <option disabled style={{ fontWeight: 'bold' }}>Select Secondary Attack</option>
                   )}
                 </select>
@@ -3224,6 +3364,29 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                                 const updatedSheet = { 
                                   ...sheet, 
                                   algorithms: newAlgorithms
+                                };
+                                handleAutoSave(updatedSheet);
+                              }
+                            }}
+                          >×</button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  {(sheet?.relics && sheet.relics.length > 0) && (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginLeft: '8px' }}>
+                      {sheet?.relics?.map((relic, idx) => (
+                        <span key={relic + idx + 'relic'} style={{ fontStyle: 'italic', display: 'flex', alignItems: 'center', background: '#f5f5f5', borderRadius: '6px', padding: '2px 8px' }}>
+                          {relic}
+                          <button
+                            style={{ marginLeft: '6px', padding: '0 6px', borderRadius: '50%', border: 'none', background: '#d32f2f', color: 'white', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.9em' }}
+                            title={`Remove ${relic}`}
+                            onClick={() => {
+                              if (sheet) {
+                                const newRelics = sheet.relics?.filter((_, i) => i !== idx) || [];
+                                const updatedSheet = { 
+                                  ...sheet, 
+                                  relics: newRelics
                                 };
                                 handleAutoSave(updatedSheet);
                               }

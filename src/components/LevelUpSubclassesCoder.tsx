@@ -230,7 +230,8 @@ const LevelUpSubclassesCoder: React.FC<LevelUpSubclassesCoderProps> = ({
       };
       onAutoSave({
         subclassProgressionDots: progressionDots,
-        spSpent: Math.max(0, newSpSpent)
+        spSpent: Math.max(0, newSpSpent),
+        spRemaining: spTotal - Math.max(0, newSpSpent)
       });
     }
   };

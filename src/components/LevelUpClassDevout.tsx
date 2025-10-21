@@ -3,7 +3,7 @@ import type { CharacterSheet } from "../types/CharacterSheet";
 import { generateBloodTradeJSX } from "../utils/devoutFeature";
 import { generateFlagellationJSX } from "../utils/devoutTechnique";
 import { generateDevoutPrimaryAttackStatsJSX, getIncantationCost } from "../utils/devoutPrimaryAttack";
-import { generateDevoutSecondaryAttackStatsJSX, generateDevoutSecondaryAttackDescriptionJSX } from "../utils/devoutSecondaryAttack";
+import { generateDevoutSecondaryAttackStatsJSX, getRelicCost } from "../utils/devoutSecondaryAttack";
 
 
 
@@ -759,10 +759,35 @@ const LevelUpClassDevout: React.FC<LevelUpClassDevoutProps> = ({
                         }}
                       >
                         <option disabled style={{ fontWeight: 'bold' }}>Relics</option>
-                        <option style={{ fontWeight: 'bold' }}>Astral Prism</option>
-                        <option style={{ fontWeight: 'bold' }}>Chaos Orb</option>
-                        <option style={{ fontWeight: 'bold' }}>Order Seal</option>
-                        <option style={{ fontWeight: 'bold' }}>Void Crystal</option>
+                        {/* Astral subclass relics */}
+                        {sheet?.subclass === "Astral" && (
+                          <>
+                            <option style={{ fontWeight: 'bold' }}>Aktinovo's Lantern</option>
+                            <option style={{ fontWeight: 'bold' }}>Agathe's Halo</option>
+                          </>
+                        )}
+                        {/* Chaos subclass relics */}
+                        {sheet?.subclass === "Chaos" && (
+                          <>
+                            <option style={{ fontWeight: 'bold' }}>Entropos' Maw</option>
+                            <option style={{ fontWeight: 'bold' }}>Kako's Bloodshot Eye</option>
+                            <option style={{ fontWeight: 'bold' }}>Storvald's Rimehold Hand</option>
+                          </>
+                        )}
+                        {/* Order subclass relics */}
+                        {sheet?.subclass === "Order" && (
+                          <>
+                            <option style={{ fontWeight: 'bold' }}>Scepter of Ethos</option>
+                            <option style={{ fontWeight: 'bold' }}>Fylakas' Censor</option>
+                          </>
+                        )}
+                        {/* Void subclass relics */}
+                        {sheet?.subclass === "Void" && (
+                          <>
+                            <option style={{ fontWeight: 'bold' }}>Kenos' Scythe</option>
+                            <option style={{ fontWeight: 'bold' }}>Orb of Mitra</option>
+                          </>
+                        )}
                       </select>
                       {/* Buy/Add dialog for Relic selection */}
                       {pendingRelic && (
@@ -770,22 +795,15 @@ const LevelUpClassDevout: React.FC<LevelUpClassDevoutProps> = ({
                           <div style={{ fontWeight: 'bold' }}>
                             {pendingRelic}
                             <span style={{ color: '#bf9000', fontWeight: 'bold', marginLeft: '8px' }}>
-                              {pendingRelic === 'Astral Prism' && '215c'}
-                              {pendingRelic === 'Chaos Orb' && '225c'}
-                              {pendingRelic === 'Order Seal' && '215c'}
-                              {pendingRelic === 'Void Crystal' && '225c'}
+                              {getRelicCost(pendingRelic)}c
                             </span>
                           </div>
                           <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
                             <button
                               style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #1976d2', background: '#1976d2', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}
                               onClick={() => {
-                                // Determine cost
-                                let cost = 0;
-                                if (pendingRelic === 'Astral Prism') cost = 215;
-                                else if (pendingRelic === 'Chaos Orb') cost = 225;
-                                else if (pendingRelic === 'Order Seal') cost = 215;
-                                else if (pendingRelic === 'Void Crystal') cost = 225;
+                                // Determine cost using the helper function
+                                const cost = getRelicCost(pendingRelic);
                                 // Check credits
                                 if (credits < cost) {
                                   setNotice('Not enough credits!');
@@ -858,11 +876,6 @@ const LevelUpClassDevout: React.FC<LevelUpClassDevoutProps> = ({
                       </div>
                     </div>
                     {generateDevoutSecondaryAttackStatsJSX(classCardDots)}
-                    {selectedRelics.map((relic, idx) => (
-                      <div key={relic + idx}>
-                        {generateDevoutSecondaryAttackDescriptionJSX(relic)}
-                      </div>
-                    ))}
                   </div>
                   
                   {/* XP progression table for Secondary Attack */}

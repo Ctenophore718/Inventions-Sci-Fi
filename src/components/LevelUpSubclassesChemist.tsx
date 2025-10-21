@@ -445,6 +445,7 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
       onAutoSave({
         xpSpent: newXpSpent,
         spSpent: newSpSpent,
+        spRemaining: spTotal - newSpSpent,
         subclassProgressionDots: progressionDots
       });
     }

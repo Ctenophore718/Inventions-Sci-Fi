@@ -16,6 +16,7 @@ import LevelUpSubclassesChemist from "./LevelUpSubclassesChemist";
 import LevelUpSubclassesCoder from "./LevelUpSubclassesCoder";
 import LevelUpSubclassesCommander from "./LevelUpSubclassesCommander";
 import LevelUpSubclassesContemplative from "./LevelUpSubclassesContemplative";
+import LevelUpSubclassesDevout from "./LevelUpSubclassesDevout";
 import { calculateChemistFeatureData } from "../utils/chemistFeature";
 
 
@@ -1505,6 +1506,23 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                 setNotice={setNotice}
               />
             )}
+
+            {/* Devout Subclass Content */}
+            {charClass === "Devout" && subclass && (
+              <LevelUpSubclassesDevout
+                sheet={sheet}
+                charClass={charClass}
+                subclass={subclass}
+                onAutoSave={handleAutoSave}
+                xpTotal={xpTotal}
+                spTotal={spTotal}
+                xpSpent={xpSpent}
+                spSpent={spSpent}
+                setXpSpent={setXpSpent}
+                setSpSpent={setSpSpent}
+                setNotice={setNotice}
+              />
+            )}
         </div>
 
 
@@ -1888,7 +1906,23 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                           // Vectorial Piloting booster always goes at position 2, same as class boosters
                           const isVectorialPiloting = subclass === "Vectorial" && skill === "Piloting" && i === 2;
 
-                          if (isChemistInvestigation || isCoderOikomagic || isCommanderDiplomacy || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine || isGrenadierIntimidation || isNecroSurvival || isPoisonerThievery || isCoerciveDeception || isBeguilerDeception || isDivinistInvestigation || isNaturalistSurvival || isTechnologistTechnology || isGalvanicAthletics || isTacticianAwareness || isTyrantIntimidation || isInertialDiplomacy || isKineticAthletics || isMercurialAcrobatics || isVectorialPiloting) {
+                          // Check for Astral Medicine booster dot
+                          // Astral Medicine booster always goes at position 2, same as class boosters
+                          const isAstralMedicine = subclass === "Astral" && skill === "Medicine" && i === 2;
+
+                          // Check for Chaos Intimidation booster dot
+                          // Chaos Intimidation booster always goes at position 2, same as class boosters
+                          const isChaosIntimidation = subclass === "Chaos" && skill === "Intimidation" && i === 2;
+
+                          // Check for Order Culture booster dot
+                          // Order Culture booster always goes at position 2, same as class boosters
+                          const isOrderCulture = subclass === "Order" && skill === "Culture" && i === 2;
+
+                          // Check for Void Stealth booster dot
+                          // Void Stealth booster always goes at position 2, same as class boosters
+                          const isVoidStealth = subclass === "Void" && skill === "Stealth" && i === 2;
+
+                          if (isChemistInvestigation || isCoderOikomagic || isCommanderDiplomacy || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine || isGrenadierIntimidation || isNecroSurvival || isPoisonerThievery || isCoerciveDeception || isBeguilerDeception || isDivinistInvestigation || isNaturalistSurvival || isTechnologistTechnology || isGalvanicAthletics || isTacticianAwareness || isTyrantIntimidation || isInertialDiplomacy || isKineticAthletics || isMercurialAcrobatics || isVectorialPiloting || isAstralMedicine || isChaosIntimidation || isOrderCulture || isVoidStealth) {
                             checked = true; // Force third dot to be filled for class booster dots
                           }
 
@@ -1919,6 +1953,10 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                             if (isKineticAthletics) return "rgba(123,148,28,0.5)";
                             if (isMercurialAcrobatics) return "rgba(148,28,108,0.5)";
                             if (isVectorialPiloting) return "rgba(83,28,148,0.5)";
+                            if (isAstralMedicine) return "rgba(91,177,175,0.5)";
+                            if (isChaosIntimidation) return "rgba(177,91,108,0.5)";
+                            if (isOrderCulture) return "rgba(174,177,91,0.5)";
+                            if (isVoidStealth) return "rgba(91,115,177,0.5)";
                             // Add other class colors here in the future
                             return "#d0d0d0"; // fallback color
                           };
@@ -1961,7 +1999,11 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                                     (subclass === "Inertial" && skill === "Diplomacy") ||
                                     (subclass === "Kinetic" && skill === "Athletics") ||
                                     (subclass === "Mercurial" && skill === "Acrobatics") ||
-                                    (subclass === "Vectorial" && skill === "Piloting")
+                                    (subclass === "Vectorial" && skill === "Piloting") ||
+                                    (subclass === "Astral" && skill === "Medicine") ||
+                                    (subclass === "Chaos" && skill === "Intimidation") ||
+                                    (subclass === "Order" && skill === "Culture") ||
+                                    (subclass === "Void" && skill === "Stealth")
                                   ))
                               )) {
                                 spCostForThisDot += [1, 1, 2, 2, 3, 4, 5, 6, 8, 10][j];
@@ -1996,7 +2038,11 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                                     (subclass === "Inertial" && skill === "Diplomacy") ||
                                     (subclass === "Kinetic" && skill === "Athletics") ||
                                     (subclass === "Mercurial" && skill === "Acrobatics") ||
-                                    (subclass === "Vectorial" && skill === "Piloting")
+                                    (subclass === "Vectorial" && skill === "Piloting") ||
+                                    (subclass === "Astral" && skill === "Medicine") ||
+                                    (subclass === "Chaos" && skill === "Intimidation") ||
+                                    (subclass === "Order" && skill === "Culture") ||
+                                    (subclass === "Void" && skill === "Stealth")
                                   ))
                               )) {
                                 spCostForThisDot += [1, 1, 2, 2, 3, 4, 5, 6, 8, 10][j];
@@ -2023,7 +2069,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                                   if (isLockedColumn) return;
                                   
                                   // Prevent clicking on class-based automatic skill dots
-                                  if (isChemistInvestigation || isCoderOikomagic || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isCommanderDiplomacy || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine || isGrenadierIntimidation || isNecroSurvival || isPoisonerThievery || isCoerciveDeception || isBeguilerDeception || isDivinistInvestigation || isNaturalistSurvival || isTechnologistTechnology || isGalvanicAthletics || isTacticianAwareness || isTyrantIntimidation || isInertialDiplomacy || isKineticAthletics || isMercurialAcrobatics || isVectorialPiloting) return;
+                                  if (isChemistInvestigation || isCoderOikomagic || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isCommanderDiplomacy || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine || isGrenadierIntimidation || isNecroSurvival || isPoisonerThievery || isCoerciveDeception || isBeguilerDeception || isDivinistInvestigation || isNaturalistSurvival || isTechnologistTechnology || isGalvanicAthletics || isTacticianAwareness || isTyrantIntimidation || isInertialDiplomacy || isKineticAthletics || isMercurialAcrobatics || isVectorialPiloting || isAstralMedicine || isChaosIntimidation || isOrderCulture || isVoidStealth) return;
 
                                   // SP costs for each skill dot position: [1sp, 1sp, 2sp, 2sp, 3sp, 4sp, 5sp, 6sp, 8sp, 10sp]
                                   const spCosts = [1, 1, 2, 2, 3, 4, 5, 6, 8, 10];
@@ -2066,6 +2112,10 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                                       if (subclass === "Kinetic" && skillName === "Athletics") return true;
                                       if (subclass === "Mercurial" && skillName === "Acrobatics") return true;
                                       if (subclass === "Vectorial" && skillName === "Piloting") return true;
+                                      if (subclass === "Astral" && skillName === "Medicine") return true;
+                                      if (subclass === "Chaos" && skillName === "Intimidation") return true;
+                                      if (subclass === "Order" && skillName === "Culture") return true;
+                                      if (subclass === "Void" && skillName === "Stealth") return true;
                                     }
                                     
                                     return false;
@@ -2176,13 +2226,13 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                                   width: isMobile ? 14 : 18,
                                   height: isMobile ? 14 : 18,
                                   borderRadius: '50%',
-                                  border: (isChemistInvestigation || isCoderOikomagic || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isCommanderDiplomacy || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine || isGrenadierIntimidation || isNecroSurvival || isPoisonerThievery || isCoerciveDeception || isBeguilerDeception || isDivinistInvestigation || isNaturalistSurvival || isTechnologistTechnology || isGalvanicAthletics || isTacticianAwareness || isTyrantIntimidation || isInertialDiplomacy || isKineticAthletics || isMercurialAcrobatics || isVectorialPiloting) ? `2px solid ${classBoostColor}` : (isLockedColumn ? '2px solid #666' : '2px solid #000'),
-                                  background: checked ? ((isChemistInvestigation || isCoderOikomagic || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isCommanderDiplomacy || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine || isGrenadierIntimidation || isNecroSurvival || isPoisonerThievery || isCoerciveDeception || isBeguilerDeception || isDivinistInvestigation || isNaturalistSurvival || isTechnologistTechnology || isGalvanicAthletics || isTacticianAwareness || isTyrantIntimidation || isInertialDiplomacy || isKineticAthletics || isMercurialAcrobatics || isVectorialPiloting) ? classBoostColor : (isLockedColumn ? '#666' : '#000')) : '#fff',
-                                  cursor: (isLockedColumn || isChemistInvestigation || isCoderOikomagic || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isCommanderDiplomacy || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine || isGrenadierIntimidation || isNecroSurvival || isPoisonerThievery || isCoerciveDeception || isBeguilerDeception || isDivinistInvestigation || isNaturalistSurvival || isTechnologistTechnology || isGalvanicAthletics || isTacticianAwareness || isTyrantIntimidation || isInertialDiplomacy || isKineticAthletics || isMercurialAcrobatics || isVectorialPiloting) ? 'not-allowed' : (canAffordCheck || canUncheck ? 'pointer' : 'not-allowed'),
-                                  opacity: (isLockedColumn || isChemistInvestigation || isCoderOikomagic || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isCommanderDiplomacy || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine || isGrenadierIntimidation || isNecroSurvival || isPoisonerThievery || isCoerciveDeception || isBeguilerDeception || isDivinistInvestigation || isNaturalistSurvival || isTechnologistTechnology || isGalvanicAthletics || isTacticianAwareness || isTyrantIntimidation || isInertialDiplomacy || isKineticAthletics || isMercurialAcrobatics || isVectorialPiloting) ? 0.6 : (canAffordCheck || canUncheck ? 1 : 0.4),
+                                  border: (isChemistInvestigation || isCoderOikomagic || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isCommanderDiplomacy || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine || isGrenadierIntimidation || isNecroSurvival || isPoisonerThievery || isCoerciveDeception || isBeguilerDeception || isDivinistInvestigation || isNaturalistSurvival || isTechnologistTechnology || isGalvanicAthletics || isTacticianAwareness || isTyrantIntimidation || isInertialDiplomacy || isKineticAthletics || isMercurialAcrobatics || isVectorialPiloting || isAstralMedicine || isChaosIntimidation || isOrderCulture || isVoidStealth) ? `2px solid ${classBoostColor}` : (isLockedColumn ? '2px solid #666' : '2px solid #000'),
+                                  background: checked ? ((isChemistInvestigation || isCoderOikomagic || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isCommanderDiplomacy || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine || isGrenadierIntimidation || isNecroSurvival || isPoisonerThievery || isCoerciveDeception || isBeguilerDeception || isDivinistInvestigation || isNaturalistSurvival || isTechnologistTechnology || isGalvanicAthletics || isTacticianAwareness || isTyrantIntimidation || isInertialDiplomacy || isKineticAthletics || isMercurialAcrobatics || isVectorialPiloting || isAstralMedicine || isChaosIntimidation || isOrderCulture || isVoidStealth) ? classBoostColor : (isLockedColumn ? '#666' : '#000')) : '#fff',
+                                  cursor: (isLockedColumn || isChemistInvestigation || isCoderOikomagic || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isCommanderDiplomacy || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine || isGrenadierIntimidation || isNecroSurvival || isPoisonerThievery || isCoerciveDeception || isBeguilerDeception || isDivinistInvestigation || isNaturalistSurvival || isTechnologistTechnology || isGalvanicAthletics || isTacticianAwareness || isTyrantIntimidation || isInertialDiplomacy || isKineticAthletics || isMercurialAcrobatics || isVectorialPiloting || isAstralMedicine || isChaosIntimidation || isOrderCulture || isVoidStealth) ? 'not-allowed' : (canAffordCheck || canUncheck ? 'pointer' : 'not-allowed'),
+                                  opacity: (isLockedColumn || isChemistInvestigation || isCoderOikomagic || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isCommanderDiplomacy || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine || isGrenadierIntimidation || isNecroSurvival || isPoisonerThievery || isCoerciveDeception || isBeguilerDeception || isDivinistInvestigation || isNaturalistSurvival || isTechnologistTechnology || isGalvanicAthletics || isTacticianAwareness || isTyrantIntimidation || isInertialDiplomacy || isKineticAthletics || isMercurialAcrobatics || isVectorialPiloting || isAstralMedicine || isChaosIntimidation || isOrderCulture || isVoidStealth) ? 0.6 : (canAffordCheck || canUncheck ? 1 : 0.4),
                                 }}
                                 title={
-                                  isChemistInvestigation || isCoderOikomagic || isCommanderDiplomacy || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine || isGrenadierIntimidation || isNecroSurvival || isPoisonerThievery || isCoerciveDeception || isBeguilerDeception || isDivinistInvestigation || isNaturalistSurvival || isTechnologistTechnology || isGalvanicAthletics || isTacticianAwareness || isTyrantIntimidation || isInertialDiplomacy || isKineticAthletics || isMercurialAcrobatics || isVectorialPiloting
+                                  isChemistInvestigation || isCoderOikomagic || isCommanderDiplomacy || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine || isGrenadierIntimidation || isNecroSurvival || isPoisonerThievery || isCoerciveDeception || isBeguilerDeception || isDivinistInvestigation || isNaturalistSurvival || isTechnologistTechnology || isGalvanicAthletics || isTacticianAwareness || isTyrantIntimidation || isInertialDiplomacy || isKineticAthletics || isMercurialAcrobatics || isVectorialPiloting || isAstralMedicine || isChaosIntimidation || isOrderCulture || isVoidStealth
                                     ? 'Class bonus skill dot (cannot be changed)'
                                     : isLockedColumn 
                                     ? 'Starting skill dots (cannot be changed)'
