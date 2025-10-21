@@ -72,16 +72,17 @@ export function generateDevoutSecondaryAttackStatsJSX(
   return (
     <div style={{ fontSize: '1em', width: '100%', height: 'fit-content', maxHeight: '100%', overflow: 'hidden' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-        <span><b><u>Cooldown</u></b> <b>[{cooldown}]</b></span>
-        <span style={{ textAlign: 'right', minWidth: '80px' }}><b><u>Crit</u></b> <b>[{critThreshold}]</b>+</span>
+        <span><b><u>Range</u></b> 1hx</span>
+        <span style={{ textAlign: 'right', minWidth: '80px' }}>Crit <b>[{critThreshold}]</b>+</span>
       </div>
       <div>
-        <b><u>Target</u></b> 1hx Range, <i>AoE</i> <b>[{aoeRadius}]</b>hx-cone<br />
-        <b><u>Damage</u></b> <b>[{damageDice}]</b>d6 <b><u style={{ color: damageColor, display: 'inline-flex', alignItems: 'center' }}>
-        </u></b>
-        {cost !== undefined && (
-          <span style={{ float: 'right', color: '#bf9000', fontWeight: 'bold' }}>{cost}c</span>
-        )}
+        <b><u>Target</u></b> <i>AoE</i> <b>[{aoeRadius}]</b>hx-Cone
+      </div>
+      <div>
+        <b><u>Damage</u></b> <b>[{damageDice}]</b>d6, status effect
+      </div>
+      <div>
+        <b><u>Crit Effect</u></b> <b>[{damageDice}]</b>d6, status effect
       </div>
     </div>
   );

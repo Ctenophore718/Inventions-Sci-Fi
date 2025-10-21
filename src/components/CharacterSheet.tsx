@@ -1189,6 +1189,31 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
       );
     }
     
+    // Add Incantations for Devout class (subclass-specific)
+    if (charClass === 'Devout') {
+      if (subclass === 'Astral') {
+        attacks.push(
+          { name: 'Cleanse', type: 'Incantation', cost: 160 },
+          { name: 'Enlighten', type: 'Incantation', cost: 160 }
+        );
+      } else if (subclass === 'Order') {
+        attacks.push(
+          { name: 'Comply', type: 'Incantation', cost: 155 },
+          { name: 'Detain', type: 'Incantation', cost: 155 }
+        );
+      } else if (subclass === 'Chaos') {
+        attacks.push(
+          { name: 'Rampage', type: 'Incantation', cost: 155 },
+          { name: 'Terrify', type: 'Incantation', cost: 155 }
+        );
+      } else if (subclass === 'Void') {
+        attacks.push(
+          { name: 'Erase', type: 'Incantation', cost: 155 },
+          { name: 'Exhaust', type: 'Incantation', cost: 160 }
+        );
+      }
+    }
+    
     return attacks;
   };
 
@@ -1336,6 +1361,12 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
           focuses: newFocuses,
           credits: credits - cost
         };
+      } else if (type === 'Incantation') {
+        const newIncantations = [...(sheet.incantations || []), attackName];
+        partialUpdate = { 
+          incantations: newIncantations,
+          credits: credits - cost
+        };
       } else {
         return;
       }
@@ -1372,6 +1403,11 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
         const newFocuses = [...(sheet.focuses || []), attackName];
         partialUpdate = { 
           focuses: newFocuses
+        };
+      } else if (type === 'Incantation') {
+        const newIncantations = [...(sheet.incantations || []), attackName];
+        partialUpdate = { 
+          incantations: newIncantations
         };
       } else {
         return;
@@ -2768,10 +2804,10 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                     textAlign: 'left',
                     minWidth: '180px'
                   }}
-                  value={pendingAttack || (charClass === 'Chemist' ? 'Dart Guns' : charClass === 'Coder' ? 'Lenses' : charClass === 'Commander' ? 'Rifles' : charClass === 'Contemplative' ? 'Focuses' : 'Select Primary Attack')}
+                  value={pendingAttack || (charClass === 'Chemist' ? 'Dart Guns' : charClass === 'Coder' ? 'Lenses' : charClass === 'Commander' ? 'Rifles' : charClass === 'Contemplative' ? 'Focuses' : charClass === 'Devout' ? 'Incantations' : 'Select Primary Attack')}
                   onChange={(e) => {
                     const value = e.target.value;
-                    if (value !== 'Dart Guns' && value !== 'Lenses' && value !== 'Rifles' && value !== 'Focuses' && value !== 'Select Primary Attack') {
+                    if (value !== 'Dart Guns' && value !== 'Lenses' && value !== 'Rifles' && value !== 'Focuses' && value !== 'Incantations' && value !== 'Select Primary Attack') {
                       setPendingAttack(value);
                     }
                   }}
@@ -2809,7 +2845,36 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                       <option style={{ fontWeight: 'bold' }}>Viperfang Ring</option>
                     </>
                   )}
-                  {charClass !== 'Chemist' && charClass !== 'Coder' && charClass !== 'Commander' && charClass !== 'Contemplative' && (
+                  {charClass === 'Devout' && (
+                    <>
+                      <option disabled style={{ fontWeight: 'bold' }}>Incantations</option>
+                      {subclass === 'Astral' && (
+                        <>
+                          <option style={{ fontWeight: 'bold' }}>Cleanse</option>
+                          <option style={{ fontWeight: 'bold' }}>Enlighten</option>
+                        </>
+                      )}
+                      {subclass === 'Order' && (
+                        <>
+                          <option style={{ fontWeight: 'bold' }}>Comply</option>
+                          <option style={{ fontWeight: 'bold' }}>Detain</option>
+                        </>
+                      )}
+                      {subclass === 'Chaos' && (
+                        <>
+                          <option style={{ fontWeight: 'bold' }}>Rampage</option>
+                          <option style={{ fontWeight: 'bold' }}>Terrify</option>
+                        </>
+                      )}
+                      {subclass === 'Void' && (
+                        <>
+                          <option style={{ fontWeight: 'bold' }}>Erase</option>
+                          <option style={{ fontWeight: 'bold' }}>Exhaust</option>
+                        </>
+                      )}
+                    </>
+                  )}
+                  {charClass !== 'Chemist' && charClass !== 'Coder' && charClass !== 'Commander' && charClass !== 'Contemplative' && charClass !== 'Devout' && (
                     <option disabled style={{ fontWeight: 'bold' }}>Select Primary Attack</option>
                   )}
                 </select>
@@ -2942,6 +3007,29 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                                 const updatedSheet = { 
                                   ...sheet, 
                                   focuses: newFocuses
+                                };
+                                handleAutoSave(updatedSheet);
+                              }
+                            }}
+                          >×</button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  {(sheet?.incantations && sheet.incantations.length > 0) && (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginLeft: '8px' }}>
+                      {sheet?.incantations?.map((incantation, idx) => (
+                        <span key={incantation + idx + 'incantation'} style={{ fontStyle: 'italic', display: 'flex', alignItems: 'center', background: '#f5f5f5', borderRadius: '6px', padding: '2px 8px' }}>
+                          {incantation}
+                          <button
+                            style={{ marginLeft: '6px', padding: '0 6px', borderRadius: '50%', border: 'none', background: '#d32f2f', color: 'white', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.9em' }}
+                            title={`Remove ${incantation}`}
+                            onClick={() => {
+                              if (sheet) {
+                                const newIncantations = sheet.incantations?.filter((_, i) => i !== idx) || [];
+                                const updatedSheet = { 
+                                  ...sheet, 
+                                  incantations: newIncantations
                                 };
                                 handleAutoSave(updatedSheet);
                               }

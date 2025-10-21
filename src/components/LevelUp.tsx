@@ -1264,6 +1264,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                     spTotal={spTotal}
                     xpSpent={xpSpent}
                     spSpent={spSpent}
+                    credits={credits}
                     setXpSpent={setXpSpent}
                     setSpSpent={setSpSpent}
                     setNotice={setNotice}

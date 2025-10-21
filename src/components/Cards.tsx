@@ -1,4 +1,4 @@
-import { generateFlagellationJSX } from "../utils/devoutTechnique";
+import { generateFlagellationJSX, generateFlagellationCardStatsJSX } from "../utils/devoutTechnique";
 import React from "react";
 import type { CharacterSheet } from "../types/CharacterSheet";
 import { loadSheetById, saveCharacterSheet } from "../utils/storage";
@@ -27,6 +27,7 @@ import { CardsChemistAttacks } from "./CardsChemistAttacks";
 import { CardsCoderAttacks } from "./CardsCoderAttacks";
 import { CardsCommanderAttacks } from "./CardsCommanderAttacks";
 import { CardsContemplativeAttacks } from "./CardsContemplativeAttacks";
+import { CardsDevoutAttacks } from "./CardsDevoutAttacks";
 import { calculateChemistFeatureData } from "../utils/chemistFeature";
 
 type CardsProps = {
@@ -552,7 +553,7 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                       );
                     })()
                   : charClass === 'Devout' ? (
-                    generateFlagellationJSX(localSheet?.classCardDots)
+                    generateFlagellationCardStatsJSX(localSheet?.classCardDots)
                   ) : charClass === 'Exospecialist' ? (
                     (() => {
                       let hx = 3;
@@ -1216,6 +1217,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
 
         {/* Contemplative Attack Cards */}
         {charClass === 'Contemplative' && <CardsContemplativeAttacks sheet={localSheet} subclass={subclass} />}
+
+        {/* Devout Attack Cards */}
+        {charClass === 'Devout' && <CardsDevoutAttacks sheet={localSheet} subclass={subclass} />}
 
       </div>
       

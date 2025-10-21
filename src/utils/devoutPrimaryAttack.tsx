@@ -1,4 +1,5 @@
 import React from 'react';
+import type { CharacterSheet } from '../types/CharacterSheet';
 
 export interface DevoutPrimaryAttackData {
   dieSizeDots: number;
@@ -29,47 +30,85 @@ export function calculateDevoutPrimaryAttackData(classCardDots?: boolean[][]): D
  */
 export function generateDevoutPrimaryAttackStatsJSX(
   classCardDots?: boolean[][],
-  cost?: number,
-  incantationName?: string
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _cost?: number,
+  incantationName?: string,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _sheet?: CharacterSheet | null
 ): React.ReactElement {
   const { dieSize, critThreshold } = calculateDevoutPrimaryAttackData(classCardDots);
   
-  // Determine damage type and icon based on incantation name
-  let damageType = '';
-  let damageIcon = '';
-  let damageColor = '';
-  
-  if (incantationName === 'Astral Bolt') {
-    damageType = 'Force';
-    damageIcon = '/Force.png';
-    damageColor = '#516fff';
-  } else if (incantationName === 'Chaos Vortex') {
-    damageType = 'Neural';
-    damageIcon = '/Neural.png';
-    damageColor = '#a929ff';
-  } else if (incantationName === 'Order Strike') {
-    damageType = 'Electric';
-    damageIcon = '/Electric.png';
-    damageColor = '#ffe700';
-  } else if (incantationName === 'Void Beam') {
-    damageType = 'Cold';
-    damageIcon = '/Cold.png';
-    damageColor = '#3ebbff';
-  }
-  
   return (
-    <div style={{ fontSize: '1em', width: '100%', height: 'fit-content', maxHeight: '100%', overflow: 'hidden' }}>
+    <div style={{ fontSize: '0.875em', width: '100%', height: 'fit-content', maxHeight: '100%', overflow: 'hidden' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
         <span><b><u>Range</u></b> 10hx</span>
         <span style={{ textAlign: 'right', minWidth: '80px' }}><b><u>Crit</u></b> <b>[{critThreshold}]</b>+</span>
       </div>
       <div>
         <b><u>Target</u></b> Single, Arcing<br />
-        <b><u>Damage</u></b> 1d<b>[{dieSize}]</b> <b><u style={{ color: damageColor, display: 'inline-flex', alignItems: 'center' }}>
-          {damageType}<img src={damageIcon} alt={damageType} style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} />
-        </u></b>
-        {cost !== undefined && (
-          <span style={{ float: 'right', color: '#bf9000', fontWeight: 'bold' }}>{cost}c</span>
+        {incantationName === 'Cleanse' ? (
+          <>
+            <b><u>Damage</u></b> 1d<b>[{dieSize}]</b> <b><u style={{ color: '#516fff', display: 'inline-flex', alignItems: 'center' }}>
+            Force<img src="/Force.png" alt="Force" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b><br />
+            <b><u>Crit Effect</u></b> 1d<b>[{dieSize}]</b> <b><u style={{ color: '#516fff', display: 'inline-flex', alignItems: 'center' }}>
+            Force<img src="/Force.png" alt="Force" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} /></u></b>, remove <br />
+            <span style={{ display: 'block', textAlign: 'right' }}>1 negative status effect</span>
+          </>
+        ) : incantationName === 'Enlighten' ? (
+          <>
+            <b><u>Damage</u></b> 1d<b>[{dieSize}]</b> <b><u style={{ color: '#516fff', display: 'inline-flex', alignItems: 'center' }}>
+            Force<img src="/Force.png" alt="Force" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b><br />
+            <b><u>Crit Effect</u></b> 1d<b>[{dieSize}]</b> <b><u style={{ color: '#516fff', display: 'inline-flex', alignItems: 'center' }}>
+            Force<img src="/Force.png" alt="Force" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} /></u></b>, grant ally <br />
+            <span style={{ display: 'block', textAlign: 'right' }}>within 10hx +2 to next roll</span>
+          </>
+        ) : incantationName === 'Comply' ? (
+          <>
+            <b><u>Damage</u></b> 1d<b>[{dieSize}]</b> <b><u style={{ color: '#ffe700', display: 'inline-flex', alignItems: 'center' }}>
+            Electric<img src="/Electric.png" alt="Electric" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b><br />
+            <b><u>Crit Effect</u></b> 1d<b>[{dieSize}]</b> <b><u style={{ color: '#ffe700', display: 'inline-flex', alignItems: 'center' }}>
+            Electric<img src="/Electric.png" alt="Electric" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} /></u></b>, <b><i>Confuse</i></b>
+          </>
+        ) : incantationName === 'Detain' ? (
+          <>
+            <b><u>Damage</u></b> 1d<b>[{dieSize}]</b> <b><u style={{ color: '#ffe700', display: 'inline-flex', alignItems: 'center' }}>
+            Electric<img src="/Electric.png" alt="Electric" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b><br />
+            <b><u>Crit Effect</u></b> 1d<b>[{dieSize}]</b> <b><u style={{ color: '#ffe700', display: 'inline-flex', alignItems: 'center' }}>
+            Electric<img src="/Electric.png" alt="Electric" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} /></u></b>, <b><i>Restrain</i></b>
+          </>
+        ) : incantationName === 'Rampage' ? (
+          <>
+            <b><u>Damage</u></b> 1d<b>[{dieSize}]</b> <b><u style={{ color: '#a929ff', display: 'inline-flex', alignItems: 'center' }}>
+            Neural<img src="/Neural.png" alt="Neural" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b><br />
+            <b><u>Crit Effect</u></b> 1d<b>[{dieSize}]</b> <b><u style={{ color: '#a929ff', display: 'inline-flex', alignItems: 'center' }}>
+            Neural<img src="/Neural.png" alt="Neural" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} /></u></b>, <b><i>Enrage</i></b>
+          </>
+        ) : incantationName === 'Terrify' ? (
+          <>
+            <b><u>Damage</u></b> 1d<b>[{dieSize}]</b> <b><u style={{ color: '#a929ff', display: 'inline-flex', alignItems: 'center' }}>
+            Neural<img src="/Neural.png" alt="Neural" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b><br />
+            <b><u>Crit Effect</u></b> 1d<b>[{dieSize}]</b> <b><u style={{ color: '#a929ff', display: 'inline-flex', alignItems: 'center' }}>
+            Neural<img src="/Neural.png" alt="Neural" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} /></u></b>, <b><i>Demoralize</i></b>
+          </>
+        ) : incantationName === 'Erase' ? (
+          <>
+            <b><u>Damage</u></b> 1d<b>[{dieSize}]</b> <b><u style={{ color: '#3ebbff', display: 'inline-flex', alignItems: 'center' }}>
+            Cold<img src="/Cold.png" alt="Cold" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b><br />
+            <b><u>Crit Effect</u></b> 1d<b>[{dieSize}]</b> <b><u style={{ color: '#3ebbff', display: 'inline-flex', alignItems: 'center' }}>
+            Cold<img src="/Cold.png" alt="Cold" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} /></u></b>, <b><i>Blind</i></b>
+          </>
+        ) : incantationName === 'Exhaust' ? (
+          <>
+            <b><u>Damage</u></b> 1d<b>[{dieSize}]</b> <b><u style={{ color: '#3ebbff', display: 'inline-flex', alignItems: 'center' }}>
+            Cold<img src="/Cold.png" alt="Cold" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b><br />
+            <b><u>Crit Effect</u></b> 1d<b>[{dieSize}]</b> <b><u style={{ color: '#3ebbff', display: 'inline-flex', alignItems: 'center' }}>
+            Cold<img src="/Cold.png" alt="Cold" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} /></u></b>, <b><i>Drain</i></b>
+          </>
+        ) : (
+          <>
+            <b><u>Damage</u></b> 1d<b>[{dieSize}]</b> <br />
+            <b><u>Crit Effect</u></b> 1d<b>[{dieSize}]</b>
+          </>
         )}
       </div>
     </div>
@@ -77,34 +116,18 @@ export function generateDevoutPrimaryAttackStatsJSX(
 }
 
 /**
- * Generate the primary attack description for Devout cards
+ * Get the incantation cost
  */
-export function generateDevoutPrimaryAttackDescriptionJSX(incantationName?: string): React.ReactElement {
-  if (incantationName === 'Astral Bolt') {
-    return (
-      <div style={{ fontSize: '0.75em', fontStyle: 'italic', marginTop: '4px' }}>
-        You channel astral energy to launch a bolt of pure force at your enemy, dealing unrelenting damage.
-      </div>
-    );
-  } else if (incantationName === 'Chaos Vortex') {
-    return (
-      <div style={{ fontSize: '0.75em', fontStyle: 'italic', marginTop: '4px' }}>
-        You summon a chaotic vortex that disrupts the target's mind, dealing neural damage and sowing confusion.
-      </div>
-    );
-  } else if (incantationName === 'Order Strike') {
-    return (
-      <div style={{ fontSize: '0.75em', fontStyle: 'italic', marginTop: '4px' }}>
-        You invoke the power of order, channeling precise electric energy to strike your foe with divine judgment.
-      </div>
-    );
-  } else if (incantationName === 'Void Beam') {
-    return (
-      <div style={{ fontSize: '0.75em', fontStyle: 'italic', marginTop: '4px' }}>
-        You draw upon the void's frigid emptiness, firing a beam of absolute cold that freezes your enemy.
-      </div>
-    );
+export function getIncantationCost(incantationName: string): number {
+  switch (incantationName) {
+    case 'Cleanse': return 160;
+    case 'Enlighten': return 160;
+    case 'Comply': return 155;
+    case 'Detain': return 155;
+    case 'Rampage': return 155;
+    case 'Terrify': return 155;
+    case 'Erase': return 155;
+    case 'Exhaust': return 160;
+    default: return 0;
   }
-  
-  return <></>;
 }

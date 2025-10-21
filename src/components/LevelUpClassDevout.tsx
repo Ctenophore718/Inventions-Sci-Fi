@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import type { CharacterSheet } from "../types/CharacterSheet";
 import { generateBloodTradeJSX } from "../utils/devoutFeature";
 import { generateFlagellationJSX } from "../utils/devoutTechnique";
-import { generateDevoutPrimaryAttackStatsJSX, generateDevoutPrimaryAttackDescriptionJSX } from "../utils/devoutPrimaryAttack";
+import { generateDevoutPrimaryAttackStatsJSX, getIncantationCost } from "../utils/devoutPrimaryAttack";
 import { generateDevoutSecondaryAttackStatsJSX, generateDevoutSecondaryAttackDescriptionJSX } from "../utils/devoutSecondaryAttack";
 
 
@@ -275,7 +275,7 @@ const LevelUpClassDevout: React.FC<LevelUpClassDevoutProps> = ({
                   <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px' }}>
                     <div style={{
                       display: 'grid',
-                      gridTemplateColumns: '1fr 24px',
+                      gridTemplateColumns: '1fr 24px 24px 24px',
                       gridTemplateRows: 'repeat(6, auto)',
                       columnGap: '6px',
                       rowGap: '2px',
@@ -287,8 +287,10 @@ const LevelUpClassDevout: React.FC<LevelUpClassDevoutProps> = ({
                       {/* Row 1: 10xp header */}
                       <span></span>
                       <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>10xp</span>
+                      <span></span>
+                      <span></span>
                       {/* Row 2: +1hx Attack Range dot */}
-                      <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>+1hx <b><i style={{ color: '#990000' }}>Attack</i></b> Range for each point</span>
+                      <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>+1hx <b><i style={{ color: '#990000' }}>Attack</i></b> Range for each die</span>
                       {(() => {
                         const arr = safeGetDotsArray(1);
                         const idx = 0;
@@ -325,9 +327,13 @@ const LevelUpClassDevout: React.FC<LevelUpClassDevoutProps> = ({
                       })()}
                       {/* Row 3: 20xp header */}
                       <span></span>
+                      <span></span>
+                      <span></span>
                       <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>20xp</span>
                       {/* Row 4: +1d6 Attack Damage dot */}
-                      <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>+1d6 <b><i style={{ color: '#990000' }}>Attack</i></b> Damage for each point</span>
+                      <span></span>
+                      <span></span>
+                      <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>+1d6 <b><i style={{ color: '#990000' }}>Attack</i></b> Damage for each die</span>
                       {(() => {
                         const arr = safeGetDotsArray(2);
                         const idx = 0;
@@ -364,9 +370,14 @@ const LevelUpClassDevout: React.FC<LevelUpClassDevoutProps> = ({
                       })()}
                       {/* Row 5: 4xp 7xp header */}
                       <span></span>
+                      <span></span>
+                      <span></span>
                       <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>4xp</span>
+                      <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>7xp</span>
                       {/* Row 6: -1 Cooldown dots */}
+                      <span></span>
                       <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>-1 Cooldown</span>
+                      
                       {(() => {
                         const arr = safeGetDotsArray(3);
                         const idx = 0;
@@ -406,6 +417,46 @@ const LevelUpClassDevout: React.FC<LevelUpClassDevoutProps> = ({
                           </span>
                         );
                       })()}
+                      {(() => {
+                        const arr = safeGetDotsArray(3);
+                        const idx = 1;
+                        const canCheck = arr.slice(0, idx).every(Boolean);
+                        const rightmostChecked = arr.lastIndexOf(true);
+                        const canUncheck = arr[idx] && idx === rightmostChecked;
+                        const xpCosts = [4, 7];
+                        return (
+                          <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
+                            <span
+                              onClick={() => {
+                                if (!arr[idx] && canCheck) {
+                                  const newDots = safeCloneClassCardDots();
+                                  for (let j = 0; j <= idx; ++j) newDots[3][j] = true;
+                                  let delta = 0;
+                                  for (let j = 0; j <= idx; ++j) if (!arr[j]) delta += xpCosts[j];
+                                  persistClassCardDots(newDots, 0, delta);
+                                } else if (arr[idx] && canUncheck) {
+                                  const newDots = safeCloneClassCardDots();
+                                  for (let j = idx; j < arr.length; ++j) newDots[3][j] = false;
+                                  let delta = 0;
+                                  for (let j = idx; j < arr.length; ++j) if (arr[j]) delta -= xpCosts[j];
+                                  persistClassCardDots(newDots, 0, delta);
+                                }
+                              }}
+                              style={{
+                                width: '15px',
+                                height: '15px',
+                                border: '2px solid #000',
+                                borderRadius: '50%',
+                                display: 'block',
+                                background: arr[idx] ? '#000' : '#fff',
+                                cursor: (canCheck && !arr[idx]) || canUncheck ? 'pointer' : 'not-allowed',
+                                transition: 'background 0.2s'
+                              }}
+                            ></span>
+                          </span>
+                        );
+                      })()}
+
                     </div>
                   </div>
                 </div>
@@ -443,10 +494,30 @@ const LevelUpClassDevout: React.FC<LevelUpClassDevoutProps> = ({
                         }}
                       >
                         <option disabled style={{ fontWeight: 'bold' }}>Incantations</option>
-                        <option style={{ fontWeight: 'bold' }}>Astral Bolt</option>
-                        <option style={{ fontWeight: 'bold' }}>Chaos Vortex</option>
-                        <option style={{ fontWeight: 'bold' }}>Order Strike</option>
-                        <option style={{ fontWeight: 'bold' }}>Void Beam</option>
+                        {_subclass === 'Astral' && (
+                          <>
+                            <option style={{ fontWeight: 'bold' }}>Cleanse</option>
+                            <option style={{ fontWeight: 'bold' }}>Enlighten</option>
+                          </>
+                        )}
+                        {_subclass === 'Order' && (
+                          <>
+                            <option style={{ fontWeight: 'bold' }}>Comply</option>
+                            <option style={{ fontWeight: 'bold' }}>Detain</option>
+                          </>
+                        )}
+                        {_subclass === 'Chaos' && (
+                          <>
+                            <option style={{ fontWeight: 'bold' }}>Rampage</option>
+                            <option style={{ fontWeight: 'bold' }}>Terrify</option>
+                          </>
+                        )}
+                        {_subclass === 'Void' && (
+                          <>
+                            <option style={{ fontWeight: 'bold' }}>Erase</option>
+                            <option style={{ fontWeight: 'bold' }}>Exhaust</option>
+                          </>
+                        )}
                       </select>
                       {/* Buy/Add dialog for Incantation selection */}
                       {pendingIncantation && (
@@ -454,10 +525,7 @@ const LevelUpClassDevout: React.FC<LevelUpClassDevoutProps> = ({
                           <div style={{ fontWeight: 'bold' }}>
                             {pendingIncantation}
                             <span style={{ color: '#bf9000', fontWeight: 'bold', marginLeft: '8px' }}>
-                              {pendingIncantation === 'Astral Bolt' && '155c'}
-                              {pendingIncantation === 'Chaos Vortex' && '160c'}
-                              {pendingIncantation === 'Order Strike' && '155c'}
-                              {pendingIncantation === 'Void Beam' && '160c'}
+                              {getIncantationCost(pendingIncantation)}c
                             </span>
                           </div>
                           <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
@@ -465,11 +533,7 @@ const LevelUpClassDevout: React.FC<LevelUpClassDevoutProps> = ({
                               style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #1976d2', background: '#1976d2', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}
                               onClick={() => {
                                 // Determine cost
-                                let cost = 0;
-                                if (pendingIncantation === 'Astral Bolt') cost = 155;
-                                else if (pendingIncantation === 'Chaos Vortex') cost = 160;
-                                else if (pendingIncantation === 'Order Strike') cost = 155;
-                                else if (pendingIncantation === 'Void Beam') cost = 160;
+                                const cost = getIncantationCost(pendingIncantation);
                                 // Check credits
                                 if (credits < cost) {
                                   setNotice('Not enough credits!');
@@ -541,12 +605,23 @@ const LevelUpClassDevout: React.FC<LevelUpClassDevoutProps> = ({
                         )}
                       </div>
                     </div>
-                    {generateDevoutPrimaryAttackStatsJSX(classCardDots)}
-                    {selectedIncantations.map((incantation, idx) => (
-                      <div key={incantation + idx}>
-                        {generateDevoutPrimaryAttackDescriptionJSX(incantation)}
+                    
+                    {/* Base stats display - always visible */}
+                    <div style={{ fontSize: '1em', marginTop: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <span><b><u>Range</u></b> 10hx</span>
+                        <span style={{ textAlign: 'right', minWidth: '80px' }}><b><u>Crit</u></b> <b>[{18 - (safeGetDotsArray(5)?.filter(Boolean).length || 0)}]</b>+</span>
                       </div>
-                    ))}
+                      <div>
+                        <b><u>Target</u></b> Single, Arcing
+                      </div>
+                      <div>
+                        <b><u>Damage</u></b> 1d<b>[{6 + (safeGetDotsArray(4)?.filter(Boolean).length || 0) * 2}]</b>
+                      </div>
+                      <div>
+                        <b><u>Crit Effect</u></b> 1d<b>[{6 + (safeGetDotsArray(4)?.filter(Boolean).length || 0) * 2}]</b>
+                      </div>
+                    </div>
                   </div>
                   
                   {/* XP progression table for Primary Attack */}
@@ -658,7 +733,7 @@ const LevelUpClassDevout: React.FC<LevelUpClassDevoutProps> = ({
                   {/* Secondary Attack */}
                   <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', marginTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
                     <div style={{ marginBottom: '4px' }}>
-                      <b><i><span style={{ color: '#000' }}>Secondary</span> <span style={{ color: '#990000' }}>Attack</span></i></b>.
+                      <b><i><span style={{ color: '#000' }}>Secondary</span> <span style={{ color: '#990000' }}>Attack</span></i></b> <i>(Cooldown <b>[{4 - (safeGetDotsArray(9)?.filter(Boolean).length || 0)}]</b>)</i>.
                     </div>
                     <div style={{ marginBottom: '4px', textAlign: 'left' }}>
                       <select 

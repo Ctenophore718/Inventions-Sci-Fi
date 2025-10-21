@@ -32,13 +32,28 @@ export function calculateDevoutTechniqueData(classCardDots?: boolean[][]): Devou
 
 /**
  * Generate the Flagellation technique JSX with dynamic values
+ * For use in the Technique section (includes header with cooldown)
  */
 export function generateFlagellationJSX(classCardDots?: boolean[][]): React.ReactElement {
   const { range, damageBonus, cooldown } = calculateDevoutTechniqueData(classCardDots);
   
   return (
     <>
-      <b><i style={{ color: '#6b1172', fontSize: '1em' }}>Flagellation</i></b> <i style={{ color: '#6b1172', fontSize: '1em' }}>(Cooldown <b style={{ color: '#000', fontStyle: 'normal' }}>[{cooldown}]</b>).</i> You choose to deal 1d4 to 5d4 untyped Damage to yourself that cannot be reduced in any way. As a result, you gain a +2 Crit{range > 0 && <> and +<b>[{range}]</b>hx <b><i style={{ color: '#990000' }}>Attack</i></b> Range</>} to your next <b><i><span style={{ color: '#990000' }}>Attack</span></i></b> for each die of Damage you dealt yourself{damageBonus > 0 && <>, plus +<b>[{damageBonus}]</b>d6 <b><i style={{ color: '#990000' }}>Attack</i></b> Damage</>}.
+      <b><i style={{ color: '#6b1172', fontSize: '1em' }}>Flagellation</i></b> <i style={{ color: '#6b1172', fontSize: '1em' }}>(Cooldown <b style={{ color: '#000', fontStyle: 'normal' }}>[{cooldown}]</b>).</i> You choose to deal 1d4 to 5d4 untyped Damage to yourself that cannot be reduced in any way. As a result, you gain a +2 Crit, +<b>[{range}]</b>hx Range and +<b>[{damageBonus}]</b>d6 Damage to your next <b><i><span style={{ color: '#990000' }}>Attack</span></i></b> for each die of Damage you dealt yourself.
+    </>
+  );
+}
+
+/**
+ * Generate the Flagellation card stats JSX (without header)
+ * For use in the Cards page
+ */
+export function generateFlagellationCardStatsJSX(classCardDots?: boolean[][]): React.ReactElement {
+  const { range, damageBonus } = calculateDevoutTechniqueData(classCardDots);
+  
+  return (
+    <>
+      You choose to deal 1d4 to 5d4 untyped Damage to yourself that cannot be reduced in any way. As a result, you gain a +2 Crit, +<b>[{range}]</b>hx Range and +<b>[{damageBonus}]</b>d6 Damage to your next <b><i style={{ color: '#990000' }}>Attack</i></b> for each die of Damage you dealt yourself.
     </>
   );
 }
