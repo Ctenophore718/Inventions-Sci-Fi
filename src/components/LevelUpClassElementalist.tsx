@@ -198,15 +198,18 @@ const LevelUpClassElementalist: React.FC<LevelUpClassElementalistProps> = ({
                 </div>
                 
                 {/* First XP progression table - +1hx */}
-                <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px' }}>
-                  <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: '1fr 24px 24px 24px',
-                    gridTemplateRows: 'repeat(3, auto)',
-                    gap: '4px',
-                    alignItems: 'start',
-                    marginBottom: '12px'
-                  }}>
+                  <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px' }}>
+                    <div style={{
+                      display: 'grid',
+                      gridTemplateColumns: '1fr 24px 24px 24px',
+                      gridTemplateRows: 'repeat(4, auto)',
+                      columnGap: '6px',
+                      rowGap: '2px',
+                      alignItems: 'start',
+                      marginBottom: '2px',
+                      width: '100%',
+                      paddingLeft: '4px'
+                    }}>
                     {/* Row 1: XP costs */}
                     <span></span>
                     <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>5xp</span>
@@ -252,19 +255,7 @@ const LevelUpClassElementalist: React.FC<LevelUpClassElementalistProps> = ({
                         </span>
                       );
                     })}
-                  </div>
-                </div>
 
-                {/* Second XP progression table - Deal +1d6 or ◯ on next Attack or Strike */}
-                <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px' }}>
-                  <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: '1fr 24px 24px 24px',
-                    gridTemplateRows: 'repeat(3, auto)',
-                    gap: '4px',
-                    alignItems: 'start',
-                    marginBottom: '12px'
-                  }}>
                     {/* Row 1: XP costs */}
                     <span></span>
                     <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>6xp</span>
@@ -339,13 +330,17 @@ const LevelUpClassElementalist: React.FC<LevelUpClassElementalistProps> = ({
                   <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
                     <i><span style={{ color: '#231172' }}><b>Commune</b> (Cooldown 4).</span></i> You deal double Damage dice with your next <b><i><span style={{ color: '#990000' }}>Attack</span></i></b>.
                   </div>
-                  <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginBottom: '8px' }}>
+                  <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px' }}>
                     <div style={{
                       display: 'grid',
                       gridTemplateColumns: '1fr 24px 24px 24px',
-                      gridTemplateRows: 'repeat(2, auto)',
-                      gap: '4px',
-                      alignItems: 'start'
+                      gridTemplateRows: 'repeat(4, auto)',
+                      columnGap: '6px',
+                      rowGap: '2px',
+                      alignItems: 'start',
+                      marginBottom: '2px',
+                      width: '100%',
+                      paddingLeft: '4px'
                     }}>
                       {/* Row 1: XP costs */}
                       <span></span>
@@ -394,16 +389,7 @@ const LevelUpClassElementalist: React.FC<LevelUpClassElementalistProps> = ({
                       </span>
                       <span></span>
                       <span></span>
-                    </div>
-                  </div>
-                  <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginBottom: '8px' }}>
-                    <div style={{
-                      display: 'grid',
-                      gridTemplateColumns: '1fr 24px 24px 24px',
-                      gridTemplateRows: 'repeat(2, auto)',
-                      gap: '4px',
-                      alignItems: 'start'
-                    }}>
+
                       {/* Row 1: XP costs */}
                       <span></span>
                       <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>5xp</span>
@@ -463,13 +449,17 @@ const LevelUpClassElementalist: React.FC<LevelUpClassElementalistProps> = ({
                   </div>
 
                   {/* +2 Damage dice */}
-                  <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginBottom: '8px' }}>
+                  <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px' }}>
                     <div style={{
                       display: 'grid',
                       gridTemplateColumns: '1fr 24px 24px 24px',
-                      gridTemplateRows: 'repeat(2, auto)',
-                      gap: '4px',
-                      alignItems: 'start'
+                      gridTemplateRows: 'repeat(4, auto)',
+                      columnGap: '6px',
+                      rowGap: '2px',
+                      alignItems: 'start',
+                      marginBottom: '2px',
+                      width: '100%',
+                      paddingLeft: '4px'
                     }}>
                       {/* Row 1: XP costs */}
                       <span></span>
@@ -516,18 +506,7 @@ const LevelUpClassElementalist: React.FC<LevelUpClassElementalistProps> = ({
                           </span>
                         );
                       })}
-                    </div>
-                  </div>
 
-                  {/* +2hx Range */}
-                  <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginBottom: '8px' }}>
-                    <div style={{
-                      display: 'grid',
-                      gridTemplateColumns: '1fr 24px 24px 24px',
-                      gridTemplateRows: 'repeat(2, auto)',
-                      gap: '4px',
-                      alignItems: 'start'
-                    }}>
                       {/* Row 1: XP costs */}
                       <span></span>
                       <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>5xp</span>
@@ -573,18 +552,7 @@ const LevelUpClassElementalist: React.FC<LevelUpClassElementalistProps> = ({
                           </span>
                         );
                       })}
-                    </div>
-                  </div>
 
-                  {/* +1 Crit */}
-                  <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginBottom: '8px' }}>
-                    <div style={{
-                      display: 'grid',
-                      gridTemplateColumns: '1fr 24px 24px 24px',
-                      gridTemplateRows: 'repeat(2, auto)',
-                      gap: '4px',
-                      alignItems: 'start'
-                    }}>
                       {/* Row 1: XP costs */}
                       <span></span>
                       <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>3xp</span>
@@ -639,13 +607,17 @@ const LevelUpClassElementalist: React.FC<LevelUpClassElementalistProps> = ({
                   </div>
 
                   {/* +1hx Range */}
-                  <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginBottom: '8px' }}>
+                  <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px' }}>
                     <div style={{
                       display: 'grid',
                       gridTemplateColumns: '1fr 24px 24px 24px',
-                      gridTemplateRows: 'repeat(2, auto)',
-                      gap: '4px',
-                      alignItems: 'start'
+                      gridTemplateRows: 'repeat(4, auto)',
+                      columnGap: '6px',
+                      rowGap: '2px',
+                      alignItems: 'start',
+                      marginBottom: '2px',
+                      width: '100%',
+                      paddingLeft: '4px'
                     }}>
                       {/* Row 1: XP costs */}
                       <span></span>
@@ -692,18 +664,7 @@ const LevelUpClassElementalist: React.FC<LevelUpClassElementalistProps> = ({
                           </span>
                         );
                       })}
-                    </div>
-                  </div>
 
-                  {/* Repeat +1 */}
-                  <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginBottom: '8px' }}>
-                    <div style={{
-                      display: 'grid',
-                      gridTemplateColumns: '1fr 24px 24px 24px',
-                      gridTemplateRows: 'repeat(2, auto)',
-                      gap: '4px',
-                      alignItems: 'start'
-                    }}>
                       {/* Row 1: XP costs */}
                       <span></span>
                       <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>5xp</span>
@@ -750,18 +711,7 @@ const LevelUpClassElementalist: React.FC<LevelUpClassElementalistProps> = ({
                         );
                       })}
                       <span></span>
-                    </div>
-                  </div>
 
-                  {/* +2hx Speed */}
-                  <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginBottom: '8px' }}>
-                    <div style={{
-                      display: 'grid',
-                      gridTemplateColumns: '1fr 24px 24px 24px',
-                      gridTemplateRows: 'repeat(2, auto)',
-                      gap: '4px',
-                      alignItems: 'start'
-                    }}>
                       {/* Row 1: XP costs */}
                       <span></span>
                       <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>5xp</span>
@@ -807,18 +757,7 @@ const LevelUpClassElementalist: React.FC<LevelUpClassElementalistProps> = ({
                           </span>
                         );
                       })}
-                    </div>
-                  </div>
 
-                  {/* +1 Crit for Secondary Attack */}
-                  <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginBottom: '8px' }}>
-                    <div style={{
-                      display: 'grid',
-                      gridTemplateColumns: '1fr 24px 24px 24px',
-                      gridTemplateRows: 'repeat(2, auto)',
-                      gap: '4px',
-                      alignItems: 'start'
-                    }}>
                       {/* Row 1: XP costs */}
                       <span></span>
                       <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>2xp</span>
@@ -864,18 +803,7 @@ const LevelUpClassElementalist: React.FC<LevelUpClassElementalistProps> = ({
                           </span>
                         );
                       })}
-                    </div>
-                  </div>
 
-                  {/* Summon +5 Hit Points */}
-                  <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginBottom: '8px' }}>
-                    <div style={{
-                      display: 'grid',
-                      gridTemplateColumns: '1fr 24px 24px 24px',
-                      gridTemplateRows: 'repeat(2, auto)',
-                      gap: '4px',
-                      alignItems: 'start'
-                    }}>
                       {/* Row 1: XP costs */}
                       <span></span>
                       <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>4xp</span>
@@ -921,18 +849,7 @@ const LevelUpClassElementalist: React.FC<LevelUpClassElementalistProps> = ({
                           </span>
                         );
                       })}
-                    </div>
-                  </div>
 
-                  {/* -1 Cooldown for Secondary Attack */}
-                  <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginBottom: '8px' }}>
-                    <div style={{
-                      display: 'grid',
-                      gridTemplateColumns: '1fr 24px 24px 24px',
-                      gridTemplateRows: 'repeat(2, auto)',
-                      gap: '4px',
-                      alignItems: 'start'
-                    }}>
                       {/* Row 1: XP costs */}
                       <span></span>
                       <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>5xp</span>
