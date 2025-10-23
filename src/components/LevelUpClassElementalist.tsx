@@ -1,5 +1,9 @@
 import React, { useState } from "react";
 import type { CharacterSheet } from "../types/CharacterSheet";
+import { generateElementalExcitementJSX } from "../utils/elementalistFeature";
+import { generateCommuneJSX } from "../utils/elementalistTechnique";
+import { generateElementalistPrimaryAttackStatsJSX, getShardCost } from "../utils/elementalistPrimaryAttack";
+import { generateElementalistSecondaryAttackDescriptionJSX } from "../utils/elementalistSecondaryAttack";
 
 
 // Default dots structure for Elementalist class card (14 rows, each with 3 or fewer dots as needed)
@@ -57,6 +61,10 @@ const LevelUpClassElementalist: React.FC<LevelUpClassElementalistProps> = ({
       }
       return defaultElementalistDots.map(row => [...row]);
     });
+
+    // Local state for selected shard (primary attack)
+    const [pendingShard, setPendingShard] = useState<string>("");
+    const _subclass = sheet?.subclass || subclass;
   
     // Helper function to safely access classCardDots array
     const safeGetDotsArray = (index: number): boolean[] => {
@@ -167,33 +175,7 @@ const LevelUpClassElementalist: React.FC<LevelUpClassElementalistProps> = ({
                 <div style={{ color: '#0b5394', fontWeight: 'bold', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '8px' }}>
                   <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32, fontFamily: 'Arial, Helvetica, sans-serif' }}>
                     <div style={{ fontWeight: 'bold', color: '#0b5394', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Feature</u></div>
-                    <span style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
-                      <b><i style={{ color: '#231172', fontSize: '1em' }}>Elemental Excitement.</i></b> {subclass === 'Air' ? (
-                        <span style={{ fontSize: '1em', fontWeight: 400 }}>
-                          When another creature within 3hx of you takes <b><span style={{ color: '#516fff' }}><u>Force</u></span></b> <img src="/Force.png" alt="Force" style={{ height: '1em', verticalAlign: 'middle', marginLeft: '2px', marginRight: '2px' }} /> Damage, you may remove a <i>Cooldown Token</i> from any of your <b><i><span style={{ color: '#990000' }}>Attacks</span></i></b> or <b><i><span style={{ color: '#bf9000' }}>Techniques</span></i></b>.
-                        </span>
-                      ) : subclass === 'Earth' ? (
-                        <span style={{ fontSize: '1em', fontWeight: 400 }}>
-                          When another creature within 3hx of you takes <b><span style={{ color: '#915927' }}><u>Bludgeoning</u></span></b> <img src="/Bludgeoning.png" alt="Bludgeoning" style={{ height: '1em', verticalAlign: 'middle', marginLeft: '2px', marginRight: '2px' }} /> Damage, you may remove a <i>Cooldown Token</i> from any of your <b><i><span style={{ color: '#990000' }}>Attacks</span></i></b> or <b><i><span style={{ color: '#bf9000' }}>Techniques</span></i></b>.
-                        </span>
-                      ) : subclass === 'Fire' ? (
-                        <span style={{ fontSize: '1em', fontWeight: 400 }}>
-                          When another creature within 3hx of you takes <b><span style={{ color: '#f90102' }}><u>Fire</u></span></b> <img src="/Fire.png" alt="Fire" style={{ height: '1em', verticalAlign: 'middle', marginLeft: '2px', marginRight: '2px' }} /> Damage, you may remove a <i>Cooldown Token</i> from any of your <b><i><span style={{ color: '#990000' }}>Attacks</span></i></b> or <b><i><span style={{ color: '#bf9000' }}>Techniques</span></i></b>.
-                        </span>
-                      ) : subclass === 'Water' ? (
-                        <span style={{ fontSize: '1em', fontWeight: 400 }}>
-                          When another creature within 3hx of you takes <b><span style={{ color: '#3ebbff' }}><u>Cold</u></span></b> <img src="/Cold.png" alt="Cold" style={{ height: '1em', verticalAlign: 'middle', marginLeft: '2px', marginRight: '2px' }} /> Damage, you may remove a <i>Cooldown Token</i> from any of your <b><i><span style={{ color: '#990000' }}>Attacks</span></i></b> or <b><i><span style={{ color: '#bf9000' }}>Techniques</span></i></b>.
-                        </span>
-                      ) : (
-                        <span style={{ fontSize: '1em', fontWeight: 400 }}>
-                          When another creature within 3hx of you takes Damage associated with your subclass, you may remove a <i>Cooldown Token</i> from any of your <b><i><span style={{ color: '#990000' }}>Attacks</span></i></b> or <b><i><span style={{ color: '#bf9000' }}>Techniques</span></i></b>.<br />
-                          <b style={{ color: '#0ee2df' }}>Air:</b> <b style={{ color: '#516fff', textDecoration: 'underline' }}><u>Force</u></b> <img src="/Force.png" alt="Force" style={{ height: '1em', verticalAlign: 'middle', marginLeft: '2px' }} /><br />
-                          <b style={{ color: '#e2b90e' }}>Earth:</b> <b style={{ color: '#915927', textDecoration: 'underline' }}><u>Bludgeoning</u></b> <img src="/Bludgeoning.png" alt="Bludgeoning" style={{ height: '1em', verticalAlign: 'middle', marginLeft: '2px' }} /><br />
-                          <b style={{ color: '#e20e0e' }}>Fire:</b> <b style={{ color: '#f90102', textDecoration: 'underline' }}><u>Fire</u></b> <img src="/Fire.png" alt="Fire" style={{ height: '1em', verticalAlign: 'middle', marginLeft: '2px' }} /><br />
-                          <b style={{ color: '#0e42e2' }}>Water:</b> <b style={{ color: '#3ebbff', textDecoration: 'underline' }}><u>Cold</u></b> <img src="/Cold.png" alt="Cold" style={{ height: '1em', verticalAlign: 'middle', marginLeft: '2px' }} />
-                        </span>
-                      )}
-                    </span>
+                    {generateElementalExcitementJSX(classCardDots, subclass)}
                   </span>
                 </div>
                 
@@ -328,7 +310,7 @@ const LevelUpClassElementalist: React.FC<LevelUpClassElementalistProps> = ({
                 <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
                   <div style={{ fontWeight: 'bold', color: '#bf9000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Technique</u></div>
                   <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
-                    <i><span style={{ color: '#231172' }}><b>Commune</b> (Cooldown 4).</span></i> You deal double Damage dice with your next <b><i><span style={{ color: '#990000' }}>Attack</span></i></b>.
+                    {generateCommuneJSX(classCardDots)}
                   </div>
                   <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px' }}>
                     <div style={{
@@ -443,9 +425,68 @@ const LevelUpClassElementalist: React.FC<LevelUpClassElementalistProps> = ({
                 {/* Attack section */}
                 <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
                   <div style={{ fontWeight: 'bold', color: '#990000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Attack</u></div>
+                  
+                  {/* Primary Attack */}
                   <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
-                    <i><b>Primary <span style={{ color: '#990000' }}>Attack</span>.</b></i><br />
-                    <i>Shards.</i> 6hx Range, <i>AoE</i> 1hx-radius, 18+ Crit, 2d6 Damage.
+                    <div style={{ marginBottom: '4px' }}>
+                      <b><i><span style={{ color: '#000' }}>Primary</span> <span style={{ color: '#990000' }}>Attack</span></i></b>.
+                    </div>
+                    <div style={{ marginBottom: '4px', textAlign: 'left' }}>
+                      <select 
+                        style={{ 
+                          fontSize: '1em', 
+                          padding: '2px 8px', 
+                          borderRadius: '6px', 
+                          border: '1px solid #ccc', 
+                          background: '#fff', 
+                          color: '#222',
+                          fontWeight: 'bold',
+                          marginBottom: '4px',
+                          textAlign: 'left',
+                          minWidth: '180px'
+                        }} 
+                        defaultValue="Shards"
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          if (value !== "Shards") {
+                            setPendingShard(value);
+                            e.target.value = "Shards"; // Reset dropdown
+                          }
+                        }}
+                      >
+                        <option disabled style={{ fontWeight: 'bold' }}>Shards</option>
+                        {_subclass === 'Air' && (
+                          <>
+                            <option style={{ fontWeight: 'bold' }}>Bluster</option>
+                            <option style={{ fontWeight: 'bold' }}>Bolt</option>
+                          </>
+                        )}
+                        {_subclass === 'Earth' && (
+                          <>
+                            <option style={{ fontWeight: 'bold' }}>Meteor</option>
+                            <option style={{ fontWeight: 'bold' }}>Tremor</option>
+                          </>
+                        )}
+                        {_subclass === 'Fire' && (
+                          <>
+                            <option style={{ fontWeight: 'bold' }}>Fireball</option>
+                            <option style={{ fontWeight: 'bold' }}>Lava Well</option>
+                          </>
+                        )}
+                        {_subclass === 'Water' && (
+                          <>
+                            <option style={{ fontWeight: 'bold' }}>Frostbite</option>
+                            <option style={{ fontWeight: 'bold' }}>Vortex</option>
+                          </>
+                        )}
+                      </select>
+                    </div>
+                    {pendingShard && (
+                      <div style={{ padding: '8px', border: '1px solid #ccc', borderRadius: '6px', marginBottom: '8px', background: '#f9f9f9' }}>
+                        <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>{pendingShard} ({getShardCost(pendingShard)}c)</div>
+                        {generateElementalistPrimaryAttackStatsJSX(classCardDots, _subclass, pendingShard)}
+                      </div>
+                    )}
                   </div>
 
                   {/* +2 Damage dice */}
@@ -602,8 +643,8 @@ const LevelUpClassElementalist: React.FC<LevelUpClassElementalistProps> = ({
                   </div>
 
                   <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px' }}>
-                    <i><b>Secondary <span style={{ color: '#990000' }}>Attack</span></b> (Cooldown 4).</i><br />
-                    <i>Elementals.</i> <b><i>Summon</i></b>, (x) Range, Single Target, Repeat (x), 18+ Crit, (x) Damage.
+                    <i><b>Secondary <span style={{ color: '#990000' }}>Attack</span>.</b></i><br />
+                    {generateElementalistSecondaryAttackDescriptionJSX(classCardDots, subclass)}
                   </div>
 
                   {/* +1hx Range */}

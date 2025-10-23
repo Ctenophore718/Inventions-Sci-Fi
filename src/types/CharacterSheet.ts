@@ -85,6 +85,9 @@ export type CharacterSheet = {
   // Relics for Devout class (secondary attacks)
   relics?: string[];
 
+  // Shards for Elementalist class (primary attacks)
+  shards?: string[];
+
   // Algorithms for Coder class
   algorithms?: string[];
 

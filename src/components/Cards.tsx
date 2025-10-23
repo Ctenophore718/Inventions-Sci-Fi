@@ -32,6 +32,7 @@ import { CardsCoderAttacks } from "./CardsCoderAttacks";
 import { CardsCommanderAttacks } from "./CardsCommanderAttacks";
 import { CardsContemplativeAttacks } from "./CardsContemplativeAttacks";
 import { CardsDevoutAttacks } from "./CardsDevoutAttacks";
+import { CardsElementalistAttacks } from "./CardsElementalistAttacks";
 import { calculateChemistFeatureData } from "../utils/chemistFeature";
 
 type CardsProps = {
@@ -1248,6 +1249,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
 
         {/* Devout Attack Cards */}
         {charClass === 'Devout' && <CardsDevoutAttacks sheet={localSheet} subclass={subclass} />}
+
+        {/* Elementalist Attack Cards */}
+        {charClass === 'Elementalist' && <CardsElementalistAttacks sheet={localSheet} subclass={subclass} />}
 
       </div>
       

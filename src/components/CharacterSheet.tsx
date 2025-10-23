@@ -41,6 +41,7 @@ import { generateAggressionJSX } from "../utils/chaosFeature";
 import { generateChaosStrikeDamageJSX } from "../utils/chaosStrike";
 import { generateOrderStrikeDamageJSX } from "../utils/orderStrike";
 import { generateArmoredGuardJSX } from "../utils/orderFeature";
+import { generateElementalExcitementJSX } from "../utils/elementalistFeature";
 
 
 
@@ -248,35 +249,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
   const commanderFeatureJSX = generateStaySharpJSX(sheet?.classCardDots);
   const contemplativeFeatureJSX = generatePsychosomaticHarmonyJSX(sheet?.classCardDots);
   const devoutFeatureJSX = generateBloodTradeJSX(sheet?.classCardDots);
-  const elementalistFeatureJSX = (
-    <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#231172' }}>Elemental Excitement.</i></b> When another creature within <b>[{3 + (charClass === 'Elementalist' && sheet?.classCardDots?.[0] ? sheet.classCardDots[0].filter(Boolean).length : 0)}]</b>hx of you takes {
-        subclass === "Air" ? (
-          <><b><u style={{ color: '#516fff', display: 'inline-flex', alignItems: 'center' }}>Force<img src="/Force.png" alt="Force" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> Damage</>
-        ) : subclass === "Earth" ? (
-          <><b><u style={{ color: '#915927', display: 'inline-flex', alignItems: 'center' }}>Bludgeoning<img src="/Bludgeoning.png" alt="Bludgeoning" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> Damage</>
-        ) : subclass === "Fire" ? (
-          <><b><u style={{ color: '#f90102', display: 'inline-flex', alignItems: 'center' }}>Fire<img src="/Fire.png" alt="Fire" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> Damage</>
-        ) : subclass === "Water" ? (
-          <><b><u style={{ color: '#3ebbff', display: 'inline-flex', alignItems: 'center' }}>Cold<img src="/Cold.png" alt="Cold" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> Damage</>
-        ) : (
-          "Damage associated with your subclass"
-        )
-      }, you may remove a <i>Cooldown Token</i> from any of your <b><i><span style={{ color: '#990000' }}>Attacks</span></i></b> or <b><i><span style={{ color: '#bf9000' }}>Techniques</span></i></b> and deal +<b>[{0 + (charClass === 'Elementalist' && sheet?.classCardDots?.[0] ? sheet.classCardDots[1].filter(Boolean).length : 0)}]</b>d6 {
-        subclass === "Air" ? (
-          <><b><u style={{ color: '#516fff', display: 'inline-flex', alignItems: 'center' }}>Force<img src="/Force.png" alt="Force" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> Damage</>
-        ) : subclass === "Earth" ? (
-          <><b><u style={{ color: '#915927', display: 'inline-flex', alignItems: 'center' }}>Bludgeoning<img src="/Bludgeoning.png" alt="Bludgeoning" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> Damage</>
-        ) : subclass === "Fire" ? (
-          <><b><u style={{ color: '#f90102', display: 'inline-flex', alignItems: 'center' }}>Fire<img src="/Fire.png" alt="Fire" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> Damage</>
-        ) : subclass === "Water" ? (
-          <><b><u style={{ color: '#3ebbff', display: 'inline-flex', alignItems: 'center' }}>Cold<img src="/Cold.png" alt="Cold" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> Damage</>
-        ) : (
-          "Damage associated with your subclass"
-        )
-      } on your next <b><i><span style={{ color: '#990000' }}>Attack</span></i></b> or <b><i><span style={{ color: '#351c75' }}>Strike</span></i></b>.
-    </span>
-  );  
+  const elementalistFeatureJSX = generateElementalExcitementJSX(sheet?.classCardDots, subclass);
   const exospecialistFeatureJSX = (
     <span style={{ color: '#000', fontWeight: 400 }}>
       <b><i style={{ color: '#117233' }}>Exosuit.</i></b> You <i>Resist</i> <b><u style={{ color: '#915927', display: 'inline-flex', alignItems: 'center' }}>
@@ -1223,6 +1196,31 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
       }
     }
     
+    // Add Shards for Elementalist class (subclass-specific, alphabetically ordered)
+    if (charClass === 'Elementalist') {
+      if (subclass === 'Air') {
+        attacks.push(
+          { name: 'Bluster', type: 'Shard', cost: 175 },
+          { name: 'Bolt', type: 'Shard', cost: 190 }
+        );
+      } else if (subclass === 'Earth') {
+        attacks.push(
+          { name: 'Meteor', type: 'Shard', cost: 175 },
+          { name: 'Tremor', type: 'Shard', cost: 175 }
+        );
+      } else if (subclass === 'Fire') {
+        attacks.push(
+          { name: 'Fireball', type: 'Shard', cost: 215 },
+          { name: 'Lava Well', type: 'Shard', cost: 175 }
+        );
+      } else if (subclass === 'Water') {
+        attacks.push(
+          { name: 'Frostbite', type: 'Shard', cost: 185 },
+          { name: 'Vortex', type: 'Shard', cost: 175 }
+        );
+      }
+    }
+    
     return attacks;
   };
 
@@ -1402,6 +1400,12 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
           incantations: newIncantations,
           credits: credits - cost
         };
+      } else if (type === 'Shard') {
+        const newShards = [...(sheet.shards || []), attackName];
+        partialUpdate = { 
+          shards: newShards,
+          credits: credits - cost
+        };
       } else {
         return;
       }
@@ -1443,6 +1447,11 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
         const newIncantations = [...(sheet.incantations || []), attackName];
         partialUpdate = { 
           incantations: newIncantations
+        };
+      } else if (type === 'Shard') {
+        const newShards = [...(sheet.shards || []), attackName];
+        partialUpdate = { 
+          shards: newShards
         };
       } else {
         return;
@@ -2915,10 +2924,10 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                     textAlign: 'left',
                     minWidth: '180px'
                   }}
-                  value={pendingAttack || (charClass === 'Chemist' ? 'Dart Guns' : charClass === 'Coder' ? 'Lenses' : charClass === 'Commander' ? 'Rifles' : charClass === 'Contemplative' ? 'Focuses' : charClass === 'Devout' ? 'Incantations' : 'Select Primary Attack')}
+                  value={pendingAttack || (charClass === 'Chemist' ? 'Dart Guns' : charClass === 'Coder' ? 'Lenses' : charClass === 'Commander' ? 'Rifles' : charClass === 'Contemplative' ? 'Focuses' : charClass === 'Devout' ? 'Incantations' : charClass === 'Elementalist' ? 'Shards' : 'Select Primary Attack')}
                   onChange={(e) => {
                     const value = e.target.value;
-                    if (value !== 'Dart Guns' && value !== 'Lenses' && value !== 'Rifles' && value !== 'Focuses' && value !== 'Incantations' && value !== 'Select Primary Attack') {
+                    if (value !== 'Dart Guns' && value !== 'Lenses' && value !== 'Rifles' && value !== 'Focuses' && value !== 'Incantations' && value !== 'Shards' && value !== 'Select Primary Attack') {
                       setPendingAttack(value);
                     }
                   }}
@@ -3141,6 +3150,29 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                                 const updatedSheet = { 
                                   ...sheet, 
                                   incantations: newIncantations
+                                };
+                                handleAutoSave(updatedSheet);
+                              }
+                            }}
+                          >×</button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  {(sheet?.shards && sheet.shards.length > 0) && (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginLeft: '8px' }}>
+                      {sheet?.shards?.map((shard, idx) => (
+                        <span key={shard + idx + 'shard'} style={{ fontStyle: 'italic', display: 'flex', alignItems: 'center', background: '#f5f5f5', borderRadius: '6px', padding: '2px 8px' }}>
+                          {shard}
+                          <button
+                            style={{ marginLeft: '6px', padding: '0 6px', borderRadius: '50%', border: 'none', background: '#d32f2f', color: 'white', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.9em' }}
+                            title={`Remove ${shard}`}
+                            onClick={() => {
+                              if (sheet) {
+                                const newShards = sheet.shards?.filter((_, i) => i !== idx) || [];
+                                const updatedSheet = { 
+                                  ...sheet, 
+                                  shards: newShards
                                 };
                                 handleAutoSave(updatedSheet);
                               }
