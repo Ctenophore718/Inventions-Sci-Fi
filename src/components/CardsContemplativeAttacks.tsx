@@ -227,7 +227,7 @@ export const CardsContemplativeAttacks: React.FC<CardsContemplativeAttacksProps>
         // Determine subclass color based on discipline
         let subclassColor = '#116372'; // Default Contemplative color
         const disciplineType = getDisciplineSubclass(discipline);
-        if (disciplineType.includes('Kinetic')) subclassColor = '#6fce1f';
+        if (disciplineType.includes('Kinetic')) subclassColor = '#7b941c';
         else if (disciplineType.includes('Mercurial')) subclassColor = '#941c6c';
         else if (disciplineType.includes('Inertial')) subclassColor = '#1c945e';
         else if (disciplineType.includes('Vectorial')) subclassColor = '#531c94';

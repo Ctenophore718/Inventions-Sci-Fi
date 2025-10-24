@@ -2994,7 +2994,36 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                       )}
                     </>
                   )}
-                  {charClass !== 'Chemist' && charClass !== 'Coder' && charClass !== 'Commander' && charClass !== 'Contemplative' && charClass !== 'Devout' && (
+                  {charClass === 'Elementalist' && (
+                    <>
+                      <option disabled style={{ fontWeight: 'bold' }}>Shards</option>
+                      {subclass === 'Air' && (
+                        <>
+                          <option style={{ fontWeight: 'bold' }}>Bluster</option>
+                          <option style={{ fontWeight: 'bold' }}>Bolt</option>
+                        </>
+                      )}
+                      {subclass === 'Earth' && (
+                        <>
+                          <option style={{ fontWeight: 'bold' }}>Meteor</option>
+                          <option style={{ fontWeight: 'bold' }}>Tremor</option>
+                        </>
+                      )}
+                      {subclass === 'Fire' && (
+                        <>
+                          <option style={{ fontWeight: 'bold' }}>Fireball</option>
+                          <option style={{ fontWeight: 'bold' }}>Lava Well</option>
+                        </>
+                      )}
+                      {subclass === 'Water' && (
+                        <>
+                          <option style={{ fontWeight: 'bold' }}>Frostbite</option>
+                          <option style={{ fontWeight: 'bold' }}>Vortex</option>
+                        </>
+                      )}
+                    </>
+                  )}
+                  {charClass !== 'Chemist' && charClass !== 'Coder' && charClass !== 'Commander' && charClass !== 'Contemplative' && charClass !== 'Devout' && charClass !== 'Elementalist' && (
                     <option disabled style={{ fontWeight: 'bold' }}>Select Primary Attack</option>
                   )}
                 </select>

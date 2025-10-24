@@ -62,24 +62,24 @@ export function generateChemistPrimaryAttackStatsJSX(
           </>
         ) : dartGunName === 'Happy Pill Pusher' ? (
           <> 
-            <b><u>Damage</u></b> <b>[{damageDice}]</b>d<b>[{dieSize}]</b>: <b><u style={{ color: '#de7204', display: 'inline-flex', alignItems: 'center' }}>
+            <b><u>Damage</u></b> <b>[{damageDice}]</b>d<b>[{dieSize}]</b> <b><u style={{ color: '#de7204', display: 'inline-flex', alignItems: 'center' }}>
             Chemical<img src="/Chemical.png" alt="Chemical" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} /></u></b><br />
-            <b><u>Crit Effect</u></b> <b>[{damageDice}]</b>d<b>[{dieSize}]</b>: <b><u style={{ color: '#de7204', display: 'inline-flex', alignItems: 'center' }}>
+            <b><u>Crit Effect</u></b> <b>[{damageDice}]</b>d<b>[{dieSize}]</b> <b><u style={{ color: '#de7204', display: 'inline-flex', alignItems: 'center' }}>
             Chemical<img src="/Chemical.png" alt="Chemical" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} /></u></b>, <br />
             <div style={{ textAlign: 'right', width: '100%' }}><b><i>Mesmerize</i></b></div>   
           </>
         ) : dartGunName === 'Sour Juicer' ? (
           <> 
-            <b><u>Damage</u></b> <b>[{damageDice}]</b>d<b>[{dieSize}]</b>: <b><u style={{ color: '#de7204', display: 'inline-flex', alignItems: 'center' }}>
+            <b><u>Damage</u></b> <b>[{damageDice}]</b>d<b>[{dieSize}]</b> <b><u style={{ color: '#de7204', display: 'inline-flex', alignItems: 'center' }}>
             Chemical<img src="/Chemical.png" alt="Chemical" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} /></u></b><br />
-            <b><u>Crit Effect</u></b> <b>[{damageDice}]</b>d<b>[{dieSize}]</b>: <b><u style={{ color: '#02b900', display: 'inline-flex', alignItems: 'center' }}>
+            <b><u>Crit Effect</u></b> <b>[{damageDice}]</b>d<b>[{dieSize}]</b> <b><u style={{ color: '#02b900', display: 'inline-flex', alignItems: 'center' }}>
             Toxic<img src="/Toxic.png" alt="Toxic" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} /></u></b>, <b><i>Demoralize</i></b>    
           </>
         ) : dartGunName === 'Prickly Goo' ? (
           <> 
-            <b><u>Damage</u></b> <b>[{damageDice}]</b>d<b>[{dieSize}]</b>: <b><u style={{ color: '#808080', display: 'inline-flex', alignItems: 'center' }}>
+            <b><u>Damage</u></b> <b>[{damageDice}]</b>d<b>[{dieSize}]</b> <b><u style={{ color: '#808080', display: 'inline-flex', alignItems: 'center' }}>
             Slashing<img src="/Slashing.png" alt="Slashing" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} /></u></b><br />
-            <b><u>Crit Effect</u></b> <b>[{damageDice}]</b>d<b>[{dieSize}]</b>: <b><u style={{ color: '#02b900', display: 'inline-flex', alignItems: 'center' }}>
+            <b><u>Crit Effect</u></b> <b>[{damageDice}]</b>d<b>[{dieSize}]</b> <b><u style={{ color: '#02b900', display: 'inline-flex', alignItems: 'center' }}>
             Toxic<img src="/Toxic.png" alt="Toxic" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} /></u></b>, <b><i>Blind,</i></b> <br />
             <div style={{ textAlign: 'right', width: '100%' }}><b><i>Restrain</i></b></div> 
           </>

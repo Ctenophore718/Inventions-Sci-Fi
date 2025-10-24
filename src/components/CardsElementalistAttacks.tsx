@@ -10,21 +10,21 @@ interface CardsElementalistAttacksProps {
 function getShardFlavorText(shard: string): string {
   switch (shard) {
     case 'Bluster':
-      return '"Let the winds carry your foes away, scattering them like leaves in a hurricane." --Zephyra, Avian Air Elementalist';
+      return '“It’s the best way to get people to get the hell out of your way, in my opinion.” --Jezebel Aura, Diminutive Air Elementalist';
     case 'Bolt':
-      return '"Lightning strikes with precision and fury, channeling the raw power of the storm directly into your enemy." --Stormcaller Vex, Android Air Elementalist';
+      return '“It’s really a matter of harnessing the energetics in the air itself. If you manipulate those particles just right, you get lightning!” --Usain, Air Elementalist';
     case 'Meteor':
-      return '"Call down the very earth from above, crushing all beneath its unstoppable weight." --Terrus, Petran Earth Elementalist';
+      return '“I am the sky stone that rains fire and spells your doom. I am Meteor.” --Rene Firestone, Human Master Earth Elementalist';
     case 'Tremor':
-      return '"The ground itself answers your call, shaking and binding those who dare stand against you." --Quake, Ursid Earth Elementalist';
+      return 'You feel that? That’s the feeling of your ass about to get whooped.';
     case 'Fireball':
-      return '"The classic spell of destruction, perfected through millennia of pyromantic practice." --Ignis Flare, Human Fire Elementalist';
+      return '“Sometimes the most basic, bread-and-butter shard is simply the best one to use in almost any circumstance.” --St. Ignatius, Lithe Fire Elementalist';
     case 'Lava Well':
-      return '"Leave behind a pool of molten fury that continues to burn long after the initial strike." --Magma, Reptoid Fire Elementalist';
+      return 'The ground beneath the target area swells up and splits open, revealing a pool of lava gushing through and searing the poor saps standing there.';
     case 'Frostbite':
-      return '"Freeze your enemies solid, their bodies encased in ice that shatters at the slightest touch." --Glacies, Felid Water Elementalist';
+      return 'The spirit of the  frigid wastelands on the extremities of the Water Plane reside within this shard, which is capable of freezing solid everything in its wake.';
     case 'Vortex':
-      return '"The swirling waters pull all within reach toward their center, dragging enemies into a drowning embrace." --Tidepool, Aquarian Water Elementalist';
+      return '“I’m gonna flush you down like a fat turd!” --Aquamantys, Mantid Water Elementalist';
     default:
       return 'Elemental shards materialize from pure xenomagical energy, shaped by the caster\'s will.';
   }

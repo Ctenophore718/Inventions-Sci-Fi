@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import type { CharacterSheet } from "../types/CharacterSheet";
 import { generateElementalExcitementJSX } from "../utils/elementalistFeature";
 import { generateCommuneJSX } from "../utils/elementalistTechnique";
@@ -29,11 +29,13 @@ type LevelUpClassElementalistProps = {
   charClass: string;
   subclass: string;
   onXpSpChange?: (xpDelta: number, spDelta: number) => void;
+  onCreditsChange?: (creditsDelta: number) => void;
   onAutoSave?: (updates: Partial<CharacterSheet>) => void;
   xpTotal: number;
   spTotal: number;
   xpSpent: number;
   spSpent: number;
+  credits: number;
   setXpSpent: (xp: number) => void;
   setSpSpent: (sp: number) => void;
   setNotice: (notice: string) => void;
@@ -44,11 +46,13 @@ const LevelUpClassElementalist: React.FC<LevelUpClassElementalistProps> = ({
   charClass,
   subclass, 
   onXpSpChange,
+  onCreditsChange,
   onAutoSave,
   xpTotal,
   spTotal, 
   xpSpent,
   spSpent,
+  credits,
   setXpSpent,
   setSpSpent,
   setNotice
@@ -62,9 +66,20 @@ const LevelUpClassElementalist: React.FC<LevelUpClassElementalistProps> = ({
       return defaultElementalistDots.map(row => [...row]);
     });
 
-    // Local state for selected shard (primary attack)
+    // Local state for selected shards (primary attacks)
+    const [selectedShards, setSelectedShards] = useState<string[]>(() => {
+      return sheet?.shards || [];
+    });
+    // Local state for pending shard selection
     const [pendingShard, setPendingShard] = useState<string>("");
     const _subclass = sheet?.subclass || subclass;
+
+    // Sync selectedShards with sheet data when it changes
+    useEffect(() => {
+      if (sheet?.shards) {
+        setSelectedShards(sheet.shards);
+      }
+    }, [sheet?.shards]);
   
     // Helper function to safely access classCardDots array
     const safeGetDotsArray = (index: number): boolean[] => {
@@ -480,13 +495,109 @@ const LevelUpClassElementalist: React.FC<LevelUpClassElementalistProps> = ({
                           </>
                         )}
                       </select>
-                    </div>
-                    {pendingShard && (
-                      <div style={{ padding: '8px', border: '1px solid #ccc', borderRadius: '6px', marginBottom: '8px', background: '#f9f9f9' }}>
-                        <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>{pendingShard} ({getShardCost(pendingShard)}c)</div>
-                        {generateElementalistPrimaryAttackStatsJSX(classCardDots, _subclass, pendingShard)}
+                      {/* Buy/Add dialog for Shard selection */}
+                      {pendingShard && (
+                        <div style={{ marginTop: '4px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                          <div style={{ fontWeight: 'bold' }}>
+                            {pendingShard}
+                            <span style={{ color: '#bf9000', fontWeight: 'bold', marginLeft: '8px' }}>
+                              {getShardCost(pendingShard)}c
+                            </span>
+                          </div>
+                          <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                            <button
+                              style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #1976d2', background: '#1976d2', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}
+                              onClick={() => {
+                                // Determine cost
+                                const cost = getShardCost(pendingShard);
+                                // Check credits
+                                if (credits < cost) {
+                                  setNotice('Not enough credits!');
+                                  return;
+                                }
+                                // Atomic operation: update both shards and credits
+                                const newShards = [...selectedShards, pendingShard];
+                                const newCredits = credits - cost;
+                                setSelectedShards(newShards);
+                                
+                                if (sheet && onAutoSave) {
+                                  onAutoSave({ 
+                                    shards: newShards,
+                                    credits: newCredits
+                                  });
+                                }
+                                
+                                // Update the LevelUp component's credits state
+                                onCreditsChange?.(-cost);
+                                setPendingShard("");
+                              }}
+                            >Buy</button>
+                            <button
+                              style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #28a745', background: '#28a745', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}
+                              onClick={() => {
+                                const newShards = [...selectedShards, pendingShard];
+                                setSelectedShards(newShards);
+                                
+                                if (sheet && onAutoSave) {
+                                  onAutoSave({ 
+                                    shards: newShards,
+                                    credits: credits // Preserve current credits
+                                  });
+                                }
+                                
+                                setPendingShard("");
+                              }}
+                            >Add</button>
+                            <button
+                              style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #aaa', background: '#eee', color: '#333', fontWeight: 'bold', cursor: 'pointer' }}
+                              onClick={() => setPendingShard("")}
+                            >Cancel</button>
+                          </div>
+                        </div>
+                      )}
+                      <div style={{ marginTop: '2px' }}>
+                        {selectedShards.length > 0 && (
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginLeft: '8px' }}>
+                            {selectedShards.map((shard, idx) => (
+                              <span key={shard + idx} style={{ fontStyle: 'italic', display: 'flex', alignItems: 'center', background: '#f5f5f5', borderRadius: '6px', padding: '2px 8px' }}>
+                                {shard}
+                                <button
+                                  style={{ marginLeft: '6px', padding: '0 6px', borderRadius: '50%', border: 'none', background: '#d32f2f', color: 'white', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.9em' }}
+                                  title={`Remove ${shard}`}
+                                  onClick={() => {
+                                    const newShards = selectedShards.filter((_, i) => i !== idx);
+                                    setSelectedShards(newShards);
+                                    
+                                    if (sheet && onAutoSave) {
+                                      onAutoSave({ 
+                                        shards: newShards
+                                      });
+                                    }
+                                  }}
+                                >×</button>
+                              </span>
+                            ))}
+                          </div>
+                        )}
                       </div>
-                    )}
+                    </div>
+                    
+                    {/* Base stats display - always visible */}
+                    <div style={{ fontSize: '1em', marginTop: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <span><b><u>Range</u></b> <b>[{6 + (safeGetDotsArray(5)?.filter(Boolean).length || 0) * 2}]</b>hx</span>
+                        <span style={{ textAlign: 'right', minWidth: '80px' }}><b><u>Crit</u></b> <b>[{18 - (safeGetDotsArray(6)?.filter(Boolean).length || 0)}]</b>+</span>
+                      </div>
+                      <div>
+                        <b><u>Target</u></b> <i>AoE</i> 1hx-Radius
+                      </div>
+                      <div>
+                        <b><u>Damage</u></b> <b>[{2 + (safeGetDotsArray(4)?.filter(Boolean).length || 0) * 2}]</b>d6
+                      </div>
+                      <div>
+                        <b><u>Crit Effect</u></b> <b>[{2 + (safeGetDotsArray(4)?.filter(Boolean).length || 0) * 2}]</b>d6, status effect
+                      </div>
+                    </div>
                   </div>
 
                   {/* +2 Damage dice */}
