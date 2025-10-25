@@ -3,7 +3,7 @@ import type { CharacterSheet } from "../types/CharacterSheet";
 import { generateElementalExcitementJSX } from "../utils/elementalistFeature";
 import { generateCommuneJSX } from "../utils/elementalistTechnique";
 import { generateElementalistPrimaryAttackStatsJSX, getShardCost } from "../utils/elementalistPrimaryAttack";
-import { generateElementalistSecondaryAttackDescriptionJSX } from "../utils/elementalistSecondaryAttack";
+import { calculateElementalistSecondaryAttackData, getElementalCost } from "../utils/elementalistSecondaryAttack";
 
 
 // Default dots structure for Elementalist class card (14 rows, each with 3 or fewer dots as needed)
@@ -72,6 +72,14 @@ const LevelUpClassElementalist: React.FC<LevelUpClassElementalistProps> = ({
     });
     // Local state for pending shard selection
     const [pendingShard, setPendingShard] = useState<string>("");
+    
+    // Local state for selected elementals (secondary attacks)
+    const [selectedElementals, setSelectedElementals] = useState<string[]>(() => {
+      return sheet?.elementals || [];
+    });
+    // Local state for pending elemental selection
+    const [pendingElemental, setPendingElemental] = useState<string>("");
+    
     const _subclass = sheet?.subclass || subclass;
 
     // Sync selectedShards with sheet data when it changes
@@ -80,6 +88,13 @@ const LevelUpClassElementalist: React.FC<LevelUpClassElementalistProps> = ({
         setSelectedShards(sheet.shards);
       }
     }, [sheet?.shards]);
+    
+    // Sync selectedElementals with sheet data when it changes
+    useEffect(() => {
+      if (sheet?.elementals) {
+        setSelectedElementals(sheet.elementals);
+      }
+    }, [sheet?.elementals]);
   
     // Helper function to safely access classCardDots array
     const safeGetDotsArray = (index: number): boolean[] => {
@@ -754,8 +769,187 @@ const LevelUpClassElementalist: React.FC<LevelUpClassElementalistProps> = ({
                   </div>
 
                   <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px' }}>
-                    <i><b>Secondary <span style={{ color: '#990000' }}>Attack</span>.</b></i><br />
-                    {generateElementalistSecondaryAttackDescriptionJSX(classCardDots, subclass)}
+                    <div style={{ marginBottom: '4px' }}>
+                      <b><i><span style={{ color: '#000' }}>Secondary</span> <span style={{ color: '#990000' }}>Attack</span></i></b> {(() => {
+                        const { cooldown } = calculateElementalistSecondaryAttackData(classCardDots);
+                        return <>(Cooldown <b>[{cooldown}]</b>)</>;
+                      })()}.
+                    </div>
+                    <div style={{ marginBottom: '4px', textAlign: 'left' }}>
+                      <select 
+                        style={{ 
+                          fontSize: '1em', 
+                          padding: '2px 8px', 
+                          borderRadius: '6px', 
+                          border: '1px solid #ccc', 
+                          background: '#fff', 
+                          color: '#222',
+                          fontWeight: 'bold',
+                          marginBottom: '4px',
+                          textAlign: 'left',
+                          minWidth: '180px'
+                        }} 
+                        defaultValue="Elementals"
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          if (value !== "Elementals") {
+                            setPendingElemental(value);
+                            e.target.value = "Elementals"; // Reset dropdown
+                          }
+                        }}
+                      >
+                        <option disabled style={{ fontWeight: 'bold' }}>Elementals</option>
+                        {_subclass === 'Air' && (
+                          <>
+                            <option style={{ fontWeight: 'bold' }}>Cloud Elemental</option>
+                            <option style={{ fontWeight: 'bold' }}>Thunderbird</option>
+                          </>
+                        )}
+                        {(_subclass === 'Air' || _subclass === 'Earth') && (
+                          <option style={{ fontWeight: 'bold' }}>Sandstorm</option>
+                        )}
+                        {_subclass === 'Earth' && (
+                          <option style={{ fontWeight: 'bold' }}>Stone Golem</option>
+                        )}
+                        {(_subclass === 'Earth' || _subclass === 'Fire') && (
+                          <option style={{ fontWeight: 'bold' }}>Magmoid</option>
+                        )}
+                        {(_subclass === 'Earth' || _subclass === 'Water') && (
+                          <option style={{ fontWeight: 'bold' }}>Sludge Brute</option>
+                        )}
+                        {_subclass === 'Fire' && (
+                          <>
+                            <option style={{ fontWeight: 'bold' }}>Fire Dragon</option>
+                            <option style={{ fontWeight: 'bold' }}>Firefox</option>
+                            <option style={{ fontWeight: 'bold' }}>Phoenix</option>
+                            <option style={{ fontWeight: 'bold' }}>Salamander</option>
+                          </>
+                        )}
+                        {_subclass === 'Water' && (
+                          <>
+                            <option style={{ fontWeight: 'bold' }}>Ice Golem</option>
+                            <option style={{ fontWeight: 'bold' }}>Water Horse</option>
+                            <option style={{ fontWeight: 'bold' }}>Water Panda</option>
+                            <option style={{ fontWeight: 'bold' }}>Wave Elemental</option>
+                          </>
+                        )}
+                      </select>
+                      {/* Buy/Add dialog for Elemental selection */}
+                      {pendingElemental && (
+                        <div style={{ marginTop: '4px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                          <div style={{ fontWeight: 'bold' }}>
+                            {pendingElemental}
+                            <span style={{ color: '#bf9000', fontWeight: 'bold', marginLeft: '8px' }}>
+                              {getElementalCost(pendingElemental)}c
+                            </span>
+                          </div>
+                          <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                            <button
+                              style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #1976d2', background: '#1976d2', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}
+                              onClick={() => {
+                                // Determine cost
+                                const cost = getElementalCost(pendingElemental);
+                                // Check credits
+                                if (credits < cost) {
+                                  setNotice('Not enough credits!');
+                                  return;
+                                }
+                                // Atomic operation: update both elementals and credits
+                                const newElementals = [...selectedElementals, pendingElemental];
+                                const newCredits = credits - cost;
+                                setSelectedElementals(newElementals);
+                                
+                                if (sheet && onAutoSave) {
+                                  onAutoSave({ 
+                                    elementals: newElementals,
+                                    credits: newCredits
+                                  });
+                                }
+                                
+                                // Update the LevelUp component's credits state
+                                onCreditsChange?.(-cost);
+                                setPendingElemental("");
+                              }}
+                            >Buy</button>
+                            <button
+                              style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #28a745', background: '#28a745', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}
+                              onClick={() => {
+                                const newElementals = [...selectedElementals, pendingElemental];
+                                setSelectedElementals(newElementals);
+                                
+                                if (sheet && onAutoSave) {
+                                  onAutoSave({ 
+                                    elementals: newElementals,
+                                    credits: credits // Preserve current credits
+                                  });
+                                }
+                                
+                                setPendingElemental("");
+                              }}
+                            >Add</button>
+                            <button
+                              style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #aaa', background: '#eee', color: '#333', fontWeight: 'bold', cursor: 'pointer' }}
+                              onClick={() => setPendingElemental("")}
+                            >Cancel</button>
+                          </div>
+                        </div>
+                      )}
+                      <div style={{ marginTop: '2px' }}>
+                        {selectedElementals.length > 0 && (
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginLeft: '8px' }}>
+                            {selectedElementals.map((elemental, idx) => (
+                              <span key={elemental + idx} style={{ fontStyle: 'italic', display: 'flex', alignItems: 'center', background: '#f5f5f5', borderRadius: '6px', padding: '2px 8px' }}>
+                                {elemental}
+                                <button
+                                  style={{ marginLeft: '6px', padding: '0 6px', borderRadius: '50%', border: 'none', background: '#d32f2f', color: 'white', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.9em' }}
+                                  title={`Remove ${elemental}`}
+                                  onClick={() => {
+                                    const newElementals = selectedElementals.filter((_, i) => i !== idx);
+                                    setSelectedElementals(newElementals);
+                                    
+                                    if (sheet && onAutoSave) {
+                                      onAutoSave({ 
+                                        elementals: newElementals
+                                      });
+                                    }
+                                  }}
+                                >×</button>
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    
+                    {/* Base stats display - always visible */}
+                    <div style={{ fontSize: '1em', marginTop: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+                      {(() => {
+                        const { summonHitPoints, speed, critThreshold, range, repeatValue } = calculateElementalistSecondaryAttackData(classCardDots);
+                        return (
+                          <>
+                            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                              <span><b><u>Summon</u></b> (x)+<b>[{summonHitPoints > 0 ? summonHitPoints : '0'}]</b> <b><i style={{ color: '#990000' }}>Hit Points</i></b></span>
+                              <span style={{ textAlign: 'right', minWidth: '80px' }}><b><u>Crit</u></b> <b>[{critThreshold}]</b>+</span>
+                            </div>
+                            <div>
+                              <b><u><i><span style={{ color: '#38761d' }}>Speed</span></i></u></b> (x)+<b>[{speed > 0 ? speed : '0'}]</b>hx
+                            </div>
+                            <div>
+                              <b><u>Range</u></b> (x)+<b>[{range > 0 ? range : '0'}]</b>hx
+                            </div>
+                            <div>
+                              <b><u>Target</u></b> Single, Repeat (x)+<b>[{repeatValue > 0 ? repeatValue : '0'}]</b>
+                            </div>
+                            <div>
+                              <b><u>Damage</u></b> (x)d(x), status effect
+                            </div>
+                            <div>
+                              <b><u>Crit Effect</u></b> (x)d(x), status effect
+                            </div>
+                          </>
+                        );
+                      })()}
+                    </div>
                   </div>
 
                   {/* +1hx Range */}

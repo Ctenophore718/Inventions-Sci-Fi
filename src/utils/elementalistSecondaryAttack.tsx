@@ -9,6 +9,36 @@ export interface ElementalistSecondaryAttackData {
   cooldown: number;
 }
 
+export interface ElementalBaseStats {
+  hitPoints: number;
+  speed: number;
+  range: number;
+  repeat: number;
+}
+
+/**
+ * Get base stats for each elemental
+ */
+export function getElementalBaseStats(elementalName: string): ElementalBaseStats {
+  switch (elementalName) {
+    case 'Cloud Elemental': return { hitPoints: 15, speed: 6, range: 5, repeat: 0 };
+    case 'Thunderbird': return { hitPoints: 10, speed: 7, range: 6, repeat: 1 };
+    case 'Sandstorm': return { hitPoints: 10, speed: 7, range: 6, repeat: 1 };
+    case 'Stone Golem': return { hitPoints: 20, speed: 4, range: 4, repeat: 0 };
+    case 'Magmoid': return { hitPoints: 15, speed: 6, range: 6, repeat: 1 };
+    case 'Sludge Brute': return { hitPoints: 15, speed: 6, range: 5, repeat: 0 };
+    case 'Fire Dragon': return { hitPoints: 20, speed: 6, range: 6, repeat: 0 };
+    case 'Firefox': return { hitPoints: 15, speed: 7, range: 6, repeat: 0 };
+    case 'Phoenix': return { hitPoints: 15, speed: 5, range: 6, repeat: 1 };
+    case 'Salamander': return { hitPoints: 20, speed: 4, range: 5, repeat: 0 };
+    case 'Ice Golem': return { hitPoints: 20, speed: 4, range: 4, repeat: 0 };
+    case 'Water Horse': return { hitPoints: 15, speed: 8, range: 5, repeat: 0 };
+    case 'Water Panda': return { hitPoints: 20, speed: 5, range: 5, repeat: 0 };
+    case 'Wave Elemental': return { hitPoints: 15, speed: 6, range: 7, repeat: 0 };
+    default: return { hitPoints: 15, speed: 6, range: 5, repeat: 0 };
+  }
+}
+
 /**
  * Calculate Elementalist secondary attack values based on class card dots
  */
@@ -41,132 +71,268 @@ export function calculateElementalistSecondaryAttackData(classCardDots?: boolean
 }
 
 /**
- * Generate the secondary attack stats for Elementalist cards
+ * Generate the secondary attack stats for Elementalist Elemental cards
  */
 export function generateElementalistSecondaryAttackStatsJSX(
   classCardDots?: boolean[][],
-  subclass?: string
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _subclass?: string,
+  elementalName?: string
 ): React.ReactElement {
   const { range, repeatValue, speed, critThreshold, summonHitPoints } = calculateElementalistSecondaryAttackData(classCardDots);
   
-  // Determine damage type and icon based on subclass
-  let damageType = '';
-  let damageColor = '';
-  let damageIcon = '';
+  // Get base stats for this elemental
+  const baseStats = getElementalBaseStats(elementalName || '');
   
-  switch (subclass) {
-    case 'Air':
-      damageType = 'Force';
-      damageColor = '#516fff';
-      damageIcon = '/Force.png';
-      break;
-    case 'Earth':
-      damageType = 'Bludgeoning';
-      damageColor = '#915927';
-      damageIcon = '/Bludgeoning.png';
-      break;
-    case 'Fire':
-      damageType = 'Fire';
-      damageColor = '#f90102';
-      damageIcon = '/Fire.png';
-      break;
-    case 'Water':
-      damageType = 'Cold';
-      damageColor = '#3ebbff';
-      damageIcon = '/Cold.png';
-      break;
-    default:
-      damageType = '';
-      damageColor = '#000';
-      damageIcon = '';
-  }
+  // Calculate final stats
+  const finalHitPoints = baseStats.hitPoints + summonHitPoints;
+  const finalSpeed = baseStats.speed + speed;
+  const finalRange = baseStats.range + range;
+  const finalRepeat = baseStats.repeat + repeatValue;
+  
+  // Helper function to get speed type for each elemental
+  const getSpeedType = (name: string): string => {
+    switch (name) {
+      case 'Cloud Elemental':
+      case 'Thunderbird':
+      case 'Sandstorm':
+      case 'Fire Dragon':
+      case 'Phoenix':
+        return 'Fly';
+      case 'Magmoid':
+      case 'Firefox':
+        return 'Lavawalk';
+      case 'Salamander':
+        return 'Swim, Lavawalk';
+      case 'Sludge Brute':
+      case 'Ice Golem':
+      case 'Water Horse':
+      case 'Water Panda':
+      case 'Wave Elemental':
+        return 'Swim';
+      default:
+        return '';
+    }
+  };
+
+  const speedType = getSpeedType(elementalName || '');
   
   return (
-    <div style={{ fontSize: '0.875em', width: '100%', height: 'fit-content', maxHeight: '100%', overflow: 'hidden' }}>
+    <div style={{ fontSize: '0.85em', width: '100%', height: 'fit-content', maxHeight: '100%', overflow: 'hidden' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-        <span><b><u>Range</u></b> <b>[{range > 0 ? range : 'x'}]</b>hx</span>
+        <span><b><u>Summon</u></b> <b>[{finalHitPoints}]</b> <b><i style={{ color: '#990000' }}>Hit Points</i></b></span>
         <span style={{ textAlign: 'right', minWidth: '80px' }}><b><u>Crit</u></b> <b>[{critThreshold}]</b>+</span>
       </div>
       <div>
-        <b><u>Target</u></b> Single Target<br />
-        <b><u>Repeat</u></b> <b>[{repeatValue > 0 ? repeatValue : 'x'}]</b><br />
-        {damageType ? (
+        <u><b><i><span style={{ color: '#38761d' }}>Speed</span></i></b></u> <b>[{finalSpeed}]</b>hx{speedType && <>, <b><i style={{ color: '#38761d' }}>{speedType}</i></b></>}<br />
+        {elementalName === 'Cloud Elemental' ? (
           <>
-            <b><u>Damage</u></b> <b>[{range > 0 ? range : 'x'}]</b>d6 <b><u style={{ color: damageColor, display: 'inline-flex', alignItems: 'center' }}>
-            {damageType}<img src={damageIcon} alt={damageType} style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>
+            <b><u>Range</u></b> <b>[{finalRange}]</b>hx<br />
+            <b><u>Target</u></b> Single, Repeat <b>[{finalRepeat}]</b><br />
+            <b><u>Damage</u></b> 2d10 <b><u style={{ color: '#3ebbff', display: 'inline-flex', alignItems: 'center' }}>
+            Cold<img src="/Cold.png" alt="Cold" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> or <b><u style={{ color: '#516fff', display: 'inline-flex', alignItems: 'center' }}>
+            Force<img src="/Force.png" alt="Force" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>, <br />
+            <span style={{ display: 'block', textAlign: 'right' }}><b><i>Mesmerize</i></b></span>
+            <b><u>Crit Effect</u></b> 2d10 <b><u style={{ color: '#3ebbff', display: 'inline-flex', alignItems: 'center' }}>
+            Cold<img src="/Cold.png" alt="Cold" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} /></u></b>, <b><i>Confuse</i></b>
+          </>
+        ) : elementalName === 'Fire Dragon' ? (
+          <>
+            <b><u>Range</u></b> <b>[{finalRange}]</b>hx<br />
+            <b><u>Target</u></b> Single, Repeat <b>[{finalRepeat}]</b><br />
+            <b><u>Damage</u></b> 2d12 <b><u style={{ color: '#f90102', display: 'inline-flex', alignItems: 'center' }}>
+            Fire<img src="/Fire.png" alt="Fire" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>, <b><i>Mesmerize</i></b><br />
+            <b><u>Crit Effect</u></b> 2d12 <b><u style={{ color: '#f90102', display: 'inline-flex', alignItems: 'center' }}>
+            Fire<img src="/Fire.png" alt="Fire" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} /></u></b>, <b><i>Spike</i></b> <b>(</b><b><u style={{ color: '#f90102', display: 'inline-flex', alignItems: 'center' }}>
+            Fire<img src="/Fire.png" alt="Fire" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b><b>)</b>
+          </>
+        ) : elementalName === 'Firefox' ? (
+          <>
+            <b><u>Range</u></b> <b>[{finalRange}]</b>hx<br />
+            <b><u>Target</u></b> Single, Repeat <b>[{finalRepeat}]</b><br />
+            <b><u>Damage</u></b> 2d10 <b><u style={{ color: '#f90102', display: 'inline-flex', alignItems: 'center' }}>
+            Fire<img src="/Fire.png" alt="Fire" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> or <b><u style={{ color: '#a6965f', display: 'inline-flex', alignItems: 'center' }}>
+            Piercing<img src="/Piercing.png" alt="Piercing" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>, 
+            <span style={{ display: 'block', textAlign: 'right' }}><b><i>Spike</i></b> <b>(</b><b><u style={{ color: '#f90102', display: 'inline-flex', alignItems: 'center' }}>
+            Fire<img src="/Fire.png" alt="Fire" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b><b>)</b></span>
+            <b><u>Crit Effect</u></b> 2d10 <b><u style={{ color: '#f90102', display: 'inline-flex', alignItems: 'center' }}>
+            Fire<img src="/Fire.png" alt="Fire" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} /></u></b> or <b><u style={{ color: '#a6965f', display: 'inline-flex', alignItems: 'center' }}>
+            Piercing<img src="/Piercing.png" alt="Piercing" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>,
+            <span style={{ display: 'block', textAlign: 'right' }}><b><i>Spike</i></b> <b>(</b><b><u style={{ color: '#f90102', display: 'inline-flex', alignItems: 'center' }}>
+            Fire<img src="/Fire.png" alt="Fire" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b><b>)</b></span>
+          </>
+        ) : elementalName === 'Ice Golem' ? (
+          <>
+            <b><u>Range</u></b> <b>[{finalRange}]</b>hx<br />
+            <b><u>Target</u></b> Single, Repeat <b>[{finalRepeat}]</b><br />
+            <b><u>Damage</u></b> 2d10 <b><u style={{ color: '#915927', display: 'inline-flex', alignItems: 'center' }}>
+            Bludgeoning<img src="/Bludgeoning.png" alt="Bludgeoning" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> or 
+            <span style={{ display: 'block', textAlign: 'right' }}><b><u style={{ color: '#3ebbff', display: 'inline-flex', alignItems: 'center' }}>
+            Cold<img src="/Cold.png" alt="Cold" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>, <b><i>Spike</i></b> <b>(</b><b><u style={{ color: '#3ebbff', display: 'inline-flex', alignItems: 'center' }}>
+            Cold<img src="/Cold.png" alt="Cold" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b><b>)</b></span>
+            <b><u>Crit Effect</u></b> 2d10 <b><u style={{ color: '#915927', display: 'inline-flex', alignItems: 'center' }}>
+            Bludgeoning<img src="/Bludgeoning.png" alt="Bludgeoning" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> or 
+            <span style={{ display: 'block', textAlign: 'right' }}><b><u style={{ color: '#3ebbff', display: 'inline-flex', alignItems: 'center' }}>
+            Cold<img src="/Cold.png" alt="Cold" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>, <b><i>Slam</i></b> 3hx</span>
+          </>
+        ) : elementalName === 'Magmoid' ? (
+          <>
+            <b><u>Range</u></b> <b>[{finalRange}]</b>hx<br />
+            <b><u>Target</u></b> Single, Repeat <b>[{finalRepeat}]</b><br />
+            <b><u>Damage</u></b> 2d8 <b><u style={{ color: '#915927', display: 'inline-flex', alignItems: 'center' }}>
+            Bludgeoning<img src="/Bludgeoning.png" alt="Bludgeoning" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} /></u></b> or <b><u style={{ color: '#f90102', display: 'inline-flex', alignItems: 'center' }}>
+            Fire<img src="/Fire.png" alt="Fire" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>, 
+            <span style={{ display: 'block', textAlign: 'right' }}><b><i>Spike</i></b> <b>(</b><b><u style={{ color: '#f90102', display: 'inline-flex', alignItems: 'center' }}>
+            Fire<img src="/Fire.png" alt="Fire" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b><b>)</b></span>
+            <b><u>Crit Effect</u></b> 2d8 <b><u style={{ color: '#915927', display: 'inline-flex', alignItems: 'center' }}>
+            Bludgeoning<img src="/Bludgeoning.png" alt="Bludgeoning" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} /></u></b> or
+            <span style={{ display: 'block', textAlign: 'right' }}><b><u style={{ color: '#f90102', display: 'inline-flex', alignItems: 'center' }}>
+            Fire<img src="/Fire.png" alt="Fire" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>, <b><i>Spike</i></b> <b>(</b><b><u style={{ color: '#f90102', display: 'inline-flex', alignItems: 'center' }}>
+            Fire<img src="/Fire.png" alt="Fire" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b><b>)</b></span>
+          </>
+        ) : elementalName === 'Sandstorm' ? (
+          <>
+            <b><u>Range</u></b> <b>[{finalRange}]</b>hx<br />
+            <b><u>Target</u></b> Single, Repeat <b>[{finalRepeat}]</b><br />
+            <b><u>Damage</u></b> 2d8 <b><u style={{ color: '#915927', display: 'inline-flex', alignItems: 'center' }}>
+            Bludgeoning<img src="/Bludgeoning.png" alt="Bludgeoning" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> or
+            <span style={{ display: 'block', textAlign: 'right' }}><b><u style={{ color: '#516fff', display: 'inline-flex', alignItems: 'center' }}>
+            Force<img src="/Force.png" alt="Force" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} /></u></b>, <b><i>Bounce</i></b> 5hx</span>
+            <b><u>Crit Effect</u></b> 2d8 <b><u style={{ color: '#915927', display: 'inline-flex', alignItems: 'center' }}>
+            Bludgeoning<img src="/Bludgeoning.png" alt="Bludgeoning" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> or
+            <span style={{ display: 'block', textAlign: 'right' }}><b><u style={{ color: '#516fff', display: 'inline-flex', alignItems: 'center' }}>
+            Force<img src="/Force.png" alt="Force" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} /></u></b>, <b><i>Blind</i></b></span>
+          </>
+        ) : elementalName === 'Phoenix' ? (
+          <>
+            <b><u>Range</u></b> <b>[{finalRange}]</b>hx<br />
+            <b><u>Target</u></b> Single, Repeat <b>[{finalRepeat}]</b><br />
+            <b><u>Damage</u></b> 2d8 <b><u style={{ color: '#d5d52a', display: 'inline-flex', alignItems: 'center' }}>
+            Electric<img src="/Electric.png" alt="Electric" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> or <b><u style={{ color: '#f90102', display: 'inline-flex', alignItems: 'center' }}>
+            Fire<img src="/Fire.png" alt="Fire" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>, 
+            <span style={{ display: 'block', textAlign: 'right' }}><b><i>Mesmerize</i></b></span>
+            <b><u>Crit Effect</u></b> 2d8 <b><u style={{ color: '#d5d52a', display: 'inline-flex', alignItems: 'center' }}>
+            Electric<img src="/Electric.png" alt="Electric" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> or <b><u style={{ color: '#f90102', display: 'inline-flex', alignItems: 'center' }}>
+            Fire<img src="/Fire.png" alt="Fire" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} /></u></b>,
+            <span style={{ display: 'block', textAlign: 'right' }}><b><i>Confuse</i></b></span>
+          </>
+        ) : elementalName === 'Salamander' ? (
+          <>
+            <b><u>Range</u></b> <b>[{finalRange}]</b>hx<br />
+            <b><u>Target</u></b> Single, Repeat <b>[{finalRepeat}]</b><br />
+            <b><u>Damage</u></b> 2d12 <b><u style={{ color: '#de7204', display: 'inline-flex', alignItems: 'center' }}>
+            Chemical<img src="/Chemical.png" alt="Chemical" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> or <b><u style={{ color: '#f90102', display: 'inline-flex', alignItems: 'center' }}>
+            Fire<img src="/Fire.png" alt="Fire" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>,
+            <span style={{ display: 'block', textAlign: 'right' }}><b><i>Restrain</i></b></span>
+            <b><u>Crit Effect</u></b> 2d12 <b><u style={{ color: '#de7204', display: 'inline-flex', alignItems: 'center' }}>
+            Chemical<img src="/Chemical.png" alt="Chemical" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> or <b><u style={{ color: '#f90102', display: 'inline-flex', alignItems: 'center' }}>
+            Fire<img src="/Fire.png" alt="Fire" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} /></u></b>,
+            <span style={{ display: 'block', textAlign: 'right' }}><b><i>Spike</i></b> <b>(</b><b><u style={{ color: '#f90102', display: 'inline-flex', alignItems: 'center' }}>
+            Fire<img src="/Fire.png" alt="Fire" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b><b>)</b></span>
+          </>
+        ) : elementalName === 'Stone Golem' ? (
+          <>
+            <b><u>Range</u></b> <b>[{finalRange}]</b>hx<br />
+            <b><u>Target</u></b> Single, Repeat <b>[{finalRepeat}]</b><br />
+            <b><u>Damage</u></b> 2d12 <b><u style={{ color: '#915927', display: 'inline-flex', alignItems: 'center' }}>
+            Bludgeoning<img src="/Bludgeoning.png" alt="Bludgeoning" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>, <b><i>Slam</i></b> 3hx<br />
+            <b><u>Crit Effect</u></b> 2d12 <b><u style={{ color: '#915927', display: 'inline-flex', alignItems: 'center' }}>
+            Bludgeoning<img src="/Bludgeoning.png" alt="Bludgeoning" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} /></u></b>, 
+            <span style={{ display: 'block', textAlign: 'right' }}><b><i>Slam</i></b> 3hx</span>
+          </>
+        ) : elementalName === 'Sludge Brute' ? (
+          <>
+            <b><u>Range</u></b> <b>[{finalRange}]</b>hx<br />
+            <b><u>Target</u></b> Single, Repeat <b>[{finalRepeat}]</b><br />
+            <b><u>Damage</u></b> 2d10 <b><u style={{ color: '#915927', display: 'inline-flex', alignItems: 'center' }}>
+            Bludgeoning<img src="/Bludgeoning.png" alt="Bludgeoning" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> or
+            <span style={{ display: 'block', textAlign: 'right' }}><b><u style={{ color: '#02b900', display: 'inline-flex', alignItems: 'center' }}>
+            Toxic<img src="/Toxic.png" alt="Toxic" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>, <b><i>Demoralize</i></b></span>
+            <b><u>Crit Effect</u></b> 2d10 <b><u style={{ color: '#915927', display: 'inline-flex', alignItems: 'center' }}>
+            Bludgeoning<img src="/Bludgeoning.png" alt="Bludgeoning" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> or
+            <span style={{ display: 'block', textAlign: 'right' }}><b><u style={{ color: '#02b900', display: 'inline-flex', alignItems: 'center' }}>
+            Toxic<img src="/Toxic.png" alt="Toxic" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>, <b><i>Spike</i></b> <b>(</b><b><u style={{ color: '#02b900', display: 'inline-flex', alignItems: 'center' }}>
+            Toxic<img src="/Toxic.png" alt="Toxic" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b><b>)</b></span>
+          </>
+        ) : elementalName === 'Thunderbird' ? (
+          <>
+            <b><u>Range</u></b> <b>[{finalRange}]</b>hx<br />
+            <b><u>Target</u></b> Single, Repeat <b>[{finalRepeat}]</b><br />
+            <b><u>Damage</u></b> 2d8 <b><u style={{ color: '#d5d52a', display: 'inline-flex', alignItems: 'center' }}>
+            Electric<img src="/Electric.png" alt="Electric" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> or <b><u style={{ color: '#516fff', display: 'inline-flex', alignItems: 'center' }}>
+            Force<img src="/Force.png" alt="Force" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} /></u></b>, <br />
+            <span style={{ display: 'block', textAlign: 'right' }}><b><i>Blind</i></b></span>
+            <b><u>Crit Effect</u></b> 2d8 <b><u style={{ color: '#d5d52a', display: 'inline-flex', alignItems: 'center' }}>
+            Electric<img src="/Electric.png" alt="Electric" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> or <b><u style={{ color: '#516fff', display: 'inline-flex', alignItems: 'center' }}>
+            Force<img src="/Force.png" alt="Force" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} /></u></b>, <br />
+            <span style={{ display: 'block', textAlign: 'right' }}><b><i>Spike</i></b> <b>(</b><b><u style={{ color: '#d5d52a', display: 'inline-flex', alignItems: 'center' }}>
+            Electric<img src="/Electric.png" alt="Electric" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b><b>)</b></span>
+          </>
+        ) : elementalName === 'Water Horse' ? (
+          <>
+            <b><u>Range</u></b> <b>[{finalRange}]</b>hx<br />
+            <b><u>Target</u></b> Single, Repeat <b>[{finalRepeat}]</b><br />
+            <b><u>Damage</u></b> 2d10 <b><u style={{ color: '#3ebbff', display: 'inline-flex', alignItems: 'center' }}>
+            Cold<img src="/Cold.png" alt="Cold" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>, <b><i>Blind</i></b><br />
+            <b><u>Crit Effect</u></b> 2d10 <b><u style={{ color: '#3ebbff', display: 'inline-flex', alignItems: 'center' }}>
+            Cold<img src="/Cold.png" alt="Cold" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} /></u></b>, <b><i>Restrain</i></b>
+          </>
+        ) : elementalName === 'Water Panda' ? (
+          <>
+            <b><u>Range</u></b> <b>[{finalRange}]</b>hx<br />
+            <b><u>Target</u></b> Single, Repeat <b>[{finalRepeat}]</b><br />
+            <b><u>Damage</u></b> 2d12 <b><u style={{ color: '#915927', display: 'inline-flex', alignItems: 'center' }}>
+            Bludgeoning<img src="/Bludgeoning.png" alt="Bludgeoning" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> or 
+            <span style={{ display: 'block', textAlign: 'right' }}><b><u style={{ color: '#3ebbff', display: 'inline-flex', alignItems: 'center' }}>
+            Cold<img src="/Cold.png" alt="Cold" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>, <b><i>Restrain</i></b></span>
+            <b><u>Crit Effect</u></b> 2d12 <b><u style={{ color: '#915927', display: 'inline-flex', alignItems: 'center' }}>
+            Bludgeoning<img src="/Bludgeoning.png" alt="Bludgeoning" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> or 
+            <span style={{ display: 'block', textAlign: 'right' }}><b><u style={{ color: '#3ebbff', display: 'inline-flex', alignItems: 'center' }}>
+            Cold<img src="/Cold.png" alt="Cold" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>, <b><i>Bounce</i></b> 3hx</span>
+          </>
+        ) : elementalName === 'Wave Elemental' ? (
+          <>
+            <b><u>Range</u></b> <b>[{finalRange}]</b>hx<br />
+            <b><u>Target</u></b> Single, Repeat <b>[{finalRepeat}]</b><br />
+            <b><u>Damage</u></b> 2d10 <b><u style={{ color: '#3ebbff', display: 'inline-flex', alignItems: 'center' }}>
+            Cold<img src="/Cold.png" alt="Cold" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> or <b><u style={{ color: '#516fff', display: 'inline-flex', alignItems: 'center' }}>
+            Force<img src="/Force.png" alt="Force" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>,
+            <span style={{ display: 'block', textAlign: 'right' }}><b><i>Bounce</i></b> 3hx</span>
+            <b><u>Crit Effect</u></b> 2d10 <b><u style={{ color: '#516fff', display: 'inline-flex', alignItems: 'center' }}>
+            Force<img src="/Force.png" alt="Force" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>, <b><i>Mesmerize</i></b>
           </>
         ) : (
           <>
-            <b><u>Damage</u></b> <b>[{range > 0 ? range : 'x'}]</b>d6
+            <b><u>Range</u></b> <b>[{finalRange}]</b>hx<br />
+            <b><u>Target</u></b> Single, Repeat <b>[{finalRepeat}]</b><br />
+            <b><u>Damage</u></b> (<b>[{range > 0 ? range : 'x'}]</b>) + 1d6<br />
+            <b><u>Crit Effect</u></b> (<b>[{range > 0 ? range : 'x'}]</b>) + 1d6
           </>
         )}
-        <br />
-        <b><i>Summon</i></b> Stats:<br />
-        <span style={{ paddingLeft: '8px' }}>
-          <b><u>Hit Points</u></b> <b>[{summonHitPoints > 0 ? summonHitPoints : 'x'}]</b><br />
-          <b><u>Speed</u></b> <b>[{speed > 0 ? speed : 'x'}]</b>hx<br />
-          <b><u>Armor</u></b> 0
-        </span>
       </div>
     </div>
   );
 }
 
 /**
- * Generate the full secondary attack description for level up/character sheet
+ * Get the elemental cost
  */
-export function generateElementalistSecondaryAttackDescriptionJSX(
-  classCardDots?: boolean[][],
-  subclass?: string
-): React.ReactElement {
-  const { range, repeatValue, speed, critThreshold, summonHitPoints, cooldown } = calculateElementalistSecondaryAttackData(classCardDots);
-  
-  // Determine damage type and icon based on subclass
-  let damageType = '';
-  let damageColor = '';
-  let damageIcon = '';
-  
-  switch (subclass) {
-    case 'Air':
-      damageType = 'Force';
-      damageColor = '#516fff';
-      damageIcon = '/Force.png';
-      break;
-    case 'Earth':
-      damageType = 'Bludgeoning';
-      damageColor = '#915927';
-      damageIcon = '/Bludgeoning.png';
-      break;
-    case 'Fire':
-      damageType = 'Fire';
-      damageColor = '#f90102';
-      damageIcon = '/Fire.png';
-      break;
-    case 'Water':
-      damageType = 'Cold';
-      damageColor = '#3ebbff';
-      damageIcon = '/Cold.png';
-      break;
-    default:
-      damageType = '';
-      damageColor = '#000';
-      damageIcon = '';
+export function getElementalCost(elementalName: string): number {
+  switch (elementalName) {
+    case 'Cloud Elemental': return 300;
+    case 'Fire Dragon': return 310;
+    case 'Firefox': return 300;
+    case 'Ice Golem': return 300;
+    case 'Magmoid': return 300;
+    case 'Sandstorm': return 300;
+    case 'Phoenix': return 325;
+    case 'Salamander': return 300;
+    case 'Stone Golem': return 300;
+    case 'Sludge Brute': return 300;
+    case 'Thunderbird': return 325;
+    case 'Water Horse': return 295;
+    case 'Water Panda': return 295;
+    case 'Wave Elemental': return 300;
+    default: return 0;
   }
-  
-  const displayRange = range > 0 ? range.toString() : 'x';
-  const displayRepeat = repeatValue > 0 ? repeatValue.toString() : 'x';
-  const displaySpeed = speed > 0 ? speed.toString() : 'x';
-  const displayHp = summonHitPoints > 0 ? summonHitPoints.toString() : 'x';
-  
-  return (
-    <span style={{ fontSize: '1em', color: '#000', fontFamily: 'Arial, Helvetica, sans-serif' }}>
-      <i>Elementals</i> (Cooldown <b>[{cooldown}]</b>). <b><i>Summon</i></b>, (<b>{displayRange}</b>) Range, Single Target, Repeat (<b>{displayRepeat}</b>), <b>[{critThreshold}]</b>+ Crit, (<b>{displayRange}</b>) Damage{damageType && (
-        <>
-          {' '}<b><u style={{ color: damageColor, display: 'inline-flex', alignItems: 'center' }}>
-            {damageType}<img src={damageIcon} alt={damageType} style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} />
-          </u></b>
-        </>
-      )}. <b><i>Summon</i></b> has (<b>{displayHp}</b>) <b><i><span style={{ color: '#990000' }}>Hit Points</span></i></b>, (<b>{displaySpeed}</b>)hx <b><i><span style={{ color: '#38761d' }}>Speed</span></i></b>, and 0 <b><i><span style={{ color: '#134f5c' }}>Armor</span></i></b>.
-    </span>
-  );
 }

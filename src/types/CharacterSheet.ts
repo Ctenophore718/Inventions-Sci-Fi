@@ -88,6 +88,9 @@ export type CharacterSheet = {
   // Shards for Elementalist class (primary attacks)
   shards?: string[];
 
+  // Elementals for Elementalist class (secondary attacks)
+  elementals?: string[];
+
   // Algorithms for Coder class
   algorithms?: string[];
 

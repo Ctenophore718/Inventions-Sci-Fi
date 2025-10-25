@@ -35,6 +35,8 @@ import { generateBloodTradeJSX } from "../utils/devoutFeature";
 import { generateFatigueJSX } from "../utils/voidFeature";
 import { generateVoidStrikeDamageJSX } from "../utils/voidStrike";
 
+import { generateAirArmorJSX } from "../utils/airFeature";
+
 import { generateMartyrJSX } from "../utils/astralFeature";
 import { generateAstralStrikeDamageJSX } from "../utils/astralStrike";
 import { generateAggressionJSX } from "../utils/chaosFeature";
@@ -787,14 +789,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
   );
 
   // Add after voidFeatureJSX
-  const airFeatureJSX = (
-    <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#0ee2df' }}>Air Armor.</i></b> You <i>Resist</i> <b><u style={{ color: '#516fff', display: 'inline-flex', alignItems: 'center' }}>
-        Force
-        <img src="/Force.png" alt="Force" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
-      </u></b> Damage
-    </span>
-  );
+  const airFeatureJSX = generateAirArmorJSX(sheet);
 
   // Add after airFeatureJSX
   const earthFeatureJSX = (
@@ -1261,6 +1256,52 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
       }
     }
     
+    // Add Elementals for Elementalist class
+    if (charClass === 'Elementalist') {
+      if (subclass === 'Air') {
+        attacks.push(
+          { name: 'Cloud Elemental', type: 'Elemental', cost: 300 },
+          { name: 'Thunderbird', type: 'Elemental', cost: 325 }
+        );
+      }
+      if (subclass === 'Air' || subclass === 'Earth') {
+        attacks.push(
+          { name: 'Sandstorm', type: 'Elemental', cost: 300 }
+        );
+      }
+      if (subclass === 'Earth') {
+        attacks.push(
+          { name: 'Stone Golem', type: 'Elemental', cost: 300 }
+        );
+      }
+      if (subclass === 'Earth' || subclass === 'Fire') {
+        attacks.push(
+          { name: 'Magmoid', type: 'Elemental', cost: 300 }
+        );
+      }
+      if (subclass === 'Earth' || subclass === 'Water') {
+        attacks.push(
+          { name: 'Sludge Brute', type: 'Elemental', cost: 300 }
+        );
+      }
+      if (subclass === 'Fire') {
+        attacks.push(
+          { name: 'Fire Dragon', type: 'Elemental', cost: 310 },
+          { name: 'Firefox', type: 'Elemental', cost: 300 },
+          { name: 'Phoenix', type: 'Elemental', cost: 325 },
+          { name: 'Salamander', type: 'Elemental', cost: 300 }
+        );
+      }
+      if (subclass === 'Water') {
+        attacks.push(
+          { name: 'Ice Golem', type: 'Elemental', cost: 300 },
+          { name: 'Water Horse', type: 'Elemental', cost: 295 },
+          { name: 'Water Panda', type: 'Elemental', cost: 295 },
+          { name: 'Wave Elemental', type: 'Elemental', cost: 300 }
+        );
+      }
+    }
+    
     // Add Super Serums for Anatomist subclass
     if (subclass === 'Anatomist') {
       attacks.push(
@@ -1482,6 +1523,12 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
           relics: newRelics,
           credits: credits - cost
         };
+      } else if (type === 'Elemental') {
+        const newElementals = [...(sheet.elementals || []), attackName];
+        partialUpdate = { 
+          elementals: newElementals,
+          credits: credits - cost
+        };
       } else if (type === 'Super Serum') {
         const newSuperSerums = [...(sheet.superSerums || []), attackName];
         partialUpdate = { 
@@ -1558,6 +1605,11 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
         const newRelics = [...(sheet.relics || []), attackName];
         partialUpdate = { 
           relics: newRelics
+        };
+      } else if (type === 'Elemental') {
+        const newElementals = [...(sheet.elementals || []), attackName];
+        partialUpdate = { 
+          elementals: newElementals
         };
       } else if (type === 'Super Serum') {
         const newSuperSerums = [...(sheet.superSerums || []), attackName];
@@ -3234,10 +3286,10 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                     textAlign: 'left',
                     minWidth: '180px'
                   }}
-                  value={pendingSecondaryAttack || (charClass === 'Coder' ? 'Algorithms' : charClass === 'Devout' ? 'Relics' : subclass === 'Anatomist' ? 'Super Serums' : subclass === 'Grenadier' ? 'Grenades' : subclass === 'Necro' ? 'Chem Zombies' : subclass === 'Poisoner' ? 'Noxious Fumes' : subclass === 'Beguiler' ? 'Whips' : subclass === 'Galvanic' ? 'Sabres' : subclass === 'Tactician' ? 'Flares' : subclass === 'Tyrant' ? 'Blasters' : (subclass === 'Kinetic' || subclass === 'Mercurial' || subclass === 'Inertial' || subclass === 'Vectorial') ? 'Disciplines' : 'Select Secondary Attack')}
+                  value={pendingSecondaryAttack || (charClass === 'Coder' ? 'Algorithms' : charClass === 'Devout' ? 'Relics' : charClass === 'Elementalist' ? 'Elementals' : subclass === 'Anatomist' ? 'Super Serums' : subclass === 'Grenadier' ? 'Grenades' : subclass === 'Necro' ? 'Chem Zombies' : subclass === 'Poisoner' ? 'Noxious Fumes' : subclass === 'Beguiler' ? 'Whips' : subclass === 'Galvanic' ? 'Sabres' : subclass === 'Tactician' ? 'Flares' : subclass === 'Tyrant' ? 'Blasters' : (subclass === 'Kinetic' || subclass === 'Mercurial' || subclass === 'Inertial' || subclass === 'Vectorial') ? 'Disciplines' : 'Select Secondary Attack')}
                   onChange={(e) => {
                     const value = e.target.value;
-                    if (value !== 'Algorithms' && value !== 'Relics' && value !== 'Super Serums' && value !== 'Grenades' && value !== 'Chem Zombies' && value !== 'Noxious Fumes' && value !== 'Whips' && value !== 'Sabres' && value !== 'Flares' && value !== 'Blasters' && value !== 'Disciplines' && value !== 'Select Secondary Attack') {
+                    if (value !== 'Algorithms' && value !== 'Relics' && value !== 'Elementals' && value !== 'Super Serums' && value !== 'Grenades' && value !== 'Chem Zombies' && value !== 'Noxious Fumes' && value !== 'Whips' && value !== 'Sabres' && value !== 'Flares' && value !== 'Blasters' && value !== 'Disciplines' && value !== 'Select Secondary Attack') {
                       setPendingSecondaryAttack(value);
                     }
                   }}
@@ -3276,6 +3328,45 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                       <option disabled style={{ fontWeight: 'bold' }}>Relics</option>
                       <option style={{ fontWeight: 'bold' }}>Kenos' Scythe</option>
                       <option style={{ fontWeight: 'bold' }}>Orb of Mitra</option>
+                    </>
+                  )}
+                  {charClass === 'Elementalist' && (
+                    <>
+                      <option disabled style={{ fontWeight: 'bold' }}>Elementals</option>
+                      {subclass === 'Air' && (
+                        <>
+                          <option style={{ fontWeight: 'bold' }}>Cloud Elemental</option>
+                          <option style={{ fontWeight: 'bold' }}>Thunderbird</option>
+                        </>
+                      )}
+                      {(subclass === 'Air' || subclass === 'Earth') && (
+                        <option style={{ fontWeight: 'bold' }}>Sandstorm</option>
+                      )}
+                      {subclass === 'Earth' && (
+                        <option style={{ fontWeight: 'bold' }}>Stone Golem</option>
+                      )}
+                      {(subclass === 'Earth' || subclass === 'Fire') && (
+                        <option style={{ fontWeight: 'bold' }}>Magmoid</option>
+                      )}
+                      {(subclass === 'Earth' || subclass === 'Water') && (
+                        <option style={{ fontWeight: 'bold' }}>Sludge Brute</option>
+                      )}
+                      {subclass === 'Fire' && (
+                        <>
+                          <option style={{ fontWeight: 'bold' }}>Fire Dragon</option>
+                          <option style={{ fontWeight: 'bold' }}>Firefox</option>
+                          <option style={{ fontWeight: 'bold' }}>Phoenix</option>
+                          <option style={{ fontWeight: 'bold' }}>Salamander</option>
+                        </>
+                      )}
+                      {subclass === 'Water' && (
+                        <>
+                          <option style={{ fontWeight: 'bold' }}>Ice Golem</option>
+                          <option style={{ fontWeight: 'bold' }}>Water Horse</option>
+                          <option style={{ fontWeight: 'bold' }}>Water Panda</option>
+                          <option style={{ fontWeight: 'bold' }}>Wave Elemental</option>
+                        </>
+                      )}
                     </>
                   )}
                   {subclass === 'Anatomist' && (
@@ -3361,7 +3452,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                       <option style={{ fontWeight: 'bold' }}>Night Prana</option>
                     </>
                   )}
-                  {charClass !== 'Coder' && charClass !== 'Devout' && subclass !== 'Anatomist' && subclass !== 'Grenadier' && subclass !== 'Necro' && subclass !== 'Poisoner' && subclass !== 'Beguiler' && subclass !== 'Galvanic' && subclass !== 'Tactician' && subclass !== 'Tyrant' && subclass !== 'Kinetic' && subclass !== 'Mercurial' && subclass !== 'Inertial' && subclass !== 'Vectorial' && (
+                  {charClass !== 'Coder' && charClass !== 'Devout' && charClass !== 'Elementalist' && subclass !== 'Anatomist' && subclass !== 'Grenadier' && subclass !== 'Necro' && subclass !== 'Poisoner' && subclass !== 'Beguiler' && subclass !== 'Galvanic' && subclass !== 'Tactician' && subclass !== 'Tyrant' && subclass !== 'Kinetic' && subclass !== 'Mercurial' && subclass !== 'Inertial' && subclass !== 'Vectorial' && (
                     <option disabled style={{ fontWeight: 'bold' }}>Select Secondary Attack</option>
                   )}
                 </select>
@@ -3448,6 +3539,29 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                                 const updatedSheet = { 
                                   ...sheet, 
                                   relics: newRelics
+                                };
+                                handleAutoSave(updatedSheet);
+                              }
+                            }}
+                          >×</button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  {(sheet?.elementals && sheet.elementals.length > 0) && (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginLeft: '8px' }}>
+                      {sheet?.elementals?.map((elemental, idx) => (
+                        <span key={elemental + idx + 'elemental'} style={{ fontStyle: 'italic', display: 'flex', alignItems: 'center', background: '#f5f5f5', borderRadius: '6px', padding: '2px 8px' }}>
+                          {elemental}
+                          <button
+                            style={{ marginLeft: '6px', padding: '0 6px', borderRadius: '50%', border: 'none', background: '#d32f2f', color: 'white', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.9em' }}
+                            title={`Remove ${elemental}`}
+                            onClick={() => {
+                              if (sheet) {
+                                const newElementals = sheet.elementals?.filter((_, i) => i !== idx) || [];
+                                const updatedSheet = { 
+                                  ...sheet, 
+                                  elementals: newElementals
                                 };
                                 handleAutoSave(updatedSheet);
                               }
