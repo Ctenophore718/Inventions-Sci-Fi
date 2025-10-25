@@ -523,7 +523,7 @@ const LevelUpSubclassesElementalist: React.FC<LevelUpSubclassesElementalistProps
           <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
             <div style={{ fontWeight: 'bold', color: '#38761d', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Movement</u></div>
             <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
-              <b><i>Enhanced Movement Effects.</i></b>
+              <b><i>Enhanced <i style={{ color: '#38761d' }}>Movement</i> Effects.</i></b> +<b>[{airMovementSpeedDots.filter(Boolean).length}]</b> <b><i style={{ color: '#38761d' }}>Speed</i></b>{airMovementFlySpeedDots[0] ? <>. <b><i style={{ color: '#38761d' }}>Fly Speed</i></b></> : null}.
             </div>
 
             {/* Movement XP progression table - +1 Speed */}

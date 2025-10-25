@@ -36,6 +36,7 @@ import { generateFatigueJSX } from "../utils/voidFeature";
 import { generateVoidStrikeDamageJSX } from "../utils/voidStrike";
 
 import { generateAirArmorJSX } from "../utils/airFeature";
+import { generateAirStrikeDamageJSX } from "../utils/airStrike";
 
 import { generateMartyrJSX } from "../utils/astralFeature";
 import { generateAstralStrikeDamageJSX } from "../utils/astralStrike";
@@ -294,6 +295,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
   // Combat fields
   // Calculate speed with Tactician Tactical Offensive bonus
   const baseSpeed = 0; // Base speed is 0 for now (will be increased by Species/Subspecies/Items later)
+
   const tacticianSpeedBonus = sheet?.subclass === 'Tactician' 
     ? 1 + ((sheet?.subclassProgressionDots as any)?.tacticianFeatureSpeedDots?.filter(Boolean).length || 0)
     : 0;
@@ -303,7 +305,10 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
   const mercurialSpeedBonus = sheet?.subclass === 'Mercurial'
     ? ((sheet?.subclassProgressionDots as any)?.mercurialMovementSpeedDots?.filter(Boolean).length || 0)
     : 0;
-  const totalSpeed = baseSpeed + tacticianSpeedBonus + kineticSpeedBonus + mercurialSpeedBonus;
+  const airSpeedBonus = sheet?.subclass === 'Air'
+    ? ((sheet?.subclassProgressionDots as any)?.airMovementSpeedDots?.filter(Boolean).length || 0)
+    : 0;
+  const totalSpeed = baseSpeed + tacticianSpeedBonus + kineticSpeedBonus + mercurialSpeedBonus + airSpeedBonus;
   const speed = totalSpeed > 0 ? `${totalSpeed}` : "0";
   
   // Calculate jump speed and jump amount for Kinetic subclass
@@ -789,7 +794,11 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
   );
 
   // Add after voidFeatureJSX
-  const airFeatureJSX = generateAirArmorJSX(sheet);
+  const airFeatureJSX = (
+    <span style={{ color: '#000', fontWeight: 400 }}>
+      {generateAirArmorJSX(sheet)}
+    </span>
+  );
 
   // Add after airFeatureJSX
   const earthFeatureJSX = (
@@ -1727,6 +1736,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                     if (subclass === "Chaos" && skill === "Intimidation") return "rgba(177,91,108,0.5)";
                     if (subclass === "Order" && skill === "Culture") return "rgba(174,177,91,0.5)";
                     if (subclass === "Void" && skill === "Stealth") return "rgba(91,115,177,0.5)";
+                    if (subclass === "Air" && skill === "Acrobatics") return "rgba(14,226,223,0.5)";
                     return null;
                   };
                   
@@ -2435,10 +2445,10 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
       <div className={styles.movementStrikeCard}>
   <h3 style={{ fontFamily: 'Arial, sans-serif' }}>Movement</h3>
         <div className={styles.cardContent}>
-          <div className={styles.horizontalLabel} style={{ color: '#38761d', fontWeight: 'bold' }}>Speed {speed}{speed !== "0" ? "hx" : ""}</div>
-          <div className={styles.horizontalLabel} style={{ color: '#38761d', fontWeight: 'bold' }}>Speed Types {movement}</div>
-          <div className={styles.horizontalLabel} style={{ color: '#38761d', fontWeight: 'bold' }}>Jump Speed {(kineticJumpSpeedBonus > 0 ? kineticJumpSpeedBonus : mercurialJumpSpeedBonus > 0 ? mercurialJumpSpeedBonus : "") + (kineticJumpSpeedBonus > 0 || mercurialJumpSpeedBonus > 0 ? "hx" : "")}</div>
-          <div className={styles.horizontalLabel} style={{ color: '#38761d', fontWeight: 'bold' }}>Jump Amount {kineticJumpAmountBonus > 0 ? kineticJumpAmountBonus : mercurialJumpAmountBonus > 0 ? mercurialJumpAmountBonus : ""}</div>
+          <div className={styles.horizontalLabel} style={{ color: '#38761d', fontWeight: 'bold' }}>Speed {speed}{speed !== "0hx" ? "hx" : ""}</div>
+          <div className={styles.horizontalLabel} style={{ color: '#38761d', fontWeight: 'bold' }}>Speed Types {movement}Ground{sheet?.subclass === 'Air' && (sheet?.subclassProgressionDots as any)?.airMovementFlySpeedDots?.[0] ? ', Fly' : ''}</div>
+          <div className={styles.horizontalLabel} style={{ color: '#38761d', fontWeight: 'bold' }}>Jump Speed {(kineticJumpSpeedBonus > 0 ? kineticJumpSpeedBonus : mercurialJumpSpeedBonus > 0 ? mercurialJumpSpeedBonus : "") + (kineticJumpSpeedBonus > 0 || mercurialJumpSpeedBonus > 0 ? "hx" : "0hx")}</div>
+          <div className={styles.horizontalLabel} style={{ color: '#38761d', fontWeight: 'bold' }}>Jump Amount {kineticJumpAmountBonus > 0 ? kineticJumpAmountBonus : mercurialJumpAmountBonus > 0 ? mercurialJumpAmountBonus : "0"}</div>
           <div className={styles.horizontalLabel} style={{ color: '#38761d', fontWeight: 'bold' }}>
             Speed Effects {
               subclass === 'Chaos' 
@@ -2577,6 +2587,10 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
               <span style={{ fontWeight: 'bold', fontFamily: 'inherit', color: '#000', marginLeft: 4, display: 'flex', alignItems: 'center' }}>
                 {generateVoidStrikeDamageJSX(sheet)}
               </span>
+            ) : subclass === 'Air' ? (
+              <span style={{ fontWeight: 'bold', fontFamily: 'inherit', color: '#000', marginLeft: 4, display: 'flex', alignItems: 'center' }}>
+                {generateAirStrikeDamageJSX(sheet)}
+              </span>
             ) : <span style={{ fontWeight: 'bold', fontFamily: 'inherit', color: '#000', marginLeft: 4 }}>{strikeDamage}</span>}
           </div>
           <div className={styles.horizontalLabel} style={{ color: '#351c75', fontWeight: 'bold' }}>Multi Strike <span style={{ color: '#000' }}>{
@@ -2590,7 +2604,9 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                     ? 2
                     : (subclass === 'Chaos' && (sheet?.subclassProgressionDots as any)?.chaosStrikeMultiStrikeDots?.[0])
                       ? 2
-                      : (multiStrike > 0 ? multiStrike : <span style={{ visibility: 'hidden' }}>0</span>)
+                      : (subclass === 'Air' && ((sheet?.subclassProgressionDots as any)?.airStrikeMultiStrikeDots?.filter(Boolean).length || 0) > 0)
+                        ? (1 + ((sheet?.subclassProgressionDots as any)?.airStrikeMultiStrikeDots?.filter(Boolean).length || 0))
+                        : (multiStrike > 0 ? multiStrike : <span style={{ visibility: 'hidden' }}>0</span>)
           }</span></div>
           <div className={styles.horizontalLabel} style={{ color: '#351c75', fontWeight: 'bold' }}>
               Strike Effects {
@@ -2624,6 +2640,8 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                     ? <span style={{ color: '#000', fontWeight: 'normal' }}><b>[{generateVectorialStrikeRangeJSX(sheet)}]</b>hx <b><i style={{ color: '#351c75' }}>Strike</i></b> Range</span>
                   : (subclass === 'Void' && (sheet?.subclassProgressionDots as any)?.voidStrikeInflictDrainDots?.[0])
                     ? <span style={{ color: '#000', fontWeight: 'normal' }}><b><i>Drain</i></b></span>
+                  : (subclass === 'Air' && (sheet?.subclassProgressionDots as any)?.airStrikeInflictSlamDots?.[0])
+                    ? <span style={{ color: '#000', fontWeight: 'normal' }}><b><i>Slam</i></b> 3hx</span>
                     : strikeEffects
               }
           </div>
@@ -2673,6 +2691,20 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                   )}
                 </span>
               )}
+              {subclass === 'Air' && (
+                <span style={{ marginLeft: 8, display: 'inline-flex', gap: 8, flexWrap: 'wrap' }}>
+                  {!(sheet?.subclassProgressionDots as any)?.airFeatureForceImmunityDots?.[0] && (
+                    <span style={{ display: 'inline-flex', alignItems: 'center', color: '#516fff', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                      <u>Force</u> <img src="/Force.png" alt="Force" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+                    </span>
+                  )}
+                  {(sheet?.subclassProgressionDots as any)?.airFeatureElectricResistanceDots?.[0] && !(sheet?.subclassProgressionDots as any)?.airFeatureElectricImmunityDots?.[0] && (
+                    <span style={{ display: 'inline-flex', alignItems: 'center', color: '#d5d52a', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                      <u>Electric</u> <img src="/Electric.png" alt="Electric" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+                    </span>
+                  )}
+                </span>
+              )}
             </div>
           <div style={{ fontWeight: 'bold', marginBottom: 2, fontFamily: 'Arial, sans-serif', color: '#666666', wordBreak: 'break-word', overflowWrap: 'break-word' }}>Immunities
             {subclass === 'Poisoner' && sheet?.subclassProgressionDots?.poisonerToxicImmunityDots?.[0] && (
@@ -2715,8 +2747,29 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                 </span>
               </>
             )}
+            {subclass === 'Air' && (sheet?.subclassProgressionDots as any)?.airFeatureForceImmunityDots?.[0] && !(sheet?.subclassProgressionDots as any)?.airFeatureForceAbsorptionDots?.[0] && (
+              <span style={{ marginLeft: 8, display: 'inline-flex', alignItems: 'center', color: '#516fff', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                <u>Force</u> <img src="/Force.png" alt="Force" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+              </span>
+            )}
+            {subclass === 'Air' && (sheet?.subclassProgressionDots as any)?.airFeatureElectricImmunityDots?.[0] && (
+              <span style={{ marginLeft: 8, display: 'inline-flex', alignItems: 'center', color: '#d5d52a', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                <u>Electric</u> <img src="/Electric.png" alt="Electric" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+              </span>
+            )}
+            {subclass === 'Air' && (sheet?.subclassProgressionDots as any)?.airFeatureRestrainImmunityDots?.[0] && (
+              <span style={{ marginLeft: 8, display: 'inline-flex', alignItems: 'center', color: '#000', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                <i>Restrain</i>
+              </span>
+            )}
           </div>
-          <div style={{ fontWeight: 'bold', marginBottom: 2, fontFamily: 'Arial, sans-serif', color: '#666666', wordBreak: 'break-word', overflowWrap: 'break-word' }}>Absorptions</div>
+          <div style={{ fontWeight: 'bold', marginBottom: 2, fontFamily: 'Arial, sans-serif', color: '#666666', wordBreak: 'break-word', overflowWrap: 'break-word' }}>Absorptions
+            {subclass === 'Air' && (sheet?.subclassProgressionDots as any)?.airFeatureForceAbsorptionDots?.[0] && (
+              <span style={{ marginLeft: 8, display: 'inline-flex', alignItems: 'center', color: '#516fff', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                <u>Force</u> <img src="/Force.png" alt="Force" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+              </span>
+            )}
+          </div>
         </div>
       </div>
 
@@ -2948,7 +3001,14 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
               <b><i style={{ color: '#5b73b1' }}>Spine-Chiller.</i></b> <span style={{ color: '#000' }}>Your vibe is just downright creepy, and your connection to the Void realm influences others in an imperceptible and emotional way. Gain an advantage on social-based skill rolls when scaring, intimidating or otherwise unnerving others.</span>
             </span>
           </div>
-          )}                          
+          )}
+          {subclass === 'Air' && (sheet?.subclassProgressionDots as any)?.airPerksSkillsDots?.[0] && (
+          <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <span>
+              <b><i style={{ color: '#0ee2df' }}>Airbender.</i></b> <span style={{ color: '#000' }}>Your elemental companion enables you to manipulate the air itself, allowing you to push, pull and/or lift and levitate objects up to 20hx away and weighing up to 50lbs.</span>
+            </span>
+          </div>
+          )}                            
         </div>
       </div>
 

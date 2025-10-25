@@ -23,7 +23,7 @@ export const generateAirArmorJSX = (sheet: CharacterSheet | null): React.JSX.Ele
     forceProtection = 'are Immune to';
   }
   
-  let electricProtection = '';
+  let electricProtection = ' - ';
   if (hasElectricImmunity) {
     electricProtection = 'are Immune to';
   } else if (hasElectricResistance) {
@@ -32,11 +32,11 @@ export const generateAirArmorJSX = (sheet: CharacterSheet | null): React.JSX.Ele
   
   return (
     <>
-      <b><i style={{ color: '#0ee2df', fontSize: '1em' }}>Air Armor.</i></b> You {forceProtection} <b><u style={{ color: '#516fff', display: 'inline-flex', alignItems: 'center' }}>
+      <b><i style={{ color: '#0ee2df', fontSize: '1em' }}>Air Armor.</i></b> You <b>[</b><i>{forceProtection}</i><b>]</b> <b><u style={{ color: '#516fff', display: 'inline-flex', alignItems: 'center' }}>
       Force<img src="/Force.png" alt="Force" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} />
-      </u></b> Damage{electricProtection && <>, and you {electricProtection} <b><u style={{ color: '#d5d52a', display: 'inline-flex', alignItems: 'center' }}>
+      </u></b> Damage{electricProtection && <>, and you <b>[</b><i>{electricProtection}</i><b>]</b> <b><u style={{ color: '#d5d52a', display: 'inline-flex', alignItems: 'center' }}>
       Electric<img src="/Electric.png" alt="Electric" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} />
-      </u></b> Damage</>}{hasRestrainImmunity && <>. You are also Immune to <b><i>Restrain</i></b></>}.
+  </u></b> and are <i>Immune</i> to <b>[</b><b><i>{hasRestrainImmunity ? 'Restrain' : ' - '}</i></b><b>]</b></>}.
     </>
   );
 };
