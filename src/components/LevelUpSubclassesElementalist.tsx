@@ -6,6 +6,9 @@ import { generateAirStrikeJSX } from "../utils/airStrike";
 import { generateEarthArmorJSX } from "../utils/earthFeature";
 import { generateEarthenWallJSX } from "../utils/earthTechnique";
 import { generateEarthStrikeJSX } from "../utils/earthStrike";
+import { generateFireArmorJSX } from "../utils/fireFeature";
+import { generateFirestormJSX } from "../utils/fireTechnique";
+import { generateFireStrikeJSX } from "../utils/fireStrike";
 
 type LevelUpSubclassesElementalistProps = {
   sheet: CharacterSheet | null;
@@ -111,6 +114,47 @@ const LevelUpSubclassesElementalist: React.FC<LevelUpSubclassesElementalistProps
   );
   const [earthPerksSkillsDots, setEarthPerksSkillsDots] = useState<boolean[]>(
     (sheet?.subclassProgressionDots as any)?.earthPerksSkillsDots || [false]
+  );
+
+  // Independent state for Fire dots
+  const [fireFeatureFireImmunityDots, setFireFeatureFireImmunityDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.fireFeatureFireImmunityDots || [false]
+  );
+  const [fireFeatureFireAbsorptionDots, setFireFeatureFireAbsorptionDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.fireFeatureFireAbsorptionDots || [false]
+  );
+  const [fireFeatureChemicalResistanceDots, setFireFeatureChemicalResistanceDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.fireFeatureChemicalResistanceDots || [false]
+  );
+  const [fireFeatureChemicalImmunityDots, setFireFeatureChemicalImmunityDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.fireFeatureChemicalImmunityDots || [false]
+  );
+  const [fireFeatureDemoralizeImmunityDots, setFireFeatureDemoralizeImmunityDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.fireFeatureDemoralizeImmunityDots || [false]
+  );
+  const [fireTechniqueHxDots, setFireTechniqueHxDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.fireTechniqueHxDots || [false, false, false]
+  );
+  const [fireTechniqueSpikeDots, setFireTechniqueSpikeDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.fireTechniqueSpikeDots || [false, false, false]
+  );
+  const [fireTechniqueCooldownDots, setFireTechniqueCooldownDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.fireTechniqueCooldownDots || [false, false]
+  );
+  const [fireMovementSpeedDots, setFireMovementSpeedDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.fireMovementSpeedDots || [false, false]
+  );
+  const [fireStrikeDamageDots, setFireStrikeDamageDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.fireStrikeDamageDots || [false, false]
+  );
+  const [fireStrikeExtraStrikeDots, setFireStrikeExtraStrikeDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.fireStrikeExtraStrikeDots || [false]
+  );
+  const [fireStrikeInflictSpikeDots, setFireStrikeInflictSpikeDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.fireStrikeInflictSpikeDots || [false]
+  );
+  const [firePerksSkillsDots, setFirePerksSkillsDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.firePerksSkillsDots || [false]
   );
 
   // Helper function to handle XP dot clicking with sequential requirement
@@ -561,7 +605,7 @@ const LevelUpSubclassesElementalist: React.FC<LevelUpSubclassesElementalistProps
           <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
             <div style={{ fontWeight: 'bold', color: '#38761d', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Movement</u></div>
             <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
-              <b><i>Enhanced <i style={{ color: '#38761d' }}>Movement</i> Effects.</i></b> +<b>[{airMovementSpeedDots.filter(Boolean).length}]</b> <b><i style={{ color: '#38761d' }}>Speed</i></b>{airMovementFlySpeedDots[0] ? <>. <b><i style={{ color: '#38761d' }}>Fly Speed</i></b></> : null}.
+              <b><i>Enhanced <i style={{ color: '#38761d' }}>Movement</i> Effects.</i></b> +<b>[{airMovementSpeedDots.filter(Boolean).length}]</b>hx <b><i style={{ color: '#38761d' }}>Speed</i></b>{airMovementFlySpeedDots[0] ? <>. <b><i style={{ color: '#38761d' }}>Fly Speed</i></b></> : null}.
             </div>
 
             {/* Movement XP progression table - +1 Speed */}
@@ -582,7 +626,7 @@ const LevelUpSubclassesElementalist: React.FC<LevelUpSubclassesElementalistProps
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>8xp</span>
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>12xp</span>
               {/* Row 2: +1 Speed dots */}
-              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1 <b><i style={{ color: '#38761d' }}>Speed</i></b></span>
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1hx <b><i style={{ color: '#38761d' }}>Speed</i></b></span>
               {[0,1,2].map(idx => (
                 <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                   <span
@@ -1277,6 +1321,564 @@ const LevelUpSubclassesElementalist: React.FC<LevelUpSubclassesElementalistProps
                       borderRadius: '50%',
                       display: 'block',
                       background: earthPerksSkillsDots[0] ? '#000' : '#fff',
+                      cursor: 'pointer',
+                      transition: 'background 0.2s'
+                    }}
+                  ></span>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {subclass === 'Fire' && (
+        <div style={{ width: '100%', marginTop: '1rem', textAlign: 'left', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
+          {/* Feature header */}
+          <div style={{ color: '#0b5394', fontWeight: 'bold', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '8px' }}>
+            <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <div style={{ fontWeight: 'bold', color: '#0b5394', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Feature</u></div>
+              <span style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
+                {generateFireArmorJSX(sheet)}
+              </span>
+            </span>
+          </div>
+
+          {/* Feature XP progression table - Fire Immunity */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 24px 24px 24px',
+            gridTemplateRows: 'repeat(2, auto)',
+            columnGap: '6px',
+            rowGap: '2px',
+            alignItems: 'start',
+            marginBottom: '2px',
+            width: '100%',
+            paddingLeft: '4px'
+          }}>
+            {/* Row 1: XP header */}
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>5xp</span>
+            <span></span>
+            <span></span>
+            {/* Row 2: Fire Immunity */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}><b><u style={{ color: '#e20e0e', display: 'inline-flex', alignItems: 'center' }}>
+            Fire<img src="/Fire.png" alt="Fire" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} />
+            </u></b> <i>Immunity</i></span>
+            <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <span
+                onClick={() => handleDotClick(fireFeatureFireImmunityDots, setFireFeatureFireImmunityDots, 0, [5], 'fireFeatureFireImmunityDots')}
+                style={{
+                  width: '15px',
+                  height: '15px',
+                  border: '2px solid #000',
+                  borderRadius: '50%',
+                  display: 'block',
+                  background: fireFeatureFireImmunityDots[0] ? '#000' : '#fff',
+                  cursor: 'pointer',
+                  transition: 'background 0.2s'
+                }}
+              ></span>
+            </span>
+          </div>
+
+          {/* Feature XP progression table - Fire Absorption (prerequisite: Fire Immunity) */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 24px 24px 24px',
+            gridTemplateRows: 'repeat(2, auto)',
+            columnGap: '6px',
+            rowGap: '2px',
+            alignItems: 'start',
+            marginBottom: '2px',
+            width: '100%',
+            paddingLeft: '4px'
+          }}>
+            {/* Row 1: XP header */}
+            <span></span>
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>8xp</span>
+            <span></span>
+            {/* Row 2: Fire Absorption */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}><b><u style={{ color: '#e20e0e', display: 'inline-flex', alignItems: 'center' }}>
+            Fire<img src="/Fire.png" alt="Fire" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} />
+            </u></b> <i>Absorption</i></span>
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>⤷</span>
+            <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <span
+                onClick={() => {
+                  if (!fireFeatureFireImmunityDots[0]) {
+                    setNotice("Must purchase Fire Immunity first!");
+                    return;
+                  }
+                  handleDotClick(fireFeatureFireAbsorptionDots, setFireFeatureFireAbsorptionDots, 0, [8], 'fireFeatureFireAbsorptionDots');
+                }}
+                style={{
+                  width: '15px',
+                  height: '15px',
+                  border: '2px solid #000',
+                  borderRadius: '50%',
+                  display: 'block',
+                  background: fireFeatureFireAbsorptionDots[0] ? '#000' : '#fff',
+                  cursor: fireFeatureFireImmunityDots[0] ? 'pointer' : 'not-allowed',
+                  transition: 'background 0.2s'
+                }}
+              ></span>
+            </span>
+          </div>
+
+          {/* Feature XP progression table - Chemical Resistance */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 24px 24px 24px',
+            gridTemplateRows: 'repeat(2, auto)',
+            columnGap: '6px',
+            rowGap: '2px',
+            alignItems: 'start',
+            marginBottom: '2px',
+            width: '100%',
+            paddingLeft: '4px'
+          }}>
+            {/* Row 1: XP header */}
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>3xp</span>
+            <span></span>
+            <span></span>
+            {/* Row 2: Chemical Resistance */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}><b><u style={{ color: '#de7204', display: 'inline-flex', alignItems: 'center' }}>
+            Chemical<img src="/Chemical.png" alt="Chemical" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} />
+            </u></b> <i>Resistance</i></span>
+            <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <span
+                onClick={() => handleDotClick(fireFeatureChemicalResistanceDots, setFireFeatureChemicalResistanceDots, 0, [3], 'fireFeatureChemicalResistanceDots')}
+                style={{
+                  width: '15px',
+                  height: '15px',
+                  border: '2px solid #000',
+                  borderRadius: '50%',
+                  display: 'block',
+                  background: fireFeatureChemicalResistanceDots[0] ? '#000' : '#fff',
+                  cursor: 'pointer',
+                  transition: 'background 0.2s'
+                }}
+              ></span>
+            </span>
+          </div>
+
+          {/* Feature XP progression table - Chemical Immunity (prerequisite: Chemical Resistance) */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 24px 24px 24px',
+            gridTemplateRows: 'repeat(2, auto)',
+            columnGap: '6px',
+            rowGap: '2px',
+            alignItems: 'start',
+            marginBottom: '2px',
+            width: '100%',
+            paddingLeft: '4px'
+          }}>
+            {/* Row 1: XP header */}
+            <span></span>
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>5xp</span>
+            <span></span>
+            {/* Row 2: Chemical Immunity */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}><b><u style={{ color: '#de7204', display: 'inline-flex', alignItems: 'center' }}>
+            Chemical<img src="/Chemical.png" alt="Chemical" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} />
+            </u></b> <i>Immunity</i></span>
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>⤷</span>
+            <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <span
+                onClick={() => {
+                  if (!fireFeatureChemicalResistanceDots[0]) {
+                    setNotice("Must purchase Chemical Resistance first!");
+                    return;
+                  }
+                  handleDotClick(fireFeatureChemicalImmunityDots, setFireFeatureChemicalImmunityDots, 0, [5], 'fireFeatureChemicalImmunityDots');
+                }}
+                style={{
+                  width: '15px',
+                  height: '15px',
+                  border: '2px solid #000',
+                  borderRadius: '50%',
+                  display: 'block',
+                  background: fireFeatureChemicalImmunityDots[0] ? '#000' : '#fff',
+                  cursor: fireFeatureChemicalResistanceDots[0] ? 'pointer' : 'not-allowed',
+                  transition: 'background 0.2s'
+                }}
+              ></span>
+            </span>
+          </div>
+
+          {/* Feature XP progression table - Demoralize Immunity */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 24px 24px 24px',
+            gridTemplateRows: 'repeat(2, auto)',
+            columnGap: '6px',
+            rowGap: '2px',
+            alignItems: 'start',
+            marginBottom: '12px',
+            width: '100%',
+            paddingLeft: '4px'
+          }}>
+            {/* Row 1: XP header */}
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>5xp</span>
+            <span></span>
+            <span></span>
+            {/* Row 2: Demoralize Immunity */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}><b><i>Demoralize</i></b> <i>Immunity</i></span>
+            <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <span
+                onClick={() => handleDotClick(fireFeatureDemoralizeImmunityDots, setFireFeatureDemoralizeImmunityDots, 0, [5], 'fireFeatureDemoralizeImmunityDots')}
+                style={{
+                  width: '15px',
+                  height: '15px',
+                  border: '2px solid #000',
+                  borderRadius: '50%',
+                  display: 'block',
+                  background: fireFeatureDemoralizeImmunityDots[0] ? '#000' : '#fff',
+                  cursor: 'pointer',
+                  transition: 'background 0.2s'
+                }}
+              ></span>
+            </span>
+          </div>
+
+          {/* Technique Section */}
+          <div style={{ marginTop: '12px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <div style={{ fontWeight: 'bold', color: '#bf9000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Technique</u></div>
+            <div style={{ fontSize: '1em', color: '#000', marginBottom: '6px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              {generateFirestormJSX(sheet)}
+            </div>
+
+            {/* Technique XP progression table - +1hx */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 24px 24px 24px',
+              gridTemplateRows: 'repeat(2, auto)',
+              columnGap: '6px',
+              rowGap: '2px',
+              alignItems: 'start',
+              marginBottom: '2px',
+              width: '100%',
+              paddingLeft: '4px'
+            }}>
+              {/* Row 1: XP header */}
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>4xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>8xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>11xp</span>
+              {/* Row 2: +1hx */}
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1hx</span>
+              {[0, 1, 2].map(index => (
+                <span key={index} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                  <span
+                    onClick={() => handleDotClick(fireTechniqueHxDots, setFireTechniqueHxDots, index, [4, 8, 11], 'fireTechniqueHxDots')}
+                    style={{
+                      width: '15px',
+                      height: '15px',
+                      border: '2px solid #000',
+                      borderRadius: '50%',
+                      display: 'block',
+                      background: fireTechniqueHxDots[index] ? '#000' : '#fff',
+                      cursor: 'pointer',
+                      transition: 'background 0.2s'
+                    }}
+                  ></span>
+                </span>
+              ))}
+            </div>
+
+            {/* Technique XP progression table - +1 instance of Spike (Fire) */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 24px 24px 24px',
+              gridTemplateRows: 'repeat(2, auto)',
+              columnGap: '6px',
+              rowGap: '2px',
+              alignItems: 'start',
+              marginBottom: '2px',
+              width: '100%',
+              paddingLeft: '4px'
+            }}>
+              {/* Row 1: XP header */}
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>5xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>10xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>15xp</span>
+              {/* Row 2: +1 instance of Spike (Fire) */}
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1 instance of <b><i>Spike</i></b> <b>(</b><b><u style={{ color: '#e20e0e', display: 'inline-flex', alignItems: 'center' }}>
+            Fire<img src="/Fire.png" alt="Fire" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} />
+            </u></b><b>)</b></span>
+              {[0, 1, 2].map(index => (
+                <span key={index} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                  <span
+                    onClick={() => handleDotClick(fireTechniqueSpikeDots, setFireTechniqueSpikeDots, index, [5, 10, 15], 'fireTechniqueSpikeDots')}
+                    style={{
+                      width: '15px',
+                      height: '15px',
+                      border: '2px solid #000',
+                      borderRadius: '50%',
+                      display: 'block',
+                      background: fireTechniqueSpikeDots[index] ? '#000' : '#fff',
+                      cursor: 'pointer',
+                      transition: 'background 0.2s'
+                    }}
+                  ></span>
+                </span>
+              ))}
+            </div>
+
+            {/* Technique XP progression table - -1 Cooldown */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 24px 24px 24px',
+              gridTemplateRows: 'repeat(2, auto)',
+              columnGap: '6px',
+              rowGap: '2px',
+              alignItems: 'start',
+              marginBottom: '12px',
+              width: '100%',
+              paddingLeft: '4px'
+            }}>
+              {/* Row 1: XP header */}
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>5xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>8xp</span>
+              <span></span>
+              {/* Row 2: -1 Cooldown */}
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>-1 Cooldown</span>
+              {[0, 1].map(index => (
+                <span key={index} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                  <span
+                    onClick={() => handleDotClick(fireTechniqueCooldownDots, setFireTechniqueCooldownDots, index, [5, 8], 'fireTechniqueCooldownDots')}
+                    style={{
+                      width: '15px',
+                      height: '15px',
+                      border: '2px solid #000',
+                      borderRadius: '50%',
+                      display: 'block',
+                      background: fireTechniqueCooldownDots[index] ? '#000' : '#fff',
+                      cursor: 'pointer',
+                      transition: 'background 0.2s'
+                    }}
+                  ></span>
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* Movement Section */}
+          <div style={{ marginTop: '12px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <div style={{ fontWeight: 'bold', color: '#000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Movement</u></div>
+            <div style={{ fontSize: '1em', color: '#000', marginBottom: '6px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <b><i>Enhanced <i style={{ color: '#38761d' }}>Movement</i> Effects.</i></b> +<b>[{fireMovementSpeedDots.filter(Boolean).length}]</b>hx <b><i style={{ color: '#38761d' }}>Speed</i></b>{airMovementFlySpeedDots[0] ? <>. <b><i style={{ color: '#38761d' }}>Fly Speed</i></b></> : null}.
+            </div>
+
+            {/* Movement XP progression table - +1 Speed */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 24px 24px 24px',
+              gridTemplateRows: 'repeat(2, auto)',
+              columnGap: '6px',
+              rowGap: '2px',
+              alignItems: 'start',
+              marginBottom: '12px',
+              width: '100%',
+              paddingLeft: '4px'
+            }}>
+              {/* Row 1: XP header */}
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>5xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>10xp</span>
+              <span></span>
+              {/* Row 2: +1 Speed */}
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1hx <b><i style={{ color: '#38761d' }}>Speed</i></b></span>
+              {[0, 1].map(index => (
+                <span key={index} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                  <span
+                    onClick={() => handleDotClick(fireMovementSpeedDots, setFireMovementSpeedDots, index, [5, 10], 'fireMovementSpeedDots')}
+                    style={{
+                      width: '15px',
+                      height: '15px',
+                      border: '2px solid #000',
+                      borderRadius: '50%',
+                      display: 'block',
+                      background: fireMovementSpeedDots[index] ? '#000' : '#fff',
+                      cursor: 'pointer',
+                      transition: 'background 0.2s'
+                    }}
+                  ></span>
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* Strike Section */}
+          <div style={{ marginTop: '12px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <div style={{ fontWeight: 'bold', color: '#351c75', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Strike</u></div>
+            <div style={{ fontSize: '1em', color: '#000', marginBottom: '6px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              {generateFireStrikeJSX(sheet)}
+            </div>
+
+            {/* Strike XP progression table - +1 Damage die */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 24px 24px 24px',
+              gridTemplateRows: 'repeat(2, auto)',
+              columnGap: '6px',
+              rowGap: '2px',
+              alignItems: 'start',
+              marginBottom: '2px',
+              width: '100%',
+              paddingLeft: '4px'
+            }}>
+              {/* Row 1: XP header */}
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>6xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>10xp</span>
+              <span></span>
+              {/* Row 2: +1 Damage die */}
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1 Damage die</span>
+              {[0, 1].map(index => (
+                <span key={index} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                  <span
+                    onClick={() => handleDotClick(fireStrikeDamageDots, setFireStrikeDamageDots, index, [6, 10], 'fireStrikeDamageDots')}
+                    style={{
+                      width: '15px',
+                      height: '15px',
+                      border: '2px solid #000',
+                      borderRadius: '50%',
+                      display: 'block',
+                      background: fireStrikeDamageDots[index] ? '#000' : '#fff',
+                      cursor: 'pointer',
+                      transition: 'background 0.2s'
+                    }}
+                  ></span>
+                </span>
+              ))}
+            </div>
+
+            {/* Strike XP progression table - +1 Strike */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 24px 24px 24px',
+              gridTemplateRows: 'repeat(2, auto)',
+              columnGap: '6px',
+              rowGap: '2px',
+              alignItems: 'start',
+              marginBottom: '2px',
+              width: '100%',
+              paddingLeft: '4px'
+            }}>
+              {/* Row 1: XP header */}
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>12xp</span>
+              <span></span>
+              <span></span>
+              {/* Row 2: +1 Strike */}
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1 <b><i style={{ color: '#351c75' }}>Strike</i></b></span>
+              <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <span
+                  onClick={() => handleDotClick(fireStrikeExtraStrikeDots, setFireStrikeExtraStrikeDots, 0, [12], 'fireStrikeExtraStrikeDots')}
+                  style={{
+                    width: '15px',
+                    height: '15px',
+                    border: '2px solid #000',
+                    borderRadius: '50%',
+                    display: 'block',
+                    background: fireStrikeExtraStrikeDots[0] ? '#000' : '#fff',
+                    cursor: 'pointer',
+                    transition: 'background 0.2s'
+                  }}
+                ></span>
+              </span>
+            </div>
+
+            {/* Strike XP progression table - Inflict Spike (Fire) */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 24px 24px 24px',
+              gridTemplateRows: 'repeat(2, auto)',
+              columnGap: '6px',
+              rowGap: '2px',
+              alignItems: 'start',
+              marginBottom: '12px',
+              width: '100%',
+              paddingLeft: '4px'
+            }}>
+              {/* Row 1: XP header */}
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>6xp</span>
+              <span></span>
+              <span></span>
+              {/* Row 2: Inflict Spike (Fire) */}
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>Inflict <b><i>Spike</i></b> <b>(</b><b><u style={{ color: '#e20e0e', display: 'inline-flex', alignItems: 'center' }}>
+      Fire<img src="/Fire.png" alt="Fire" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} />
+      </u></b><b>)</b></span>
+              <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <span
+                  onClick={() => handleDotClick(fireStrikeInflictSpikeDots, setFireStrikeInflictSpikeDots, 0, [6], 'fireStrikeInflictSpikeDots')}
+                  style={{
+                    width: '15px',
+                    height: '15px',
+                    border: '2px solid #000',
+                    borderRadius: '50%',
+                    display: 'block',
+                    background: fireStrikeInflictSpikeDots[0] ? '#000' : '#fff',
+                    cursor: 'pointer',
+                    transition: 'background 0.2s'
+                  }}
+                ></span>
+              </span>
+            </div>
+          </div>
+
+          {/* Perks Section */}
+          <div style={{ marginTop: '12px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <div style={{ fontWeight: 'bold', color: '#000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Perks</u></div>
+            <div style={{ fontSize: '1em', color: '#000', marginBottom: '6px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <i><b>Skills.</b> Intimidation</i> +2
+            </div>
+            <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 24px',
+                gridTemplateRows: 'auto auto',
+                columnGap: '6px',
+                rowGap: '2px',
+                alignItems: 'start',
+                marginTop: '-12px',
+                width: '100%',
+                paddingLeft: '4px'
+              }}>
+                {/* Row 1: SP header */}
+                <span></span>
+                <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>9sp</span>
+                {/* Row 2: Firestarter */}
+                <div style={{
+                  fontSize: '1em', 
+                  fontFamily: 'Arial, Helvetica, sans-serif', 
+                  textAlign: 'left', 
+                  paddingRight: '8px',
+                  maxWidth: '500px',
+                  overflowWrap: 'break-word',
+                  wordWrap: 'break-word'
+                }}>
+                  <b><i style={{ color: '#e20e0e', fontSize: '1em' }}>Firestarter.</i></b> Your elemental companion allows you to start fires on even the most fire resistant materials and objects up to 20hx away.
+                </div>
+                <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start' }}>
+                  <span
+                    onClick={() => handleSpDotClick(firePerksSkillsDots, setFirePerksSkillsDots, 0, [9], 'firePerksSkillsDots')}
+                    style={{
+                      width: '15px',
+                      height: '15px',
+                      border: '2px solid #000',
+                      borderRadius: '50%',
+                      display: 'block',
+                      background: firePerksSkillsDots[0] ? '#000' : '#fff',
                       cursor: 'pointer',
                       transition: 'background 0.2s'
                     }}

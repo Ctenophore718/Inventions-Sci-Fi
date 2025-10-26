@@ -39,6 +39,8 @@ import { generateAirArmorJSX } from "../utils/airFeature";
 import { generateAirStrikeDamageJSX } from "../utils/airStrike";
 import { generateEarthArmorJSX } from "../utils/earthFeature";
 import { generateEarthStrikeDamageJSX } from "../utils/earthStrike";
+import { generateFireArmorJSX } from "../utils/fireFeature";
+import { generateFireStrikeDamageJSX } from "../utils/fireStrike";
 
 import { generateMartyrJSX } from "../utils/astralFeature";
 import { generateAstralStrikeDamageJSX } from "../utils/astralStrike";
@@ -311,7 +313,10 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
   const airSpeedBonus = sheet?.subclass === 'Air'
     ? ((sheet?.subclassProgressionDots as any)?.airMovementSpeedDots?.filter(Boolean).length || 0)
     : 0;
-  const totalSpeed = baseSpeed + tacticianSpeedBonus + kineticSpeedBonus + mercurialSpeedBonus + airSpeedBonus;
+  const fireSpeedBonus = sheet?.subclass === 'Fire'
+    ? ((sheet?.subclassProgressionDots as any)?.fireMovementSpeedDots?.filter(Boolean).length || 0)
+    : 0;
+  const totalSpeed = baseSpeed + tacticianSpeedBonus + kineticSpeedBonus + mercurialSpeedBonus + airSpeedBonus + fireSpeedBonus;
   const speed = totalSpeed > 0 ? `${totalSpeed}` : "0";
   
   // Calculate jump speed and jump amount for Kinetic subclass
@@ -813,10 +818,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
   // Add after earthFeatureJSX
   const fireFeatureJSX = (
     <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#e20e0e' }}>Fire Armor.</i></b> You <i>Resist</i> <b><u style={{ color: '#f90102', display: 'inline-flex', alignItems: 'center' }}>
-        Fire
-        <img src="/Fire.png" alt="Fire" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
-      </u></b> Damage
+      {generateFireArmorJSX(sheet)}
     </span>
   );
 
@@ -1738,6 +1740,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                     if (subclass === "Void" && skill === "Stealth") return "rgba(91,115,177,0.5)";
                     if (subclass === "Air" && skill === "Acrobatics") return "rgba(14,226,223,0.5)";
                     if (subclass === "Earth" && skill === "Survival") return "rgba(226,185,14,0.5)";
+                    if (subclass === "Fire" && skill === "Intimidation") return "rgba(226,14,14,0.5)";
                     return null;
                   };
                   
@@ -2596,6 +2599,10 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
               <span style={{ fontWeight: 'bold', fontFamily: 'inherit', color: '#000', marginLeft: 4, display: 'flex', alignItems: 'center' }}>
                 {generateEarthStrikeDamageJSX(sheet)}
               </span>
+            ) : subclass === 'Fire' ? (
+              <span style={{ fontWeight: 'bold', fontFamily: 'inherit', color: '#000', marginLeft: 4, display: 'flex', alignItems: 'center' }}>
+                {generateFireStrikeDamageJSX(sheet)}
+              </span>
             ) : <span style={{ fontWeight: 'bold', fontFamily: 'inherit', color: '#000', marginLeft: 4 }}>{strikeDamage}</span>}
           </div>
           <div className={styles.horizontalLabel} style={{ color: '#351c75', fontWeight: 'bold' }}>Multi Strike <span style={{ color: '#000' }}>{
@@ -2611,7 +2618,9 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                       ? 2
                       : (subclass === 'Air' && ((sheet?.subclassProgressionDots as any)?.airStrikeMultiStrikeDots?.filter(Boolean).length || 0) > 0)
                         ? (1 + ((sheet?.subclassProgressionDots as any)?.airStrikeMultiStrikeDots?.filter(Boolean).length || 0))
-                        : (multiStrike > 0 ? multiStrike : <span style={{ visibility: 'hidden' }}>0</span>)
+                        : (subclass === 'Fire' && ((sheet?.subclassProgressionDots as any)?.fireStrikeExtraStrikeDots?.filter(Boolean).length || 0) > 0)
+                          ? (1 + ((sheet?.subclassProgressionDots as any)?.fireStrikeExtraStrikeDots?.filter(Boolean).length || 0))
+                          : (multiStrike > 0 ? multiStrike : <span style={{ visibility: 'hidden' }}>0</span>)
           }</span></div>
           <div className={styles.horizontalLabel} style={{ color: '#351c75', fontWeight: 'bold' }}>
               Strike Effects {
@@ -2649,6 +2658,10 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                     ? <span style={{ color: '#000', fontWeight: 'normal' }}><b><i>Slam</i></b> 3hx</span>
                   : (subclass === 'Earth' && (sheet?.subclassProgressionDots as any)?.earthStrikeInflictRestrainDots?.[0])
                     ? <span style={{ color: '#000', fontWeight: 'normal' }}><b><i>Restrain</i></b></span>
+                  : (subclass === 'Fire' && (sheet?.subclassProgressionDots as any)?.fireStrikeInflictSpikeDots?.[0])
+                    ? <span style={{ color: '#000', fontWeight: 'normal' }}><b><i>Spike</i></b> <b>(</b><b><u style={{ color: '#e20e0e', display: 'inline-flex', alignItems: 'center' }}>
+      Fire<img src="/Fire.png" alt="Fire" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} />
+      </u></b><b>)</b></span>
                     : strikeEffects
               }
           </div>
@@ -2726,6 +2739,20 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                   )}
                 </span>
               )}
+              {subclass === 'Fire' && (
+                <span style={{ marginLeft: 8, display: 'inline-flex', gap: 8, flexWrap: 'wrap' }}>
+                  {!(sheet?.subclassProgressionDots as any)?.fireFeatureFireImmunityDots?.[0] && (
+                    <span style={{ display: 'inline-flex', alignItems: 'center', color: '#e20e0e', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                      <u>Fire</u> <img src="/Fire.png" alt="Fire" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+                    </span>
+                  )}
+                  {(sheet?.subclassProgressionDots as any)?.fireFeatureChemicalResistanceDots?.[0] && !(sheet?.subclassProgressionDots as any)?.fireFeatureChemicalImmunityDots?.[0] && (
+                    <span style={{ display: 'inline-flex', alignItems: 'center', color: '#de7204', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                      <u>Chemical</u> <img src="/Chemical.png" alt="Chemical" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+                    </span>
+                  )}
+                </span>
+              )}
             </div>
           <div style={{ fontWeight: 'bold', marginBottom: 2, fontFamily: 'Arial, sans-serif', color: '#666666', wordBreak: 'break-word', overflowWrap: 'break-word' }}>Immunities
             {subclass === 'Poisoner' && sheet?.subclassProgressionDots?.poisonerToxicImmunityDots?.[0] && (
@@ -2798,6 +2825,21 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                 <i>Slam</i>
               </span>
             )}
+            {subclass === 'Fire' && (sheet?.subclassProgressionDots as any)?.fireFeatureFireImmunityDots?.[0] && !(sheet?.subclassProgressionDots as any)?.fireFeatureFireAbsorptionDots?.[0] && (
+              <span style={{ marginLeft: 8, display: 'inline-flex', alignItems: 'center', color: '#e20e0e', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                <u>Fire</u> <img src="/Fire.png" alt="Fire" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+              </span>
+            )}
+            {subclass === 'Fire' && (sheet?.subclassProgressionDots as any)?.fireFeatureChemicalImmunityDots?.[0] && (
+              <span style={{ marginLeft: 8, display: 'inline-flex', alignItems: 'center', color: '#de7204', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                <u>Chemical</u> <img src="/Chemical.png" alt="Chemical" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+              </span>
+            )}
+            {subclass === 'Fire' && (sheet?.subclassProgressionDots as any)?.fireFeatureDemoralizeImmunityDots?.[0] && (
+              <span style={{ marginLeft: 8, display: 'inline-flex', alignItems: 'center', color: '#000', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                <i>Demoralize</i>
+              </span>
+            )}
           </div>
           <div style={{ fontWeight: 'bold', marginBottom: 2, fontFamily: 'Arial, sans-serif', color: '#666666', wordBreak: 'break-word', overflowWrap: 'break-word' }}>Absorptions
             {subclass === 'Air' && (sheet?.subclassProgressionDots as any)?.airFeatureForceAbsorptionDots?.[0] && (
@@ -2808,6 +2850,11 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
             {subclass === 'Earth' && (sheet?.subclassProgressionDots as any)?.earthFeatureBludgeoningAbsorptionDots?.[0] && (
               <span style={{ marginLeft: 8, display: 'inline-flex', alignItems: 'center', color: '#915927', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                 <u>Bludgeoning</u> <img src="/Bludgeoning.png" alt="Bludgeoning" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+              </span>
+            )}
+            {subclass === 'Fire' && (sheet?.subclassProgressionDots as any)?.fireFeatureFireAbsorptionDots?.[0] && (
+              <span style={{ marginLeft: 8, display: 'inline-flex', alignItems: 'center', color: '#e20e0e', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                <u>Fire</u> <img src="/Fire.png" alt="Fire" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
               </span>
             )}
           </div>

@@ -254,7 +254,14 @@ const CharacterSheetPerks: React.FC<CharacterSheetPerksProps> = ({
               <b><i style={{ color: '#e2b90e' }}>Earthmolder.</i></b> <span style={{ color: '#000' }}>Your elemental companion enables you to mold earth, clay and stone to your will, allowing you to create buildings, raise and lower the ground, and otherwise manipulate the earth within a 10hx radius in minutes.</span>
             </span>
           </div>
-          )}                              
+          )}
+          {subclass === 'Fire' && (sheet?.subclassProgressionDots as any)?.firePerksSkillsDots?.[0] && (
+          <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <span>
+              <b><i style={{ color: '#e20e0e' }}>Firestarter.</i></b> <span style={{ color: '#000' }}>Your elemental companion allows you to start fires on even the most fire resistant materials and objects up to 20hx away.</span>
+            </span>
+          </div>
+          )}                                        
         </div>
       </div>
   );
