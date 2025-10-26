@@ -3,6 +3,9 @@ import type { CharacterSheet } from "../types/CharacterSheet";
 import { generateAirArmorJSX } from "../utils/airFeature";
 import { generateWingsOfAirJSX } from "../utils/airTechnique";
 import { generateAirStrikeJSX } from "../utils/airStrike";
+import { generateEarthArmorJSX } from "../utils/earthFeature";
+import { generateEarthenWallJSX } from "../utils/earthTechnique";
+import { generateEarthStrikeJSX } from "../utils/earthStrike";
 
 type LevelUpSubclassesElementalistProps = {
   sheet: CharacterSheet | null;
@@ -73,6 +76,41 @@ const LevelUpSubclassesElementalist: React.FC<LevelUpSubclassesElementalistProps
   );
   const [airPerksSkillsDots, setAirPerksSkillsDots] = useState<boolean[]>(
     (sheet?.subclassProgressionDots as any)?.airPerksSkillsDots || [false]
+  );
+
+  // Independent state for Earth dots
+  const [earthFeatureBludgeoningImmunityDots, setEarthFeatureBludgeoningImmunityDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.earthFeatureBludgeoningImmunityDots || [false]
+  );
+  const [earthFeatureBludgeoningAbsorptionDots, setEarthFeatureBludgeoningAbsorptionDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.earthFeatureBludgeoningAbsorptionDots || [false]
+  );
+  const [earthFeatureSlashingResistanceDots, setEarthFeatureSlashingResistanceDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.earthFeatureSlashingResistanceDots || [false]
+  );
+  const [earthFeatureSlashingImmunityDots, setEarthFeatureSlashingImmunityDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.earthFeatureSlashingImmunityDots || [false]
+  );
+  const [earthFeatureSlamImmunityDots, setEarthFeatureSlamImmunityDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.earthFeatureSlamImmunityDots || [false]
+  );
+  const [earthTechniqueAoEDots, setEarthTechniqueAoEDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.earthTechniqueAoEDots || [false, false, false]
+  );
+  const [earthTechniqueBounceDots, setEarthTechniqueBounceDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.earthTechniqueBounceDots || [false]
+  );
+  const [earthTechniqueCooldownDots, setEarthTechniqueCooldownDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.earthTechniqueCooldownDots || [false, false]
+  );
+  const [earthStrikeDamageDots, setEarthStrikeDamageDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.earthStrikeDamageDots || [false, false, false]
+  );
+  const [earthStrikeInflictRestrainDots, setEarthStrikeInflictRestrainDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.earthStrikeInflictRestrainDots || [false]
+  );
+  const [earthPerksSkillsDots, setEarthPerksSkillsDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.earthPerksSkillsDots || [false]
   );
 
   // Helper function to handle XP dot clicking with sequential requirement
@@ -765,6 +803,480 @@ const LevelUpSubclassesElementalist: React.FC<LevelUpSubclassesElementalistProps
                       borderRadius: '50%',
                       display: 'block',
                       background: airPerksSkillsDots[0] ? '#000' : '#fff',
+                      cursor: 'pointer',
+                      transition: 'background 0.2s'
+                    }}
+                  ></span>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Earth Subclass Card */}
+      {subclass === 'Earth' && (
+        <div style={{ width: '100%', marginTop: '1rem', textAlign: 'left', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
+          {/* Feature header */}
+          <div style={{ color: '#0b5394', fontWeight: 'bold', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '8px' }}>
+            <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <div style={{ fontWeight: 'bold', color: '#0b5394', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Feature</u></div>
+              <span style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
+                {generateEarthArmorJSX(sheet)}
+              </span>
+            </span>
+          </div>
+
+          {/* Feature XP progression table - Bludgeoning Immunity */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 24px 24px 24px',
+            gridTemplateRows: 'repeat(2, auto)',
+            columnGap: '6px',
+            rowGap: '2px',
+            alignItems: 'start',
+            marginBottom: '2px',
+            width: '100%',
+            paddingLeft: '4px'
+          }}>
+            {/* Row 1: XP header */}
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>5xp</span>
+            <span></span>
+            <span></span>
+            {/* Row 2: Bludgeoning Immunity */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}><b><u style={{ color: '#8B4513', display: 'inline-flex', alignItems: 'center' }}>
+            Bludgeoning<img src="/Bludgeoning.png" alt="Bludgeoning" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} />
+            </u></b> <i>Immunity</i></span>
+            <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <span
+                onClick={() => handleDotClick(earthFeatureBludgeoningImmunityDots, setEarthFeatureBludgeoningImmunityDots, 0, [5], 'earthFeatureBludgeoningImmunityDots')}
+                style={{
+                  width: '15px',
+                  height: '15px',
+                  border: '2px solid #000',
+                  borderRadius: '50%',
+                  display: 'block',
+                  background: earthFeatureBludgeoningImmunityDots[0] ? '#000' : '#fff',
+                  cursor: 'pointer',
+                  transition: 'background 0.2s'
+                }}
+              ></span>
+            </span>
+          </div>
+
+          {/* Feature XP progression table - Bludgeoning Absorption */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 24px 24px 24px',
+            gridTemplateRows: 'repeat(2, auto)',
+            columnGap: '6px',
+            rowGap: '2px',
+            alignItems: 'start',
+            marginBottom: '2px',
+            width: '100%',
+            paddingLeft: '4px'
+          }}>
+            {/* Row 1: XP header */}
+            <span></span>
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>8xp</span>
+            <span></span>
+            {/* Row 2: Bludgeoning Absorption */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}><b><u style={{ color: '#8B4513', display: 'inline-flex', alignItems: 'center' }}>
+            Bludgeoning<img src="/Bludgeoning.png" alt="Bludgeoning" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} />
+            </u></b> <i>Absorption</i></span>
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>⤷</span>
+            <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <span
+                onClick={() => {
+                  if (!earthFeatureBludgeoningImmunityDots[0]) {
+                    setNotice("Must purchase Bludgeoning Immunity first!");
+                    return;
+                  }
+                  handleDotClick(earthFeatureBludgeoningAbsorptionDots, setEarthFeatureBludgeoningAbsorptionDots, 0, [8], 'earthFeatureBludgeoningAbsorptionDots');
+                }}
+                style={{
+                  width: '15px',
+                  height: '15px',
+                  border: '2px solid #000',
+                  borderRadius: '50%',
+                  display: 'block',
+                  background: earthFeatureBludgeoningAbsorptionDots[0] ? '#000' : '#fff',
+                  cursor: earthFeatureBludgeoningImmunityDots[0] ? 'pointer' : 'not-allowed',
+                  transition: 'background 0.2s'
+                }}
+              ></span>
+            </span>
+          </div>
+
+          {/* Feature XP progression table - Slashing Resistance */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 24px 24px 24px',
+            gridTemplateRows: 'repeat(2, auto)',
+            columnGap: '6px',
+            rowGap: '2px',
+            alignItems: 'start',
+            marginBottom: '2px',
+            width: '100%',
+            paddingLeft: '4px'
+          }}>
+            {/* Row 1: XP header */}
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>3xp</span>
+            <span></span>
+            <span></span>
+            {/* Row 2: Slashing Resistance */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}><b><u style={{ color: '#808080', display: 'inline-flex', alignItems: 'center' }}>
+            Slashing<img src="/Slashing.png" alt="Slashing" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} />
+            </u></b> <i>Resistance</i></span>
+            <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <span
+                onClick={() => handleDotClick(earthFeatureSlashingResistanceDots, setEarthFeatureSlashingResistanceDots, 0, [3], 'earthFeatureSlashingResistanceDots')}
+                style={{
+                  width: '15px',
+                  height: '15px',
+                  border: '2px solid #000',
+                  borderRadius: '50%',
+                  display: 'block',
+                  background: earthFeatureSlashingResistanceDots[0] ? '#000' : '#fff',
+                  cursor: 'pointer',
+                  transition: 'background 0.2s'
+                }}
+              ></span>
+            </span>
+          </div>
+
+          {/* Feature XP progression table - Slashing Immunity */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 24px 24px 24px',
+            gridTemplateRows: 'repeat(2, auto)',
+            columnGap: '6px',
+            rowGap: '2px',
+            alignItems: 'start',
+            marginBottom: '2px',
+            width: '100%',
+            paddingLeft: '4px'
+          }}>
+            {/* Row 1: XP header */}
+            <span></span>
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>5xp</span>
+            <span></span>
+            {/* Row 2: Slashing Immunity */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}><b><u style={{ color: '#808080', display: 'inline-flex', alignItems: 'center' }}>
+            Slashing<img src="/Slashing.png" alt="Slashing" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} />
+            </u></b> <i>Immunity</i></span>
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>⤷</span>
+            <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <span
+                onClick={() => {
+                  if (!earthFeatureSlashingResistanceDots[0]) {
+                    setNotice("Must purchase Slashing Resistance first!");
+                    return;
+                  }
+                  handleDotClick(earthFeatureSlashingImmunityDots, setEarthFeatureSlashingImmunityDots, 0, [5], 'earthFeatureSlashingImmunityDots');
+                }}
+                style={{
+                  width: '15px',
+                  height: '15px',
+                  border: '2px solid #000',
+                  borderRadius: '50%',
+                  display: 'block',
+                  background: earthFeatureSlashingImmunityDots[0] ? '#000' : '#fff',
+                  cursor: earthFeatureSlashingResistanceDots[0] ? 'pointer' : 'not-allowed',
+                  transition: 'background 0.2s'
+                }}
+              ></span>
+            </span>
+          </div>
+
+          {/* Feature XP progression table - Slam Immunity */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 24px 24px 24px',
+            gridTemplateRows: 'repeat(2, auto)',
+            columnGap: '6px',
+            rowGap: '2px',
+            alignItems: 'start',
+            marginBottom: '2px',
+            width: '100%',
+            paddingLeft: '4px'
+          }}>
+            {/* Row 1: XP header */}
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>5xp</span>
+            <span></span>
+            <span></span>
+            {/* Row 2: Slam Immunity */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}><b><i>Slam</i></b> <i>Immunity</i></span>
+            <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <span
+                onClick={() => handleDotClick(earthFeatureSlamImmunityDots, setEarthFeatureSlamImmunityDots, 0, [5], 'earthFeatureSlamImmunityDots')}
+                style={{
+                  width: '15px',
+                  height: '15px',
+                  border: '2px solid #000',
+                  borderRadius: '50%',
+                  display: 'block',
+                  background: earthFeatureSlamImmunityDots[0] ? '#000' : '#fff',
+                  cursor: 'pointer',
+                  transition: 'background 0.2s'
+                }}
+              ></span>
+            </span>
+          </div>
+
+          {/* Technique Section */}
+          <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <div style={{ fontWeight: 'bold', color: '#bf9000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Technique</u></div>
+            <div style={{ color: '#000', fontWeight: 400, fontSize: '1em', marginBottom: '8px' }}>
+              {generateEarthenWallJSX(sheet)}
+            </div>
+
+            {/* Technique XP progression table - +3hx-chain AoE */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 24px 24px 24px',
+              gridTemplateRows: 'repeat(2, auto)',
+              columnGap: '6px',
+              rowGap: '2px',
+              alignItems: 'start',
+              marginBottom: '2px',
+              width: '100%',
+              paddingLeft: '4px'
+            }}>
+              {/* Row 1: XP header */}
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>4xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>8xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>11xp</span>
+              {/* Row 2: +3hx-chain AoE dots */}
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+3hx-Chain <i>AoE</i></span>
+              {[0,1,2].map(idx => (
+                <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                  <span
+                    onClick={() => handleDotClick(earthTechniqueAoEDots, setEarthTechniqueAoEDots, idx, [4, 8, 11], 'earthTechniqueAoEDots')}
+                    style={{
+                      width: '15px',
+                      height: '15px',
+                      border: '2px solid #000',
+                      borderRadius: '50%',
+                      display: 'block',
+                      background: earthTechniqueAoEDots[idx] ? '#000' : '#fff',
+                      cursor: (idx === 0 || earthTechniqueAoEDots.slice(0, idx).every(Boolean)) ? 'pointer' : 'not-allowed',
+                      transition: 'background 0.2s'
+                    }}
+                  ></span>
+                </span>
+              ))}
+            </div>
+
+            {/* Technique XP progression table - Inflict Bounce */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 24px 24px 24px',
+              gridTemplateRows: 'repeat(2, auto)',
+              columnGap: '6px',
+              rowGap: '2px',
+              alignItems: 'start',
+              marginTop: '2px',
+              marginBottom: '2px',
+              width: '100%',
+              paddingLeft: '4px'
+            }}>
+              {/* Row 1: XP header */}
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>7xp</span>
+              <span></span>
+              <span></span>
+              {/* Row 2: Inflict Bounce */}
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>Inflict <b><i>Bounce</i></b> 3hx in <i>AoE</i></span>
+              <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <span
+                  onClick={() => handleDotClick(earthTechniqueBounceDots, setEarthTechniqueBounceDots, 0, [7], 'earthTechniqueBounceDots')}
+                  style={{
+                    width: '15px',
+                    height: '15px',
+                    border: '2px solid #000',
+                    borderRadius: '50%',
+                    display: 'block',
+                    background: earthTechniqueBounceDots[0] ? '#000' : '#fff',
+                    cursor: 'pointer',
+                    transition: 'background 0.2s'
+                  }}
+                ></span>
+              </span>
+            </div>
+
+            {/* Technique XP progression table - -1 Cooldown */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 24px 24px 24px',
+              gridTemplateRows: 'repeat(2, auto)',
+              columnGap: '6px',
+              rowGap: '2px',
+              alignItems: 'start',
+              marginTop: '2px',
+              marginBottom: '2px',
+              width: '100%',
+              paddingLeft: '4px'
+            }}>
+              {/* Row 1: XP header */}
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>4xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>7xp</span>
+              <span></span>
+              {/* Row 2: -1 Cooldown dots */}
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>-1 <i>Cooldown</i></span>
+              {[0,1].map(idx => (
+                <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                  <span
+                    onClick={() => handleDotClick(earthTechniqueCooldownDots, setEarthTechniqueCooldownDots, idx, [4, 7], 'earthTechniqueCooldownDots')}
+                    style={{
+                      width: '15px',
+                      height: '15px',
+                      border: '2px solid #000',
+                      borderRadius: '50%',
+                      display: 'block',
+                      background: earthTechniqueCooldownDots[idx] ? '#000' : '#fff',
+                      cursor: (idx === 0 || earthTechniqueCooldownDots.slice(0, idx).every(Boolean)) ? 'pointer' : 'not-allowed',
+                      transition: 'background 0.2s'
+                    }}
+                  ></span>
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* Strike Section */}
+          <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <div style={{ fontWeight: 'bold', color: '#351c75', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Strike</u></div>
+            <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              {generateEarthStrikeJSX(sheet)}
+            </div>
+
+            {/* Strike XP progression table - +2 Damage dice */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 24px 24px 24px',
+              gridTemplateRows: 'repeat(2, auto)',
+              columnGap: '6px',
+              rowGap: '2px',
+              alignItems: 'start',
+              marginBottom: '2px',
+              width: '100%',
+              paddingLeft: '4px'
+            }}>
+              {/* Row 1: XP header */}
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>6xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>10xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>18xp</span>
+              {/* Row 2: +2 Damage dice dots */}
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+2 Damage dice</span>
+              {[0,1,2].map(idx => (
+                <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                  <span
+                    onClick={() => handleDotClick(earthStrikeDamageDots, setEarthStrikeDamageDots, idx, [6, 10, 18], 'earthStrikeDamageDots')}
+                    style={{
+                      width: '15px',
+                      height: '15px',
+                      border: '2px solid #000',
+                      borderRadius: '50%',
+                      display: 'block',
+                      background: earthStrikeDamageDots[idx] ? '#000' : '#fff',
+                      cursor: (idx === 0 || earthStrikeDamageDots.slice(0, idx).every(Boolean)) ? 'pointer' : 'not-allowed',
+                      transition: 'background 0.2s'
+                    }}
+                  ></span>
+                </span>
+              ))}
+            </div>
+
+            {/* Strike XP progression table - Inflict Restrain */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 24px 24px 24px',
+              gridTemplateRows: 'repeat(2, auto)',
+              columnGap: '6px',
+              rowGap: '2px',
+              alignItems: 'start',
+              marginTop: '2px',
+              marginBottom: '2px',
+              width: '100%',
+              paddingLeft: '4px'
+            }}>
+              {/* Row 1: XP header */}
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>6xp</span>
+              <span></span>
+              <span></span>
+              {/* Row 2: Inflict Restrain */}
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>Inflict <b><i>Restrain</i></b></span>
+              <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <span
+                  onClick={() => handleDotClick(earthStrikeInflictRestrainDots, setEarthStrikeInflictRestrainDots, 0, [6], 'earthStrikeInflictRestrainDots')}
+                  style={{
+                    width: '15px',
+                    height: '15px',
+                    border: '2px solid #000',
+                    borderRadius: '50%',
+                    display: 'block',
+                    background: earthStrikeInflictRestrainDots[0] ? '#000' : '#fff',
+                    cursor: 'pointer',
+                    transition: 'background 0.2s'
+                  }}
+                ></span>
+              </span>
+            </div>
+          </div>
+
+          {/* Perks Section */}
+          <div style={{ marginTop: '12px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <div style={{ fontWeight: 'bold', color: '#000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Perks</u></div>
+            <div style={{ fontSize: '1em', color: '#000', marginBottom: '6px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <i><b>Skills.</b> Survival</i> +2
+            </div>
+            <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 24px',
+                gridTemplateRows: 'auto auto',
+                columnGap: '6px',
+                rowGap: '2px',
+                alignItems: 'start',
+                marginTop: '-12px',
+                width: '100%',
+                paddingLeft: '4px'
+              }}>
+                {/* Row 1: SP header */}
+                <span></span>
+                <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>10sp</span>
+                {/* Row 2: Earthmolder */}
+                <div style={{
+                  fontSize: '1em', 
+                  fontFamily: 'Arial, Helvetica, sans-serif', 
+                  textAlign: 'left', 
+                  paddingRight: '8px',
+                  maxWidth: '500px',
+                  overflowWrap: 'break-word',
+                  wordWrap: 'break-word'
+                }}>
+                  <b><i style={{ color: '#e2b90e', fontSize: '1em' }}>Earthmolder.</i></b> Your elemental companion enables you to mold earth, clay and stone to your will, allowing you to create buildings, raise and lower the ground, and otherwise manipulate the earth within a 10hx radius in minutes.
+                </div>
+                <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start' }}>
+                  <span
+                    onClick={() => handleSpDotClick(earthPerksSkillsDots, setEarthPerksSkillsDots, 0, [10], 'earthPerksSkillsDots')}
+                    style={{
+                      width: '15px',
+                      height: '15px',
+                      border: '2px solid #000',
+                      borderRadius: '50%',
+                      display: 'block',
+                      background: earthPerksSkillsDots[0] ? '#000' : '#fff',
                       cursor: 'pointer',
                       transition: 'background 0.2s'
                     }}
