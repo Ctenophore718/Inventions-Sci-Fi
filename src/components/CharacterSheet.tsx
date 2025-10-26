@@ -41,6 +41,8 @@ import { generateEarthArmorJSX } from "../utils/earthFeature";
 import { generateEarthStrikeDamageJSX } from "../utils/earthStrike";
 import { generateFireArmorJSX } from "../utils/fireFeature";
 import { generateFireStrikeDamageJSX } from "../utils/fireStrike";
+import { generateWaterArmorJSX } from "../utils/waterFeature";
+import { generateWaterStrikeDamageJSX } from "../utils/waterStrike";
 
 import { generateMartyrJSX } from "../utils/astralFeature";
 import { generateAstralStrikeDamageJSX } from "../utils/astralStrike";
@@ -316,7 +318,10 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
   const fireSpeedBonus = sheet?.subclass === 'Fire'
     ? ((sheet?.subclassProgressionDots as any)?.fireMovementSpeedDots?.filter(Boolean).length || 0)
     : 0;
-  const totalSpeed = baseSpeed + tacticianSpeedBonus + kineticSpeedBonus + mercurialSpeedBonus + airSpeedBonus + fireSpeedBonus;
+  const waterSpeedBonus = sheet?.subclass === 'Water'
+    ? ((sheet?.subclassProgressionDots as any)?.waterMovementSpeedDots?.filter(Boolean).length || 0)
+    : 0;
+  const totalSpeed = baseSpeed + tacticianSpeedBonus + kineticSpeedBonus + mercurialSpeedBonus + airSpeedBonus + fireSpeedBonus + waterSpeedBonus;
   const speed = totalSpeed > 0 ? `${totalSpeed}` : "0";
   
   // Calculate jump speed and jump amount for Kinetic subclass
@@ -824,10 +829,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
 
   const waterFeatureJSX = (
     <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#0e42e2' }}>Water Armor.</i></b> You <i>Resist</i> <b><u style={{ color: '#3ebbff', display: 'inline-flex', alignItems: 'center' }}>
-        Cold
-        <img src="/Cold.png" alt="Cold" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
-      </u></b> Damage
+      {generateWaterArmorJSX(sheet)}
     </span>
   );
 
@@ -1741,6 +1743,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                     if (subclass === "Air" && skill === "Acrobatics") return "rgba(14,226,223,0.5)";
                     if (subclass === "Earth" && skill === "Survival") return "rgba(226,185,14,0.5)";
                     if (subclass === "Fire" && skill === "Intimidation") return "rgba(226,14,14,0.5)";
+                    if (subclass === "Water" && skill === "Medicine") return "rgba(14,66,226,0.5)";
                     return null;
                   };
                   
@@ -2450,7 +2453,11 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
   <h3 style={{ fontFamily: 'Arial, sans-serif' }}>Movement</h3>
         <div className={styles.cardContent}>
           <div className={styles.horizontalLabel} style={{ color: '#38761d', fontWeight: 'bold' }}>Speed {speed}{speed !== "0hx" ? "hx" : ""}</div>
-          <div className={styles.horizontalLabel} style={{ color: '#38761d', fontWeight: 'bold' }}>Speed Types {movement}Ground{sheet?.subclass === 'Air' && (sheet?.subclassProgressionDots as any)?.airMovementFlySpeedDots?.[0] ? ', Fly' : ''}</div>
+          <div className={styles.horizontalLabel} style={{ color: '#38761d', fontWeight: 'bold' }}>
+            Speed Types {movement}Ground
+            {sheet?.subclass === 'Air' && (sheet?.subclassProgressionDots as any)?.airMovementFlySpeedDots?.[0] ? ', Fly' : ''}
+            {sheet?.subclass === 'Water' && (sheet?.subclassProgressionDots as any)?.waterMovementSwimSpeedDots?.[0] ? ', Swim' : ''}
+          </div>
           <div className={styles.horizontalLabel} style={{ color: '#38761d', fontWeight: 'bold' }}>Jump Speed {(kineticJumpSpeedBonus > 0 ? kineticJumpSpeedBonus : mercurialJumpSpeedBonus > 0 ? mercurialJumpSpeedBonus : "") + (kineticJumpSpeedBonus > 0 || mercurialJumpSpeedBonus > 0 ? "hx" : "0hx")}</div>
           <div className={styles.horizontalLabel} style={{ color: '#38761d', fontWeight: 'bold' }}>Jump Amount {kineticJumpAmountBonus > 0 ? kineticJumpAmountBonus : mercurialJumpAmountBonus > 0 ? mercurialJumpAmountBonus : "0"}</div>
           <div className={styles.horizontalLabel} style={{ color: '#38761d', fontWeight: 'bold' }}>
@@ -2603,6 +2610,10 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
               <span style={{ fontWeight: 'bold', fontFamily: 'inherit', color: '#000', marginLeft: 4, display: 'flex', alignItems: 'center' }}>
                 {generateFireStrikeDamageJSX(sheet)}
               </span>
+            ) : subclass === 'Water' ? (
+              <span style={{ fontWeight: 'bold', fontFamily: 'inherit', color: '#000', marginLeft: 4, display: 'flex', alignItems: 'center' }}>
+                {generateWaterStrikeDamageJSX(sheet)}
+              </span>
             ) : <span style={{ fontWeight: 'bold', fontFamily: 'inherit', color: '#000', marginLeft: 4 }}>{strikeDamage}</span>}
           </div>
           <div className={styles.horizontalLabel} style={{ color: '#351c75', fontWeight: 'bold' }}>Multi Strike <span style={{ color: '#000' }}>{
@@ -2662,6 +2673,8 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                     ? <span style={{ color: '#000', fontWeight: 'normal' }}><b><i>Spike</i></b> <b>(</b><b><u style={{ color: '#e20e0e', display: 'inline-flex', alignItems: 'center' }}>
       Fire<img src="/Fire.png" alt="Fire" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} />
       </u></b><b>)</b></span>
+                  : (subclass === 'Water' && (sheet?.subclassProgressionDots as any)?.waterStrikeInflictDemoralizeDots?.[0])
+                    ? <span style={{ color: '#000', fontWeight: 'normal' }}><b><i>Demoralize</i></b></span>
                     : strikeEffects
               }
           </div>
@@ -2753,6 +2766,20 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                   )}
                 </span>
               )}
+              {subclass === 'Water' && (
+                <span style={{ marginLeft: 8, display: 'inline-flex', gap: 8, flexWrap: 'wrap' }}>
+                  {!(sheet?.subclassProgressionDots as any)?.waterFeatureColdImmunityDots?.[0] && (
+                    <span style={{ display: 'inline-flex', alignItems: 'center', color: '#3ebbff', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                      <u>Cold</u> <img src="/Cold.png" alt="Cold" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+                    </span>
+                  )}
+                  {(sheet?.subclassProgressionDots as any)?.waterFeatureToxicResistanceDots?.[0] && !(sheet?.subclassProgressionDots as any)?.waterFeatureToxicImmunityDots?.[0] && (
+                    <span style={{ display: 'inline-flex', alignItems: 'center', color: '#02b900', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                      <u>Toxic</u> <img src="/Toxic.png" alt="Toxic" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+                    </span>
+                  )}
+                </span>
+              )}
             </div>
           <div style={{ fontWeight: 'bold', marginBottom: 2, fontFamily: 'Arial, sans-serif', color: '#666666', wordBreak: 'break-word', overflowWrap: 'break-word' }}>Immunities
             {subclass === 'Poisoner' && sheet?.subclassProgressionDots?.poisonerToxicImmunityDots?.[0] && (
@@ -2840,6 +2867,21 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                 <i>Demoralize</i>
               </span>
             )}
+            {subclass === 'Water' && (sheet?.subclassProgressionDots as any)?.waterFeatureColdImmunityDots?.[0] && !(sheet?.subclassProgressionDots as any)?.waterFeatureColdAbsorptionDots?.[0] && (
+              <span style={{ marginLeft: 8, display: 'inline-flex', alignItems: 'center', color: '#3ebbff', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                <u>Cold</u> <img src="/Cold.png" alt="Cold" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+              </span>
+            )}
+            {subclass === 'Water' && (sheet?.subclassProgressionDots as any)?.waterFeatureToxicImmunityDots?.[0] && (
+              <span style={{ marginLeft: 8, display: 'inline-flex', alignItems: 'center', color: '#02b900', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                <u>Toxic</u> <img src="/Toxic.png" alt="Toxic" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+              </span>
+            )}
+            {subclass === 'Water' && (sheet?.subclassProgressionDots as any)?.waterFeatureSpikeImmunityDots?.[0] && (
+              <span style={{ marginLeft: 8, display: 'inline-flex', alignItems: 'center', color: '#000', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                <i>Spike</i>
+              </span>
+            )}
           </div>
           <div style={{ fontWeight: 'bold', marginBottom: 2, fontFamily: 'Arial, sans-serif', color: '#666666', wordBreak: 'break-word', overflowWrap: 'break-word' }}>Absorptions
             {subclass === 'Air' && (sheet?.subclassProgressionDots as any)?.airFeatureForceAbsorptionDots?.[0] && (
@@ -2855,6 +2897,11 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
             {subclass === 'Fire' && (sheet?.subclassProgressionDots as any)?.fireFeatureFireAbsorptionDots?.[0] && (
               <span style={{ marginLeft: 8, display: 'inline-flex', alignItems: 'center', color: '#e20e0e', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                 <u>Fire</u> <img src="/Fire.png" alt="Fire" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+              </span>
+            )}
+            {subclass === 'Water' && (sheet?.subclassProgressionDots as any)?.waterFeatureColdAbsorptionDots?.[0] && (
+              <span style={{ marginLeft: 8, display: 'inline-flex', alignItems: 'center', color: '#3ebbff', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                <u>Cold</u> <img src="/Cold.png" alt="Cold" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
               </span>
             )}
           </div>

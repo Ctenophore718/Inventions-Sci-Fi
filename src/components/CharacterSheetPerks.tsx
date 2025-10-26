@@ -261,6 +261,13 @@ const CharacterSheetPerks: React.FC<CharacterSheetPerksProps> = ({
               <b><i style={{ color: '#e20e0e' }}>Firestarter.</i></b> <span style={{ color: '#000' }}>Your elemental companion allows you to start fires on even the most fire resistant materials and objects up to 20hx away.</span>
             </span>
           </div>
+          )} 
+          {subclass === 'Water' && (sheet?.subclassProgressionDots as any)?.waterPerksSkillsDots?.[0] && (
+          <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <span>
+              <b><i style={{ color: '#0e42e2' }}>Waterweaver.</i></b> <span style={{ color: '#000' }}>Your elemental companion allows you to pull water out of all sources of moisture within 20hx and change them into any form that water can take (water, ice, steam).</span>
+            </span>
+          </div>
           )}                                        
         </div>
       </div>
