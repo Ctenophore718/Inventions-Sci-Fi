@@ -14,7 +14,7 @@ export interface ExospecialistSecondaryAttackData {
 export function calculateExospecialistSecondaryAttackData(classCardDots?: boolean[][]): ExospecialistSecondaryAttackData {
   // Get '+1hx Damage die' dots (array index 6)
   const damageDieDots = classCardDots?.[6]?.filter(Boolean).length || 0;
-  const damageDieSize = 4 + damageDieDots; // Base d4, +1 per dot (d4 -> d5 -> d6 -> d7)
+  const damageDieSize = 1 + damageDieDots; // Base d4, +1 per dot (d4 -> d5 -> d6 -> d7)
   
   // Get 'Repeat +1' dots (array index 7)
   const repeatDots = classCardDots?.[7]?.filter(Boolean).length || 0;
@@ -69,42 +69,37 @@ export function generateExospecialistSecondaryAttackStatsJSX(
       <div>
         {missileName === 'Neutron Torpedo' ? (
           <>
-            <b><u>Target</u></b> Single, <i>Arcing</i>, <i>Repeat</i> <b>[{repeatValue}]</b><br />
-            <b><u>Damage</u></b> <b>[1]</b>d{damageDieSize} <b><u style={{ color: '#d5d52a', display: 'inline-flex', alignItems: 'center' }}>
-            Electric<img src="/Electric.png" alt="Electric" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> or <b><u style={{ color: '#516fff', display: 'inline-flex', alignItems: 'center' }}>
-            Force<img src="/Force.png" alt="Force" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>, <br />
-            <span style={{ display: 'block', textAlign: 'right' }}><b><i>Blind</i></b></span>
-            <b><u>Crit Effect</u></b> <b>[1]</b>d{damageDieSize} <b><u style={{ color: '#d5d52a', display: 'inline-flex', alignItems: 'center' }}>
-            Electric<img src="/Electric.png" alt="Electric" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} /></u></b>, <br />
-            <span style={{ display: 'block', textAlign: 'right' }}><b><i>Spike</i></b> <b>(</b><b><u style={{ color: '#d5d52a', display: 'inline-flex', alignItems: 'center' }}>
-            Electric<img src="/Electric.png" alt="Electric" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b><b>)</b></span>
+            <b><u>Target</u></b> Single, Arcing, Repeat <b>[{repeatValue}]</b><br />
+            <b><u>Damage</u></b> <b>[{damageDieSize}]</b>d4 <b><u style={{ color: '#de7204', display: 'inline-flex', alignItems: 'center' }}>
+            Chemical<img src="/Chemical.png" alt="Chemical" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> <br />
+            <b><u>Crit Effect</u></b> <b>[{damageDieSize}]</b>d4 <b><u style={{ color: '#de7204', display: 'inline-flex', alignItems: 'center' }}>
+            Chemical<img src="/Chemical.png" alt="Chemical" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} /></u></b>, <br />
+            <span style={{ display: 'block', textAlign: 'right' }}><b><i>Spike</i></b> <b>(</b><b><u style={{ color: '#de7204', display: 'inline-flex', alignItems: 'center' }}>
+            Chemical<img src="/Chemical.png" alt="Chemical" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b><b>)</b></span>
           </>
         ) : missileName === 'Pulsar Cannon' ? (
           <>
-            <b><u>Target</u></b> Single, <i>Arcing</i>, <i>Repeat</i> <b>[{repeatValue}]</b><br />
-            <b><u>Damage</u></b> <b>[1]</b>d{damageDieSize} <b><u style={{ color: '#516fff', display: 'inline-flex', alignItems: 'center' }}>
-            Force<img src="/Force.png" alt="Force" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>, <b><i>Confuse</i></b><br />
-            <b><u>Crit Effect</u></b> <b>[1]</b>d{damageDieSize} <b><u style={{ color: '#516fff', display: 'inline-flex', alignItems: 'center' }}>
-            Force<img src="/Force.png" alt="Force" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} /></u></b>, <br />
-            <span style={{ display: 'block', textAlign: 'right' }}><b><i>Bounce</i></b> 5hx</span>
+            <b><u>Target</u></b> Single, Arcing, Repeat <b>[{repeatValue}]</b><br />
+            <b><u>Damage</u></b> <b>[{damageDieSize}]</b>d4 <b><u style={{ color: '#d5d52a', display: 'inline-flex', alignItems: 'center' }}>
+            Electric<img src="/Electric.png" alt="Electric" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> <br />
+            <b><u>Crit Effect</u></b> <b>[{damageDieSize}]</b>d4 <b><u style={{ color: '#a929ff', display: 'inline-flex', alignItems: 'center' }}>
+            Neural<img src="/Neural.png" alt="Neural" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} /></u></b>, <b><i>Blind</i></b>
           </>
         ) : missileName === 'Razor Rain' ? (
           <>
-            <b><u>Target</u></b> Single, <i>Arcing</i>, <i>Repeat</i> <b>[{repeatValue}]</b><br />
-            <b><u>Damage</u></b> <b>[1]</b>d{damageDieSize} <b><u style={{ color: '#a6965f', display: 'inline-flex', alignItems: 'center' }}>
-            Piercing<img src="/Piercing.png" alt="Piercing" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> or <b><u style={{ color: '#575757', display: 'inline-flex', alignItems: 'center' }}>
-            Slashing<img src="/Slashing.png" alt="Slashing" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>, <br />
-            <span style={{ display: 'block', textAlign: 'right' }}><b><i>Bleed</i></b></span>
-            <b><u>Crit Effect</u></b> <b>[1]</b>d{damageDieSize} <b><u style={{ color: '#a6965f', display: 'inline-flex', alignItems: 'center' }}>
-            Piercing<img src="/Piercing.png" alt="Piercing" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> or <b><u style={{ color: '#575757', display: 'inline-flex', alignItems: 'center' }}>
+            <b><u>Target</u></b> Single, Arcing, Repeat <b>[{repeatValue}]</b><br />
+            <b><u>Damage</u></b> <b>[{damageDieSize}]</b>d4 <b><u style={{ color: '#575757', display: 'inline-flex', alignItems: 'center' }}>
+            Slashing<img src="/Slashing.png" alt="Slashing" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> <br />
+            <b><u>Crit Effect</u></b> <b>[{damageDieSize}]</b>d4 <b><u style={{ color: '#575757', display: 'inline-flex', alignItems: 'center' }}>
             Slashing<img src="/Slashing.png" alt="Slashing" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} /></u></b>, <br />
-            <span style={{ display: 'block', textAlign: 'right' }}><b><i>Bleed</i></b></span>
+            <span style={{ display: 'block', textAlign: 'right' }}><b><i>Spike</i></b> <b>(</b><b><u style={{ color: '#575757', display: 'inline-flex', alignItems: 'center' }}>
+            Slashing<img src="/Slashing.png" alt="Slashing" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b><b>)</b>, <b><i>Restrain</i></b></span>
           </>
         ) : (
           <>
-            <b><u>Target</u></b> Single, <i>Arcing</i>, <i>Repeat</i> <b>[{repeatValue}]</b><br />
-            <b><u>Damage</u></b> <b>[1]</b>d{damageDieSize}<br />
-            <b><u>Crit Effect</u></b> <b>[1]</b>d{damageDieSize}, status effect
+            <b><u>Target</u></b> Single, Arcing, Repeat <b>[{repeatValue}]</b><br />
+            <b><u>Damage</u></b> <b>[{damageDieSize}]</b>d4<br />
+            <b><u>Crit Effect</u></b> <b>[{damageDieSize}]</b>d4, status effect
           </>
         )}
       </div>

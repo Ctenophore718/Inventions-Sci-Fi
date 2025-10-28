@@ -18,8 +18,8 @@ export function calculateExospecialistPrimaryAttackData(classCardDots?: boolean[
   const rangeDots = classCardDots?.[5]?.filter(Boolean).length || 0;
   const range = 6 + (rangeDots * 2); // Base 6, +2 per dot
   
-  // Get '+1 Crit' dots (array index 6)
-  const critDots = classCardDots?.[6]?.filter(Boolean).length || 0;
+  // Get '+1 Crit' dots (array index 5) - PRIMARY ATTACK CRIT
+  const critDots = classCardDots?.[5]?.filter(Boolean).length || 0;
   const critThreshold = 18 - critDots; // Base 18, -1 per dot
   
   return { damageDice, range, critThreshold };
@@ -60,30 +60,25 @@ export function generateExospecialistPrimaryAttackStatsJSX(
         <b><u>Target</u></b> <i>AoE</i> 4hx-Cone<br />
         {blasterName === 'Boomstick' ? (
           <>
-            <b><u>Damage</u></b> <b>[{damageDice}]</b>d6 <b><u style={{ color: '#915927', display: 'inline-flex', alignItems: 'center' }}>
-            Bludgeoning<img src="/Bludgeoning.png" alt="Bludgeoning" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> or<br />
-            <span style={{ display: 'block', textAlign: 'right' }}><b><u style={{ color: '#516fff', display: 'inline-flex', alignItems: 'center' }}>
-            Force<img src="/Force.png" alt="Force" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>, <b><i>Slam</i></b> 4hx</span>
-            <b><u>Crit Effect</u></b> <b>[{damageDice}]</b>d6 <b><u style={{ color: '#516fff', display: 'inline-flex', alignItems: 'center' }}>
-            Force<img src="/Force.png" alt="Force" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} /></u></b>, <br />
-            <span style={{ display: 'block', textAlign: 'right' }}><b><i>Slam</i></b> 6hx</span>
+            <b><u>Damage</u></b> <b>[{damageDice}]</b>d6 <b><u style={{ color: '#a6965f', display: 'inline-flex', alignItems: 'center' }}>
+            Piercing<img src="/Piercing.png" alt="Piercing" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> <br />
+            <b><u>Crit Effect</u></b> <b>[{damageDice}]</b>d6 <b><u style={{ color: '#a6965f', display: 'inline-flex', alignItems: 'center' }}>
+            Piercing<img src="/Piercing.png" alt="Piercing" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>, <b><i>Slam</i></b> 3hx
           </>
         ) : blasterName === 'Firestarter' ? (
           <>
             <b><u>Damage</u></b> <b>[{damageDice}]</b>d6 <b><u style={{ color: '#f90102', display: 'inline-flex', alignItems: 'center' }}>
-            Fire<img src="/Fire.png" alt="Fire" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>, <b><i>Spike</i></b> <b>(</b><b><u style={{ color: '#f90102', display: 'inline-flex', alignItems: 'center' }}>
-            Fire<img src="/Fire.png" alt="Fire" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b><b>)</b><br />
+            Fire<img src="/Fire.png" alt="Fire" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> <br />
             <b><u>Crit Effect</u></b> <b>[{damageDice}]</b>d6 <b><u style={{ color: '#f90102', display: 'inline-flex', alignItems: 'center' }}>
-            Fire<img src="/Fire.png" alt="Fire" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} /></u></b>, <br />
-            <span style={{ display: 'block', textAlign: 'right' }}><b><i>Spike</i></b> <b>(</b><b><u style={{ color: '#f90102', display: 'inline-flex', alignItems: 'center' }}>
-            Fire<img src="/Fire.png" alt="Fire" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b><b>)</b></span>
+            Fire<img src="/Fire.png" alt="Fire" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} /></u></b>, <b><i>Spike</i></b> <b>(</b><b><u style={{ color: '#f90102', display: 'inline-flex', alignItems: 'center' }}>
+            Fire<img src="/Fire.png" alt="Fire" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b><b>)</b>
           </>
         ) : blasterName === 'Sleepytime' ? (
           <>
-            <b><u>Damage</u></b> <b>[{damageDice}]</b>d6 <b><u style={{ color: '#516fff', display: 'inline-flex', alignItems: 'center' }}>
-            Force<img src="/Force.png" alt="Force" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>, <b><i>Mesmerize</i></b><br />
-            <b><u>Crit Effect</u></b> <b>[{damageDice}]</b>d6 <b><u style={{ color: '#516fff', display: 'inline-flex', alignItems: 'center' }}>
-            Force<img src="/Force.png" alt="Force" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} /></u></b>, <b><i>Stun</i></b>
+            <b><u>Damage</u></b> <b>[{damageDice}]</b>d6 <b><u style={{ color: '#de7204', display: 'inline-flex', alignItems: 'center' }}>
+            Chemical<img src="/Chemical.png" alt="Chemical" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> <br />
+            <b><u>Crit Effect</u></b> <b>[{damageDice}]</b>d6 <b><u style={{ color: '#de7204', display: 'inline-flex', alignItems: 'center' }}>
+            Chemical<img src="/Chemical.png" alt="Chemical" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} /></u></b>, <b><i>Sleep</i></b>
           </>
         ) : (
           <>

@@ -278,13 +278,14 @@ export const CardsExospecialistAttacks: React.FC<CardsExospecialistAttacksProps>
               display: 'flex',
               flexDirection: 'row',
               alignItems: 'center',
-              justifyContent: 'flex-start',
+              justifyContent: 'space-between',
               paddingLeft: 10,
               paddingRight: 10,
               zIndex: 3
             }}>
-              <span style={{ color: '#990000', fontFamily: 'Arial, Helvetica, sans-serif', fontWeight: 'bold', fontSize: '1.1em', textAlign: 'left' }}>
-                Secondary Attack (Cooldown [{cooldown}])
+              <span style={{ color: '#990000', fontFamily: 'Arial, Helvetica, sans-serif', fontWeight: 'bold', fontSize: '1.1em', textAlign: 'left' }}>Secondary Attack</span>
+              <span style={{ color: '#990000', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '0.875em', fontStyle: 'italic', marginRight: 22, whiteSpace: 'nowrap', maxWidth: 'calc(100% - 180px)', overflow: 'hidden', textOverflow: 'ellipsis', textAlign: 'right' }}>
+                Cooldown <span style={{ fontWeight: 'bold', fontStyle: 'normal' }}>[{cooldown}]</span>
               </span>
             </div>
             
