@@ -91,6 +91,12 @@ export type CharacterSheet = {
   // Elementals for Elementalist class (secondary attacks)
   elementals?: string[];
 
+  // Integrated Blasters for Exospecialist class (primary attacks)
+  integratedBlasters?: string[];
+
+  // Smart Missiles for Exospecialist class (secondary attacks)
+  smartMissiles?: string[];
+
   // Algorithms for Coder class
   algorithms?: string[];
 

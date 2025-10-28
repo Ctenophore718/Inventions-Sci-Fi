@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import type { CharacterSheet } from "../types/CharacterSheet";
+import { generateExosuitJSX } from "../utils/exospecialistFeature";
+import { generateTargetLockJSX } from "../utils/exospecialistTechnique";
 
 
 
@@ -46,8 +48,9 @@ const LevelUpClassExospecialist: React.FC<LevelUpClassExospecialistProps> = ({
   spSpent,
   setXpSpent,
   setSpSpent,
-  setNotice
-}) => {
+  setNotice,
+  onCreditsChange
+}: LevelUpClassExospecialistProps & { onCreditsChange?: (delta: number) => void }) => {
   
     // Local state for class card dots (Exospecialist)
     const [classCardDots, setClassCardDots] = useState<boolean[][]>(() => {
@@ -56,6 +59,54 @@ const LevelUpClassExospecialist: React.FC<LevelUpClassExospecialistProps> = ({
       }
       return defaultExospecialistDots.map(row => [...row]);
     });
+
+    // State for purchased weapons
+    const [selectedIntegratedBlasters, setSelectedIntegratedBlasters] = useState<string[]>(() => {
+      return sheet?.integratedBlasters || [];
+    });
+    const [selectedSmartMissiles, setSelectedSmartMissiles] = useState<string[]>(() => {
+      return sheet?.smartMissiles || [];
+    });
+
+    // State for pending weapon purchases
+    const [pendingPrimaryWeapon, setPendingPrimaryWeapon] = useState<string>("");
+    const [pendingSecondaryWeapon, setPendingSecondaryWeapon] = useState<string>("");
+
+    // Get current credits
+    const credits = sheet?.credits || 0;
+
+    // Sync selectedIntegratedBlasters with sheet data when it changes
+    useEffect(() => {
+      if (sheet?.integratedBlasters) {
+        setSelectedIntegratedBlasters(sheet.integratedBlasters);
+      }
+    }, [sheet?.integratedBlasters]);
+    
+    // Sync selectedSmartMissiles with sheet data when it changes
+    useEffect(() => {
+      if (sheet?.smartMissiles) {
+        setSelectedSmartMissiles(sheet.smartMissiles);
+      }
+    }, [sheet?.smartMissiles]);
+
+    // Helper function to get weapon cost
+    const getIntegratedBlasterCost = (weapon: string): number => {
+      switch (weapon) {
+        case 'Boomstick': return 170;
+        case 'Firestarter': return 160;
+        case 'Sleepytime': return 170;
+        default: return 0;
+      }
+    };
+
+    const getSmartMissileCost = (weapon: string): number => {
+      switch (weapon) {
+        case 'Neutron Torpedo': return 215;
+        case 'Pulsar Cannon': return 225;
+        case 'Razor Rain': return 250;
+        default: return 0;
+      }
+    };
   
     // Helper function to safely access classCardDots array
     const safeGetDotsArray = (index: number): boolean[] => {
@@ -167,7 +218,7 @@ const LevelUpClassExospecialist: React.FC<LevelUpClassExospecialistProps> = ({
                   <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32, fontFamily: 'Arial, Helvetica, sans-serif' }}>
                     <div style={{ fontWeight: 'bold', color: '#0b5394', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Feature</u></div>
                     <span style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
-                      <b><i style={{ color: '#117233', fontSize: '1em' }}>Exosuit.</i></b> <span style={{ fontSize: '1em', fontWeight: 400 }}>You <i>Resist</i> <b><span style={{ color: '#915927' }}><u>Bludgeoning</u></span></b> <img src="/Bludgeoning.png" alt="Bludgeoning" style={{ height: '1em', verticalAlign: 'middle', marginLeft: '2px', marginRight: '2px' }} />, <b><span style={{ color: '#a6965f' }}><u>Piercing</u></span></b> <img src="/Piercing.png" alt="Piercing" style={{ height: '1em', verticalAlign: 'middle', marginLeft: '2px', marginRight: '2px' }} /> and <b><span style={{ color: '#808080' }}><u>Slashing</u></span></b> <img src="/Slashing.png" alt="Slashing" style={{ height: '1em', verticalAlign: 'middle', marginLeft: '2px', marginRight: '2px' }} /> Damage and have an additional 20 <b><i><span style={{ color: '#990000' }}>Hit Points</span></i></b>.</span>
+                      {generateExosuitJSX()}
                     </span>
                   </span>
                 </div>
@@ -176,18 +227,21 @@ const LevelUpClassExospecialist: React.FC<LevelUpClassExospecialistProps> = ({
                 <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
                   <div style={{ fontWeight: 'bold', color: '#bf9000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Technique</u></div>
                   <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
-                    <i><span style={{ color: '#117233' }}><b>Target Lock</b> (Cooldown 3).</span></i> You and allies within 3hx gain a +2 to Crit rolls on <i><span style={{ color: '#990000' }}><b>Attacks</b></span></i> and ignore 50% Cover until the start of the next round.
+                    {generateTargetLockJSX(classCardDots)}
                   </div>
                 {/* Feature XP progression table */}
-                <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px' }}>
-                  <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: '1fr 24px 24px 24px',
-                    gridTemplateRows: 'repeat(2, auto)',
-                    gap: '4px',
-                    alignItems: 'start',
-                    marginBottom: '12px'
-                  }}>
+                  <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px' }}>
+                    <div style={{
+                      display: 'grid',
+                      gridTemplateColumns: '1fr 24px 24px 24px',
+                      gridTemplateRows: 'repeat(4, auto)',
+                      columnGap: '6px',
+                      rowGap: '2px',
+                      alignItems: 'start',
+                      marginBottom: '2px',
+                      width: '100%',
+                      paddingLeft: '4px'
+                    }}>
                     {/* Row 1: XP costs */}
                     <span></span>
                     <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>3xp</span>
@@ -233,18 +287,6 @@ const LevelUpClassExospecialist: React.FC<LevelUpClassExospecialistProps> = ({
                         </span>
                       );
                     })}
-                  </div>
-                </div>
-                {/* Second XP progression table - +1 Armor */}
-                <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px' }}>
-                  <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: '1fr 24px 24px 24px',
-                    gridTemplateRows: 'repeat(2, auto)',
-                    gap: '4px',
-                    alignItems: 'start',
-                    marginBottom: '12px'
-                  }}>
                     {/* Row 1: XP costs */}
                     <span></span>
                     <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>5xp</span>
@@ -290,18 +332,7 @@ const LevelUpClassExospecialist: React.FC<LevelUpClassExospecialistProps> = ({
                         </span>
                       );
                     })}
-                  </div>
-                </div>
-                  {/* Third row: Single dot for Ignore 100% Cover */}
-                <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px' }}>
-                  <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: '1fr 24px 24px 24px',
-                    gridTemplateRows: 'repeat(2, auto)',
-                    gap: '4px',
-                    alignItems: 'start',
-                    marginBottom: '12px'
-                  }}>
+
                     {/* Row 1: XP costs */}
                     <span></span>
                     <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>11xp</span>
@@ -349,16 +380,6 @@ const LevelUpClassExospecialist: React.FC<LevelUpClassExospecialistProps> = ({
                     </span>
                     <span></span>
                     <span></span>
-                  </div>
-                </div>
-                  <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginBottom: '8px' }}>
-                    <div style={{
-                      display: 'grid',
-                      gridTemplateColumns: '1fr 24px 24px 24px',
-                      gridTemplateRows: 'repeat(2, auto)',
-                      gap: '4px',
-                      alignItems: 'start'
-                    }}>
                       {/* Row 1: XP costs */}
                       <span></span>
                       <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>5xp</span>
@@ -412,26 +433,161 @@ const LevelUpClassExospecialist: React.FC<LevelUpClassExospecialistProps> = ({
                 {/* Primary Attack section */}
                 <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
                   <div style={{ fontWeight: 'bold', color: '#990000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Attack</u></div>
+                  
+                  {/* Primary Attack Details */}
                   <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
-                    <i><b>Primary <span style={{ color: '#990000' }}>Attack.</span></b></i><br />
-                    <i>Integrated Blasters.</i> 1hx Range, <i>AoE</i> 4hx-cone, 18+ Crit, 2d6 Damage.
+                    <div style={{ marginBottom: '4px' }}>
+                      <b><i><span style={{ color: '#000' }}>Primary</span> <span style={{ color: '#990000' }}>Attack</span></i></b>.
+                    </div>
+                    <div style={{ marginBottom: '4px', textAlign: 'left' }}>
+                      <select 
+                        style={{ 
+                          fontSize: '1em', 
+                          padding: '2px 8px', 
+                          borderRadius: '6px', 
+                          border: '1px solid #ccc', 
+                          background: '#fff', 
+                          color: '#222',
+                          fontWeight: 'bold',
+                          marginBottom: '4px',
+                          textAlign: 'left',
+                          minWidth: '180px'
+                        }} 
+                        defaultValue="Integrated Blasters"
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          if (value !== "Integrated Blasters") {
+                            setPendingPrimaryWeapon(value);
+                            e.target.value = "Integrated Blasters";
+                          }
+                        }}
+                      >
+                        <option disabled style={{ fontWeight: 'bold' }}>Integrated Blasters</option>
+                        <option style={{ fontWeight: 'bold' }}>Boomstick</option>
+                        <option style={{ fontWeight: 'bold' }}>Firestarter</option>
+                        <option style={{ fontWeight: 'bold' }}>Sleepytime</option>
+                      </select>
+                      
+                      {/* Buy/Add dialog for Primary Weapon */}
+                      {pendingPrimaryWeapon && (
+                        <div style={{ marginTop: '4px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                          <div style={{ fontWeight: 'bold' }}>
+                            {pendingPrimaryWeapon}
+                            <span style={{ color: '#bf9000', fontWeight: 'bold', marginLeft: '8px' }}>
+                              {getIntegratedBlasterCost(pendingPrimaryWeapon)}c
+                            </span>
+                          </div>
+                          <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                            <button
+                              style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #1976d2', background: '#1976d2', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}
+                              onClick={() => {
+                                const cost = getIntegratedBlasterCost(pendingPrimaryWeapon);
+                                if (credits < cost) {
+                                  setNotice('Not enough credits!');
+                                  return;
+                                }
+                                const newWeapons = [...selectedIntegratedBlasters, pendingPrimaryWeapon];
+                                const newCredits = credits - cost;
+                                setSelectedIntegratedBlasters(newWeapons);
+                                
+                                if (sheet && onAutoSave) {
+                                  onAutoSave({ 
+                                    integratedBlasters: newWeapons,
+                                    credits: newCredits
+                                  });
+                                }
+                                
+                                onCreditsChange?.(-cost);
+                                setPendingPrimaryWeapon("");
+                              }}
+                            >Buy</button>
+                            <button
+                              style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #28a745', background: '#28a745', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}
+                              onClick={() => {
+                                const newWeapons = [...selectedIntegratedBlasters, pendingPrimaryWeapon];
+                                setSelectedIntegratedBlasters(newWeapons);
+                                
+                                if (sheet && onAutoSave) {
+                                  onAutoSave({ 
+                                    integratedBlasters: newWeapons,
+                                    credits: credits
+                                  });
+                                }
+                                
+                                setPendingPrimaryWeapon("");
+                              }}
+                            >Add</button>
+                            <button
+                              style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #aaa', background: '#eee', color: '#333', fontWeight: 'bold', cursor: 'pointer' }}
+                              onClick={() => setPendingPrimaryWeapon("")}
+                            >Cancel</button>
+                          </div>
+                        </div>
+                      )}
+                      <div style={{ marginTop: '2px' }}>
+                        {selectedIntegratedBlasters.length > 0 && (
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginLeft: '8px' }}>
+                            {selectedIntegratedBlasters.map((weapon, idx) => (
+                              <span key={weapon + idx} style={{ fontStyle: 'italic', display: 'flex', alignItems: 'center', background: '#f5f5f5', borderRadius: '6px', padding: '2px 8px' }}>
+                                {weapon}
+                                <button
+                                  style={{ marginLeft: '6px', padding: '0 6px', borderRadius: '50%', border: 'none', background: '#d32f2f', color: 'white', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.9em' }}
+                                  title={`Remove ${weapon}`}
+                                  onClick={() => {
+                                    const newWeapons = selectedIntegratedBlasters.filter((_, i) => i !== idx);
+                                    setSelectedIntegratedBlasters(newWeapons);
+                                    
+                                    if (sheet && onAutoSave) {
+                                      onAutoSave({ 
+                                        integratedBlasters: newWeapons
+                                      });
+                                    }
+                                  }}
+                                >×</button>
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Base stats display - always visible */}
+                    <div style={{ fontSize: '1em', marginTop: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <span><b><u>Range</u></b> 1hx</span>
+                        <span style={{ textAlign: 'right', minWidth: '80px' }}><b><u>Crit</u></b> <b>[{18 - safeGetDotsArray(5).filter(Boolean).length}]</b>+</span>
+                      </div>
+                      <div>
+                        <b><u>Target</u></b> <i>AoE</i> 4hx-Cone
+                      </div>
+                      <div>
+                        <b><u>Damage</u></b> <b>[{2 + (safeGetDotsArray(4).filter(Boolean).length * 2)}]</b>d6
+                      </div>
+                      <div>
+                        <b><u>Crit Effect</u></b> <b>[{2 + (safeGetDotsArray(4).filter(Boolean).length * 2)}]</b>d6, status effect
+                      </div>
+                    </div>
                   </div>
 
-                  {/* +1hx Range */}
-                  <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginBottom: '8px' }}>
+                  {/* Primary Attack XP progression */}
+                  <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px' }}>
                     <div style={{
                       display: 'grid',
                       gridTemplateColumns: '1fr 24px 24px 24px',
-                      gridTemplateRows: 'repeat(2, auto)',
-                      gap: '4px',
-                      alignItems: 'start'
+                      gridTemplateRows: 'repeat(4, auto)',
+                      columnGap: '6px',
+                      rowGap: '2px',
+                      alignItems: 'start',
+                      marginBottom: '2px',
+                      width: '100%',
+                      paddingLeft: '4px'
                     }}>
                       {/* Row 1: XP costs */}
                       <span></span>
                       <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>8xp</span>
                       <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>13xp</span>
                       <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>21xp</span>
-                      {/* Row 2: +1hx Range dots */}
+                      {/* Row 2: +2 Damage dice dots */}
                       <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>+2 Damage dice</span>
                       {[0,1,2].map(idx => {
                         const arr = safeGetDotsArray(4);
@@ -471,18 +627,6 @@ const LevelUpClassExospecialist: React.FC<LevelUpClassExospecialistProps> = ({
                           </span>
                         );
                       })}
-                    </div>
-                  </div>
-
-                  {/* +1 Crit */}
-                  <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginBottom: '8px' }}>
-                    <div style={{
-                      display: 'grid',
-                      gridTemplateColumns: '1fr 24px 24px 24px',
-                      gridTemplateRows: 'repeat(2, auto)',
-                      gap: '4px',
-                      alignItems: 'start'
-                    }}>
                       {/* Row 1: XP costs */}
                       <span></span>
                       <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>3xp</span>
@@ -533,26 +677,177 @@ const LevelUpClassExospecialist: React.FC<LevelUpClassExospecialistProps> = ({
                 </div>
 
                 {/* Secondary Attack section */}
+                <div style={{ marginTop: '8px' }}>
                   <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
-                    <i><b>Secondary <span style={{ color: '#990000' }}>Attack</span></b> (Cooldown 4).</i><br />
-                    <i>Smart Missiles.</i> 12hx Range, Single Target, Arcing, Repeat 1, 18+ Crit, 1d4 Damage.
-                  
-                  {/* +1hx Range */}
-                  <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginBottom: '8px' }}>
+                    <div style={{ marginBottom: '4px' }}>
+                      <b><i>Secondary <span style={{ color: '#990000' }}>Attack</span></i></b> (Cooldown <b>[{Math.max(2, 4 - safeGetDotsArray(10).filter(Boolean).length)}]</b>).
+                    </div>
+                    <div style={{ marginBottom: '4px', textAlign: 'left' }}>
+                      <select 
+                        style={{ 
+                          fontSize: '1em', 
+                          padding: '2px 8px', 
+                          borderRadius: '6px', 
+                          border: '1px solid #ccc', 
+                          background: '#fff', 
+                          color: '#222',
+                          fontWeight: 'bold',
+                          marginBottom: '4px',
+                          textAlign: 'left',
+                          minWidth: '180px'
+                        }} 
+                        defaultValue="Smart Missiles"
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          if (value !== "Smart Missiles") {
+                            setPendingSecondaryWeapon(value);
+                            e.target.value = "Smart Missiles";
+                          }
+                        }}
+                      >
+                        <option disabled style={{ fontWeight: 'bold' }}>Smart Missiles</option>
+                        <option style={{ fontWeight: 'bold' }}>Neutron Torpedo</option>
+                        <option style={{ fontWeight: 'bold' }}>Pulsar Cannon</option>
+                        <option style={{ fontWeight: 'bold' }}>Razor Rain</option>
+                      </select>
+                      
+                      {/* Buy/Add dialog for Secondary Weapon */}
+                      {pendingSecondaryWeapon && (
+                        <div style={{ marginTop: '4px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                          <div style={{ fontWeight: 'bold' }}>
+                            {pendingSecondaryWeapon}
+                            <span style={{ color: '#bf9000', fontWeight: 'bold', marginLeft: '8px' }}>
+                              {getSmartMissileCost(pendingSecondaryWeapon)}c
+                            </span>
+                          </div>
+                          <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                            <button
+                              style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #1976d2', background: '#1976d2', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}
+                              onClick={() => {
+                                const cost = getSmartMissileCost(pendingSecondaryWeapon);
+                                if (credits < cost) {
+                                  setNotice('Not enough credits!');
+                                  return;
+                                }
+                                const newWeapons = [...selectedSmartMissiles, pendingSecondaryWeapon];
+                                const newCredits = credits - cost;
+                                setSelectedSmartMissiles(newWeapons);
+                                
+                                if (sheet && onAutoSave) {
+                                  onAutoSave({ 
+                                    smartMissiles: newWeapons,
+                                    credits: newCredits
+                                  });
+                                }
+                                
+                                onCreditsChange?.(-cost);
+                                setPendingSecondaryWeapon("");
+                              }}
+                            >Buy</button>
+                            <button
+                              style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #28a745', background: '#28a745', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}
+                              onClick={() => {
+                                const newWeapons = [...selectedSmartMissiles, pendingSecondaryWeapon];
+                                setSelectedSmartMissiles(newWeapons);
+                                
+                                if (sheet && onAutoSave) {
+                                  onAutoSave({ 
+                                    smartMissiles: newWeapons,
+                                    credits: credits
+                                  });
+                                }
+                                
+                                setPendingSecondaryWeapon("");
+                              }}
+                            >Add</button>
+                            <button
+                              style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #aaa', background: '#eee', color: '#333', fontWeight: 'bold', cursor: 'pointer' }}
+                              onClick={() => setPendingSecondaryWeapon("")}
+                            >Cancel</button>
+                          </div>
+                        </div>
+                      )}
+                      <div style={{ marginTop: '2px' }}>
+                        {selectedSmartMissiles.length > 0 && (
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginLeft: '8px' }}>
+                            {selectedSmartMissiles.map((weapon, idx) => (
+                              <span key={weapon + idx} style={{ fontStyle: 'italic', display: 'flex', alignItems: 'center', background: '#f5f5f5', borderRadius: '6px', padding: '2px 8px' }}>
+                                {weapon}
+                                <button
+                                  style={{ marginLeft: '6px', padding: '0 6px', borderRadius: '50%', border: 'none', background: '#d32f2f', color: 'white', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.9em' }}
+                                  title={`Remove ${weapon}`}
+                                  onClick={() => {
+                                    const newWeapons = selectedSmartMissiles.filter((_, i) => i !== idx);
+                                    setSelectedSmartMissiles(newWeapons);
+                                    
+                                    if (sheet && onAutoSave) {
+                                      onAutoSave({ 
+                                        smartMissiles: newWeapons
+                                      });
+                                    }
+                                  }}
+                                >×</button>
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Base stats display - always visible */}
+                    <div style={{ fontSize: '1em', marginTop: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <span><b><u>Range</u></b> <b>[{12 + (safeGetDotsArray(8).filter(Boolean).length * 3)}]</b>hx</span>
+                        <span style={{ textAlign: 'right', minWidth: '80px' }}><b><u>Crit</u></b> <b>[{18 - safeGetDotsArray(9).filter(Boolean).length}]</b>+</span>
+                      </div>
+                      <div>
+                        <b><u>Target</u></b> Single, Arcing, Repeat <b>[{1 + safeGetDotsArray(7).filter(Boolean).length}]</b>
+                      </div>
+                      <div>
+                        <b><u>Damage</u></b> <b>[{1 + safeGetDotsArray(6).filter(Boolean).length}]</b>d4
+                      </div>
+                      <div>
+                        <b><u>Crit Effect</u></b> <b>[{1 + safeGetDotsArray(6).filter(Boolean).length}]</b>d4, status effect
+                      </div>
+                    </div>
+                  </div>
+                
+                  {/* Secondary Attack XP progression */}
+                  <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px' }}>
                     <div style={{
                       display: 'grid',
                       gridTemplateColumns: '1fr 24px 24px 24px',
-                      gridTemplateRows: 'repeat(2, auto)',
-                      gap: '4px',
-                      alignItems: 'start'
+                      gridTemplateRows: 'repeat(4, auto)',
+                      columnGap: '6px',
+                      rowGap: '2px',
+                      alignItems: 'start',
+                      marginBottom: '2px',
+                      width: '100%',
+                      paddingLeft: '4px'
+                    }}>
+                    </div>
+                  </div>
+
+                  {/* Secondary Attack XP progression */}
+                  <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px' }}>
+                    <div style={{
+                      display: 'grid',
+                      gridTemplateColumns: '1fr 24px 24px 24px',
+                      gridTemplateRows: 'repeat(4, auto)',
+                      columnGap: '6px',
+                      rowGap: '2px',
+                      alignItems: 'start',
+                      marginBottom: '2px',
+                      width: '100%',
+                      paddingLeft: '4px'
                     }}>
                       {/* Row 1: XP costs */}
                       <span></span>
                       <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>5xp</span>
                       <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>8xp</span>
                       <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>15xp</span>
-                      {/* Row 2: +1hx Range dots */}
-                      <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>+1hx Damage die</span>
+                      {/* Row 2: +1 Damage die dots */}
+                      <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>+1 Damage die</span>
                       {[0,1,2].map(idx => {
                         const arr = safeGetDotsArray(6);
                         const canCheck = idx === 0 || arr.slice(0, idx).every(Boolean);
@@ -591,18 +886,6 @@ const LevelUpClassExospecialist: React.FC<LevelUpClassExospecialistProps> = ({
                           </span>
                         );
                       })}
-                    </div>
-                  </div>
-
-                  {/* +1hx Blast */}
-                  <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginBottom: '8px' }}>
-                    <div style={{
-                      display: 'grid',
-                      gridTemplateColumns: '1fr 24px 24px 24px',
-                      gridTemplateRows: 'repeat(2, auto)',
-                      gap: '4px',
-                      alignItems: 'start'
-                    }}>
                       {/* Row 1: XP costs */}
                       <span></span>
                       <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>12xp</span>
@@ -649,18 +932,6 @@ const LevelUpClassExospecialist: React.FC<LevelUpClassExospecialistProps> = ({
                         );
                       })}
                       <span></span>
-                    </div>
-                  </div>
-
-                  {/* +1d6 Damage */}
-                  <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginBottom: '8px' }}>
-                    <div style={{
-                      display: 'grid',
-                      gridTemplateColumns: '1fr 24px 24px 24px',
-                      gridTemplateRows: 'repeat(2, auto)',
-                      gap: '4px',
-                      alignItems: 'start'
-                    }}>
                       {/* Row 1: XP costs */}
                       <span></span>
                       <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>4xp</span>
@@ -706,18 +977,6 @@ const LevelUpClassExospecialist: React.FC<LevelUpClassExospecialistProps> = ({
                           </span>
                         );
                       })}
-                    </div>
-                  </div>
-
-                  {/* +1 Crit */}
-                  <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginBottom: '8px' }}>
-                    <div style={{
-                      display: 'grid',
-                      gridTemplateColumns: '1fr 24px 24px 24px',
-                      gridTemplateRows: 'repeat(2, auto)',
-                      gap: '4px',
-                      alignItems: 'start'
-                    }}>
                       {/* Row 1: XP costs */}
                       <span></span>
                       <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>3xp</span>
@@ -763,18 +1022,6 @@ const LevelUpClassExospecialist: React.FC<LevelUpClassExospecialistProps> = ({
                           </span>
                         );
                       })}
-                    </div>
-                  </div>
-
-                  {/* -1 Cooldown */}
-                  <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginBottom: '8px' }}>
-                    <div style={{
-                      display: 'grid',
-                      gridTemplateColumns: '1fr 24px 24px 24px',
-                      gridTemplateRows: 'repeat(2, auto)',
-                      gap: '4px',
-                      alignItems: 'start'
-                    }}>
                       {/* Row 1: XP costs */}
                       <span></span>
                       <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>5xp</span>

@@ -7,6 +7,7 @@ import { generateFirestormCardJSX } from "../utils/fireTechnique";
 import { generateCleansingWatersCardJSX } from "../utils/waterTechnique";
 import { generateBulwarkCardJSX } from "../utils/orderTechnique";
 import { generateWeakenCardJSX } from "../utils/voidTechnique";
+import { generateTargetLockDescriptionJSX } from "../utils/exospecialistTechnique";
 import React from "react";
 import type { CharacterSheet } from "../types/CharacterSheet";
 import { loadSheetById, saveCharacterSheet } from "../utils/storage";
@@ -38,6 +39,7 @@ import { CardsContemplativeAttacks } from "./CardsContemplativeAttacks";
 import { CardsDevoutAttacks } from "./CardsDevoutAttacks";
 import { CardsElementalistAttacks } from "./CardsElementalistAttacks";
 import { CardsElementalistSecondaryAttacks } from "./CardsElementalistSecondaryAttacks";
+import { CardsExospecialistAttacks } from "./CardsExospecialistAttacks";
 import { calculateChemistFeatureData } from "../utils/chemistFeature";
 
 type CardsProps = {
@@ -565,30 +567,8 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                   : charClass === 'Devout' ? (
                     generateFlagellationCardStatsJSX(localSheet?.classCardDots)
                   ) : charClass === 'Exospecialist' ? (
-                    (() => {
-                      let hx = 3;
-                      let crit = 2;
-                      if (localSheet && Array.isArray(localSheet.classCardDots)) {
-                        if (Array.isArray(localSheet.classCardDots[0])) {
-                          hx = 3 + localSheet.classCardDots[0].filter(Boolean).length;
-                        }
-                        // +2 Crit dots are in classCardDots[1]
-                        if (Array.isArray(localSheet.classCardDots[1])) {
-                          crit = 2 + 2 * localSheet.classCardDots[1].filter(Boolean).length;
-                        }
-                      }
-                      let cover = 50;
-                      // Ignore 100% Cover dot is in classCardDots[2][0]
-                      if (localSheet && Array.isArray(localSheet.classCardDots) && Array.isArray(localSheet.classCardDots[2]) && localSheet.classCardDots[2][0]) {
-                        cover = 100;
-                      }
-                      return (
-                        <>
-                          You and allies within <b>[{hx}]</b>hx gain a +<b>[{crit}]</b> to Crit rolls on <b><i style={{ color: '#990000' }}>Attacks</i></b> and ignore <b>[{cover}]</b>% Cover until the start of the next round.
-                        </>
-                      );
-                  })()) 
-                  : charClass === 'Chemist' ? (
+                    generateTargetLockDescriptionJSX(localSheet?.classCardDots)
+                  ) : charClass === 'Chemist' ? (
                     <div style={{ display: 'flex', alignItems: 'flex-start', flexWrap: 'wrap' }}>
                       {generateVolatileExperimentsDescriptionJSX(localSheet?.classCardDots)}
                     </div>
@@ -1296,6 +1276,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
             <CardsElementalistSecondaryAttacks sheet={localSheet} />
           </>
         )}
+
+        {/* Exospecialist Attack Cards */}
+        {charClass === 'Exospecialist' && <CardsExospecialistAttacks sheet={localSheet} subclass={subclass} />}
 
       </div>
       

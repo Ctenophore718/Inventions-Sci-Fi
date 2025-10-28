@@ -51,6 +51,7 @@ import { generateChaosStrikeDamageJSX } from "../utils/chaosStrike";
 import { generateOrderStrikeDamageJSX } from "../utils/orderStrike";
 import { generateArmoredGuardJSX } from "../utils/orderFeature";
 import { generateElementalExcitementJSX } from "../utils/elementalistFeature";
+import { generateExosuitJSX } from "../utils/exospecialistFeature";
 
 import CharacterSheetInventory from "./CharacterSheetInventory";
 import CharacterSheetPerks from "./CharacterSheetPerks";
@@ -260,20 +261,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
   const contemplativeFeatureJSX = generatePsychosomaticHarmonyJSX(sheet?.classCardDots);
   const devoutFeatureJSX = generateBloodTradeJSX(sheet?.classCardDots);
   const elementalistFeatureJSX = generateElementalExcitementJSX(sheet?.classCardDots, subclass);
-  const exospecialistFeatureJSX = (
-    <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#117233' }}>Exosuit.</i></b> You <i>Resist</i> <b><u style={{ color: '#915927', display: 'inline-flex', alignItems: 'center' }}>
-        Bludgeoning
-        <img src="/Bludgeoning.png" alt="Bludgeoning" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
-      </u></b>, <b><u style={{ color: '#a6965f', display: 'inline-flex', alignItems: 'center' }}>
-        Piercing
-        <img src="/Piercing.png" alt="Piercing" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
-      </u></b> and <b><u style={{ color: '#808080', display: 'inline-flex', alignItems: 'center' }}>
-        Slashing
-        <img src="/Slashing.png" alt="Slashing" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
-      </u></b> Damage and have an additional 20 <b><i style={{ color: '#990000' }}>Hit Points</i></b>.
-    </span>
-  );
+  const exospecialistFeatureJSX = generateExosuitJSX();
 
 
   const gunslingerFeatureJSX = (
@@ -1229,6 +1217,15 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
       }
     }
     
+    // Add Integrated Blasters for Exospecialist class
+    if (charClass === 'Exospecialist') {
+      attacks.push(
+        { name: 'Boomstick', type: 'Integrated Blaster', cost: 170 },
+        { name: 'Firestarter', type: 'Integrated Blaster', cost: 160 },
+        { name: 'Sleepytime', type: 'Integrated Blaster', cost: 170 }
+      );
+    }
+    
     return attacks;
   };
 
@@ -1407,6 +1404,15 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
       );
     }
     
+    // Add Smart Missiles for Exospecialist class
+    if (charClass === 'Exospecialist') {
+      attacks.push(
+        { name: 'Neutron Torpedo', type: 'Smart Missile', cost: 215 },
+        { name: 'Pulsar Cannon', type: 'Smart Missile', cost: 225 },
+        { name: 'Razor Rain', type: 'Smart Missile', cost: 250 }
+      );
+    }
+    
     return attacks;
   };
 
@@ -1460,6 +1466,12 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
           shards: newShards,
           credits: credits - cost
         };
+      } else if (type === 'Integrated Blaster') {
+        const newIntegratedBlasters = [...(sheet.integratedBlasters || []), attackName];
+        partialUpdate = { 
+          integratedBlasters: newIntegratedBlasters,
+          credits: credits - cost
+        };
       } else {
         return;
       }
@@ -1506,6 +1518,11 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
         const newShards = [...(sheet.shards || []), attackName];
         partialUpdate = { 
           shards: newShards
+        };
+      } else if (type === 'Integrated Blaster') {
+        const newIntegratedBlasters = [...(sheet.integratedBlasters || []), attackName];
+        partialUpdate = { 
+          integratedBlasters: newIntegratedBlasters
         };
       } else {
         return;
@@ -1596,6 +1613,12 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
           disciplines: newDisciplines,
           credits: credits - cost
         };
+      } else if (type === 'Smart Missile') {
+        const newSmartMissiles = [...(sheet.smartMissiles || []), attackName];
+        partialUpdate = { 
+          smartMissiles: newSmartMissiles,
+          credits: credits - cost
+        };
       } else {
         return;
       }
@@ -1668,6 +1691,11 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
         const newDisciplines = [...(sheet.disciplines || []), attackName];
         partialUpdate = { 
           disciplines: newDisciplines
+        };
+      } else if (type === 'Smart Missile') {
+        const newSmartMissiles = [...(sheet.smartMissiles || []), attackName];
+        partialUpdate = { 
+          smartMissiles: newSmartMissiles
         };
       } else {
         return;
