@@ -18,6 +18,7 @@ import LevelUpSubclassesCommander from "./LevelUpSubclassesCommander";
 import LevelUpSubclassesContemplative from "./LevelUpSubclassesContemplative";
 import LevelUpSubclassesDevout from "./LevelUpSubclassesDevout";
 import LevelUpSubclassesElementalist from "./LevelUpSubclassesElementalist";
+import LevelUpSubclassesExospecialist from "./LevelUpSubclassesExospecialist";
 import { calculateChemistFeatureData } from "../utils/chemistFeature";
 
 
@@ -1531,6 +1532,23 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
             {/* Elementalist Subclass Content */}
             {charClass === "Elementalist" && subclass && (
               <LevelUpSubclassesElementalist
+                sheet={sheet}
+                charClass={charClass}
+                subclass={subclass}
+                onAutoSave={handleAutoSave}
+                xpTotal={xpTotal}
+                spTotal={spTotal}
+                xpSpent={xpSpent}
+                spSpent={spSpent}
+                setXpSpent={setXpSpent}
+                setSpSpent={setSpSpent}
+                setNotice={setNotice}
+              />
+            )}
+
+            {/* Exospecialist Subclass Content */}
+            {charClass === "Exospecialist" && subclass && (
+              <LevelUpSubclassesExospecialist
                 sheet={sheet}
                 charClass={charClass}
                 subclass={subclass}

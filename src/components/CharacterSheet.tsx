@@ -44,6 +44,8 @@ import { generateFireStrikeDamageJSX } from "../utils/fireStrike";
 import { generateWaterArmorJSX } from "../utils/waterFeature";
 import { generateWaterStrikeDamageJSX } from "../utils/waterStrike";
 
+import { generateSteelWingsJSX } from "../utils/aeronautFeature";
+
 import { generateMartyrJSX } from "../utils/astralFeature";
 import { generateAstralStrikeDamageJSX } from "../utils/astralStrike";
 import { generateAggressionJSX } from "../utils/chaosFeature";
@@ -309,7 +311,10 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
   const waterSpeedBonus = sheet?.subclass === 'Water'
     ? ((sheet?.subclassProgressionDots as any)?.waterMovementSpeedDots?.filter(Boolean).length || 0)
     : 0;
-  const totalSpeed = baseSpeed + tacticianSpeedBonus + kineticSpeedBonus + mercurialSpeedBonus + airSpeedBonus + fireSpeedBonus + waterSpeedBonus;
+  const aeronautSpeedBonus = sheet?.subclass === 'Aeronaut'
+    ? 2 + ((sheet?.subclassProgressionDots as any)?.aeronautFeatureSpeedDots?.filter(Boolean).length || 0) * 2
+    : 0;
+  const totalSpeed = baseSpeed + tacticianSpeedBonus + kineticSpeedBonus + mercurialSpeedBonus + airSpeedBonus + fireSpeedBonus + waterSpeedBonus + aeronautSpeedBonus;
   const speed = totalSpeed > 0 ? `${totalSpeed}` : "0";
   
   // Calculate jump speed and jump amount for Kinetic subclass
@@ -823,7 +828,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
 
   const aeronautFeatureJSX = (
     <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#3da1d8' }}>Steel Wings.</i></b> You have a <b><i style={{ color: '#38761d' }}>Flight Speed</i></b> and an additional +<b>[2]</b> <b><i style={{ color: '#38761d' }}>Speed</i></b>.
+      {generateSteelWingsJSX(sheet)}
     </span>
   );
 
@@ -2485,6 +2490,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
             Speed Types {movement}Ground
             {sheet?.subclass === 'Air' && (sheet?.subclassProgressionDots as any)?.airMovementFlySpeedDots?.[0] ? ', Fly' : ''}
             {sheet?.subclass === 'Water' && (sheet?.subclassProgressionDots as any)?.waterMovementSwimSpeedDots?.[0] ? ', Swim' : ''}
+            {sheet?.subclass === 'Aeronaut' ? ', Fly' : ''}
           </div>
           <div className={styles.horizontalLabel} style={{ color: '#38761d', fontWeight: 'bold' }}>Jump Speed {(kineticJumpSpeedBonus > 0 ? kineticJumpSpeedBonus : mercurialJumpSpeedBonus > 0 ? mercurialJumpSpeedBonus : "") + (kineticJumpSpeedBonus > 0 || mercurialJumpSpeedBonus > 0 ? "hx" : "0hx")}</div>
           <div className={styles.horizontalLabel} style={{ color: '#38761d', fontWeight: 'bold' }}>Jump Amount {kineticJumpAmountBonus > 0 ? kineticJumpAmountBonus : mercurialJumpAmountBonus > 0 ? mercurialJumpAmountBonus : "0"}</div>

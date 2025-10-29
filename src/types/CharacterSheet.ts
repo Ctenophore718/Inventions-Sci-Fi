@@ -273,6 +273,17 @@ export type CharacterSheet = {
     kineticStrikeSlamHxDots?: boolean[];
     kineticStrikeMultiStrikeDots?: boolean[];
     kineticPerksSkillsDots?: boolean[];
+    // Aeronaut subclass progression (Exospecialist)
+    aeronautFeatureSpeedDots?: boolean[];
+    aeronautTechniqueBounceDots?: boolean[];
+    aeronautTechniqueSpikeDots?: boolean[];
+    aeronautTechniqueAoEDots?: boolean[];
+    aeronautTechniqueCooldownDots?: boolean[];
+    aeronautHitPointsDots?: boolean[];
+    aeronautStrikeDamageDots?: boolean[];
+    aeronautStrikeExtraDots?: boolean[];
+    aeronautMovementSpeedDots?: boolean[];
+    aeronautPerksSkillsDots?: boolean[];
     // Add other subclasses as needed
   };
 };
