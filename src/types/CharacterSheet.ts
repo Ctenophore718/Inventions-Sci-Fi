@@ -284,6 +284,19 @@ export type CharacterSheet = {
     aeronautStrikeExtraDots?: boolean[];
     aeronautMovementSpeedDots?: boolean[];
     aeronautPerksSkillsDots?: boolean[];
+    // Brawler subclass progression (Exospecialist)
+    brawlerFeatureConditionDots?: boolean[];
+    brawlerFeatureCounterDots?: boolean[];
+    brawlerTechniqueRangeDots?: boolean[];
+    brawlerTechniqueSlamDots?: boolean[];
+    brawlerTechniqueSpikeDots?: boolean[];
+    brawlerTechniqueCooldownDots?: boolean[];
+    brawlerHitPointsDots?: boolean[];
+    brawlerStrikeDamageDots?: boolean[];
+    brawlerStrikeSpikeDots?: boolean[];
+    brawlerStrikeExtraDots?: boolean[];
+    brawlerMovementSpeedDots?: boolean[];
+    brawlerPerksSkillsDots?: boolean[];
     // Add other subclasses as needed
   };
 };
