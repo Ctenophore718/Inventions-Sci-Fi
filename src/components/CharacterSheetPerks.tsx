@@ -268,7 +268,14 @@ const CharacterSheetPerks: React.FC<CharacterSheetPerksProps> = ({
               <b><i style={{ color: '#0e42e2' }}>Waterweaver.</i></b> <span style={{ color: '#000' }}>Your elemental companion allows you to pull water out of all sources of moisture within 20hx and change them into any form that water can take (water, ice, steam).</span>
             </span>
           </div>
-          )}                                        
+          )} 
+          {subclass === 'Aeronaut' && (sheet?.subclassProgressionDots as any)?.aeronautPerksSkillsDots?.[0] && (
+          <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <span>
+              <b><i style={{ color: '#3da1d8' }}>Aerial Ace.</i></b> <span style={{ color: '#000' }}>You have expert experience with flying and can predict air currents, inertial motions and cross-vectors for any flying object. Gain an advantage on related skills rolls.</span>
+            </span>
+          </div>
+          )}                                          
         </div>
       </div>
   );

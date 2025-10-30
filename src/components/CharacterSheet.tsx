@@ -45,6 +45,7 @@ import { generateWaterArmorJSX } from "../utils/waterFeature";
 import { generateWaterStrikeDamageJSX } from "../utils/waterStrike";
 
 import { generateSteelWingsJSX } from "../utils/aeronautFeature";
+import { generateAeronautStrikeJSX, generateAeronautStrikeDamageJSX } from "../utils/aeronautStrike";
 
 import { generateMartyrJSX } from "../utils/astralFeature";
 import { generateAstralStrikeDamageJSX } from "../utils/astralStrike";
@@ -312,7 +313,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
     ? ((sheet?.subclassProgressionDots as any)?.waterMovementSpeedDots?.filter(Boolean).length || 0)
     : 0;
   const aeronautSpeedBonus = sheet?.subclass === 'Aeronaut'
-    ? 2 + ((sheet?.subclassProgressionDots as any)?.aeronautFeatureSpeedDots?.filter(Boolean).length || 0) * 2
+    ? 2 + ((sheet?.subclassProgressionDots as any)?.aeronautFeatureSpeedDots?.filter(Boolean).length || 0) * 2 + ((sheet?.subclassProgressionDots as any)?.aeronautMovementSpeedDots?.filter(Boolean).length || 0) * 2
     : 0;
   const totalSpeed = baseSpeed + tacticianSpeedBonus + kineticSpeedBonus + mercurialSpeedBonus + airSpeedBonus + fireSpeedBonus + waterSpeedBonus + aeronautSpeedBonus;
   const speed = totalSpeed > 0 ? `${totalSpeed}` : "0";
@@ -337,6 +338,12 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
   
   const strikeDamage = sheet?.strikeDamage || "";
   const maxHitPoints = sheet?.maxHitPoints || 0;
+  
+  // Calculate Aeronaut hit points bonus
+  const aeronautHitPointsBonus = sheet?.subclass === 'Aeronaut'
+    ? ((sheet?.subclassProgressionDots as any)?.aeronautHitPointsDots?.filter(Boolean).length || 0) * 5
+    : 0;
+  
   const [deathCount, setDeathCount] = useState(sheet?.deathCount || 0);
 
   // Attributes
@@ -1777,6 +1784,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                     if (subclass === "Earth" && skill === "Survival") return "rgba(226,185,14,0.5)";
                     if (subclass === "Fire" && skill === "Intimidation") return "rgba(226,14,14,0.5)";
                     if (subclass === "Water" && skill === "Medicine") return "rgba(14,66,226,0.5)";
+                    if (subclass === "Aeronaut" && skill === "Piloting") return "rgba(61,161,216,0.5)";
                     return null;
                   };
                   
@@ -2648,6 +2656,10 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
               <span style={{ fontWeight: 'bold', fontFamily: 'inherit', color: '#000', marginLeft: 4, display: 'flex', alignItems: 'center' }}>
                 {generateWaterStrikeDamageJSX(sheet)}
               </span>
+            ) : subclass === 'Aeronaut' ? (
+              <span style={{ fontWeight: 'bold', fontFamily: 'inherit', color: '#000', marginLeft: 4, display: 'flex', alignItems: 'center' }}>
+                {generateAeronautStrikeDamageJSX(sheet)}
+              </span>
             ) : <span style={{ fontWeight: 'bold', fontFamily: 'inherit', color: '#000', marginLeft: 4 }}>{strikeDamage}</span>}
           </div>
           <div className={styles.horizontalLabel} style={{ color: '#351c75', fontWeight: 'bold' }}>Multi Strike <span style={{ color: '#000' }}>{
@@ -2665,7 +2677,9 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                         ? (1 + ((sheet?.subclassProgressionDots as any)?.airStrikeMultiStrikeDots?.filter(Boolean).length || 0))
                         : (subclass === 'Fire' && ((sheet?.subclassProgressionDots as any)?.fireStrikeExtraStrikeDots?.filter(Boolean).length || 0) > 0)
                           ? (1 + ((sheet?.subclassProgressionDots as any)?.fireStrikeExtraStrikeDots?.filter(Boolean).length || 0))
-                          : (multiStrike > 0 ? multiStrike : <span style={{ visibility: 'hidden' }}>0</span>)
+                          : (subclass === 'Aeronaut' && (sheet?.subclassProgressionDots as any)?.aeronautStrikeExtraDots?.[0])
+                            ? 2
+                            : (multiStrike > 0 ? multiStrike : <span style={{ visibility: 'hidden' }}>0</span>)
           }</span></div>
           <div className={styles.horizontalLabel} style={{ color: '#351c75', fontWeight: 'bold' }}>
               Strike Effects {
@@ -3686,7 +3700,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <span style={{ fontWeight: 'bold', minWidth: '120px' }}>Max Hit Points:</span>
-                <span style={{ minWidth: '40px', textAlign: 'center' }}>{charClass === "Exospecialist" ? maxHitPoints + 20 : maxHitPoints}</span>
+                <span style={{ minWidth: '40px', textAlign: 'center' }}>{charClass === "Exospecialist" ? maxHitPoints + 20 + aeronautHitPointsBonus : maxHitPoints}</span>
               </div>
 
               <hr style={{ margin: '8px 0', border: '1px solid #eee' }} />
@@ -3768,7 +3782,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
             }
           }}
         >
-          hp: {currentHitPoints}/{charClass === "Exospecialist" ? maxHitPoints + 20 : maxHitPoints}
+          hp: {currentHitPoints}/{charClass === "Exospecialist" ? maxHitPoints + 20 + aeronautHitPointsBonus : maxHitPoints}
         </button>
       </div>
 

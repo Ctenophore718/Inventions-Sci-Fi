@@ -9,6 +9,7 @@ import { generateBulwarkCardJSX } from "../utils/orderTechnique";
 import { generateWeakenCardJSX } from "../utils/voidTechnique";
 import { generateTargetLockDescriptionJSX } from "../utils/exospecialistTechnique";
 import { generateDiveBombCardJSX } from "../utils/aeronautTechnique";
+import { generateTheOlOneTwoCardJSX } from "../utils/brawlerTechnique";
 import React from "react";
 import type { CharacterSheet } from "../types/CharacterSheet";
 import { loadSheetById, saveCharacterSheet } from "../utils/storage";
@@ -273,7 +274,21 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
     
     // Add class-specific bonuses
     if (localSheet?.charClass === 'Exospecialist') {
-      return baseHP + 20;
+      let effectiveHP = baseHP + 20;
+      
+      // Aeronaut subclass gets +5 Hit Points per dot
+      if (localSheet?.subclass === 'Aeronaut') {
+        const aeronautHitPointsBonus = ((localSheet?.subclassProgressionDots as any)?.aeronautHitPointsDots?.filter(Boolean).length || 0) * 5;
+        effectiveHP += aeronautHitPointsBonus;
+      }
+      
+      // Brawler subclass gets +10 Hit Points per dot
+      if (localSheet?.subclass === 'Brawler') {
+        const brawlerHitPointsBonus = ((localSheet?.subclassProgressionDots as any)?.brawlerHitPointsDots?.filter(Boolean).length || 0) * 10;
+        effectiveHP += brawlerHitPointsBonus;
+      }
+      
+      return effectiveHP;
     }
     
     return baseHP;
@@ -300,7 +315,7 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
       <div style={{ padding: "1rem" }}>
   {/* Cards header moved to App.tsx for right alignment */}
       
-      {/* Responsive card grid with fixed card sizes (240px × 336px) - optimized for 3 cards on iPad */}
+      {/* Responsive card grid with fixed card sizes (240px � 336px) - optimized for 3 cards on iPad */}
       <div style={{ 
         marginTop: '0.5rem', 
         marginBottom: '2rem',
@@ -626,23 +641,23 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
               textAlign: 'left'
             }}>
               {charClass === 'Devout' ? (
-                <span>“Sacrifice is a necessary cost of any spiritual power. The most devout sacrifice their own flesh.” <br />--Theodora de la Fe, Defteran Devout</span>
+                <span>�Sacrifice is a necessary cost of any spiritual power. The most devout sacrifice their own flesh.� <br />--Theodora de la Fe, Defteran Devout</span>
               ) : charClass === 'Chemist' ? 
                 'With the right concoctions, any spell or weapon becomes even more volatile than before.' 
                 : charClass === 'Coder' ?
-                (<span>“Although it’s a universal script, the math behind reflecting energetic material is quite complex.”<br />--Luminova, X-Ray Naturalist</span>)
+                (<span>�Although it�s a universal script, the math behind reflecting energetic material is quite complex.�<br />--Luminova, X-Ray Naturalist</span>)
                 : charClass === 'Commander' ? (
-                  <span style={{ fontSize: '0.89em' }}>“...That's 'cause I got people with me, people who trust each other, who do for each other and ain't always looking for the advantage.” --Mal, Human Captain of Serenity</span>
+                  <span style={{ fontSize: '0.89em' }}>�...That's 'cause I got people with me, people who trust each other, who do for each other and ain't always looking for the advantage.� --Mal, Human Captain of Serenity</span>
                 ) : charClass === 'Contemplative' ? (
-                  <span>“One must always be responsive at a moment’s notice to fight not only another day, but another instant.” --Master Li Ren, Felid Contemplative</span>
+                  <span>�One must always be responsive at a moment�s notice to fight not only another day, but another instant.� --Master Li Ren, Felid Contemplative</span>
                 ) : charClass === 'Elementalist' ? (
                   <span>A little prayer with your Xenomagical elemental sprite can go a long way.</span>
                 ) : charClass === 'Exospecialist' ? (
                   <span>Aim at your target without distractions. Focus on one target. Hit your goal and move on to the next one. Focus is your friend.</span>
                 ) : charClass === 'Gunslinger' ? (
-                  <span>“I always keep my finger on the trigger, right at the brink of firing. Don’t even blink at me wrong or you’ll get a hole in ya.” --Anonymous</span>
+                  <span>�I always keep my finger on the trigger, right at the brink of firing. Don�t even blink at me wrong or you�ll get a hole in ya.� --Anonymous</span>
                 ) : charClass === 'Technician' ? (
-                  <span>“Really changes the meaning of ‘trip-mine’ when it causes psychedelic visions to anyone who steps on it.” --Jackdaw Nightswain, Corvid Technician</span>
+                  <span>�Really changes the meaning of �trip-mine� when it causes psychedelic visions to anyone who steps on it.� --Jackdaw Nightswain, Corvid Technician</span>
                 ) : 'Flavor text.'}
             </div>
             </div>
@@ -927,7 +942,7 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
               textAlign: 'left'
             }}>
               {localSheet?.subclass === 'Grenadier'
-                ? '“I thought it would be a good idea to give all my friends some bombing capabilities and boy, oh boy… was I right!” --Thed Explomb, Apocritan Grenadier'
+                ? '�I thought it would be a good idea to give all my friends some bombing capabilities and boy, oh boy� was I right!� --Thed Explomb, Apocritan Grenadier'
                 : localSheet?.subclass === 'Necro'
                 ? '"Forgive my thralls, for they know not what they do. Their will belongs solely to me." --Grimmith Everrise, Petran Necro Chemist'
                 : localSheet?.subclass === 'Anatomist'
@@ -947,15 +962,15 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                 : localSheet?.subclass === 'Galvanic'
                 ? '"The most important six inches on the battlefield is between your ears." --Jim Mattis'
                 : localSheet?.subclass === 'Tactician'
-                ? '"You know… sometimes the best tactics come from just embracing strategery altogether. Don\'t overthink it, son.. strategery!" --Jerj Boosh, Human Tactician'
+                ? '"You know� sometimes the best tactics come from just embracing strategery altogether. Don\'t overthink it, son.. strategery!" --Jerj Boosh, Human Tactician'
                 : localSheet?.subclass === 'Tyrant'
                 ? '"Fear is a powerful weapon when wielded with skill." --General Kassidar'
                 : localSheet?.subclass === 'Inertial'
                 ? 'Pure gravitational Oikomagic courses through your body, forcing nearby enemies ever nearer to you while also forcing their attacks to stray your way.'
                 : localSheet?.subclass === 'Kinetic'
-                ? '“Such a dramatic blow is not accomplished by hitting as hard as you can, but by drawing from the well of infinite energy within.” --Master Kaz, Human Kinetic'
+                ? '�Such a dramatic blow is not accomplished by hitting as hard as you can, but by drawing from the well of infinite energy within.� --Master Kaz, Human Kinetic'
                : localSheet?.subclass === 'Mercurial'
-                ? 'It’s not so much that our bodies move faster, it’s that the world around us moves slower.'
+                ? 'It�s not so much that our bodies move faster, it�s that the world around us moves slower.'
               : localSheet?.subclass === 'Vectorial'
                 ? 'The Vectorial briefly clones herself to throw not only her punches, but her very essence into the battlefield, causing exponential havoc and chaos.'
               : localSheet?.subclass === 'Astral'
@@ -967,15 +982,17 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
               : localSheet?.subclass === 'Void'
                 ? '"I am the essence of emptiness. All that feel my touch feel nothing but absolute loss." --Kenos, the Positive Nothingness'
               : localSheet?.subclass === 'Air'
-                ? '“The essence of the wind lifts and guides you, allows you to fly alongside the clouds and enables you as a swift breeze." --Aeras Longsparrow, Air Elementalist'
+                ? '�The essence of the wind lifts and guides you, allows you to fly alongside the clouds and enables you as a swift breeze." --Aeras Longsparrow, Air Elementalist'
               : localSheet?.subclass === 'Earth'
-                ? '“Ain’t there that saying about needing faith to move mountains? Hogwash! Ya just need a little stoney mote friend!” --Droogin, Stout Earth Elementalist'
+                ? '�Ain�t there that saying about needing faith to move mountains? Hogwash! Ya just need a little stoney mote friend!� --Droogin, Stout Earth Elementalist'
               : localSheet?.subclass === 'Fire'
-                ? '“Some storms are so fierce that they literally melt away any protection you thought you would’ve had.” --Flambeaux, Infrared Fire Elementalist'
+                ? '�Some storms are so fierce that they literally melt away any protection you thought you would�ve had.� --Flambeaux, Infrared Fire Elementalist'
               : localSheet?.subclass === 'Water'
-                ? '“The life-giving power of water not only revitalizes the body but innoculates the soul from all ailments.” --Thalassian, Drifting Chloroptid  Water Elementalist'
+                ? '"The life-giving power of water not only revitalizes the body but innoculates the soul from all ailments." --Thalassian, Drifting Chloroptid  Water Elementalist'
               : localSheet?.subclass === 'Aeronaut'
-                ? '“Like a bird of prey striking its hapless target, the more speed I gain in the dive, the more likely the death that awaits.” --Shin Egoliss, Human Aeronaut'
+                ? '"Like a bird of prey striking its hapless target, the more speed I gain in the dive, the more likely the death that awaits." --Shin Egoliss, Human Aeronaut'
+              : localSheet?.subclass === 'Brawler'
+                ? '"When your exosuit can amplify a single punch tenfold, you learn real quick that finesse beats brute force every time." --Gritt Steelhammer, Stout Brawler'
               : 'Flavor text.'}
             </div>
         </div>
@@ -1331,7 +1348,7 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                 e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
               }}
             >
-              🏠 Home
+              ?? Home
             </button>
             
             <button
@@ -1358,7 +1375,7 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                 e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
               }}
             >
-              👤 Character Sheet
+              ?? Character Sheet
             </button>
 
             <button
@@ -1377,7 +1394,7 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                 opacity: 0.6
               }}
             >
-              🃏 Cards
+              ?? Cards
             </button>            
             
             <button
@@ -1404,7 +1421,7 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                 e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
               }}
             >
-              ⬆️ Level Up
+              ?? Level Up
             </button>
             
           </div>
@@ -1449,7 +1466,7 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
             }
           }}
         >
-          <span style={{ color: 'white', fontSize: '1.3em', lineHeight: 1 }}>{isNavExpanded ? '✕' : '⊞'}</span>
+          <span style={{ color: 'white', fontSize: '1.3em', lineHeight: 1 }}>{isNavExpanded ? '?' : '?'}</span>
         </button>
       </div>
 
@@ -1488,7 +1505,7 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                     handleAutoSave({ xpTotal: newValue });
                   }}
                 >
-                  −
+                  -
                 </button>
                 <input
                   type="text"
@@ -1546,7 +1563,7 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                     handleAutoSave({ spTotal: newValue });
                   }}
                 >
-                  −
+                  -
                 </button>
                 <input
                   type="text"
@@ -1660,7 +1677,7 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                     handleAutoSave({ credits: newValue });
                   }}
                 >
-                  −
+                  -
                 </button>
                 <input
                   type="text"
@@ -1811,7 +1828,7 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                     handleAutoSave({ currentHitPoints: newValue });
                   }}
                 >
-                  −
+                  -
                 </button>
                 <input
                   type="text"
@@ -2014,7 +2031,7 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                       handleAutoSave({ chemTokens: newValue });
                     }}
                   >
-                    −
+                    -
                   </button>
                   <input
                     type="text"

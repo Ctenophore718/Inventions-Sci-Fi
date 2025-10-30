@@ -4,6 +4,9 @@ import { saveCharacterSheet } from "../utils/storage";
 import { generateSteelWingsJSX } from "../utils/aeronautFeature";
 import { generateDiveBombJSX } from "../utils/aeronautTechnique";
 import { generateAeronautStrikeJSX } from "../utils/aeronautStrike";
+import { generateFightinDirtyJSX } from "../utils/brawlerFeature";
+import { generateTheOlOneTwoJSX } from "../utils/brawlerTechnique";
+import { generateBrawlerStrikeJSX } from "../utils/brawlerStrike";
 
 type LevelUpSubclassesExospecialistProps = {
   sheet: CharacterSheet | null;
@@ -62,6 +65,44 @@ const LevelUpSubclassesExospecialist: React.FC<LevelUpSubclassesExospecialistPro
   );
   const [aeronautPerksSkillsDots, setAeronautPerksSkillsDots] = useState<boolean[]>(
     (sheet?.subclassProgressionDots as any)?.aeronautPerksSkillsDots || [false]
+  );
+
+  // Independent state for Brawler dots
+  const [brawlerFeatureConditionDots, setBrawlerFeatureConditionDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.brawlerFeatureConditionDots || [false]
+  );
+  const [brawlerFeatureCounterDots, setBrawlerFeatureCounterDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.brawlerFeatureCounterDots || [false]
+  );
+  const [brawlerTechniqueRangeDots, setBrawlerTechniqueRangeDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.brawlerTechniqueRangeDots || [false, false, false]
+  );
+  const [brawlerTechniqueSlamDots, setBrawlerTechniqueSlamDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.brawlerTechniqueSlamDots || [false, false, false]
+  );
+  const [brawlerTechniqueSpikeDots, setBrawlerTechniqueSpikeDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.brawlerTechniqueSpikeDots || [false]
+  );
+  const [brawlerTechniqueCooldownDots, setBrawlerTechniqueCooldownDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.brawlerTechniqueCooldownDots || [false, false]
+  );
+  const [brawlerHitPointsDots, setBrawlerHitPointsDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.brawlerHitPointsDots || [false, false, false]
+  );
+  const [brawlerStrikeDamageDots, setBrawlerStrikeDamageDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.brawlerStrikeDamageDots || [false, false, false]
+  );
+  const [brawlerStrikeSpikeDots, setBrawlerStrikeSpikeDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.brawlerStrikeSpikeDots || [false]
+  );
+  const [brawlerStrikeExtraDots, setBrawlerStrikeExtraDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.brawlerStrikeExtraDots || [false]
+  );
+  const [brawlerMovementSpeedDots, setBrawlerMovementSpeedDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.brawlerMovementSpeedDots || [false]
+  );
+  const [brawlerPerksSkillsDots, setBrawlerPerksSkillsDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.brawlerPerksSkillsDots || [false]
   );
 
   // Helper function to handle XP dot clicking with sequential requirement
@@ -308,7 +349,7 @@ const LevelUpSubclassesExospecialist: React.FC<LevelUpSubclassesExospecialistPro
           <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
             <div style={{ fontWeight: 'bold', color: '#990000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Hit Points</u></div>
             <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
-              <b><i>Extra Hit Points.</i></b>
+              <b><i>Extra</i> <i style={{ color: '#990000' }}>Hit Points.</i></b> +<b>[{aeronautHitPointsDots.filter(Boolean).length * 5}]</b> <b><i style={{ color: '#990000' }}>Hit Points</i></b>.
             </div>
 
             <div style={{
@@ -328,7 +369,7 @@ const LevelUpSubclassesExospecialist: React.FC<LevelUpSubclassesExospecialistPro
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>6xp</span>
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>9xp</span>
               {/* Row 2: +5 Hit Points dots */}
-              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+5 Hit Points</span>
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+5 <b><i style={{ color: '#990000' }}>Hit Points</i></b></span>
               {[0,1,2].map(idx => (
                 <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                   <span
@@ -354,6 +395,7 @@ const LevelUpSubclassesExospecialist: React.FC<LevelUpSubclassesExospecialistPro
             <div style={{ fontWeight: 'bold', color: '#351c75', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Strike</u></div>
             <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
               {generateAeronautStrikeJSX(sheet)}
+              {aeronautStrikeExtraDots[0] && <> +<b>[1]</b> <b><i style={{ color: '#351c75' }}>Strike</i></b>.</>}
             </div>
             
             <div style={{
@@ -423,7 +465,7 @@ const LevelUpSubclassesExospecialist: React.FC<LevelUpSubclassesExospecialistPro
           <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
             <div style={{ fontWeight: 'bold', color: '#38761d', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Movement</u></div>
             <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
-              <b><i>Enhanced <span style={{ color: '#38761d' }}>Movement</span> Effects.</i></b>
+              <b><i>Enhanced <span style={{ color: '#38761d' }}>Movement</span> Effects.</i></b> +<b>[{aeronautMovementSpeedDots.filter(Boolean).length * 2}]</b>hx <b><i style={{ color: '#38761d' }}>Speed</i></b>.
             </div>
 
             <div style={{
@@ -497,7 +539,7 @@ const LevelUpSubclassesExospecialist: React.FC<LevelUpSubclassesExospecialistPro
                   lineHeight: '1.2',
                   gridColumn: '1 / 4'
                 }}>
-                  <b><i style={{ color: '#117233', fontSize: '1em' }}>Aerial Ace.</i></b> You have expert experience with flying and can predict air currents, inertial motions and cross-vectors for any flying object. Gain an advantage on related skills rolls.
+                  <b><i style={{ color: '#3da1d8', fontSize: '1em' }}>Aerial Ace.</i></b> You have expert experience with flying and can predict air currents, inertial motions and cross-vectors for any flying object. Gain an advantage on related skills rolls.
                 </div>
                 <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start' }}>
                   <span
@@ -509,6 +551,445 @@ const LevelUpSubclassesExospecialist: React.FC<LevelUpSubclassesExospecialistPro
                       borderRadius: '50%',
                       display: 'block',
                       background: aeronautPerksSkillsDots[0] ? '#000' : '#fff',
+                      cursor: 'pointer',
+                      transition: 'background 0.2s'
+                    }}
+                  ></span>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {subclass === 'Brawler' && (
+        <div style={{ width: '100%', marginTop: '1rem', textAlign: 'left', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
+          {/* Feature header */}
+          <div style={{ color: '#0b5394', fontWeight: 'bold', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '8px' }}>
+            <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <div style={{ fontWeight: 'bold', color: '#0b5394', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Feature</u></div>
+              <span style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
+                {generateFightinDirtyJSX(sheet)}
+              </span>
+            </span>
+          </div>
+
+          {/* Feature XP progression table */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 24px 24px 24px',
+            gridTemplateRows: 'repeat(4, auto)',
+            columnGap: '6px',
+            rowGap: '2px',
+            alignItems: 'start',
+            marginBottom: '2px',
+            width: '100%',
+            paddingLeft: '4px'
+          }}>
+            {/* Row 1: XP header */}
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>6xp</span>
+            <span></span>
+            <span></span>
+            {/* Row 2: +1 condition effect */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1 condition effect</span>
+            <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <span
+                onClick={() => handleDotClick(brawlerFeatureConditionDots, setBrawlerFeatureConditionDots, 0, [6], 'brawlerFeatureConditionDots')}
+                style={{
+                  width: '15px',
+                  height: '15px',
+                  border: '2px solid #000',
+                  borderRadius: '50%',
+                  display: 'block',
+                  background: brawlerFeatureConditionDots[0] ? '#000' : '#fff',
+                  cursor: 'pointer',
+                  transition: 'background 0.2s'
+                }}
+              ></span>
+            </span>
+            <span></span>
+            <span></span>
+
+            {/* Row 3: XP header */}
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>6xp</span>
+            <span></span>
+            <span></span>
+            {/* Row 4: Inflict condition(s) against enemies who Strike you */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>Inflict condition(s) against enemies who <b><i style={{ color: '#351c75' }}>Strike</i></b> you</span>
+            <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <span
+                onClick={() => handleDotClick(brawlerFeatureCounterDots, setBrawlerFeatureCounterDots, 0, [6], 'brawlerFeatureCounterDots')}
+                style={{
+                  width: '15px',
+                  height: '15px',
+                  border: '2px solid #000',
+                  borderRadius: '50%',
+                  display: 'block',
+                  background: brawlerFeatureCounterDots[0] ? '#000' : '#fff',
+                  cursor: 'pointer',
+                  transition: 'background 0.2s'
+                }}
+              ></span>
+            </span>
+            <span></span>
+            <span></span>
+          </div>
+
+          {/* Technique Section */}
+          <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <div style={{ fontWeight: 'bold', color: '#bf9000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Technique</u></div>
+            <div style={{ color: '#000', fontWeight: 400, fontSize: '1em', marginBottom: '8px' }}>
+              {generateTheOlOneTwoJSX(sheet)}
+            </div>
+
+            {/* Technique XP progression table */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 24px 24px 24px',
+              gridTemplateRows: 'repeat(10, auto)',
+              columnGap: '6px',
+              rowGap: '2px',
+              alignItems: 'start',
+              marginBottom: '2px',
+              width: '100%',
+              paddingLeft: '4px'
+            }}>
+              {/* Row 1: XP header */}
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>3xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>6xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>9xp</span>
+              {/* Row 2: +1hx range */}
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1hx</span>
+              {[0,1,2].map(idx => (
+                <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                  <span
+                    onClick={() => handleDotClick(brawlerTechniqueRangeDots, setBrawlerTechniqueRangeDots, idx, [3, 6, 9], 'brawlerTechniqueRangeDots')}
+                    style={{
+                      width: '15px',
+                      height: '15px',
+                      border: '2px solid #000',
+                      borderRadius: '50%',
+                      display: 'block',
+                      background: brawlerTechniqueRangeDots[idx] ? '#000' : '#fff',
+                      cursor: (idx === 0 || brawlerTechniqueRangeDots.slice(0, idx).every(Boolean)) ? 'pointer' : 'not-allowed',
+                      transition: 'background 0.2s'
+                    }}
+                  ></span>
+                </span>
+              ))}
+
+              {/* Row 3: XP header */}
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>3xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>4xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>6xp</span>
+              {/* Row 4: +1hx Slam */}
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1hx <b><i>Slam</i></b></span>
+              {[0,1,2].map(idx => (
+                <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                  <span
+                    onClick={() => handleDotClick(brawlerTechniqueSlamDots, setBrawlerTechniqueSlamDots, idx, [3, 4, 6], 'brawlerTechniqueSlamDots')}
+                    style={{
+                      width: '15px',
+                      height: '15px',
+                      border: '2px solid #000',
+                      borderRadius: '50%',
+                      display: 'block',
+                      background: brawlerTechniqueSlamDots[idx] ? '#000' : '#fff',
+                      cursor: (idx === 0 || brawlerTechniqueSlamDots.slice(0, idx).every(Boolean)) ? 'pointer' : 'not-allowed',
+                      transition: 'background 0.2s'
+                    }}
+                  ></span>
+                </span>
+              ))}
+
+              {/* Row 5: XP header */}
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>6xp</span>
+              <span></span>
+              <span></span>
+              {/* Row 6: Inflict Spike (Bludgeoning) */}
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>Inflict <b><i>Spike</i></b> <b>(</b><b><u style={{ color: '#915927', display: 'inline-flex', alignItems: 'center' }}>Bludgeoning<img src="/Bludgeoning.png" alt="Bludgeoning" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b><b>)</b></span>
+              <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <span
+                  onClick={() => handleDotClick(brawlerTechniqueSpikeDots, setBrawlerTechniqueSpikeDots, 0, [6], 'brawlerTechniqueSpikeDots')}
+                  style={{
+                    width: '15px',
+                    height: '15px',
+                    border: '2px solid #000',
+                    borderRadius: '50%',
+                    display: 'block',
+                    background: brawlerTechniqueSpikeDots[0] ? '#000' : '#fff',
+                    cursor: 'pointer',
+                    transition: 'background 0.2s'
+                  }}
+                ></span>
+              </span>
+              <span></span>
+              <span></span>
+
+              {/* Row 7: XP header */}
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>5xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>8xp</span>
+              <span></span>
+              {/* Row 8: -1 Cooldown */}
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>-1 Cooldown</span>
+              {[0,1].map(idx => (
+                <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                  <span
+                    onClick={() => handleDotClick(brawlerTechniqueCooldownDots, setBrawlerTechniqueCooldownDots, idx, [5, 8], 'brawlerTechniqueCooldownDots')}
+                    style={{
+                      width: '15px',
+                      height: '15px',
+                      border: '2px solid #000',
+                      borderRadius: '50%',
+                      display: 'block',
+                      background: brawlerTechniqueCooldownDots[idx] ? '#000' : '#fff',
+                      cursor: (idx === 0 || brawlerTechniqueCooldownDots[0]) ? 'pointer' : 'not-allowed',
+                      transition: 'background 0.2s'
+                    }}
+                  ></span>
+                </span>
+              ))}
+              <span></span>
+            </div>
+          </div>
+
+          {/* Hit Points Section */}
+          <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <div style={{ fontWeight: 'bold', color: '#990000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Hit Points</u></div>
+            <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <b><i>Extra</i> <i style={{ color: '#990000' }}>Hit Points.</i></b> +<b>[{brawlerHitPointsDots.filter(Boolean).length * 10}]</b> <b><i style={{ color: '#990000' }}>Hit Points</i></b>.
+            </div>
+
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 24px 24px 24px',
+              gridTemplateRows: 'repeat(2, auto)',
+              columnGap: '6px',
+              rowGap: '2px',
+              alignItems: 'start',
+              marginBottom: '2px',
+              width: '100%',
+              paddingLeft: '4px'
+            }}>
+              {/* Row 1: XP header */}
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>7xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>13xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>19xp</span>
+              {/* Row 2: +10 Hit Points dots */}
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+10 <b><i style={{ color: '#990000' }}>Hit Points</i></b></span>
+              {[0,1,2].map(idx => (
+                <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                  <span
+                    onClick={() => handleDotClick(brawlerHitPointsDots, setBrawlerHitPointsDots, idx, [7, 13, 19], 'brawlerHitPointsDots')}
+                    style={{
+                      width: '15px',
+                      height: '15px',
+                      border: '2px solid #000',
+                      borderRadius: '50%',
+                      display: 'block',
+                      background: brawlerHitPointsDots[idx] ? '#000' : '#fff',
+                      cursor: (idx === 0 || brawlerHitPointsDots.slice(0, idx).every(Boolean)) ? 'pointer' : 'not-allowed',
+                      transition: 'background 0.2s'
+                    }}
+                  ></span>
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* Strike Section */}
+          <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <div style={{ fontWeight: 'bold', color: '#351c75', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Strike</u></div>
+            <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              {generateBrawlerStrikeJSX(sheet)}
+              {brawlerStrikeExtraDots[0] && <> +<b>[1]</b> <b><i style={{ color: '#351c75' }}>Strike</i></b>.</>}
+            </div>
+            
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 24px 24px 24px',
+              gridTemplateRows: 'repeat(6, auto)',
+              columnGap: '6px',
+              rowGap: '2px',
+              alignItems: 'start',
+              marginBottom: '2px',
+              width: '100%',
+              paddingLeft: '4px'
+            }}>
+              {/* Row 1: XP header */}
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>6xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>10xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>18xp</span>
+              {/* Row 2: +1 Damage die dots */}
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1 Damage die</span>
+              {[0,1,2].map(idx => (
+                <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                  <span
+                    onClick={() => handleDotClick(brawlerStrikeDamageDots, setBrawlerStrikeDamageDots, idx, [6, 10, 18], 'brawlerStrikeDamageDots')}
+                    style={{
+                      width: '15px',
+                      height: '15px',
+                      border: '2px solid #000',
+                      borderRadius: '50%',
+                      display: 'block',
+                      background: brawlerStrikeDamageDots[idx] ? '#000' : '#fff',
+                      cursor: (idx === 0 || brawlerStrikeDamageDots.slice(0, idx).every(Boolean)) ? 'pointer' : 'not-allowed',
+                      transition: 'background 0.2s'
+                    }}
+                  ></span>
+                </span>
+              ))}
+
+              {/* Row 3: XP header */}
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>8xp</span>
+              <span></span>
+              <span></span>
+              {/* Row 4: Inflict Spike (Bludgeoning) */}
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>Inflict <b><i>Spike</i></b> <b>(</b><b><u style={{ color: '#915927', display: 'inline-flex', alignItems: 'center' }}>Bludgeoning<img src="/Bludgeoning.png" alt="Bludgeoning" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b><b>)</b></span>
+              <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <span
+                  onClick={() => handleDotClick(brawlerStrikeSpikeDots, setBrawlerStrikeSpikeDots, 0, [8], 'brawlerStrikeSpikeDots')}
+                  style={{
+                    width: '15px',
+                    height: '15px',
+                    border: '2px solid #000',
+                    borderRadius: '50%',
+                    display: 'block',
+                    background: brawlerStrikeSpikeDots[0] ? '#000' : '#fff',
+                    cursor: 'pointer',
+                    transition: 'background 0.2s'
+                  }}
+                ></span>
+              </span>
+              <span></span>
+              <span></span>
+
+              {/* Row 5: XP header */}
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>10xp</span>
+              <span></span>
+              <span></span>
+              {/* Row 6: +1 Strike */}
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1 <i><b>Strike</b></i></span>
+              <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <span
+                  onClick={() => handleDotClick(brawlerStrikeExtraDots, setBrawlerStrikeExtraDots, 0, [10], 'brawlerStrikeExtraDots')}
+                  style={{
+                    width: '15px',
+                    height: '15px',
+                    border: '2px solid #000',
+                    borderRadius: '50%',
+                    display: 'block',
+                    background: brawlerStrikeExtraDots[0] ? '#000' : '#fff',
+                    cursor: 'pointer',
+                    transition: 'background 0.2s'
+                  }}
+                ></span>
+              </span>
+              <span></span>
+              <span></span>
+            </div>
+          </div>
+
+          {/* Movement Section */}
+          <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <div style={{ fontWeight: 'bold', color: '#38761d', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Movement</u></div>
+            <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <b><i>Enhanced <span style={{ color: '#38761d' }}>Movement</span> Effects.</i></b>
+            </div>
+
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 24px 24px 24px',
+              gridTemplateRows: 'repeat(2, auto)',
+              columnGap: '6px',
+              rowGap: '2px',
+              alignItems: 'start',
+              marginBottom: '2px',
+              width: '100%',
+              paddingLeft: '4px'
+            }}>
+              {/* Row 1: XP header */}
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>7xp</span>
+              <span></span>
+              <span></span>
+              {/* Row 2: +1 Speed */}
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1 <b><i><span style={{ color: '#38761d' }}>Speed</span></i></b></span>
+              <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <span
+                  onClick={() => handleDotClick(brawlerMovementSpeedDots, setBrawlerMovementSpeedDots, 0, [7], 'brawlerMovementSpeedDots')}
+                  style={{
+                    width: '15px',
+                    height: '15px',
+                    border: '2px solid #000',
+                    borderRadius: '50%',
+                    display: 'block',
+                    background: brawlerMovementSpeedDots[0] ? '#000' : '#fff',
+                    cursor: 'pointer',
+                    transition: 'background 0.2s'
+                  }}
+                ></span>
+              </span>
+              <span></span>
+              <span></span>
+            </div>
+          </div>
+
+          {/* Perks Section */}
+          <div style={{ marginTop: '12px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <div style={{ fontWeight: 'bold', color: '#000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Perks</u></div>
+            <div style={{ fontSize: '1em', color: '#000', marginBottom: '6px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <i><b>Skills.</b> Survival</i> +2
+            </div>
+            <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 24px 24px 24px',
+                gridTemplateRows: 'auto auto',
+                columnGap: '6px',
+                rowGap: '2px',
+                alignItems: 'start',
+                marginTop: '-12px',
+                marginBottom: '2px',
+                width: '100%',
+                paddingLeft: '4px'
+              }}>
+                {/* Row 1: Empty cells and 10sp header */}
+                <span></span>
+                <span></span>
+                <span></span>
+                <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>10sp</span>
+                {/* Row 2: Grappler Schematics text and dot */}
+                <div style={{ 
+                  fontSize: '1em', 
+                  fontFamily: 'Arial, Helvetica, sans-serif', 
+                  textAlign: 'left',
+                  paddingRight: '8px',
+                  lineHeight: '1.2',
+                  gridColumn: '1 / 4'
+                }}>
+                  <b><i style={{ color: '#d8a53d', fontSize: '1em' }}>Grappler Schematics.</i></b> Your exosuit allows you to perform heroic feats of athleticism, from scaling walls to jumping impossible distances to wrestling giants. Gain an advantage on related skill rolls.
+                </div>
+                <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start' }}>
+                  <span
+                    onClick={() => handleSpDotClick(brawlerPerksSkillsDots, setBrawlerPerksSkillsDots, 0, [10], 'brawlerPerksSkillsDots')}
+                    style={{
+                      width: '15px',
+                      height: '15px',
+                      border: '2px solid #000',
+                      borderRadius: '50%',
+                      display: 'block',
+                      background: brawlerPerksSkillsDots[0] ? '#000' : '#fff',
                       cursor: 'pointer',
                       transition: 'background 0.2s'
                     }}
