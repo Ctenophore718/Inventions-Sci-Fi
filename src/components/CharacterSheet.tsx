@@ -47,6 +47,8 @@ import { generateWaterStrikeDamageJSX } from "../utils/waterStrike";
 import { generateSteelWingsJSX } from "../utils/aeronautFeature";
 import { generateAeronautStrikeJSX, generateAeronautStrikeDamageJSX } from "../utils/aeronautStrike";
 
+import { generateFightinDirtyJSX } from "../utils/brawlerFeature";
+
 import { generateMartyrJSX } from "../utils/astralFeature";
 import { generateAstralStrikeDamageJSX } from "../utils/astralStrike";
 import { generateAggressionJSX } from "../utils/chaosFeature";
@@ -839,11 +841,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
     </span>
   );
 
-  const brawlerFeatureJSX = (
-    <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#d8a53d' }}>Fightin' Dirty.</i></b> When you <b><i style={{ color: '#351c75' }}>Strike</i></b> an enemy, you inflict <b>[1]</b> of the following conditions: <b><i>Blind</i></b>, <b><i>Spike</i></b> (<b><u style={{ color: '#915927' }}>Bludgeoning<img src="/Bludgeoning.png" alt="Bludgeoning" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>), or <b><i>Restrain</i></b>.
-    </span>
-  );
+  const brawlerFeatureJSX = generateFightinDirtyJSX(sheet);
 
   const dreadnaughtFeatureJSX = (
     <span style={{ color: '#000', fontWeight: 400 }}>
