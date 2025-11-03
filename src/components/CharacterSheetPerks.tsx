@@ -275,6 +275,27 @@ const CharacterSheetPerks: React.FC<CharacterSheetPerksProps> = ({
               <b><i style={{ color: '#3da1d8' }}>Aerial Ace.</i></b> <span style={{ color: '#000' }}>You have expert experience with flying and can predict air currents, inertial motions and cross-vectors for any flying object. Gain an advantage on related skills rolls.</span>
             </span>
           </div>
+          )} 
+          {subclass === 'Brawler' && (sheet?.subclassProgressionDots as any)?.brawlerPerksSkillsDots?.[0] && (
+          <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <span>
+              <b><i style={{ color: '#d8a53d' }}>Brawler Schematics.</i></b> <span style={{ color: '#000' }}>Your exosuit allows you to perform heroic feats of athleticism, from scaling walls to jumping impossible distances to wrestling giants. Gain an advantage on related skill rolls.</span>
+            </span>
+          </div>
+          )} 
+          {subclass === 'Dreadnaught' && (sheet?.subclassProgressionDots as any)?.dreadnaughtPerksSkillsDots?.[0] && (
+          <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <span>
+              <b><i style={{ color: '#d83da0' }}>Implaccable Will.</i></b> <span style={{ color: '#000' }}>You are steadfast and determined in everything you do and tend to easily see the clearest path to your goals. As such, you aren't easily swayed by the words or actions of others. Gain an advantage on related skill rolls.</span>
+            </span>
+          </div>
+          )} 
+          {subclass === 'Spectre' && (sheet?.subclassProgressionDots as any)?.spectrePerksSkillsDots?.[0] && (
+          <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <span>
+              <b><i style={{ color: '#6a3dd8' }}>Quantum Cloaking Array.</i></b> <span style={{ color: '#000' }}>Your suit allows you to become invisible to the naked eye at any time outside of combat. Only the appropriate magical abilities or technological gear can see you. Gain an advantage on related skill rolls.</span>
+            </span>
+          </div>
           )}                                          
         </div>
       </div>

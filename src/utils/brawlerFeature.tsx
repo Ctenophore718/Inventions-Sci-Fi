@@ -12,7 +12,7 @@ export const generateFightinDirtyJSX = (sheet: CharacterSheet | null): React.JSX
   
   return (
     <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#d8a53d' }}>Fightin' Dirty.</i></b> When you <b><i style={{ color: '#351c75' }}>Strike</i></b> an enemy, you inflict <b>[{hasExtraCondition ? '2' : '1'}]</b> of the following conditions: <b><i>Blind</i></b>, <b><i>Spike</i></b> <b>(</b><b><u style={{ color: '#915927', display: 'inline-flex', alignItems: 'center' }}>Bludgeoning<img src="/Bludgeoning.png" alt="Bludgeoning" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b><b>)</b>, or <b><i>Restrain</i></b>.{hasCounter && <> Additionally, when enemies <b><i style={{ color: '#351c75' }}>Strike</i></b> you, they are inflicted with <b>[1]</b> of the above conditions.</>}
+      <b><i style={{ color: '#d8a53d' }}>Fightin' Dirty.</i></b> When you <b><i style={{ color: '#351c75' }}>Strike</i></b> an enemy or when an enemy <b>[{hasCounter ? <i style={{ color: '#351c75' }}>Strikes</i> : ' - '}]</b> you, you inflict <b>[{hasExtraCondition ? '2' : '1'}]</b> of the following conditions: <b><i>Blind</i></b>, <b><i>Spike</i></b> <b>(</b><b><u style={{ color: '#915927', display: 'inline-flex', alignItems: 'center' }}>Bludgeoning<img src="/Bludgeoning.png" alt="Bludgeoning" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b><b>)</b>, or <b><i>Restrain</i></b>.
     </span>
   );
 };

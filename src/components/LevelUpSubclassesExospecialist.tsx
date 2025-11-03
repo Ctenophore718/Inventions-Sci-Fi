@@ -7,6 +7,12 @@ import { generateAeronautStrikeJSX } from "../utils/aeronautStrike";
 import { generateFightinDirtyJSX } from "../utils/brawlerFeature";
 import { generateTheOlOneTwoJSX } from "../utils/brawlerTechnique";
 import { generateBrawlerStrikeJSX } from "../utils/brawlerStrike";
+import { generateToweringDefenseJSX } from "../utils/dreadnaughtFeature";
+import { generateBarrageJSX } from "../utils/dreadnaughtTechnique";
+import { generateDreadnaughtStrikeJSX } from "../utils/dreadnaughtStrike";
+import { generateHoloFieldJSX } from "../utils/spectreFeature";
+import { generateStealthModeJSX } from "../utils/spectreTechnique";
+import { generateSpectreStrikeJSX } from "../utils/spectreStrike";
 
 type LevelUpSubclassesExospecialistProps = {
   sheet: CharacterSheet | null;
@@ -103,6 +109,67 @@ const LevelUpSubclassesExospecialist: React.FC<LevelUpSubclassesExospecialistPro
   );
   const [brawlerPerksSkillsDots, setBrawlerPerksSkillsDots] = useState<boolean[]>(
     (sheet?.subclassProgressionDots as any)?.brawlerPerksSkillsDots || [false]
+  );
+
+  // Independent state for Dreadnaught dots
+  const [dreadnaughtFeatureBounceImmunityDots, setDreadnaughtFeatureBounceImmunityDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.dreadnaughtFeatureBounceImmunityDots || [false]
+  );
+  const [dreadnaughtFeatureMesmerizeImmunityDots, setDreadnaughtFeatureMesmerizeImmunityDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.dreadnaughtFeatureMesmerizeImmunityDots || [false]
+  );
+  const [dreadnaughtFeatureRestrainImmunityDots, setDreadnaughtFeatureRestrainImmunityDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.dreadnaughtFeatureRestrainImmunityDots || [false]
+  );
+  const [dreadnaughtFeatureSlamImmunityDots, setDreadnaughtFeatureSlamImmunityDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.dreadnaughtFeatureSlamImmunityDots || [false]
+  );
+  const [dreadnaughtTechniqueExtraAttackDots, setDreadnaughtTechniqueExtraAttackDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.dreadnaughtTechniqueExtraAttackDots || [false]
+  );
+  const [dreadnaughtTechniqueCooldownDots, setDreadnaughtTechniqueCooldownDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.dreadnaughtTechniqueCooldownDots || [false, false]
+  );
+  const [dreadnaughtHitPointsDots, setDreadnaughtHitPointsDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.dreadnaughtHitPointsDots || [false, false, false]
+  );
+  const [dreadnaughtHitPointsExtraDots, setDreadnaughtHitPointsExtraDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.dreadnaughtHitPointsExtraDots || [false]
+  );
+  const [dreadnaughtStrikeDamageDots, setDreadnaughtStrikeDamageDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.dreadnaughtStrikeDamageDots || [false, false, false]
+  );
+  const [dreadnaughtPerksSkillsDots, setDreadnaughtPerksSkillsDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.dreadnaughtPerksSkillsDots || [false]
+  );
+
+  // Independent state for Spectre dots
+  const [spectreFeatureExtraCoverDieDots, setSpectreFeatureExtraCoverDieDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.spectreFeatureExtraCoverDieDots || [false]
+  );
+  const [spectreTechniqueTeleportDots, setSpectreTechniqueTeleportDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.spectreTechniqueTeleportDots || [false, false, false]
+  );
+  const [spectreTechniqueCannotBeTargetedDots, setSpectreTechniqueCannotBeTargetedDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.spectreTechniqueCannotBeTargetedDots || [false]
+  );
+  const [spectreTechniqueCooldownDots, setSpectreTechniqueCooldownDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.spectreTechniqueCooldownDots || [false, false]
+  );
+  const [spectreHitPointsDots, setSpectreHitPointsDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.spectreHitPointsDots || [false, false]
+  );
+  const [spectreStrikeDamageDots, setSpectreStrikeDamageDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.spectreStrikeDamageDots || [false, false, false]
+  );
+  const [spectreStrikeExtraDots, setSpectreStrikeExtraDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.spectreStrikeExtraDots || [false]
+  );
+  const [spectreMovementSpeedDots, setSpectreMovementSpeedDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.spectreMovementSpeedDots || [false, false, false]
+  );
+  const [spectrePerksSkillsDots, setSpectrePerksSkillsDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.spectrePerksSkillsDots || [false]
   );
 
   // Helper function to handle XP dot clicking with sequential requirement
@@ -904,7 +971,7 @@ const LevelUpSubclassesExospecialist: React.FC<LevelUpSubclassesExospecialistPro
           <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
             <div style={{ fontWeight: 'bold', color: '#38761d', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Movement</u></div>
             <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
-              <b><i>Enhanced <span style={{ color: '#38761d' }}>Movement</span> Effects.</i></b>
+              <b><i>Enhanced <span style={{ color: '#38761d' }}>Movement</span> Effects.</i></b>{brawlerMovementSpeedDots[0] && <> +<b>[1]</b>hx <b><i style={{ color: '#38761d' }}>Speed</i></b>.</>}
             </div>
 
             <div style={{
@@ -924,7 +991,7 @@ const LevelUpSubclassesExospecialist: React.FC<LevelUpSubclassesExospecialistPro
               <span></span>
               <span></span>
               {/* Row 2: +1 Speed */}
-              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1 <b><i><span style={{ color: '#38761d' }}>Speed</span></i></b></span>
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1hx <b><i><span style={{ color: '#38761d' }}>Speed</span></i></b></span>
               <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                 <span
                   onClick={() => handleDotClick(brawlerMovementSpeedDots, setBrawlerMovementSpeedDots, 0, [7], 'brawlerMovementSpeedDots')}
@@ -997,6 +1064,758 @@ const LevelUpSubclassesExospecialist: React.FC<LevelUpSubclassesExospecialistPro
                 </span>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {subclass === 'Dreadnaught' && (
+        <div style={{ width: '100%', marginTop: '1rem', textAlign: 'left', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
+          {/* Feature header */}
+          <div style={{ color: '#0b5394', fontWeight: 'bold', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '8px' }}>
+            <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <div style={{ fontWeight: 'bold', color: '#0b5394', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Feature</u></div>
+              <span style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
+                {generateToweringDefenseJSX(sheet)}
+              </span>
+            </span>
+          </div>
+
+          {/* Feature XP progression table */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 24px 24px 24px',
+            gridTemplateRows: 'repeat(8, auto)',
+            columnGap: '6px',
+            rowGap: '2px',
+            alignItems: 'start',
+            marginBottom: '2px',
+            width: '100%',
+            paddingLeft: '4px'
+          }}>
+            {/* Row 1: XP header */}
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>3xp</span>
+            <span></span>
+            <span></span>
+            {/* Row 2: Bounce Immunity */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}><i><b>Bounce</b> Immunity</i></span>
+            <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <span
+                onClick={() => handleSpDotClick(dreadnaughtFeatureBounceImmunityDots, setDreadnaughtFeatureBounceImmunityDots, 0, [3], 'dreadnaughtFeatureBounceImmunityDots')}
+                style={{
+                  width: '15px',
+                  height: '15px',
+                  border: '2px solid #000',
+                  borderRadius: '50%',
+                  display: 'block',
+                  background: dreadnaughtFeatureBounceImmunityDots[0] ? '#000' : '#fff',
+                  cursor: 'pointer',
+                  transition: 'background 0.2s'
+                }}
+              ></span>
+            </span>
+            <span></span>
+            <span></span>
+
+            {/* Row 3: XP header */}
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>5xp</span>
+            <span></span>
+            <span></span>
+            {/* Row 4: Mesmerize Immunity */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}><i><b>Mesmerize</b> Immunity</i></span>
+            <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <span
+                onClick={() => handleSpDotClick(dreadnaughtFeatureMesmerizeImmunityDots, setDreadnaughtFeatureMesmerizeImmunityDots, 0, [5], 'dreadnaughtFeatureMesmerizeImmunityDots')}
+                style={{
+                  width: '15px',
+                  height: '15px',
+                  border: '2px solid #000',
+                  borderRadius: '50%',
+                  display: 'block',
+                  background: dreadnaughtFeatureMesmerizeImmunityDots[0] ? '#000' : '#fff',
+                  cursor: 'pointer',
+                  transition: 'background 0.2s'
+                }}
+              ></span>
+            </span>
+            <span></span>
+            <span></span>
+
+            {/* Row 5: XP header */}
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>5xp</span>
+            <span></span>
+            <span></span>
+            {/* Row 6: Restrain Immunity */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}><i><b>Restrain</b> Immunity</i></span>
+            <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <span
+                onClick={() => handleSpDotClick(dreadnaughtFeatureRestrainImmunityDots, setDreadnaughtFeatureRestrainImmunityDots, 0, [5], 'dreadnaughtFeatureRestrainImmunityDots')}
+                style={{
+                  width: '15px',
+                  height: '15px',
+                  border: '2px solid #000',
+                  borderRadius: '50%',
+                  display: 'block',
+                  background: dreadnaughtFeatureRestrainImmunityDots[0] ? '#000' : '#fff',
+                  cursor: 'pointer',
+                  transition: 'background 0.2s'
+                }}
+              ></span>
+            </span>
+            <span></span>
+            <span></span>
+
+            {/* Row 7: XP header */}
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>3xp</span>
+            <span></span>
+            <span></span>
+            {/* Row 8: Slam Immunity */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}><i><b>Slam</b> Immunity</i></span>
+            <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <span
+                onClick={() => handleSpDotClick(dreadnaughtFeatureSlamImmunityDots, setDreadnaughtFeatureSlamImmunityDots, 0, [3], 'dreadnaughtFeatureSlamImmunityDots')}
+                style={{
+                  width: '15px',
+                  height: '15px',
+                  border: '2px solid #000',
+                  borderRadius: '50%',
+                  display: 'block',
+                  background: dreadnaughtFeatureSlamImmunityDots[0] ? '#000' : '#fff',
+                  cursor: 'pointer',
+                  transition: 'background 0.2s'
+                }}
+              ></span>
+            </span>
+            <span></span>
+            <span></span>
+          </div>
+
+          {/* Technique Section */}
+          <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <div style={{ fontWeight: 'bold', color: '#bf9000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Technique</u></div>
+            <div style={{ color: '#000', fontWeight: 400, fontSize: '1em', marginBottom: '8px' }}>
+              {generateBarrageJSX(sheet)}
+            </div>
+
+            {/* Technique XP progression table */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 24px 24px 24px',
+              gridTemplateRows: 'repeat(4, auto)',
+              columnGap: '6px',
+              rowGap: '2px',
+              alignItems: 'start',
+              marginBottom: '2px',
+              width: '100%',
+              paddingLeft: '4px'
+            }}>
+              {/* Row 1: XP header */}
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>20xp</span>
+              <span></span>
+              <span></span>
+              {/* Row 2: +1 of each Attack */}
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1 of each <b><i style={{ color: '#990000' }}>Attack</i></b></span>
+              <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <span
+                  onClick={() => handleDotClick(dreadnaughtTechniqueExtraAttackDots, setDreadnaughtTechniqueExtraAttackDots, 0, [20], 'dreadnaughtTechniqueExtraAttackDots')}
+                  style={{
+                    width: '15px',
+                    height: '15px',
+                    border: '2px solid #000',
+                    borderRadius: '50%',
+                    display: 'block',
+                    background: dreadnaughtTechniqueExtraAttackDots[0] ? '#000' : '#fff',
+                    cursor: 'pointer',
+                    transition: 'background 0.2s'
+                  }}
+                ></span>
+              </span>
+              <span></span>
+              <span></span>
+
+              {/* Row 3: XP header */}
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>6xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>9xp</span>
+              <span></span>
+              {/* Row 4: -1 Cooldown */}
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>-1 <i>Cooldown</i></span>
+              {[0,1].map(idx => (
+                <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                  <span
+                    onClick={() => handleDotClick(dreadnaughtTechniqueCooldownDots, setDreadnaughtTechniqueCooldownDots, idx, [6, 9], 'dreadnaughtTechniqueCooldownDots')}
+                    style={{
+                      width: '15px',
+                      height: '15px',
+                      border: '2px solid #000',
+                      borderRadius: '50%',
+                      display: 'block',
+                      background: dreadnaughtTechniqueCooldownDots[idx] ? '#000' : '#fff',
+                      cursor: (idx === 0 || dreadnaughtTechniqueCooldownDots[0]) ? 'pointer' : 'not-allowed',
+                      transition: 'background 0.2s'
+                    }}
+                  ></span>
+                </span>
+              ))}
+              <span></span>
+            </div>
+          </div>
+
+          {/* Hit Points Section */}
+          <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <div style={{ fontWeight: 'bold', color: '#990000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Hit Points</u></div>
+            <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <b><i>Extra</i> <i style={{ color: '#990000' }}>Hit Points.</i></b> +<b>[{dreadnaughtHitPointsDots.filter(Boolean).length * 10 + (dreadnaughtHitPointsExtraDots[0] ? 20 : 0)}]</b> <b><i style={{ color: '#990000' }}>Hit Points</i></b>.
+            </div>
+
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 24px 24px 24px',
+              gridTemplateRows: 'repeat(4, auto)',
+              columnGap: '6px',
+              rowGap: '2px',
+              alignItems: 'start',
+              marginBottom: '2px',
+              width: '100%',
+              paddingLeft: '4px'
+            }}>
+              {/* Row 1: XP header */}
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>5xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>10xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>15xp</span>
+              {/* Row 2: +10 Hit Points dots */}
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+10 <b><i style={{ color: '#990000' }}>Hit Points</i></b></span>
+              {[0,1,2].map(idx => (
+                <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                  <span
+                    onClick={() => handleDotClick(dreadnaughtHitPointsDots, setDreadnaughtHitPointsDots, idx, [5, 10, 15], 'dreadnaughtHitPointsDots')}
+                    style={{
+                      width: '15px',
+                      height: '15px',
+                      border: '2px solid #000',
+                      borderRadius: '50%',
+                      display: 'block',
+                      background: dreadnaughtHitPointsDots[idx] ? '#000' : '#fff',
+                      cursor: (idx === 0 || dreadnaughtHitPointsDots.slice(0, idx).every(Boolean)) ? 'pointer' : 'not-allowed',
+                      transition: 'background 0.2s'
+                    }}
+                  ></span>
+                </span>
+              ))}
+
+              {/* Row 3: XP header */}
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>20xp</span>
+              <span></span>
+              <span></span>
+              {/* Row 4: +20 Hit Points */}
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+20 <b><i style={{ color: '#990000' }}>Hit Points</i></b></span>
+              <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <span
+                  onClick={() => handleDotClick(dreadnaughtHitPointsExtraDots, setDreadnaughtHitPointsExtraDots, 0, [20], 'dreadnaughtHitPointsExtraDots')}
+                  style={{
+                    width: '15px',
+                    height: '15px',
+                    border: '2px solid #000',
+                    borderRadius: '50%',
+                    display: 'block',
+                    background: dreadnaughtHitPointsExtraDots[0] ? '#000' : '#fff',
+                    cursor: 'pointer',
+                    transition: 'background 0.2s'
+                  }}
+                ></span>
+              </span>
+              <span></span>
+              <span></span>
+            </div>
+          </div>
+
+          {/* Strike Section */}
+          <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <div style={{ fontWeight: 'bold', color: '#351c75', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Strike</u></div>
+            <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              {generateDreadnaughtStrikeJSX(sheet)}
+            </div>
+            
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 24px 24px 24px',
+              gridTemplateRows: 'repeat(2, auto)',
+              columnGap: '6px',
+              rowGap: '2px',
+              alignItems: 'start',
+              marginBottom: '2px',
+              width: '100%',
+              paddingLeft: '4px'
+            }}>
+              {/* Row 1: XP header */}
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>6xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>10xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>18xp</span>
+              {/* Row 2: +2 Damage dice dots */}
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+2 Damage dice</span>
+              {[0,1,2].map(idx => (
+                <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                  <span
+                    onClick={() => handleDotClick(dreadnaughtStrikeDamageDots, setDreadnaughtStrikeDamageDots, idx, [6, 10, 18], 'dreadnaughtStrikeDamageDots')}
+                    style={{
+                      width: '15px',
+                      height: '15px',
+                      border: '2px solid #000',
+                      borderRadius: '50%',
+                      display: 'block',
+                      background: dreadnaughtStrikeDamageDots[idx] ? '#000' : '#fff',
+                      cursor: (idx === 0 || dreadnaughtStrikeDamageDots.slice(0, idx).every(Boolean)) ? 'pointer' : 'not-allowed',
+                      transition: 'background 0.2s'
+                    }}
+                  ></span>
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* Perks Section */}
+          <div style={{ marginTop: '12px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <div style={{ fontWeight: 'bold', color: '#000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Perks</u></div>
+            <div style={{ fontSize: '1em', color: '#000', marginBottom: '6px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <i><b>Skills.</b> Intimidation</i> +2
+            </div>
+            <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 24px 24px 24px',
+                gridTemplateRows: 'auto auto',
+                columnGap: '6px',
+                rowGap: '2px',
+                alignItems: 'start',
+                marginTop: '-12px',
+                marginBottom: '2px',
+                width: '100%',
+                paddingLeft: '4px'
+              }}>
+                {/* Row 1: Empty cells and 8sp header */}
+                <span></span>
+                <span></span>
+                <span></span>
+                <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>8sp</span>
+                {/* Row 2: Implacable Will text and dot */}
+                <div style={{ 
+                  fontSize: '1em', 
+                  fontFamily: 'Arial, Helvetica, sans-serif', 
+                  textAlign: 'left',
+                  paddingRight: '8px',
+                  lineHeight: '1.2',
+                  gridColumn: '1 / 4'
+                }}>
+                  <b><i style={{ color: '#d83da0', fontSize: '1em' }}>Implacable Will.</i></b> You are steadfast and determined in everything you do and tend to easily see the clearest path to your goals. As such, you aren't easily swayed by the words or actions of others. Gain an advantage on related skill rolls.
+                </div>
+                <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start' }}>
+                  <span
+                    onClick={() => handleSpDotClick(dreadnaughtPerksSkillsDots, setDreadnaughtPerksSkillsDots, 0, [8], 'dreadnaughtPerksSkillsDots')}
+                    style={{
+                      width: '15px',
+                      height: '15px',
+                      border: '2px solid #000',
+                      borderRadius: '50%',
+                      display: 'block',
+                      background: dreadnaughtPerksSkillsDots[0] ? '#000' : '#fff',
+                      cursor: 'pointer',
+                      transition: 'background 0.2s'
+                    }}
+                  ></span>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Spectre Subclass */}
+      {subclass === 'Spectre' && (
+        <div style={{ width: '100%', marginTop: '1rem', textAlign: 'left', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
+          {/* Feature header */}
+          <div style={{ color: '#0b5394', fontWeight: 'bold', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '8px' }}>
+            <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <div style={{ fontWeight: 'bold', color: '#0b5394', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Feature</u></div>
+              <span style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
+                {generateHoloFieldJSX(sheet)}
+              </span>
+            </span>
+          </div>
+
+          {/* Feature XP progression table */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 24px 24px 24px',
+            gridTemplateRows: 'auto',
+            columnGap: '6px',
+            rowGap: '2px',
+            alignItems: 'start',
+            marginBottom: '2px',
+            width: '100%',
+            paddingLeft: '4px'
+          }}>
+            {/* Row 1: XP header */}
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>3xp</span>
+            <span></span>
+            <span></span>
+            {/* Row 2: Extra Cover Die */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1 Cover die, discard next lowest</span>
+            <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <span
+                onClick={() => handleSpDotClick(spectreFeatureExtraCoverDieDots, setSpectreFeatureExtraCoverDieDots, 0, [3], 'spectreFeatureExtraCoverDieDots')}
+                style={{
+                  width: '15px',
+                  height: '15px',
+                  border: '2px solid #000',
+                  borderRadius: '50%',
+                  display: 'block',
+                  background: spectreFeatureExtraCoverDieDots[0] ? '#000' : '#fff',
+                  cursor: 'pointer',
+                  transition: 'background 0.2s'
+                }}
+              ></span>
+            </span>
+            <span></span>
+            <span></span>
+          </div>
+
+          <hr style={{ margin: '16px 0', border: 0, borderTop: '1px solid #ddd' }} />
+
+          {/* Technique header */}
+          <div style={{ color: '#bf9000', fontWeight: 'bold', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '8px' }}>
+            <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <div style={{ fontWeight: 'bold', color: '#bf9000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Technique</u></div>
+              <span style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
+                {generateStealthModeJSX(sheet)}
+              </span>
+            </span>
+          </div>
+
+          {/* Technique XP progression table */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 24px 24px 24px',
+            columnGap: '6px',
+            rowGap: '2px',
+            alignItems: 'start',
+            marginBottom: '2px',
+            width: '100%',
+            paddingLeft: '4px'
+          }}>
+            {/* Row 1: XP headers */}
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>3xp</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>6xp</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>9xp</span>
+            {/* Row 2: Teleport +1hx */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}><span style={{ color: '#38761d' }}><b><i>Teleport</i></b></span> +1hx</span>
+            {[0, 1, 2].map(i => (
+              <span key={i} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <span
+                  onClick={() => handleDotClick(spectreTechniqueTeleportDots, setSpectreTechniqueTeleportDots, i, [3, 6, 9], 'spectreTechniqueTeleportDots')}
+                  style={{
+                    width: '15px',
+                    height: '15px',
+                    border: '2px solid #000',
+                    borderRadius: '50%',
+                    display: 'block',
+                    background: spectreTechniqueTeleportDots[i] ? '#000' : '#fff',
+                    cursor: (i === 0 || spectreTechniqueTeleportDots[i - 1]) ? 'pointer' : 'not-allowed',
+                    transition: 'background 0.2s'
+                  }}
+                ></span>
+              </span>
+            ))}
+            <span></span>
+            <span></span>
+
+            {/* Row 3: XP header */}
+            <span></span>
+            <span></span>
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>17xp</span>
+            <span></span>
+            <span></span>
+            {/* Row 4: Cannot be targeted */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>Cannot be targeted</span>
+            <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <span
+                onClick={() => handleSpDotClick(spectreTechniqueCannotBeTargetedDots, setSpectreTechniqueCannotBeTargetedDots, 0, [17], 'spectreTechniqueCannotBeTargetedDots')}
+                style={{
+                  width: '15px',
+                  height: '15px',
+                  border: '2px solid #000',
+                  borderRadius: '50%',
+                  display: 'block',
+                  background: spectreTechniqueCannotBeTargetedDots[0] ? '#000' : '#fff',
+                  cursor: 'pointer',
+                  transition: 'background 0.2s'
+                }}
+              ></span>
+            </span>
+            <span></span>
+            <span></span>
+
+            {/* Row 5: XP headers */}
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>5xp</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>10xp</span>
+            <span></span>
+            {/* Row 6: -1 Cooldown */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>-1 Cooldown</span>
+            {[0, 1].map(i => (
+              <span key={i} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <span
+                  onClick={() => handleDotClick(spectreTechniqueCooldownDots, setSpectreTechniqueCooldownDots, i, [5, 10], 'spectreTechniqueCooldownDots')}
+                  style={{
+                    width: '15px',
+                    height: '15px',
+                    border: '2px solid #000',
+                    borderRadius: '50%',
+                    display: 'block',
+                    background: spectreTechniqueCooldownDots[i] ? '#000' : '#fff',
+                    cursor: (i === 0 || spectreTechniqueCooldownDots[i - 1]) ? 'pointer' : 'not-allowed',
+                    transition: 'background 0.2s'
+                  }}
+                ></span>
+              </span>
+            ))}
+          </div>
+
+          <hr style={{ margin: '16px 0', border: 0, borderTop: '1px solid #ddd' }} />
+
+          {/* Hit Points header */}
+          <div style={{ color: '#990000', fontWeight: 'bold', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '8px' }}>
+            <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <div style={{ fontWeight: 'bold', color: '#990000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Hit Points</u></div>
+              <span style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
+                <b><i>Extra</i> <i style={{ color: '#990000' }}>Hit Points.</i></b> +<b>[{spectreHitPointsDots.filter(Boolean).length * 10}]</b> <b><i style={{ color: '#990000' }}>Hit Points</i></b>.
+              </span>
+            </span>
+          </div>
+
+          {/* Hit Points XP progression table */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 24px 24px 24px',
+            columnGap: '6px',
+            rowGap: '2px',
+            alignItems: 'start',
+            marginBottom: '2px',
+            width: '100%',
+            paddingLeft: '4px'
+          }}>
+            {/* Row 1: XP headers */}
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>7xp</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>13xp</span>
+            <span></span>
+            {/* Row 2: +10 Hit Points */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+10 <b><i style={{ color: '#990000' }}>Hit Points</i></b></span>
+            {[0, 1].map(i => (
+              <span key={i} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <span
+                  onClick={() => handleDotClick(spectreHitPointsDots, setSpectreHitPointsDots, i, [7, 13], 'spectreHitPointsDots')}
+                  style={{
+                    width: '15px',
+                    height: '15px',
+                    border: '2px solid #000',
+                    borderRadius: '50%',
+                    display: 'block',
+                    background: spectreHitPointsDots[i] ? '#000' : '#fff',
+                    cursor: (i === 0 || spectreHitPointsDots[i - 1]) ? 'pointer' : 'not-allowed',
+                    transition: 'background 0.2s'
+                  }}
+                ></span>
+              </span>
+            ))}
+            <span></span>
+          </div>
+
+          <hr style={{ margin: '16px 0', border: 0, borderTop: '1px solid #ddd' }} />
+
+          {/* Strike header */}
+          <div style={{ color: '#351c75', fontWeight: 'bold', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '8px' }}>
+            <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <div style={{ fontWeight: 'bold', color: '#351c75', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Strike</u></div>
+              <span style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
+                {generateSpectreStrikeJSX(sheet)}
+              </span>
+            </span>
+          </div>
+
+          {/* Strike XP progression table */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 24px 24px 24px',
+            columnGap: '6px',
+            rowGap: '2px',
+            alignItems: 'start',
+            marginBottom: '2px',
+            width: '100%',
+            paddingLeft: '4px'
+          }}>
+            {/* Row 1: XP headers */}
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>6xp</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>10xp</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>18xp</span>     
+            {/* Row 2: +1 Damage die */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1 Damage die</span>
+            {[0, 1, 2].map(i => (
+              <span key={i} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <span
+                  onClick={() => handleDotClick(spectreStrikeDamageDots, setSpectreStrikeDamageDots, i, [6, 10, 18], 'spectreStrikeDamageDots')}
+                  style={{
+                    width: '15px',
+                    height: '15px',
+                    border: '2px solid #000',
+                    borderRadius: '50%',
+                    display: 'block',
+                    background: spectreStrikeDamageDots[i] ? '#000' : '#fff',
+                    cursor: (i === 0 || spectreStrikeDamageDots[i - 1]) ? 'pointer' : 'not-allowed',
+                    transition: 'background 0.2s'
+                  }}
+                ></span>
+              </span>
+            ))}
+            <span></span>
+
+            {/* Row 3: XP header */}
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>12xp</span>
+            <span></span>
+            <span></span>
+            {/* Row 4: +1 Strike */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1 <b><i><span style={{ color: '#351c75' }}>Strike</span></i></b></span>
+            <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <span
+                onClick={() => handleSpDotClick(spectreStrikeExtraDots, setSpectreStrikeExtraDots, 0, [12], 'spectreStrikeExtraDots')}
+                style={{
+                  width: '15px',
+                  height: '15px',
+                  border: '2px solid #000',
+                  borderRadius: '50%',
+                  display: 'block',
+                  background: spectreStrikeExtraDots[0] ? '#000' : '#fff',
+                  cursor: 'pointer',
+                  transition: 'background 0.2s'
+                }}
+              ></span>
+            </span>
+            <span></span>
+            <span></span>
+          </div>
+
+          <hr style={{ margin: '16px 0', border: 0, borderTop: '1px solid #ddd' }} />
+
+          {/* Movement header */}
+          <div style={{ color: '#38761d', fontWeight: 'bold', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '8px' }}>
+            <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <div style={{ fontWeight: 'bold', color: '#38761d', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Movement</u></div>
+              <span style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
+                <b><i>Enhanced <span style={{ color: '#38761d' }}>Movement</span> Effects.</i></b> +<b>[{spectreMovementSpeedDots.filter(Boolean).length}]</b>hx <b><i style={{ color: '#38761d' }}>Speed</i></b>.
+              </span>
+            </span>
+          </div>
+
+          {/* Movement XP progression table */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 24px 24px 24px',
+            columnGap: '6px',
+            rowGap: '2px',
+            alignItems: 'start',
+            marginBottom: '2px',
+            width: '100%',
+            paddingLeft: '4px'
+          }}>
+            {/* Row 1: XP headers */}
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>3xp</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>6xp</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>12xp</span>
+            {/* Row 2: +1 Speed */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1hx <b><i style={{ color: '#38761d' }}>Speed</i></b></span>
+            {[0, 1, 2].map(i => (
+              <span key={i} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <span
+                  onClick={() => handleDotClick(spectreMovementSpeedDots, setSpectreMovementSpeedDots, i, [3, 6, 12], 'spectreMovementSpeedDots')}
+                  style={{
+                    width: '15px',
+                    height: '15px',
+                    border: '2px solid #000',
+                    borderRadius: '50%',
+                    display: 'block',
+                    background: spectreMovementSpeedDots[i] ? '#000' : '#fff',
+                    cursor: (i === 0 || spectreMovementSpeedDots[i - 1]) ? 'pointer' : 'not-allowed',
+                    transition: 'background 0.2s'
+                  }}
+                ></span>
+              </span>
+            ))}
+            <span></span>
+          </div>
+
+          <hr style={{ margin: '12px', border: 0, borderTop: '1px solid #ddd' }} />
+
+          {/* Perks header */}
+            <div style={{ fontWeight: 'bold', color: '#000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Perks</u></div>
+            <div style={{ fontSize: '1em', color: '#000', marginBottom: '6px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <i><b>Skills.</b> Stealth</i> +2
+            </div>
+
+          {/* Perks SP progression table */}
+          <div style={{
+            display: 'grid',
+                gridTemplateColumns: '1fr 24px 24px 24px',
+                gridTemplateRows: 'auto auto',
+            columnGap: '6px',
+                rowGap: '2px',
+                alignItems: 'start',
+                marginTop: '-12px',
+                marginBottom: '2px',
+                width: '100%',
+                paddingLeft: '4px'
+          }}>
+            {/* Row 1: Empty cells and 12sp header */}
+            <span></span>
+            <span></span>
+                <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>12sp</span>
+            {/* Row 2: Quantum Cloaking Array text and dot */}
+                <div style={{ 
+                  fontSize: '1em', 
+                  fontFamily: 'Arial, Helvetica, sans-serif', 
+                  textAlign: 'left',
+                  paddingRight: '8px',
+                  lineHeight: '1.2',
+                  gridColumn: '1 / 4'
+            }}>
+              <b><i style={{ color: '#6a3dd8', fontSize: '1em' }}>Quantum Cloaking Array.</i></b> Your suit allows you to become invisible to the naked eye at any time outside of combat. Only the appropriate magical abilities or technological gear can see you. Gain an advantage on related skill rolls.
+            </div>
+            <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start' }}>
+              <span
+                onClick={() => handleSpDotClick(spectrePerksSkillsDots, setSpectrePerksSkillsDots, 0, [12], 'spectrePerksSkillsDots')}
+                style={{
+                  width: '15px',
+                  height: '15px',
+                  border: '2px solid #000',
+                  borderRadius: '50%',
+                  display: 'block',
+                  background: spectrePerksSkillsDots[0] ? '#000' : '#fff',
+                  cursor: 'pointer',
+                  transition: 'background 0.2s'
+                }}
+              ></span>
+            </span>
           </div>
         </div>
       )}

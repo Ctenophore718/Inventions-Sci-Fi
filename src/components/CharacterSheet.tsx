@@ -48,6 +48,13 @@ import { generateSteelWingsJSX } from "../utils/aeronautFeature";
 import { generateAeronautStrikeJSX, generateAeronautStrikeDamageJSX } from "../utils/aeronautStrike";
 
 import { generateFightinDirtyJSX } from "../utils/brawlerFeature";
+import { generateBrawlerStrikeJSX, generateBrawlerStrikeDamageJSX, generateBrawlerStrikeEffectsJSX } from "../utils/brawlerStrike";
+
+import { generateToweringDefenseJSX } from "../utils/dreadnaughtFeature";
+import { generateDreadnaughtStrikeDamageJSX } from "../utils/dreadnaughtStrike";
+
+import { generateHoloFieldJSX } from "../utils/spectreFeature";
+import { generateSpectreStrikeDamageJSX } from "../utils/spectreStrike";
 
 import { generateMartyrJSX } from "../utils/astralFeature";
 import { generateAstralStrikeDamageJSX } from "../utils/astralStrike";
@@ -317,7 +324,13 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
   const aeronautSpeedBonus = sheet?.subclass === 'Aeronaut'
     ? 2 + ((sheet?.subclassProgressionDots as any)?.aeronautFeatureSpeedDots?.filter(Boolean).length || 0) * 2 + ((sheet?.subclassProgressionDots as any)?.aeronautMovementSpeedDots?.filter(Boolean).length || 0) * 2
     : 0;
-  const totalSpeed = baseSpeed + tacticianSpeedBonus + kineticSpeedBonus + mercurialSpeedBonus + airSpeedBonus + fireSpeedBonus + waterSpeedBonus + aeronautSpeedBonus;
+  const brawlerSpeedBonus = sheet?.subclass === 'Brawler'
+    ? ((sheet?.subclassProgressionDots as any)?.brawlerMovementSpeedDots?.filter(Boolean).length || 0)
+    : 0;
+  const spectreSpeedBonus = sheet?.subclass === 'Spectre'
+    ? ((sheet?.subclassProgressionDots as any)?.spectreMovementSpeedDots?.filter(Boolean).length || 0)
+    : 0;
+  const totalSpeed = baseSpeed + tacticianSpeedBonus + kineticSpeedBonus + mercurialSpeedBonus + airSpeedBonus + fireSpeedBonus + waterSpeedBonus + aeronautSpeedBonus + brawlerSpeedBonus + spectreSpeedBonus;
   const speed = totalSpeed > 0 ? `${totalSpeed}` : "0";
   
   // Calculate jump speed and jump amount for Kinetic subclass
@@ -344,6 +357,21 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
   // Calculate Aeronaut hit points bonus
   const aeronautHitPointsBonus = sheet?.subclass === 'Aeronaut'
     ? ((sheet?.subclassProgressionDots as any)?.aeronautHitPointsDots?.filter(Boolean).length || 0) * 5
+    : 0;
+  
+  // Calculate Brawler hit points bonus
+  const brawlerHitPointsBonus = sheet?.subclass === 'Brawler'
+    ? ((sheet?.subclassProgressionDots as any)?.brawlerHitPointsDots?.filter(Boolean).length || 0) * 10
+    : 0;
+  
+  // Calculate Dreadnaught hit points bonus
+  const dreadnaughtHitPointsBonus = sheet?.subclass === 'Dreadnaught'
+    ? ((sheet?.subclassProgressionDots as any)?.dreadnaughtHitPointsDots?.filter(Boolean).length || 0) * 10 + (((sheet?.subclassProgressionDots as any)?.dreadnaughtHitPointsExtraDots?.[0]) ? 20 : 0)
+    : 0;
+  
+  // Calculate Spectre hit points bonus
+  const spectreHitPointsBonus = sheet?.subclass === 'Spectre'
+    ? ((sheet?.subclassProgressionDots as any)?.spectreHitPointsDots?.filter(Boolean).length || 0) * 10
     : 0;
   
   const [deathCount, setDeathCount] = useState(sheet?.deathCount || 0);
@@ -843,15 +871,11 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
 
   const brawlerFeatureJSX = generateFightinDirtyJSX(sheet);
 
-  const dreadnaughtFeatureJSX = (
-    <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#d83da0' }}>Towering Defense.</i></b> When resolving <b><i><span style={{ color: '#990000' }}>Attacks</span></i></b>, other creatures treat you as 100% Cover. Additionally, while wearing your <i>Exosuit</i>, your size is 3hx.
-    </span>
-  );
+  const dreadnaughtFeatureJSX = generateToweringDefenseJSX(sheet);
 
   const spectreFeatureJSX = (
     <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#6a3dd8' }}>Holo-Field.</i></b> You roll <b>[1]</b> additional Cover die when a creature <b><i><span style={{ color: '#990000' }}>Attacks</span></i></b> you, and discard the lowest roll. Additionally, you can use the <i>Stealth</i> skill once per turn without using an <i>Action</i>.
+      {generateHoloFieldJSX(sheet)}
     </span>
   );
 
@@ -1783,6 +1807,9 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                     if (subclass === "Fire" && skill === "Intimidation") return "rgba(226,14,14,0.5)";
                     if (subclass === "Water" && skill === "Medicine") return "rgba(14,66,226,0.5)";
                     if (subclass === "Aeronaut" && skill === "Piloting") return "rgba(61,161,216,0.5)";
+                    if (subclass === "Brawler" && skill === "Survival") return "rgba(216,165,61,0.5)";
+                    if (subclass === "Dreadnaught" && skill === "Intimidation") return "rgba(216,61,160,0.5)";
+                    if (subclass === "Spectre" && skill === "Stealth") return "rgba(106,61,216,0.5)";
                     return null;
                   };
                   
@@ -2658,6 +2685,18 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
               <span style={{ fontWeight: 'bold', fontFamily: 'inherit', color: '#000', marginLeft: 4, display: 'flex', alignItems: 'center' }}>
                 {generateAeronautStrikeDamageJSX(sheet)}
               </span>
+            ) : subclass === 'Brawler' ? (
+              <span style={{ fontWeight: 'bold', fontFamily: 'inherit', color: '#000', marginLeft: 4, display: 'flex', alignItems: 'center' }}>
+                {generateBrawlerStrikeDamageJSX(sheet)}
+              </span>
+            ) : subclass === 'Dreadnaught' ? (
+              <span style={{ fontWeight: 'bold', fontFamily: 'inherit', color: '#000', marginLeft: 4, display: 'flex', alignItems: 'center' }}>
+                {generateDreadnaughtStrikeDamageJSX(sheet)}
+              </span>
+            ) : subclass === 'Spectre' ? (
+              <span style={{ fontWeight: 'bold', fontFamily: 'inherit', color: '#000', marginLeft: 4, display: 'flex', alignItems: 'center' }}>
+                {generateSpectreStrikeDamageJSX(sheet)}
+              </span>
             ) : <span style={{ fontWeight: 'bold', fontFamily: 'inherit', color: '#000', marginLeft: 4 }}>{strikeDamage}</span>}
           </div>
           <div className={styles.horizontalLabel} style={{ color: '#351c75', fontWeight: 'bold' }}>Multi Strike <span style={{ color: '#000' }}>{
@@ -2677,7 +2716,11 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                           ? (1 + ((sheet?.subclassProgressionDots as any)?.fireStrikeExtraStrikeDots?.filter(Boolean).length || 0))
                           : (subclass === 'Aeronaut' && (sheet?.subclassProgressionDots as any)?.aeronautStrikeExtraDots?.[0])
                             ? 2
-                            : (multiStrike > 0 ? multiStrike : <span style={{ visibility: 'hidden' }}>0</span>)
+                            : (subclass === 'Brawler' && (sheet?.subclassProgressionDots as any)?.brawlerStrikeExtraDots?.[0])
+                              ? 2
+                              : (subclass === 'Spectre' && (sheet?.subclassProgressionDots as any)?.spectreStrikeExtraDots?.[0])
+                                ? 2
+                                : (multiStrike > 0 ? multiStrike : <span style={{ visibility: 'hidden' }}>0</span>)
           }</span></div>
           <div className={styles.horizontalLabel} style={{ color: '#351c75', fontWeight: 'bold' }}>
               Strike Effects {
@@ -2721,6 +2764,8 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
       </u></b><b>)</b></span>
                   : (subclass === 'Water' && (sheet?.subclassProgressionDots as any)?.waterStrikeInflictDemoralizeDots?.[0])
                     ? <span style={{ color: '#000', fontWeight: 'normal' }}><b><i>Demoralize</i></b></span>
+                  : (subclass === 'Brawler')
+                    ? generateBrawlerStrikeEffectsJSX(sheet) || strikeEffects
                     : strikeEffects
               }
           </div>
@@ -2926,6 +2971,26 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
             {subclass === 'Water' && (sheet?.subclassProgressionDots as any)?.waterFeatureSpikeImmunityDots?.[0] && (
               <span style={{ marginLeft: 8, display: 'inline-flex', alignItems: 'center', color: '#000', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                 <i>Spike</i>
+              </span>
+            )}
+            {subclass === 'Dreadnaught' && (sheet?.subclassProgressionDots as any)?.dreadnaughtFeatureBounceImmunityDots?.[0] && (
+              <span style={{ marginLeft: 8, display: 'inline-flex', alignItems: 'center', color: '#000', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                <i>Bounce</i>
+              </span>
+            )}
+            {subclass === 'Dreadnaught' && (sheet?.subclassProgressionDots as any)?.dreadnaughtFeatureMesmerizeImmunityDots?.[0] && (
+              <span style={{ marginLeft: 8, display: 'inline-flex', alignItems: 'center', color: '#000', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                <i>Mesmerize</i>
+              </span>
+            )}
+            {subclass === 'Dreadnaught' && (sheet?.subclassProgressionDots as any)?.dreadnaughtFeatureRestrainImmunityDots?.[0] && (
+              <span style={{ marginLeft: 8, display: 'inline-flex', alignItems: 'center', color: '#000', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                <i>Restrain</i>
+              </span>
+            )}
+            {subclass === 'Dreadnaught' && (sheet?.subclassProgressionDots as any)?.dreadnaughtFeatureSlamImmunityDots?.[0] && (
+              <span style={{ marginLeft: 8, display: 'inline-flex', alignItems: 'center', color: '#000', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                <i>Slam</i>
               </span>
             )}
           </div>
@@ -3698,7 +3763,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <span style={{ fontWeight: 'bold', minWidth: '120px' }}>Max Hit Points:</span>
-                <span style={{ minWidth: '40px', textAlign: 'center' }}>{charClass === "Exospecialist" ? maxHitPoints + 20 + aeronautHitPointsBonus : maxHitPoints}</span>
+                <span style={{ minWidth: '40px', textAlign: 'center' }}>{charClass === "Exospecialist" ? maxHitPoints + 20 + aeronautHitPointsBonus + brawlerHitPointsBonus + dreadnaughtHitPointsBonus + spectreHitPointsBonus : maxHitPoints}</span>
               </div>
 
               <hr style={{ margin: '8px 0', border: '1px solid #eee' }} />
@@ -3780,7 +3845,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
             }
           }}
         >
-          hp: {currentHitPoints}/{charClass === "Exospecialist" ? maxHitPoints + 20 + aeronautHitPointsBonus : maxHitPoints}
+          hp: {currentHitPoints}/{charClass === "Exospecialist" ? maxHitPoints + 20 + aeronautHitPointsBonus + brawlerHitPointsBonus + dreadnaughtHitPointsBonus + spectreHitPointsBonus : maxHitPoints}
         </button>
       </div>
 

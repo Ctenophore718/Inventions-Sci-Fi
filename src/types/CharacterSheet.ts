@@ -297,6 +297,27 @@ export type CharacterSheet = {
     brawlerStrikeExtraDots?: boolean[];
     brawlerMovementSpeedDots?: boolean[];
     brawlerPerksSkillsDots?: boolean[];
+    // Dreadnaught subclass progression (Exospecialist)
+    dreadnaughtFeatureBounceImmunityDots?: boolean[];
+    dreadnaughtFeatureMesmerizeImmunityDots?: boolean[];
+    dreadnaughtFeatureRestrainImmunityDots?: boolean[];
+    dreadnaughtFeatureSlamImmunityDots?: boolean[];
+    dreadnaughtTechniqueExtraAttackDots?: boolean[];
+    dreadnaughtTechniqueCooldownDots?: boolean[];
+    dreadnaughtHitPointsDots?: boolean[];
+    dreadnaughtHitPointsExtraDots?: boolean[];
+    dreadnaughtStrikeDamageDots?: boolean[];
+    dreadnaughtPerksSkillsDots?: boolean[];
+    // Spectre subclass progression (Exospecialist)
+    spectreFeatureExtraCoverDieDots?: boolean[];
+    spectreTechniqueTeleportDots?: boolean[];
+    spectreTechniqueCannotBeTargetedDots?: boolean[];
+    spectreTechniqueCooldownDots?: boolean[];
+    spectreHitPointsDots?: boolean[];
+    spectreStrikeDamageDots?: boolean[];
+    spectreStrikeExtraDots?: boolean[];
+    spectreMovementSpeedDots?: boolean[];
+    spectrePerksSkillsDots?: boolean[];
     // Add other subclasses as needed
   };
 };
