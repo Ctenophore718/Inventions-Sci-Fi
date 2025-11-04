@@ -64,6 +64,8 @@ import { generateOrderStrikeDamageJSX } from "../utils/orderStrike";
 import { generateArmoredGuardJSX } from "../utils/orderFeature";
 import { generateElementalExcitementJSX } from "../utils/elementalistFeature";
 import { generateExosuitJSX } from "../utils/exospecialistFeature";
+import { generateSharpshooterCharacterSheetJSX } from "../utils/gunslingerFeature";
+import { generateBulletCodeJSX } from "../utils/ammocoderFeature";
 
 import CharacterSheetInventory from "./CharacterSheetInventory";
 import CharacterSheetPerks from "./CharacterSheetPerks";
@@ -278,7 +280,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
 
   const gunslingerFeatureJSX = (
     <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#4e7211' }}>Sharpshooter.</i></b> You gain a +<b>[{2 + (charClass === 'Gunslinger' && sheet?.classCardDots?.[0] ? sheet.classCardDots[0].filter(Boolean).length : 0)}]</b> to Crit rolls and a +<b>[{0 + (charClass === 'Gunslinger' && sheet?.classCardDots?.[1] ? sheet.classCardDots[1].filter(Boolean).length : 0)}]</b>hx Range on all <b><i><span style={{ color: '#990000' }}>Attacks</span></i></b>.
+      {generateSharpshooterCharacterSheetJSX(sheet)}
     </span>
   );  
 
@@ -881,14 +883,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
 
   const ammoCoderFeatureJSX = (
     <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#0a3991' }}>Bullet Code.</i></b> Whenever you make an <b><i><span style={{ color: '#990000' }}>Attack</span></i></b>, you can change the Damage type of your <b><i><span style={{ color: '#990000' }}>Attack</span></i></b> to any of the following:<br/>
-      <b><u style={{ color: '#de7204', display: 'inline-flex', alignItems: 'center' }}>Chemical<img src="/Chemical.png" alt="Chemical" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>,&nbsp;
-      <b><u style={{ color: '#3ebbff', display: 'inline-flex', alignItems: 'center' }}>Cold<img src="/Cold.png" alt="Cold" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>,&nbsp;
-      <b><u style={{ color: '#ffe700', display: 'inline-flex', alignItems: 'center' }}>Electric<img src="/Electric.png" alt="Electric" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>,&nbsp;
-      <b><u style={{ color: '#f90102', display: 'inline-flex', alignItems: 'center' }}>Fire<img src="/Fire.png" alt="Fire" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>,&nbsp;
-      <b><u style={{ color: '#516fff', display: 'inline-flex', alignItems: 'center' }}>Force<img src="/Force.png" alt="Force" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>,&nbsp;
-      <b><u style={{ color: '#a929ff', display: 'inline-flex', alignItems: 'center' }}>Neural<img src="/Neural.png" alt="Neural" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>,&nbsp;
-      <b><u style={{ color: '#02b900', display: 'inline-flex', alignItems: 'center' }}>Toxic<img src="/Toxic.png" alt="Toxic" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>
+      {generateBulletCodeJSX(sheet)}
     </span>
   );
 
@@ -1260,6 +1255,14 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
       );
     }
     
+    // Add Coder Carbines for Gunslinger class (Ammo Coder subclass)
+    if (charClass === 'Gunslinger' && subclass === 'Ammo Coder') {
+      attacks.push(
+        { name: 'Arcane Railgun', type: 'Coder Carbine', cost: 175 },
+        { name: 'Space Vaporizer', type: 'Coder Carbine', cost: 165 }
+      );
+    }
+    
     return attacks;
   };
 
@@ -1506,6 +1509,12 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
           integratedBlasters: newIntegratedBlasters,
           credits: credits - cost
         };
+      } else if (type === 'Coder Carbine') {
+        const newCoderCarbines = [...(sheet.coderCarbines || []), attackName];
+        partialUpdate = { 
+          coderCarbines: newCoderCarbines,
+          credits: credits - cost
+        };
       } else {
         return;
       }
@@ -1557,6 +1566,11 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
         const newIntegratedBlasters = [...(sheet.integratedBlasters || []), attackName];
         partialUpdate = { 
           integratedBlasters: newIntegratedBlasters
+        };
+      } else if (type === 'Coder Carbine') {
+        const newCoderCarbines = [...(sheet.coderCarbines || []), attackName];
+        partialUpdate = { 
+          coderCarbines: newCoderCarbines
         };
       } else {
         return;

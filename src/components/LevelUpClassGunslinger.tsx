@@ -1,5 +1,8 @@
 import React, { useState } from "react";
 import type { CharacterSheet } from "../types/CharacterSheet";
+import { generateSharpshooterJSX } from "../utils/gunslingerFeature";
+import { generateQuickShotJSX } from "../utils/gunslingerTechnique";
+import { generateDoubleTapJSX } from "../utils/gunslingerSecondaryAttack";
 
 // Default Gunslinger dots structure: 8 rows, each with the number of dots needed for each feature
 const defaultGunslingerDots: boolean[][] = [
@@ -162,7 +165,7 @@ const LevelUpClassGunslinger: React.FC<LevelUpClassGunslingerProps> = ({
                   <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32, fontFamily: 'Arial, Helvetica, sans-serif' }}>
                     <div style={{ fontWeight: 'bold', color: '#0b5394', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Feature</u></div>
                     <span style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
-                      <b><i style={{ color: '#4e7211', fontSize: '1em' }}>Sharpshooter.</i></b> <span style={{ fontSize: '1em', fontWeight: 400 }}>You gain a +2 to Crit rolls on all <span style={{ color: '#990000' }}><b><i>Attacks</i></b></span>.</span>
+                      {generateSharpshooterJSX(sheet)}
                     </span>
                   </span>
                 </div>
@@ -278,7 +281,7 @@ const LevelUpClassGunslinger: React.FC<LevelUpClassGunslingerProps> = ({
                 <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
                   <div style={{ fontWeight: 'bold', color: '#bf9000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Technique</u></div>
                   <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
-                    <b><i style={{ color: '#4e7211', fontSize: '1em' }}>Quick Shot</i></b> <i style={{ color: '#4e7211', fontSize: '1em' }}>(Cooldown 4).</i> Until the start of the next round, when an enemy <span style={{ color: '#38761d' }}><b><i>Moves</i></b></span> in your <i>Line-of-Sight</i> and is in Range, you can make a <b><i>Primary</i></b> <span style={{ color: '#990000' }}><b><i>Attack</i></b></span> against them as long as the <span style={{ color: '#990000' }}><b><i>Attack</i></b></span> is <i>Active</i>. After you make this <span style={{ color: '#990000' }}><b><i>Attack</i></b></span>, <span style={{ color: '#4e7211' }}><i>Quick Shot</i></span> expires.
+                    {generateQuickShotJSX(sheet)}
                   </div>
                   <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px' }}>
                     <div style={{
@@ -443,12 +446,12 @@ const LevelUpClassGunslinger: React.FC<LevelUpClassGunslingerProps> = ({
                 <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
                   <div style={{ fontWeight: 'bold', color: '#990000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Attack</u></div>
                   <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
-                    <b><i style={{ color: '#4e7211', fontSize: '1em' }}>Double Tap</i></b> <i style={{ color: '#4e7211', fontSize: '1em' }}>(Cooldown 4).</i> Instead of a standard <b><i>Seondary</i></b> <span style={{ color: '#990000' }}><b><i>Attack</i></b></span>, you fire your <b><i>Primary</i></b> <span style={{ color: '#990000' }}><b><i>Attack</i></b></span> weapon two times in a row against the same or different target(s).
+                    {generateDoubleTapJSX(sheet)}
                   </div>
                   <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px' }}>
                     <div style={{
                       display: 'grid',
-                      gridTemplateColumns: '1fr 24px',
+                      gridTemplateColumns: '1fr 24px 24px 24px',
                       gridTemplateRows: 'repeat(2, auto)',
                       columnGap: '6px',
                       rowGap: '2px',
@@ -460,6 +463,8 @@ const LevelUpClassGunslinger: React.FC<LevelUpClassGunslingerProps> = ({
                       {/* Row 1: XP header (20xp) */}
                       <span></span>
                       <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>20xp</span>
+                      <span></span>
+                      <span></span>
                       {/* Row 2: Fire three times dot (interactive) */}
                       <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>Fire three times</span>
                       <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
@@ -502,27 +507,15 @@ const LevelUpClassGunslinger: React.FC<LevelUpClassGunslingerProps> = ({
                           );
                         })()}
                       </span>
-                    </div>
-                  </div>
-                  {/* -1 Cooldown dots for Attack */}
-                  <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px' }}>
-                    <div style={{
-                      display: 'grid',
-                      gridTemplateColumns: '1fr 24px 24px',
-                      gridTemplateRows: 'repeat(3, auto)',
-                      columnGap: '6px',
-                      rowGap: '2px',
-                      alignItems: 'start',
-                      marginBottom: '2px',
-                      width: '100%',
-                      paddingLeft: '4px'
-                    }}>
                       {/* Row 1: XP header (6xp, 9xp) */}
+                      <span></span>
+                      <span></span>
                       <span></span>
                       <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>6xp</span>
                       <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>9xp</span>
+                      <span></span>
                       {/* Row 2: -1 Cooldown dots (interactive) */}
-                      <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>-1 Cooldown</span>
+                      <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>-1 <i>Cooldown</i></span>
                       {[0,1].map(idx => {
                         const arr = safeGetDotsArray(6);
                         const canCheck = idx === 0 || arr.slice(0, idx).every(Boolean);

@@ -97,6 +97,9 @@ export type CharacterSheet = {
   // Smart Missiles for Exospecialist class (secondary attacks)
   smartMissiles?: string[];
 
+  // Coder Carbines for Ammo Coder subclass (primary attacks)
+  coderCarbines?: string[];
+
   // Algorithms for Coder class
   algorithms?: string[];
 

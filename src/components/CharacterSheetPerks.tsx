@@ -88,7 +88,7 @@ const CharacterSheetPerks: React.FC<CharacterSheetPerksProps> = ({
           {charClass === 'Gunslinger' && sheet?.classCardDots?.[7]?.[0] && (
             <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
               <span>
-                <b><i style={{ color: '#4e7211' }}>Gunslinger's Grit.</i></b> <span style={{ color: '#000' }}>Youâ€™ve been in sticky situations enough times to see whatâ€™s coming around the bend. Gain an advantage on related skills when identifying potentially dangerous social situations or defending yours or your companionsâ€™ reputations.</span>
+                <b><i style={{ color: '#4e7211' }}>Gunslinger's Grit.</i></b> <span style={{ color: '#000' }}>You’ve been in sticky situations enough times to see what’s coming around the bend. Gain an advantage on related skills when identifying potentially dangerous social situations or defending yours or your companions' reputations.</span>
               </span>
             </div>
           )}

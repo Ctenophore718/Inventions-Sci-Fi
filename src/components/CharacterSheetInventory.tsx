@@ -59,10 +59,10 @@ const CharacterSheetInventory: React.FC<CharacterSheetInventoryProps> = ({
                     textAlign: 'left',
                     minWidth: '180px'
                   }}
-                  value={pendingAttack || (charClass === 'Chemist' ? 'Dart Guns' : charClass === 'Coder' ? 'Lenses' : charClass === 'Commander' ? 'Rifles' : charClass === 'Contemplative' ? 'Focuses' : charClass === 'Devout' ? 'Incantations' : charClass === 'Elementalist' ? 'Shards' : charClass === 'Exospecialist' ? 'Integrated Blasters' : 'Select Primary Attack')}
+                  value={pendingAttack || (charClass === 'Chemist' ? 'Dart Guns' : charClass === 'Coder' ? 'Lenses' : charClass === 'Commander' ? 'Rifles' : charClass === 'Contemplative' ? 'Focuses' : charClass === 'Devout' ? 'Incantations' : charClass === 'Elementalist' ? 'Shards' : charClass === 'Exospecialist' ? 'Integrated Blasters' : charClass === 'Gunslinger' ? 'Coder Carbines' : 'Select Primary Attack')}
                   onChange={(e) => {
                     const value = e.target.value;
-                    if (value !== 'Dart Guns' && value !== 'Lenses' && value !== 'Rifles' && value !== 'Focuses' && value !== 'Incantations' && value !== 'Shards' && value !== 'Integrated Blasters' && value !== 'Select Primary Attack') {
+                    if (value !== 'Dart Guns' && value !== 'Lenses' && value !== 'Rifles' && value !== 'Focuses' && value !== 'Incantations' && value !== 'Shards' && value !== 'Integrated Blasters' && value !== 'Coder Carbines' && value !== 'Select Primary Attack') {
                       setPendingAttack(value);
                     }
                   }}
@@ -166,7 +166,14 @@ const CharacterSheetInventory: React.FC<CharacterSheetInventoryProps> = ({
                       <option style={{ fontWeight: 'bold' }}>Sleepytime</option>
                     </>
                   )}
-                  {charClass !== 'Chemist' && charClass !== 'Coder' && charClass !== 'Commander' && charClass !== 'Contemplative' && charClass !== 'Devout' && charClass !== 'Elementalist' && charClass !== 'Exospecialist' && (
+                  {charClass === 'Gunslinger' && subclass === 'Ammo Coder' && (
+                    <>
+                      <option disabled style={{ fontWeight: 'bold' }}>Coder Carbines</option>
+                      <option style={{ fontWeight: 'bold' }}>Arcane Railgun</option>
+                      <option style={{ fontWeight: 'bold' }}>Space Vaporizer</option>
+                    </>
+                  )}
+                  {charClass !== 'Chemist' && charClass !== 'Coder' && charClass !== 'Commander' && charClass !== 'Contemplative' && charClass !== 'Devout' && charClass !== 'Elementalist' && charClass !== 'Exospecialist' && charClass !== 'Gunslinger' && (
                     <option disabled style={{ fontWeight: 'bold' }}>Select Primary Attack</option>
                   )}
                 </select>
@@ -377,14 +384,39 @@ const CharacterSheetInventory: React.FC<CharacterSheetInventoryProps> = ({
                       ))}
                     </div>
                   )}
+                  {(sheet?.coderCarbines && sheet.coderCarbines.length > 0) && (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginLeft: '8px' }}>
+                      {sheet?.coderCarbines?.map((weapon, idx) => (
+                        <span key={weapon + idx + 'coderCarbine'} style={{ fontStyle: 'italic', display: 'flex', alignItems: 'center', background: '#f5f5f5', borderRadius: '6px', padding: '2px 8px' }}>
+                          {weapon}
+                          <button
+                            style={{ marginLeft: '6px', padding: '0 6px', borderRadius: '50%', border: 'none', background: '#d32f2f', color: 'white', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.9em' }}
+                            title={`Remove ${weapon}`}
+                            onClick={() => {
+                              if (sheet) {
+                                const newCoderCarbines = sheet.coderCarbines?.filter((_, i) => i !== idx) || [];
+                                const updatedSheet = { 
+                                  ...sheet, 
+                                  coderCarbines: newCoderCarbines
+                                };
+                                handleAutoSave(updatedSheet);
+                              }
+                            }}
+                          >×</button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
 
-            {/* Secondary Attacks Section */}
-            <div style={{ fontWeight: 'bold', color: '#990000', marginBottom: '6px', fontSize: '1.06em', fontFamily: 'Arial, Helvetica, sans-serif' }}>
-              <u><span style={{ color: '#000' }}>Secondary</span> Attacks</u>
-            </div>
+            {/* Secondary Attacks Section - Hidden for Gunslinger */}
+            {charClass !== 'Gunslinger' && (
+              <>
+                <div style={{ fontWeight: 'bold', color: '#990000', marginBottom: '6px', fontSize: '1.06em', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+                  <u><span style={{ color: '#000' }}>Secondary</span> Attacks</u>
+                </div>
             <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
               <div style={{ marginBottom: '4px', textAlign: 'left' }}>
                 <select
@@ -926,6 +958,8 @@ const CharacterSheetInventory: React.FC<CharacterSheetInventoryProps> = ({
                 </div>
               </div>
             </div>
+              </>
+            )}
           </div>
         </div>
       </div>

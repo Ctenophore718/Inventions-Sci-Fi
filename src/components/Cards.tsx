@@ -12,6 +12,9 @@ import { generateDiveBombCardJSX } from "../utils/aeronautTechnique";
 import { generateTheOlOneTwoCardJSX } from "../utils/brawlerTechnique";
 import { generateBarrageCardJSX } from "../utils/dreadnaughtTechnique";
 import { generateStealthModeCardJSX } from "../utils/spectreTechnique";
+import { generateQuickShotCardJSX } from "../utils/gunslingerTechnique";
+import { generateDoubleTapCardJSX } from "../utils/gunslingerSecondaryAttack";
+import { generateEncodeWeaknessCardJSX } from "../utils/ammocoderTechnique";
 import React from "react";
 import type { CharacterSheet } from "../types/CharacterSheet";
 import { loadSheetById, saveCharacterSheet } from "../utils/storage";
@@ -44,6 +47,7 @@ import { CardsDevoutAttacks } from "./CardsDevoutAttacks";
 import { CardsElementalistAttacks } from "./CardsElementalistAttacks";
 import { CardsElementalistSecondaryAttacks } from "./CardsElementalistSecondaryAttacks";
 import { CardsExospecialistAttacks } from "./CardsExospecialistAttacks";
+import { CardsGunslingerAttacks } from "./CardsGunslingerAttacks";
 import { calculateChemistFeatureData } from "../utils/chemistFeature";
 
 type CardsProps = {
@@ -578,22 +582,7 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
               }}>
                 {charClass === 'Gunslinger'
                   ? (() => {
-                      // Get number of '+1 Attack' dots from classCardDots[2]
-                      let creatureDots = 0;
-                      if (localSheet && Array.isArray(localSheet.classCardDots) && Array.isArray(localSheet.classCardDots[3])) {
-                        creatureDots = localSheet.classCardDots[3].filter(Boolean).length;
-                      }
-                      let attackDots = 0;
-                      if (localSheet && Array.isArray(localSheet.classCardDots) && Array.isArray(localSheet.classCardDots[2])) {
-                        attackDots = localSheet.classCardDots[2].filter(Boolean).length;
-                      }
-                      const enemyCount = 1 + creatureDots;
-                      const attackCount = 1 + attackDots;
-                      return (
-                        <>
-                          Until the start of the next round, when <b>[{enemyCount}]</b> enemy(s) <b><i><span style={{ color: '#38761d' }}>Moves</span></i></b> in your <i>Line-of-Sight</i> and is in Range, you can make <b>[{attackCount}]</b> <b><i>Primary</i></b> <b><i><span style={{ color: '#990000' }}>Attack(s)</span></i></b> against them as long as the <b><i><span style={{ color: '#990000' }}>Attack</span></i></b> is <i>Active</i>. After you make the <b><i><span style={{ color: '#990000' }}>Attack(s)</span></i></b>, <i><span style={{ color: '#4e7211' }}>Quick Shot</span></i> expires.
-                        </>
-                      );
+                      return generateQuickShotCardJSX(localSheet?.classCardDots);
                     })()
                   : charClass === 'Devout' ? (
                     generateFlagellationCardStatsJSX(localSheet?.classCardDots)
@@ -656,23 +645,23 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
               textAlign: 'left'
             }}>
               {charClass === 'Devout' ? (
-                <span>�Sacrifice is a necessary cost of any spiritual power. The most devout sacrifice their own flesh.� <br />--Theodora de la Fe, Defteran Devout</span>
+                <span>"Sacrifice is a necessary cost of any spiritual power. The most devout sacrifice their own flesh." <br />--Theodora de la Fe, Defteran Devout</span>
               ) : charClass === 'Chemist' ? 
                 'With the right concoctions, any spell or weapon becomes even more volatile than before.' 
                 : charClass === 'Coder' ?
-                (<span>�Although it�s a universal script, the math behind reflecting energetic material is quite complex.�<br />--Luminova, X-Ray Naturalist</span>)
+                (<span>"Although it’s a universal script, the math behind reflecting energetic material is quite complex." --Luminova, X-Ray Naturalist</span>)
                 : charClass === 'Commander' ? (
-                  <span style={{ fontSize: '0.89em' }}>�...That's 'cause I got people with me, people who trust each other, who do for each other and ain't always looking for the advantage.� --Mal, Human Captain of Serenity</span>
+                  <span style={{ fontSize: '0.89em' }}>"...That's 'cause I got people with me, people who trust each other, who do for each other and ain't always looking for the advantage." --Mal, Human Captain of Serenity</span>
                 ) : charClass === 'Contemplative' ? (
-                  <span>�One must always be responsive at a moment�s notice to fight not only another day, but another instant.� --Master Li Ren, Felid Contemplative</span>
+                  <span>"One must always be responsive at a moment’s notice to fight not only another day, but another instant." --Master Li Ren, Felid Contemplative</span>
                 ) : charClass === 'Elementalist' ? (
                   <span>A little prayer with your Xenomagical elemental sprite can go a long way.</span>
                 ) : charClass === 'Exospecialist' ? (
                   <span>Aim at your target without distractions. Focus on one target. Hit your goal and move on to the next one. Focus is your friend.</span>
                 ) : charClass === 'Gunslinger' ? (
-                  <span>�I always keep my finger on the trigger, right at the brink of firing. Don�t even blink at me wrong or you�ll get a hole in ya.� --Anonymous</span>
+                  <span>"I always keep my finger on the trigger, right at the brink of firing. Don’t even blink at me wrong or you’ll get a hole in ya." --Anonymous</span>
                 ) : charClass === 'Technician' ? (
-                  <span>�Really changes the meaning of �trip-mine� when it causes psychedelic visions to anyone who steps on it.� --Jackdaw Nightswain, Corvid Technician</span>
+                  <span>"Really changes the meaning of 'trip-mine' when it causes psychedelic visions to anyone who steps on it." --Jackdaw Nightswain, Corvid Technician</span>
                 ) : 'Flavor text.'}
             </div>
             </div>
@@ -709,7 +698,7 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                 fontFamily: 'Arial, Helvetica, sans-serif',
                 fontWeight: 'bold',
                 fontSize: 'clamp(0.8em, 4vw, 1.25em)',
-                color: localSheet?.subclass === 'Anatomist' ? '#66cf00' : localSheet?.subclass === 'Grenadier' ? '#cf0000' : localSheet?.subclass === 'Necro' ? '#0033cf' : localSheet?.subclass === 'Poisoner' ? '#cf7600' : localSheet?.subclass === 'Coercive' ? '#43c9ff' : localSheet?.subclass === 'Divinist' ? '#ff4343' : localSheet?.subclass === 'Naturalist' ? '#66cf00' : localSheet?.subclass === 'Technologist' ? '#8c43ff' : localSheet?.subclass === 'Beguiler' ? '#1f21ce' : localSheet?.subclass === 'Galvanic' ? '#6fce1f' : localSheet?.subclass === 'Tactician' ? '#cec31f' : localSheet?.subclass === 'Tyrant' ? '#ce1f1f' : localSheet?.subclass === 'Inertial' ? '#1c945e' : localSheet?.subclass === 'Kinetic' ? '#7b941c' : localSheet?.subclass === 'Mercurial' ? '#941c6c' : localSheet?.subclass === 'Vectorial' ? '#531c94' : localSheet?.subclass === 'Astral' ? '#5bb1af' : localSheet?.subclass === 'Chaos' ? '#b15b6c' : localSheet?.subclass === 'Order' ? '#aeb15b' : localSheet?.subclass === 'Void' ? '#5b73b1' : localSheet?.subclass === 'Aeronaut' ? '#3da1d8' : localSheet?.subclass === 'Brawler' ? '#d8a53d' : localSheet?.subclass === 'Dreadnaught' ? '#d83da0' : localSheet?.subclass === 'Spectre' ? '#6a3dd8' : 'black',
+                color: localSheet?.subclass === 'Anatomist' ? '#66cf00' : localSheet?.subclass === 'Grenadier' ? '#cf0000' : localSheet?.subclass === 'Necro' ? '#0033cf' : localSheet?.subclass === 'Poisoner' ? '#cf7600' : localSheet?.subclass === 'Coercive' ? '#43c9ff' : localSheet?.subclass === 'Divinist' ? '#ff4343' : localSheet?.subclass === 'Naturalist' ? '#66cf00' : localSheet?.subclass === 'Technologist' ? '#8c43ff' : localSheet?.subclass === 'Beguiler' ? '#1f21ce' : localSheet?.subclass === 'Galvanic' ? '#6fce1f' : localSheet?.subclass === 'Tactician' ? '#cec31f' : localSheet?.subclass === 'Tyrant' ? '#ce1f1f' : localSheet?.subclass === 'Inertial' ? '#1c945e' : localSheet?.subclass === 'Kinetic' ? '#7b941c' : localSheet?.subclass === 'Mercurial' ? '#941c6c' : localSheet?.subclass === 'Vectorial' ? '#531c94' : localSheet?.subclass === 'Astral' ? '#5bb1af' : localSheet?.subclass === 'Chaos' ? '#b15b6c' : localSheet?.subclass === 'Order' ? '#aeb15b' : localSheet?.subclass === 'Void' ? '#5b73b1' : localSheet?.subclass === 'Aeronaut' ? '#3da1d8' : localSheet?.subclass === 'Brawler' ? '#d8a53d' : localSheet?.subclass === 'Dreadnaught' ? '#d83da0' : localSheet?.subclass === 'Spectre' ? '#6a3dd8' : localSheet?.subclass === 'Ammo Coder' ? '#112972' : 'black',
                 lineHeight: 1,
                 textAlign: 'left',
                 whiteSpace: 'nowrap',
@@ -718,13 +707,13 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                 flexShrink: 1,
                 marginRight: '5px'
               }}>
-                {localSheet?.subclass === 'Anatomist' ? 'The "Good Stuff"' : localSheet?.subclass === 'Grenadier' ? 'The "Big One"' : localSheet?.subclass === 'Necro' ? 'Grasp of the Grave' : localSheet?.subclass === 'Poisoner' ? 'Toxic Takedown' : localSheet?.subclass === 'Coercive' ? 'Enemies On All Sides' : localSheet?.subclass === 'Divinist' ? 'Fate Reader' : localSheet?.subclass === 'Naturalist' ? 'Bed of Rejuvenation' : localSheet?.subclass === 'Technologist' ? 'Force Field' : localSheet?.subclass === 'Beguiler' ? 'Seduce' : localSheet?.subclass === 'Galvanic' ? 'Bolstering Oratory' : localSheet?.subclass === 'Tactician' ? 'Strategery' : localSheet?.subclass === 'Tyrant' ? 'Tyrannize' : localSheet?.subclass === 'Inertial' ? 'Gravity Well' : localSheet?.subclass === 'Kinetic' ? <span style={{ color: '#7b941c' }}>Grand Slam</span> : localSheet?.subclass === 'Mercurial' ? <span style={{ color: '#941c6c' }}>Haste</span> : localSheet?.subclass === 'Vectorial' ? <span style={{ color: '#531c94' }}>Vector Clone</span> : localSheet?.subclass === 'Astral' ? 'Benefaction' : localSheet?.subclass === 'Chaos' ? 'Savagery' : localSheet?.subclass === 'Order' ? 'Bulwark' : localSheet?.subclass === 'Void' ? 'Weaken' : localSheet?.subclass === 'Air' ? <span style={{ color: '#0ee2df' }}>Wings of Air</span> : localSheet?.subclass === 'Earth' ? <span style={{ color: '#e2b90e' }}>Earthen Wall</span> : localSheet?.subclass === 'Fire' ? <span style={{ color: '#e25d0e' }}>Firestorm</span> : localSheet?.subclass === 'Water' ? <span style={{ color: '#0e42e2' }}>Cleansing Waters</span> : localSheet?.subclass === 'Aeronaut' ? 'Dive Bomb' : localSheet?.subclass === 'Brawler' ? 'The Ol\' One-Two' : localSheet?.subclass === 'Dreadnaught' ? 'Barrage' : localSheet?.subclass === 'Spectre' ? 'Stealth Mode' : 'Subclass Card Name'}
+                {localSheet?.subclass === 'Anatomist' ? 'The "Good Stuff"' : localSheet?.subclass === 'Grenadier' ? 'The "Big One"' : localSheet?.subclass === 'Necro' ? 'Grasp of the Grave' : localSheet?.subclass === 'Poisoner' ? 'Toxic Takedown' : localSheet?.subclass === 'Coercive' ? 'Enemies On All Sides' : localSheet?.subclass === 'Divinist' ? 'Fate Reader' : localSheet?.subclass === 'Naturalist' ? 'Bed of Rejuvenation' : localSheet?.subclass === 'Technologist' ? 'Force Field' : localSheet?.subclass === 'Beguiler' ? 'Seduce' : localSheet?.subclass === 'Galvanic' ? 'Bolstering Oratory' : localSheet?.subclass === 'Tactician' ? 'Strategery' : localSheet?.subclass === 'Tyrant' ? 'Tyrannize' : localSheet?.subclass === 'Inertial' ? 'Gravity Well' : localSheet?.subclass === 'Kinetic' ? <span style={{ color: '#7b941c' }}>Grand Slam</span> : localSheet?.subclass === 'Mercurial' ? <span style={{ color: '#941c6c' }}>Haste</span> : localSheet?.subclass === 'Vectorial' ? <span style={{ color: '#531c94' }}>Vector Clone</span> : localSheet?.subclass === 'Astral' ? 'Benefaction' : localSheet?.subclass === 'Chaos' ? 'Savagery' : localSheet?.subclass === 'Order' ? 'Bulwark' : localSheet?.subclass === 'Void' ? 'Weaken' : localSheet?.subclass === 'Air' ? <span style={{ color: '#0ee2df' }}>Wings of Air</span> : localSheet?.subclass === 'Earth' ? <span style={{ color: '#e2b90e' }}>Earthen Wall</span> : localSheet?.subclass === 'Fire' ? <span style={{ color: '#e25d0e' }}>Firestorm</span> : localSheet?.subclass === 'Water' ? <span style={{ color: '#0e42e2' }}>Cleansing Waters</span> : localSheet?.subclass === 'Aeronaut' ? 'Dive Bomb' : localSheet?.subclass === 'Brawler' ? 'The Ol\' One-Two' : localSheet?.subclass === 'Dreadnaught' ? 'Barrage' : localSheet?.subclass === 'Spectre' ? 'Stealth Mode' : localSheet?.subclass === 'Ammo Coder' ? 'Encode Weakness' : 'Subclass Card Name'}
               </span>
               <span style={{
                 fontFamily: 'Arial, Helvetica, sans-serif',
                 fontStyle: 'italic',
                 fontSize: '0.75em',
-                color: localSheet?.subclass === 'Anatomist' ? '#66cf00' : localSheet?.subclass === 'Grenadier' ? '#cf0000' : localSheet?.subclass === 'Necro' ? '#0033cf' : localSheet?.subclass === 'Poisoner' ? '#cf7600' : localSheet?.subclass === 'Coercive' ? '#43c9ff' : localSheet?.subclass === 'Divinist' ? '#ff4343' : localSheet?.subclass === 'Naturalist' ? '#66cf00' : localSheet?.subclass === 'Technologist' ? '#8c43ff' : localSheet?.subclass === 'Beguiler' ? '#1f21ce' : localSheet?.subclass === 'Galvanic' ? '#6fce1f' : localSheet?.subclass === 'Tactician' ? '#cec31f' : localSheet?.subclass === 'Tyrant' ? '#ce1f1f' : localSheet?.subclass === 'Inertial' ? '#1c945e' : localSheet?.subclass === 'Kinetic' ? '#6A0D91' : localSheet?.subclass === 'Mercurial' ? '#941c6c' : localSheet?.subclass === 'Vectorial' ? '#531c94' : localSheet?.subclass === 'Astral' ? '#5bb1af' : localSheet?.subclass === 'Chaos' ? '#b15b6c' : localSheet?.subclass === 'Order' ? '#aeb15b' : localSheet?.subclass === 'Void' ? '#5b73b1' : localSheet?.subclass === 'Earth' ? '#8B4513' : localSheet?.subclass === 'Fire' ? '#e25d0e' : localSheet?.subclass === 'Aeronaut' ? '#3da1d8' : localSheet?.subclass === 'Brawler' ? '#d8a53d' : localSheet?.subclass === 'Dreadnaught' ? '#d83da0' : localSheet?.subclass === 'Spectre' ? '#6a3dd8' : 'black',
+                color: localSheet?.subclass === 'Anatomist' ? '#66cf00' : localSheet?.subclass === 'Grenadier' ? '#cf0000' : localSheet?.subclass === 'Necro' ? '#0033cf' : localSheet?.subclass === 'Poisoner' ? '#cf7600' : localSheet?.subclass === 'Coercive' ? '#43c9ff' : localSheet?.subclass === 'Divinist' ? '#ff4343' : localSheet?.subclass === 'Naturalist' ? '#66cf00' : localSheet?.subclass === 'Technologist' ? '#8c43ff' : localSheet?.subclass === 'Beguiler' ? '#1f21ce' : localSheet?.subclass === 'Galvanic' ? '#6fce1f' : localSheet?.subclass === 'Tactician' ? '#cec31f' : localSheet?.subclass === 'Tyrant' ? '#ce1f1f' : localSheet?.subclass === 'Inertial' ? '#1c945e' : localSheet?.subclass === 'Kinetic' ? '#6A0D91' : localSheet?.subclass === 'Mercurial' ? '#941c6c' : localSheet?.subclass === 'Vectorial' ? '#531c94' : localSheet?.subclass === 'Astral' ? '#5bb1af' : localSheet?.subclass === 'Chaos' ? '#b15b6c' : localSheet?.subclass === 'Order' ? '#aeb15b' : localSheet?.subclass === 'Void' ? '#5b73b1' : localSheet?.subclass === 'Earth' ? '#8B4513' : localSheet?.subclass === 'Fire' ? '#e25d0e' : localSheet?.subclass === 'Aeronaut' ? '#3da1d8' : localSheet?.subclass === 'Brawler' ? '#d8a53d' : localSheet?.subclass === 'Dreadnaught' ? '#d83da0' : localSheet?.subclass === 'Spectre' ? '#6a3dd8' : localSheet?.subclass === 'Ammo Coder' ? '#112972' : 'black',
                 lineHeight: 1,
                 whiteSpace: 'normal',
                 wordBreak: 'keep-all',
@@ -732,11 +721,11 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                 maxWidth: '72px',
                 display: 'inline-block',
                 textAlign: 'right'
-              }}>{localSheet?.subclass === 'Air' ? <span style={{ color: '#0ee2df', fontWeight: 'bold' }}>Air</span> : localSheet?.subclass === 'Earth' ? <span style={{ color: '#e2b90e', fontWeight: 'bold' }}>Earth</span> : localSheet?.subclass === 'Fire' ? <span style={{ color: '#e25d0e', fontWeight: 'bold' }}>Fire</span> : localSheet?.subclass === 'Water' ? <span style={{ color: '#0e42e2', fontWeight: 'bold' }}>Water</span> : localSheet?.subclass === 'Anatomist' ? 'Anatomist' : localSheet?.subclass === 'Grenadier' ? 'Grenadier' : localSheet?.subclass === 'Necro' ? 'Necro' : localSheet?.subclass === 'Poisoner' ? 'Poisoner' : localSheet?.subclass === 'Coercive' ? 'Coercive' : localSheet?.subclass === 'Divinist' ? 'Divinist' : localSheet?.subclass === 'Naturalist' ? 'Naturalist' : localSheet?.subclass === 'Technologist' ? 'Technologist' : localSheet?.subclass === 'Beguiler' ? 'Beguiler' : localSheet?.subclass === 'Galvanic' ? 'Galvanic' : localSheet?.subclass === 'Tactician' ? 'Tactician' : localSheet?.subclass === 'Tyrant' ? 'Tyrant' : localSheet?.subclass === 'Inertial' ? 'Inertial' : localSheet?.subclass === 'Kinetic' ? <span style={{ color: '#7b941c' }}>Kinetic</span> : localSheet?.subclass === 'Mercurial' ? <span style={{ color: '#941c6c' }}>Mercurial</span> : localSheet?.subclass === 'Vectorial' ? <span style={{ color: '#531c94' }}>Vectorial</span> : localSheet?.subclass === 'Astral' ? 'Astral' : localSheet?.subclass === 'Chaos' ? 'Chaos' : localSheet?.subclass === 'Order' ? 'Order' : localSheet?.subclass === 'Void' ? 'Void' : localSheet?.subclass === 'Aeronaut' ? 'Aeronaut' : localSheet?.subclass === 'Brawler' ? 'Brawler' : localSheet?.subclass === 'Dreadnaught' ? 'Dreadnaught' : localSheet?.subclass === 'Spectre' ? 'Spectre' : 'Subclass'}</span>
+              }}>{localSheet?.subclass === 'Air' ? <span style={{ color: '#0ee2df', fontWeight: 'bold' }}>Air</span> : localSheet?.subclass === 'Earth' ? <span style={{ color: '#e2b90e', fontWeight: 'bold' }}>Earth</span> : localSheet?.subclass === 'Fire' ? <span style={{ color: '#e25d0e', fontWeight: 'bold' }}>Fire</span> : localSheet?.subclass === 'Water' ? <span style={{ color: '#0e42e2', fontWeight: 'bold' }}>Water</span> : localSheet?.subclass === 'Anatomist' ? 'Anatomist' : localSheet?.subclass === 'Grenadier' ? 'Grenadier' : localSheet?.subclass === 'Necro' ? 'Necro' : localSheet?.subclass === 'Poisoner' ? 'Poisoner' : localSheet?.subclass === 'Coercive' ? 'Coercive' : localSheet?.subclass === 'Divinist' ? 'Divinist' : localSheet?.subclass === 'Naturalist' ? 'Naturalist' : localSheet?.subclass === 'Technologist' ? 'Technologist' : localSheet?.subclass === 'Beguiler' ? 'Beguiler' : localSheet?.subclass === 'Galvanic' ? 'Galvanic' : localSheet?.subclass === 'Tactician' ? 'Tactician' : localSheet?.subclass === 'Tyrant' ? 'Tyrant' : localSheet?.subclass === 'Inertial' ? 'Inertial' : localSheet?.subclass === 'Kinetic' ? <span style={{ color: '#7b941c' }}>Kinetic</span> : localSheet?.subclass === 'Mercurial' ? <span style={{ color: '#941c6c' }}>Mercurial</span> : localSheet?.subclass === 'Vectorial' ? <span style={{ color: '#531c94' }}>Vectorial</span> : localSheet?.subclass === 'Astral' ? 'Astral' : localSheet?.subclass === 'Chaos' ? 'Chaos' : localSheet?.subclass === 'Order' ? 'Order' : localSheet?.subclass === 'Void' ? 'Void' : localSheet?.subclass === 'Aeronaut' ? 'Aeronaut' : localSheet?.subclass === 'Brawler' ? 'Brawler' : localSheet?.subclass === 'Dreadnaught' ? 'Dreadnaught' : localSheet?.subclass === 'Spectre' ? 'Spectre' : localSheet?.subclass === 'Ammo Coder' ? <span>Ammo<br />Coder</span> : 'Subclass'}</span>
             </div>
             <img 
-              src={localSheet?.subclass === 'Anatomist' ? "/The Good Stuff.png" : localSheet?.subclass === 'Grenadier' ? "/The Big One.png" : localSheet?.subclass === 'Necro' ? "/Grasp of the Grave.png" : localSheet?.subclass === 'Poisoner' ? "/Toxic Takedown.png" : localSheet?.subclass === 'Coercive' ? "/Enemies On All Sides.png" : localSheet?.subclass === 'Divinist' ? "/Fate Reader.png" : localSheet?.subclass === 'Naturalist' ? "/Bed of Rejuvenation.png" : localSheet?.subclass === 'Technologist' ? "/Force Field.png" : localSheet?.subclass === 'Beguiler' ? "/Seduce.png" : localSheet?.subclass === 'Galvanic' ? "/Bolstering Oratory.png" : localSheet?.subclass === 'Tactician' ? "/Strategery.png" : localSheet?.subclass === 'Tyrant' ? "/Tyrannize.png" : localSheet?.subclass === 'Inertial' ? "/Gravity Well.png" : localSheet?.subclass === 'Kinetic' ? "/Grand Slam.png" : localSheet?.subclass === 'Mercurial' ? "/Haste.png" : localSheet?.subclass === 'Vectorial' ? "/Vector Clone.png" : localSheet?.subclass === 'Astral' ? "/Benefaction.png" : localSheet?.subclass === 'Chaos' ? "/Savagery.png" : localSheet?.subclass === 'Order' ? "/Bulwark.png" : localSheet?.subclass === 'Void' ? "/Weaken.png" : localSheet?.subclass === 'Air' ? "/Wings of Air.png" : localSheet?.subclass === 'Earth' ? "/Earthen Wall.png" : localSheet?.subclass === 'Fire' ? "/Firestorm.png" : localSheet?.subclass === 'Water' ? "/Cleansing Waters.png" : localSheet?.subclass === 'Aeronaut' ? "/Dive Bomb.png" : localSheet?.subclass === 'Brawler' ? "/The Ol' One-Two.png" : localSheet?.subclass === 'Dreadnaught' ? "/Barrage.png" : localSheet?.subclass === 'Spectre' ? "/Stealth Mode.png" : "/Blank Card.png"}
-              alt={localSheet?.subclass === 'Anatomist' ? "The Good Stuff" : localSheet?.subclass === 'Grenadier' ? "The Big One" : localSheet?.subclass === 'Necro' ? "Grasp of the Grave" : localSheet?.subclass === 'Poisoner' ? "Toxic Takedown" : localSheet?.subclass === 'Coercive' ? "Enemies On All Sides" : localSheet?.subclass === 'Divinist' ? "Fate Reader" : localSheet?.subclass === 'Naturalist' ? "Bed of Rejuvenation" : localSheet?.subclass === 'Technologist' ? "Force Field" : localSheet?.subclass === 'Beguiler' ? "Seduce" : localSheet?.subclass === 'Galvanic' ? "Bolstering Oratory" : localSheet?.subclass === 'Tactician' ? "Strategery" : localSheet?.subclass === 'Tyrant' ? "Tyrannize" : localSheet?.subclass === 'Inertial' ? "Gravity Well" : localSheet?.subclass === 'Kinetic' ? "Grand Slam" : localSheet?.subclass === 'Mercurial' ? "Haste" : localSheet?.subclass === 'Vectorial' ? "Vector Clone" : localSheet?.subclass === 'Astral' ? "Benefaction" : localSheet?.subclass === 'Chaos' ? "Savagery" : localSheet?.subclass === 'Order' ? "Bulwark" : localSheet?.subclass === 'Void' ? "Weaken" : localSheet?.subclass === 'Air' ? "Wings of Air" : localSheet?.subclass === 'Earth' ? "Earthen Wall" : localSheet?.subclass === 'Fire' ? "Firestorm" : localSheet?.subclass === 'Water' ? "Cleansing Waters" : localSheet?.subclass === 'Aeronaut' ? "Dive Bomb" : localSheet?.subclass === 'Brawler' ? "The Ol' One-Two" : localSheet?.subclass === 'Dreadnaught' ? "Barrage" : localSheet?.subclass === 'Spectre' ? "Stealth Mode" : "Blank Card"}
+              src={localSheet?.subclass === 'Anatomist' ? "/The Good Stuff.png" : localSheet?.subclass === 'Grenadier' ? "/The Big One.png" : localSheet?.subclass === 'Necro' ? "/Grasp of the Grave.png" : localSheet?.subclass === 'Poisoner' ? "/Toxic Takedown.png" : localSheet?.subclass === 'Coercive' ? "/Enemies On All Sides.png" : localSheet?.subclass === 'Divinist' ? "/Fate Reader.png" : localSheet?.subclass === 'Naturalist' ? "/Bed of Rejuvenation.png" : localSheet?.subclass === 'Technologist' ? "/Force Field.png" : localSheet?.subclass === 'Beguiler' ? "/Seduce.png" : localSheet?.subclass === 'Galvanic' ? "/Bolstering Oratory.png" : localSheet?.subclass === 'Tactician' ? "/Strategery.png" : localSheet?.subclass === 'Tyrant' ? "/Tyrannize.png" : localSheet?.subclass === 'Inertial' ? "/Gravity Well.png" : localSheet?.subclass === 'Kinetic' ? "/Grand Slam.png" : localSheet?.subclass === 'Mercurial' ? "/Haste.png" : localSheet?.subclass === 'Vectorial' ? "/Vector Clone.png" : localSheet?.subclass === 'Astral' ? "/Benefaction.png" : localSheet?.subclass === 'Chaos' ? "/Savagery.png" : localSheet?.subclass === 'Order' ? "/Bulwark.png" : localSheet?.subclass === 'Void' ? "/Weaken.png" : localSheet?.subclass === 'Air' ? "/Wings of Air.png" : localSheet?.subclass === 'Earth' ? "/Earthen Wall.png" : localSheet?.subclass === 'Fire' ? "/Firestorm.png" : localSheet?.subclass === 'Water' ? "/Cleansing Waters.png" : localSheet?.subclass === 'Aeronaut' ? "/Dive Bomb.png" : localSheet?.subclass === 'Brawler' ? "/The Ol' One-Two.png" : localSheet?.subclass === 'Dreadnaught' ? "/Barrage.png" : localSheet?.subclass === 'Spectre' ? "/Stealth Mode.png" : localSheet?.subclass === 'Ammo Coder' ? "/Encode Weakness.png" : "/Blank Card.png"}
+              alt={localSheet?.subclass === 'Anatomist' ? "The Good Stuff" : localSheet?.subclass === 'Grenadier' ? "The Big One" : localSheet?.subclass === 'Necro' ? "Grasp of the Grave" : localSheet?.subclass === 'Poisoner' ? "Toxic Takedown" : localSheet?.subclass === 'Coercive' ? "Enemies On All Sides" : localSheet?.subclass === 'Divinist' ? "Fate Reader" : localSheet?.subclass === 'Naturalist' ? "Bed of Rejuvenation" : localSheet?.subclass === 'Technologist' ? "Force Field" : localSheet?.subclass === 'Beguiler' ? "Seduce" : localSheet?.subclass === 'Galvanic' ? "Bolstering Oratory" : localSheet?.subclass === 'Tactician' ? "Strategery" : localSheet?.subclass === 'Tyrant' ? "Tyrannize" : localSheet?.subclass === 'Inertial' ? "Gravity Well" : localSheet?.subclass === 'Kinetic' ? "Grand Slam" : localSheet?.subclass === 'Mercurial' ? "Haste" : localSheet?.subclass === 'Vectorial' ? "Vector Clone" : localSheet?.subclass === 'Astral' ? "Benefaction" : localSheet?.subclass === 'Chaos' ? "Savagery" : localSheet?.subclass === 'Order' ? "Bulwark" : localSheet?.subclass === 'Void' ? "Weaken" : localSheet?.subclass === 'Air' ? "Wings of Air" : localSheet?.subclass === 'Earth' ? "Earthen Wall" : localSheet?.subclass === 'Fire' ? "Firestorm" : localSheet?.subclass === 'Water' ? "Cleansing Waters" : localSheet?.subclass === 'Aeronaut' ? "Dive Bomb" : localSheet?.subclass === 'Brawler' ? "The Ol' One-Two" : localSheet?.subclass === 'Dreadnaught' ? "Barrage" : localSheet?.subclass === 'Spectre' ? "Stealth Mode" : localSheet?.subclass === 'Ammo Coder' ? "Encode Weakness" : "Blank Card"}
               style={{
                 position: 'absolute',
                 top: 35,
@@ -835,6 +824,8 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                   ? <>Cooldown <span style={{ fontWeight: 'bold', fontStyle: 'normal' }}>[{4 - ((localSheet?.subclassProgressionDots as any)?.dreadnaughtTechniqueCooldownDots?.filter(Boolean).length || 0)}]</span></>
                   : localSheet?.subclass === 'Spectre'
                   ? <>Cooldown <span style={{ fontWeight: 'bold', fontStyle: 'normal' }}>[{3 - ((localSheet?.subclassProgressionDots as any)?.spectreTechniqueCooldownDots?.filter(Boolean).length || 0)}]</span></>
+                  : localSheet?.subclass === 'Ammo Coder'
+                  ? <>Cooldown <span style={{ fontWeight: 'bold', fontStyle: 'normal' }}>[{4 - ((localSheet?.subclassProgressionDots as any)?.ammocoderTechniqueCooldownDots?.filter(Boolean).length || 0)}]</span></>
                   : <>Cooldown <span style={{ fontWeight: 'bold', fontStyle: 'normal' }}>[{localSheet?.subclass === 'Anatomist' ? calculateAnatomistTechniqueData(localSheet?.subclassProgressionDots).cooldown : '#'}]</span></>}
               </span>
             </div>
@@ -951,6 +942,8 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                   ? generateBarrageCardJSX(localSheet)
                   : localSheet?.subclass === 'Spectre'
                   ? generateStealthModeCardJSX(localSheet)
+                  : localSheet?.subclass === 'Ammo Coder'
+                  ? generateEncodeWeaknessCardJSX(localSheet?.subclassProgressionDots)
                   : 'Card stats.'}
               </div>
             </div>
@@ -963,7 +956,7 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
               color: '#000',
               fontFamily: 'Arial, Helvetica, sans-serif',
               fontStyle: 'italic',
-              fontSize: localSheet?.subclass === 'Grenadier' ? '0.69em' : localSheet?.subclass === 'Anatomist' ? '0.69em' : localSheet?.subclass === 'Necro' ? '0.69em' : localSheet?.subclass === 'Poisoner' ? '0.69em' : localSheet?.subclass === 'Coercive' ? '0.69em' : localSheet?.subclass === 'Divinist' ? '0.69em' : localSheet?.subclass === 'Naturalist' ? '0.69em' : localSheet?.subclass === 'Technologist' ? '0.69em' : localSheet?.subclass === 'Beguiler' ? '0.69em' : localSheet?.subclass === 'Galvanic' ? '0.69em' : localSheet?.subclass === 'Tactician' ? '0.69em' : localSheet?.subclass === 'Tyrant' ? '0.69em' : localSheet?.subclass === 'Inertial' ? '0.69em' : localSheet?.subclass === 'Kinetic' ? '0.69em' : localSheet?.subclass === 'Mercurial' ? '0.69em' : localSheet?.subclass === 'Vectorial' ? '0.69em' : localSheet?.subclass === 'Astral' ? '0.69em' : localSheet?.subclass === 'Chaos' ? '0.69em' : localSheet?.subclass === 'Order' ? '0.69em' : localSheet?.subclass === 'Void' ? '0.69em' : localSheet?.subclass === 'Air' ? '0.69em' : localSheet?.subclass === 'Earth' ? '0.69em' : localSheet?.subclass === 'Fire' ? '0.69em' : localSheet?.subclass === 'Water' ? '0.69em' : localSheet?.subclass === 'Aeronaut' ? '0.69em' : localSheet?.subclass === 'Brawler' ? '0.69em' : '0.70em',
+              fontSize: localSheet?.subclass === 'Grenadier' ? '0.69em' : localSheet?.subclass === 'Anatomist' ? '0.69em' : localSheet?.subclass === 'Necro' ? '0.69em' : localSheet?.subclass === 'Poisoner' ? '0.69em' : localSheet?.subclass === 'Coercive' ? '0.69em' : localSheet?.subclass === 'Divinist' ? '0.69em' : localSheet?.subclass === 'Naturalist' ? '0.69em' : localSheet?.subclass === 'Technologist' ? '0.69em' : localSheet?.subclass === 'Beguiler' ? '0.69em' : localSheet?.subclass === 'Galvanic' ? '0.69em' : localSheet?.subclass === 'Tactician' ? '0.69em' : localSheet?.subclass === 'Tyrant' ? '0.69em' : localSheet?.subclass === 'Inertial' ? '0.69em' : localSheet?.subclass === 'Kinetic' ? '0.69em' : localSheet?.subclass === 'Mercurial' ? '0.69em' : localSheet?.subclass === 'Vectorial' ? '0.69em' : localSheet?.subclass === 'Astral' ? '0.69em' : localSheet?.subclass === 'Chaos' ? '0.69em' : localSheet?.subclass === 'Order' ? '0.69em' : localSheet?.subclass === 'Void' ? '0.69em' : localSheet?.subclass === 'Air' ? '0.69em' : localSheet?.subclass === 'Earth' ? '0.69em' : localSheet?.subclass === 'Fire' ? '0.69em' : localSheet?.subclass === 'Water' ? '0.69em' : localSheet?.subclass === 'Aeronaut' ? '0.69em' : localSheet?.subclass === 'Brawler' ? '0.69em' : localSheet?.subclass === 'Ammo Coder' ? '0.69em' : '0.70em',
               fontWeight: 400,
               zIndex: 3,
               textAlign: 'left'
@@ -1024,6 +1017,8 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                 ? '“Never underestimate the firepower of a freakin’ dreadnaught, fools!” --Barristair Big’uns, Defteran Dreadnaught'
               : localSheet?.subclass === 'Spectre'
                 ? 'Holographic scales woven into a Spectre’s armor create a mirror-like illusion that reflects the background into the foreground.'
+              : localSheet?.subclass === 'Ammo Coder'
+                ? '"I carefully whisper an Oikospell into my carbine right before I pull the trigger -- keeps \'em on their toes." --Brecka Mageshot, Renegade Ammo Coder'
               : 'Flavor text.'}
             </div>
         </div>
@@ -1308,6 +1303,152 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
             </div>
         </div>
         
+        {/* Gunslinger Double-Tap Secondary Attack Card */}
+        {charClass === 'Gunslinger' && (
+          <div style={{ 
+            width: '240px', 
+            height: '336px', 
+            background: '#fff', 
+            border: '5px solid #990000', 
+            borderRadius: 8, 
+            boxShadow: '0 2px 4px rgba(0,0,0,0.1)', 
+            padding: '1.2rem', 
+            display: 'flex', 
+            flexDirection: 'column', 
+            alignItems: 'center', 
+            justifyContent: 'center',
+            flexShrink: 0,
+            position: 'relative',
+            overflow: 'hidden'
+          }}>
+            <div style={{
+              position: 'absolute',
+              top: -4,
+              left: 0,
+              width: '100%',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'flex-end',
+              padding: '0 10px',
+              boxSizing: 'border-box',
+              minHeight: '2.1em'
+            }}>
+              <span style={{
+                fontFamily: 'Arial, Helvetica, sans-serif',
+                fontWeight: 'bold',
+                fontSize: 'clamp(0.8em, 4vw, 1.25em)',
+                color: '#4e7211',
+                lineHeight: 1,
+                textAlign: 'left',
+                whiteSpace: 'nowrap',
+                maxWidth: 'calc(100% - 87px)',
+                minWidth: 0,
+                flexShrink: 1,
+                marginRight: '5px'
+              }}>
+                Double-Tap
+              </span>
+              <span style={{
+                fontFamily: 'Arial, Helvetica, sans-serif',
+                fontStyle: 'italic',
+                fontSize: '0.75em',
+                color: '#4e7211',
+                lineHeight: 1,
+                whiteSpace: 'normal',
+                wordBreak: 'keep-all',
+                overflowWrap: 'anywhere',
+                maxWidth: '78px',
+                display: 'inline-block',
+                textAlign: 'right',
+                marginRight: '0px'
+              }}>Gunslinger</span>
+            </div>
+            <img 
+              src="/Double-Tap.png"
+              alt="Double-Tap"
+              style={{
+                position: 'absolute',
+                top: 35,
+                left: 10,
+                right: 10,
+                width: 'calc(100% - 20px)',
+                height: 'calc(50% - 55px)',
+                objectFit: 'cover',
+                zIndex: 1,
+                borderRadius: 8
+              }}
+            />
+            <div style={{
+              position: 'absolute',
+              top: 'calc(50% - 15px)',
+              left: 0,
+              width: '100%',
+              display: 'flex',
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              paddingLeft: 10,
+              paddingRight: 10,
+              zIndex: 3
+            }}>
+              <span style={{ color: '#990000', fontFamily: 'Arial, Helvetica, sans-serif', fontWeight: 'bold', fontSize: '1.1em', textAlign: 'left' }}>Secondary Attack</span>
+              <span style={{ color: '#990000', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '0.875em', fontStyle: 'italic', marginRight: 22, whiteSpace: 'nowrap', maxWidth: 'calc(100% - 120px)', overflow: 'hidden', textOverflow: 'ellipsis', textAlign: 'right' }}>
+                Cooldown <span style={{ fontWeight: 'bold', fontStyle: 'normal' }}>[{(() => {
+                  // Calculate cooldown (4 - number of -1 Cooldown dots from classCardDots[6])
+                  let cooldownDots = 0;
+                  if (localSheet && Array.isArray(localSheet.classCardDots) && Array.isArray(localSheet.classCardDots[6])) {
+                    cooldownDots = localSheet.classCardDots[6].filter(Boolean).length;
+                  }
+                  return 4 - cooldownDots;
+                })()}]</span>
+              </span>
+            </div>
+            
+            <div style={{
+              position: 'absolute',
+              top: 'calc(50% + 10px)',
+              left: 10,
+              right: 10,
+              bottom: 45,
+              color: '#000',
+              fontFamily: 'Arial, Helvetica, sans-serif',
+              fontWeight: 400,
+              overflow: 'auto',
+              wordWrap: 'break-word',
+              display: 'flex',
+              alignItems: 'flex-start',
+              zIndex: 2,
+              lineHeight: 1.2
+            }}>
+              <div style={{
+                fontSize: '0.875em',
+                width: '100%',
+                height: 'fit-content',
+                maxHeight: '100%',
+                overflow: 'hidden'
+              }}>
+                {generateDoubleTapCardJSX(localSheet?.classCardDots)}
+              </div>
+            </div>
+            <div style={{
+              position: 'absolute',
+              top: 330,
+              bottom: 5,
+              left: 10,
+              right: 10,
+              color: '#000',
+              fontFamily: 'Arial, Helvetica, sans-serif',
+              fontStyle: 'italic',
+              fontSize: '0.70em',
+              fontWeight: 400,
+              zIndex: 3,
+              textAlign: 'left'
+            }}>
+              If at first you don’t blast ‘em to smithereens… try, try again.
+            </div>
+          </div>
+        )}
+        
         {/* Attack Cards */}
         {/* Chemist Attack Cards */}
         {charClass === 'Chemist' && <CardsChemistAttacks sheet={localSheet} />}
@@ -1334,6 +1475,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
 
         {/* Exospecialist Attack Cards */}
         {charClass === 'Exospecialist' && <CardsExospecialistAttacks sheet={localSheet} subclass={subclass} />}
+
+        {/* Gunslinger Attack Cards */}
+        {charClass === 'Gunslinger' && <CardsGunslingerAttacks sheet={localSheet} subclass={subclass} />}
 
       </div>
       
