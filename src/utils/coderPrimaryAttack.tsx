@@ -34,7 +34,8 @@ export function generateCoderPrimaryAttackStatsJSX(
   lensName?: string,
   hasIgnore100Cover?: boolean,
   subclass?: string,
-  subclassProgressionDots?: any
+  subclassProgressionDots?: any,
+  charClass?: string
 ): React.ReactElement {
   const { dieSize, critThreshold } = calculateCoderPrimaryAttackData(classCardDots);
   
@@ -42,16 +43,28 @@ export function generateCoderPrimaryAttackStatsJSX(
   const coverPercentage = hasIgnore100Cover ? '100%' : '50%';
   
   // Calculate range bonus from Divinist subclass
-  const rangeBonus = subclass === 'Divinist' 
+  let rangeBonus = subclass === 'Divinist' 
     ? (subclassProgressionDots?.divinistFeatureRangeDots?.filter(Boolean).length || 0)
     : 0;
+  
+  // Add Sharpshooter range bonus for Gunslinger class (Ammo Coder subclass)
+  if (charClass === 'Gunslinger') {
+    rangeBonus += (classCardDots?.[1]?.filter(Boolean).length || 0);
+  }
+  
   const totalRange = 10 + rangeBonus;
+  
+  // Calculate Sharpshooter crit bonus for Gunslinger class (Ammo Coder subclass)
+  const sharpshooterCritBonus = charClass === 'Gunslinger' 
+    ? (2 + (classCardDots?.[0]?.filter(Boolean).length || 0))
+    : 0;
+  const adjustedCritThreshold = critThreshold - sharpshooterCritBonus;
   
   return (
     <div style={{ fontSize: '0.875em', width: '100%', height: 'fit-content', maxHeight: '100%', overflow: 'hidden' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-        <span><b><u>Range</u></b> {subclass === 'Divinist' ? <b>[{totalRange}]</b> : totalRange}hx</span>
-        <span style={{ textAlign: 'right', minWidth: '80px' }}><b><u>Crit</u></b> <b>[{critThreshold}]</b>+</span>
+        <span><b><u>Range</u></b> {(subclass === 'Divinist' || charClass === 'Gunslinger') ? <b>[{totalRange}]</b> : totalRange}hx</span>
+        <span style={{ textAlign: 'right', minWidth: '80px' }}><b><u>Crit</u></b> <b>[{adjustedCritThreshold}]</b>+</span>
       </div>
       <div>
         <b><u>Target</u></b> Single, ignore <b>[{coverPercentage}]</b> Cover <br />

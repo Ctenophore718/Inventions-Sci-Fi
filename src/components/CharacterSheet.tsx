@@ -66,6 +66,7 @@ import { generateElementalExcitementJSX } from "../utils/elementalistFeature";
 import { generateExosuitJSX } from "../utils/exospecialistFeature";
 import { generateSharpshooterCharacterSheetJSX } from "../utils/gunslingerFeature";
 import { generateBulletCodeJSX } from "../utils/ammocoderFeature";
+import { generateExcessiveDisplayJSX } from "../utils/ordnancerFeature";
 import { generateAmmoCoderStrikeDamageJSX } from "../utils/ammocoderStrike";
 
 import CharacterSheetInventory from "./CharacterSheetInventory";
@@ -893,7 +894,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
 
   const ordnancerFeatureJSX = (
     <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#910a0a' }}>Excessive Display.</i></b> You and all allies within <b>[3]</b>hx deal +1d6 Damage to all <b><i><span style={{ color: '#990000' }}>Attacks</span></i></b>. The Damage type is the same as the <b><i><span style={{ color: '#990000' }}>Attack</span></i></b> used.
+      {generateExcessiveDisplayJSX(sheet)}
     </span>
   );
 

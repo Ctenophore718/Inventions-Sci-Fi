@@ -40,9 +40,14 @@ export const CardsGunslingerAttacks: React.FC<CardsGunslingerAttacksProps> = ({ 
   const dieSizeDots = (sheet?.subclassProgressionDots as any)?.ammocoderAttackDieSizeDots?.filter(Boolean).length || 0;
   const critDots = (sheet?.subclassProgressionDots as any)?.ammocoderAttackCritDots?.filter(Boolean).length || 0;
 
+  // Calculate Sharpshooter bonuses (Gunslinger feature)
+  const sharpshooterCritBonus = 2 + (sheet?.classCardDots?.[0]?.filter(Boolean).length || 0);
+  const sharpshooterRangeBonus = 0 + (sheet?.classCardDots?.[1]?.filter(Boolean).length || 0);
+
   const dieSize = 6 + (dieSizeDots * 2);
-  const critThreshold = 18 - critDots;
+  const critThreshold = 18 - critDots - sharpshooterCritBonus;
   const chainAoE = 1 + (chainAoEDots * 2);
+  const totalRange = 10 + sharpshooterRangeBonus;
 
   return (
     <>
@@ -163,7 +168,7 @@ export const CardsGunslingerAttacks: React.FC<CardsGunslingerAttacksProps> = ({ 
           }}>
             <div style={{ fontSize: '0.875em', width: '100%', height: 'fit-content', maxHeight: '100%', overflow: 'hidden' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span><b><u>Range</u></b> 10hx</span>
+                <span><b><u>Range</u></b> <b>[{totalRange}]</b>hx</span>
                 <span style={{ textAlign: 'right', minWidth: '80px' }}><b><u>Crit</u></b> <b>[{critThreshold}]</b>+</span>
               </div>
               <div>

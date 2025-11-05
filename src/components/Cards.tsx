@@ -1315,7 +1315,7 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
         {charClass === 'Chemist' && <CardsChemistAttacks sheet={localSheet} />}
         
         {/* Coder Attack Cards */}
-        {charClass === 'Coder' && <CardsCoderAttacks sheet={localSheet} subclass={subclass} />}
+        {charClass === 'Coder' && <CardsCoderAttacks sheet={localSheet} subclass={subclass} charClass={charClass} />}
 
         {/* Commander Attack Cards */}
         {charClass === 'Commander' && <CardsCommanderAttacks sheet={localSheet} subclass={subclass} />}

@@ -6,6 +6,7 @@ import { generateCoderSecondaryAttackStatsJSX, getAlgorithmCost } from '../utils
 interface CardsCoderAttacksProps {
   sheet: CharacterSheet | null;
   subclass: string;
+  charClass: string;
 }
 
 function getLensFlavorText(lens: string): string {
@@ -30,7 +31,7 @@ function getAlgorithmFlavorText(algorithm: string): string {
   }
 }
 
-export const CardsCoderAttacks: React.FC<CardsCoderAttacksProps> = ({ sheet, subclass }) => {
+export const CardsCoderAttacks: React.FC<CardsCoderAttacksProps> = ({ sheet, subclass, charClass }) => {
   const lenses = sheet?.lenses || [];
   const algorithms = sheet?.algorithms || [];
   
@@ -154,7 +155,7 @@ export const CardsCoderAttacks: React.FC<CardsCoderAttacksProps> = ({ sheet, sub
             zIndex: 2,
             lineHeight: 1.2
           }}>
-            {generateCoderPrimaryAttackStatsJSX(sheet?.classCardDots, getLensCost(lens), lens, hasIgnore100Cover, subclass, sheet?.subclassProgressionDots)}
+            {generateCoderPrimaryAttackStatsJSX(sheet?.classCardDots, getLensCost(lens), lens, hasIgnore100Cover, subclass, sheet?.subclassProgressionDots, charClass)}
           </div>
           
           {/* Flavor Text */}

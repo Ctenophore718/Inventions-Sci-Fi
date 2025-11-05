@@ -375,7 +375,7 @@ const LevelUpSubclassesGunslinger: React.FC<LevelUpSubclassesGunslingerProps> = 
             
             <div style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
               <div style={{ marginBottom: '8px' }}>
-                <b><i style={{ color: '#990000' }}>Primary Attack.</i></b>
+                <b><i>Primary</i> <i style={{ color: '#990000' }}>Attack.</i></b>
               </div>
               
               {/* Coder Carbines dropdown */}
@@ -493,8 +493,8 @@ const LevelUpSubclassesGunslinger: React.FC<LevelUpSubclassesGunslingerProps> = 
               {/* Attack stats */}
               <div style={{ fontSize: '1em', marginTop: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span><b><u>Range</u></b> 10hx</span>
-                  <span style={{ textAlign: 'right', minWidth: '80px' }}><b><u>Crit</u></b> <b>[{18 - ammocoderAttackCritDots.filter(Boolean).length}]</b>+</span>
+                  <span><b><u>Range</u></b> <b>[{10 + (sheet?.classCardDots?.[1] ? sheet.classCardDots[1].filter(Boolean).length : 0)}]</b>hx</span>
+                  <span style={{ textAlign: 'right', minWidth: '80px' }}><b><u>Crit</u></b> <b>[{18 - ammocoderAttackCritDots.filter(Boolean).length - (2 + (sheet?.classCardDots?.[0] ? sheet.classCardDots[0].filter(Boolean).length : 0))}]</b>+</span>
                 </div>
                 <div>
                   <b><u>Target</u></b> AoE <b>[{1 + (ammocoderAttackChainAoEDots.filter(Boolean).length * 2)}]</b>hx-Chain
@@ -869,7 +869,7 @@ const LevelUpSubclassesGunslinger: React.FC<LevelUpSubclassesGunslingerProps> = 
           <div style={{ color: '#990000', fontWeight: 'bold', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '8px' }}>
             <div style={{ fontWeight: 'bold', color: '#990000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Attack</u></div>
             <div style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
-              <b><i style={{ color: '#990000' }}>Primary Attack.</i></b><br />
+              <b>Primary <i style={{ color: '#990000' }}>Attack.</i></b><br />
               <b>Rocket Launcher.</b> 12hx Range, AoE 1hx-Radius, 20+ Crit, 2d6 Damage.
             </div>
           </div>
