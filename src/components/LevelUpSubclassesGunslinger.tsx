@@ -3,6 +3,9 @@ import type { CharacterSheet } from "../types/CharacterSheet";
 import { generateBulletCodeJSX } from "../utils/ammocoderFeature";
 import { generateEncodeWeaknessJSX } from "../utils/ammocoderTechnique";
 import { generateAmmoCoderStrikeJSX } from "../utils/ammocoderStrike";
+import { generateExcessiveDisplayJSX } from "../utils/ordnancerFeature";
+import { generateArtilleryStrikeJSX } from "../utils/ordnancerTechnique";
+import { generateOrdnancerStrikeJSX } from "../utils/ordnancerStrike";
 
 type LevelUpSubclassesGunslingerProps = {
   sheet: CharacterSheet | null;
@@ -58,6 +61,32 @@ const LevelUpSubclassesGunslinger: React.FC<LevelUpSubclassesGunslingerProps> = 
   );
   const [ammocoderPerksSkillsDots, setAmmocoderPerksSkillsDots] = useState<boolean[]>(
     (sheet?.subclassProgressionDots as any)?.ammocoderPerksSkillsDots || [false]
+  );
+
+  // Independent state for Ordnancer dots
+  const [ordnancerFeatureRangeDots, setOrdnancerFeatureRangeDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.ordnancerFeatureRangeDots || [false, false, false]
+  );
+  const [ordnancerTechniqueSpikeDots, setOrdnancerTechniqueSpikeDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.ordnancerTechniqueSpikeDots || [false, false, false]
+  );
+  const [ordnancerTechniqueDamageDots, setOrdnancerTechniqueDamageDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.ordnancerTechniqueDamageDots || [false, false, false]
+  );
+  const [ordnancerTechniqueCooldownDots, setOrdnancerTechniqueCooldownDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.ordnancerTechniqueCooldownDots || [false, false]
+  );
+  const [ordnancerAttackDamageDiceDots, setOrdnancerAttackDamageDiceDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.ordnancerAttackDamageDiceDots || [false, false, false]
+  );
+  const [ordnancerAttackCritDots, setOrdnancerAttackCritDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.ordnancerAttackCritDots || [false, false, false]
+  );
+  const [ordnancerStrikeDamageDiceDots, setOrdnancerStrikeDamageDiceDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.ordnancerStrikeDamageDiceDots || [false, false, false]
+  );
+  const [ordnancerPerksSkillsDots, setOrdnancerPerksSkillsDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.ordnancerPerksSkillsDots || [false]
   );
 
   // State for Coder Carbines dropdown
@@ -587,7 +616,7 @@ const LevelUpSubclassesGunslinger: React.FC<LevelUpSubclassesGunslingerProps> = 
             <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32, fontFamily: 'Arial, Helvetica, sans-serif' }}>
               <div style={{ fontWeight: 'bold', color: '#38761d', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Movement</u></div>
               <span style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
-                <b><i>Enhanced <span style={{ color: '#38761d' }}>Movement</span> Effects.</i></b>
+                <b><i>Enhanced <span style={{ color: '#38761d' }}>Movement</span> Effects.</i></b> +<b>[{ammocoderMovementSpeedDots.filter(Boolean).length}]</b>hx <b><i style={{ color: '#38761d' }}>Speed</i></b>.
               </span>
             </span>
           </div>
@@ -676,6 +705,331 @@ const LevelUpSubclassesGunslinger: React.FC<LevelUpSubclassesGunslingerProps> = 
                   borderRadius: '50%',
                   display: 'block',
                   background: ammocoderPerksSkillsDots[0] ? '#000' : '#fff',
+                  cursor: 'pointer',
+                  transition: 'background 0.2s'
+                }}
+              ></span>
+            </span>
+          </div>
+        </div>
+      )}
+
+      {/* Ordnancer Subclass Card */}
+      {subclass === 'Ordnancer' && (
+        <div style={{ width: '100%', marginTop: '1rem', textAlign: 'left', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
+          {/* Feature header */}
+          <div style={{ color: '#0b5394', fontWeight: 'bold', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '8px' }}>
+            <div style={{ fontWeight: 'bold', color: '#0b5394', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Feature</u></div>
+            <span style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
+              {generateExcessiveDisplayJSX(sheet)}
+            </span>
+          </div>
+
+          {/* Feature XP progression table */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 24px 24px 24px',
+            gridTemplateRows: 'auto',
+            columnGap: '6px',
+            rowGap: '2px',
+            alignItems: 'start',
+            marginBottom: '2px',
+            width: '100%',
+            paddingLeft: '4px'
+          }}>
+            {/* Row 1: XP headers */}
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>4xp</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>8xp</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>12xp</span>
+            {/* Row 2: +1hx range */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1hx</span>
+            {[0, 1, 2].map(i => (
+              <span key={i} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <span
+                  onClick={() => handleDotClick(ordnancerFeatureRangeDots, setOrdnancerFeatureRangeDots, i, [4, 8, 12], 'ordnancerFeatureRangeDots')}
+                  style={{
+                    width: '15px',
+                    height: '15px',
+                    border: '2px solid #000',
+                    borderRadius: '50%',
+                    display: 'block',
+                    background: ordnancerFeatureRangeDots[i] ? '#000' : '#fff',
+                    cursor: (i === 0 || ordnancerFeatureRangeDots[i - 1]) ? 'pointer' : 'not-allowed',
+                    transition: 'background 0.2s'
+                  }}
+                ></span>
+              </span>
+            ))}
+          </div>
+
+          <hr style={{ margin: '16px 0', border: 0, borderTop: '1px solid #ddd' }} />
+
+          {/* Technique header */}
+          <div style={{ color: '#bf9000', fontWeight: 'bold', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '8px' }}>
+            <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <div style={{ fontWeight: 'bold', color: '#bf9000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Technique</u></div>
+              <span style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
+                {generateArtilleryStrikeJSX(sheet)}
+              </span>
+            </span>
+          </div>
+
+          {/* Technique XP progression table */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 24px 24px 24px',
+            columnGap: '6px',
+            rowGap: '2px',
+            alignItems: 'start',
+            marginBottom: '2px',
+            width: '100%',
+            paddingLeft: '4px'
+          }}>
+            {/* Row 1: XP headers */}
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>6xp</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>10xp</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>15xp</span>
+            {/* Row 2: +1 instance of Spike */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1 instance of <i>Spike</i></span>
+            {[0, 1, 2].map(i => (
+              <span key={i} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <span
+                  onClick={() => handleDotClick(ordnancerTechniqueSpikeDots, setOrdnancerTechniqueSpikeDots, i, [6, 10, 15], 'ordnancerTechniqueSpikeDots')}
+                  style={{
+                    width: '15px',
+                    height: '15px',
+                    border: '2px solid #000',
+                    borderRadius: '50%',
+                    display: 'block',
+                    background: ordnancerTechniqueSpikeDots[i] ? '#000' : '#fff',
+                    cursor: (i === 0 || ordnancerTechniqueSpikeDots[i - 1]) ? 'pointer' : 'not-allowed',
+                    transition: 'background 0.2s'
+                  }}
+                ></span>
+              </span>
+            ))}
+            <span></span>
+
+            {/* Row 3: XP headers */}
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>5xp</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>8xp</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>12xp</span>
+            {/* Row 4: +1d6 Damage */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1d6 Damage</span>
+            {[0, 1, 2].map(i => (
+              <span key={i} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <span
+                  onClick={() => handleDotClick(ordnancerTechniqueDamageDots, setOrdnancerTechniqueDamageDots, i, [5, 8, 12], 'ordnancerTechniqueDamageDots')}
+                  style={{
+                    width: '15px',
+                    height: '15px',
+                    border: '2px solid #000',
+                    borderRadius: '50%',
+                    display: 'block',
+                    background: ordnancerTechniqueDamageDots[i] ? '#000' : '#fff',
+                    cursor: (i === 0 || ordnancerTechniqueDamageDots[i - 1]) ? 'pointer' : 'not-allowed',
+                    transition: 'background 0.2s'
+                  }}
+                ></span>
+              </span>
+            ))}
+
+            {/* Row 5: XP headers */}
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>5xp</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>8xp</span>
+            <span></span>
+            {/* Row 6: -1 Cooldown */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>-1 Cooldown</span>
+            {[0, 1].map(i => (
+              <span key={i} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <span
+                  onClick={() => handleDotClick(ordnancerTechniqueCooldownDots, setOrdnancerTechniqueCooldownDots, i, [5, 8], 'ordnancerTechniqueCooldownDots')}
+                  style={{
+                    width: '15px',
+                    height: '15px',
+                    border: '2px solid #000',
+                    borderRadius: '50%',
+                    display: 'block',
+                    background: ordnancerTechniqueCooldownDots[i] ? '#000' : '#fff',
+                    cursor: (i === 0 || ordnancerTechniqueCooldownDots[i - 1]) ? 'pointer' : 'not-allowed',
+                    transition: 'background 0.2s'
+                  }}
+                ></span>
+              </span>
+            ))}
+            <span></span>
+          </div>
+
+          <hr style={{ margin: '16px 0', border: 0, borderTop: '1px solid #ddd' }} />
+
+          {/* Attack header */}
+          <div style={{ color: '#990000', fontWeight: 'bold', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '8px' }}>
+            <div style={{ fontWeight: 'bold', color: '#990000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Attack</u></div>
+            <div style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
+              <b><i style={{ color: '#990000' }}>Primary Attack.</i></b><br />
+              <b>Rocket Launcher.</b> 12hx Range, AoE 1hx-Radius, 20+ Crit, 2d6 Damage.
+            </div>
+          </div>
+
+          {/* Attack XP progression table */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 24px 24px 24px',
+            columnGap: '6px',
+            rowGap: '2px',
+            alignItems: 'start',
+            marginBottom: '2px',
+            width: '100%',
+            paddingLeft: '4px'
+          }}>
+            {/* Row 1: XP headers */}
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>6xp</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>10xp</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>16xp</span>
+            {/* Row 2: +2 Damage dice */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+2 Damage dice</span>
+            {[0, 1, 2].map(i => (
+              <span key={i} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <span
+                  onClick={() => handleDotClick(ordnancerAttackDamageDiceDots, setOrdnancerAttackDamageDiceDots, i, [6, 10, 16], 'ordnancerAttackDamageDiceDots')}
+                  style={{
+                    width: '15px',
+                    height: '15px',
+                    border: '2px solid #000',
+                    borderRadius: '50%',
+                    display: 'block',
+                    background: ordnancerAttackDamageDiceDots[i] ? '#000' : '#fff',
+                    cursor: (i === 0 || ordnancerAttackDamageDiceDots[i - 1]) ? 'pointer' : 'not-allowed',
+                    transition: 'background 0.2s'
+                  }}
+                ></span>
+              </span>
+            ))}
+            <span></span>
+
+            {/* Row 3: XP headers */}
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>2xp</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>4xp</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>6xp</span>
+            {/* Row 4: +1 Crit */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1 Crit</span>
+            {[0, 1, 2].map(i => (
+              <span key={i} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <span
+                  onClick={() => handleDotClick(ordnancerAttackCritDots, setOrdnancerAttackCritDots, i, [2, 4, 6], 'ordnancerAttackCritDots')}
+                  style={{
+                    width: '15px',
+                    height: '15px',
+                    border: '2px solid #000',
+                    borderRadius: '50%',
+                    display: 'block',
+                    background: ordnancerAttackCritDots[i] ? '#000' : '#fff',
+                    cursor: (i === 0 || ordnancerAttackCritDots[i - 1]) ? 'pointer' : 'not-allowed',
+                    transition: 'background 0.2s'
+                  }}
+                ></span>
+              </span>
+            ))}
+          </div>
+
+          <hr style={{ margin: '16px 0', border: 0, borderTop: '1px solid #ddd' }} />
+
+          {/* Strike header */}
+          <div style={{ color: '#351c75', fontWeight: 'bold', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '8px' }}>
+            <div style={{ fontWeight: 'bold', color: '#351c75', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Strike</u></div>
+            <span style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
+              {generateOrdnancerStrikeJSX(sheet)}
+            </span>
+          </div>
+
+          {/* Strike XP progression table */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 24px 24px 24px',
+            columnGap: '6px',
+            rowGap: '2px',
+            alignItems: 'start',
+            marginBottom: '2px',
+            width: '100%',
+            paddingLeft: '4px'
+          }}>
+            {/* Row 1: XP headers */}
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>6xp</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>10xp</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>18xp</span>
+            {/* Row 2: +1 Damage die */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1 Damage die</span>
+            {[0, 1, 2].map(i => (
+              <span key={i} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <span
+                  onClick={() => handleDotClick(ordnancerStrikeDamageDiceDots, setOrdnancerStrikeDamageDiceDots, i, [6, 10, 18], 'ordnancerStrikeDamageDiceDots')}
+                  style={{
+                    width: '15px',
+                    height: '15px',
+                    border: '2px solid #000',
+                    borderRadius: '50%',
+                    display: 'block',
+                    background: ordnancerStrikeDamageDiceDots[i] ? '#000' : '#fff',
+                    cursor: (i === 0 || ordnancerStrikeDamageDiceDots[i - 1]) ? 'pointer' : 'not-allowed',
+                    transition: 'background 0.2s'
+                  }}
+                ></span>
+              </span>
+            ))}
+          </div>
+
+          <hr style={{ margin: '12px', border: 0, borderTop: '1px solid #ddd' }} />
+
+          {/* Perks header */}
+          <div style={{ fontWeight: 'bold', color: '#000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Perks</u></div>
+          <div style={{ fontSize: '1em', color: '#000', marginBottom: '6px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <i><b>Skills.</b> Athletics</i> +2
+          </div>
+
+          {/* Perks SP progression table */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 24px 24px 24px',
+            gridTemplateRows: 'auto auto',
+            columnGap: '6px',
+            rowGap: '2px',
+            alignItems: 'start',
+            marginTop: '-12px',
+            marginBottom: '2px',
+            width: '100%',
+            paddingLeft: '4px'
+          }}>
+            {/* Row 1: Empty cells and 8sp header */}
+            <span></span>
+            <span></span>
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>8sp</span>
+            {/* Row 2: Bringin' the Big Guns text and dot */}
+            <div style={{ 
+              fontSize: '1em', 
+              fontFamily: 'Arial, Helvetica, sans-serif', 
+              textAlign: 'left',
+              paddingRight: '8px',
+              lineHeight: '1.2',
+              gridColumn: '1 / 4'
+            }}>
+              <b><i style={{ color: '#910a0a', fontSize: '1em' }}>Bringin' the Big Guns.</i></b> Your heavy weapons are practically an extension of your personality. Gain an advantage on skill rolls related to displaying your ridiculous arsenal, whether you're showing off, threatening or anything in between.
+            </div>
+            <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start' }}>
+              <span
+                onClick={() => handleSpDotClick(ordnancerPerksSkillsDots, setOrdnancerPerksSkillsDots, 0, [8], 'ordnancerPerksSkillsDots')}
+                style={{
+                  width: '15px',
+                  height: '15px',
+                  border: '2px solid #000',
+                  borderRadius: '50%',
+                  display: 'block',
+                  background: ordnancerPerksSkillsDots[0] ? '#000' : '#fff',
                   cursor: 'pointer',
                   transition: 'background 0.2s'
                 }}

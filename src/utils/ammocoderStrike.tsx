@@ -6,7 +6,7 @@ export const generateAmmoCoderStrikeJSX = (sheet: CharacterSheet | null) => {
 
   return (
     <>
-      <b><i style={{ color: '#351c75' }}>Strike</i> Damage.</b> <b>[1]</b>d4 <b><u style={{ color: '#575757', display: 'inline-flex', alignItems: 'center' }}>
+      <b><i style={{ color: '#351c75' }}>Strike</i> Damage.</b> <b>[1]</b>d4 <b><u style={{ color: '#915927', display: 'inline-flex', alignItems: 'center' }}>
       Bludgeoning<img src="/Bludgeoning.png" alt="Bludgeoning" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>.
     </>
   );
@@ -19,7 +19,7 @@ export const generateAmmoCoderStrikeDamageJSX = (sheet: CharacterSheet | null) =
   return (
     <>
       [1]d4&nbsp;
-      <span style={{ color: '#575757', textDecoration: 'underline', fontWeight: 'bold', fontFamily: 'inherit', display: 'inline-flex', alignItems: 'center' }}>
+      <span style={{ color: '#915927', textDecoration: 'underline', fontWeight: 'bold', fontFamily: 'inherit', display: 'inline-flex', alignItems: 'center' }}>
         Bludgeoning
         <img src="/Bludgeoning.png" alt="Bludgeoning" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
       </span>

@@ -66,6 +66,7 @@ import { generateElementalExcitementJSX } from "../utils/elementalistFeature";
 import { generateExosuitJSX } from "../utils/exospecialistFeature";
 import { generateSharpshooterCharacterSheetJSX } from "../utils/gunslingerFeature";
 import { generateBulletCodeJSX } from "../utils/ammocoderFeature";
+import { generateAmmoCoderStrikeDamageJSX } from "../utils/ammocoderStrike";
 
 import CharacterSheetInventory from "./CharacterSheetInventory";
 import CharacterSheetPerks from "./CharacterSheetPerks";
@@ -332,7 +333,10 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
   const spectreSpeedBonus = sheet?.subclass === 'Spectre'
     ? ((sheet?.subclassProgressionDots as any)?.spectreMovementSpeedDots?.filter(Boolean).length || 0)
     : 0;
-  const totalSpeed = baseSpeed + tacticianSpeedBonus + kineticSpeedBonus + mercurialSpeedBonus + airSpeedBonus + fireSpeedBonus + waterSpeedBonus + aeronautSpeedBonus + brawlerSpeedBonus + spectreSpeedBonus;
+  const ammocoderSpeedBonus = sheet?.subclass === 'Ammo Coder'
+    ? ((sheet?.subclassProgressionDots as any)?.ammocoderMovementSpeedDots?.filter(Boolean).length || 0)
+    : 0;
+  const totalSpeed = baseSpeed + tacticianSpeedBonus + kineticSpeedBonus + mercurialSpeedBonus + airSpeedBonus + fireSpeedBonus + waterSpeedBonus + aeronautSpeedBonus + brawlerSpeedBonus + spectreSpeedBonus + ammocoderSpeedBonus;
   const speed = totalSpeed > 0 ? `${totalSpeed}` : "0";
   
   // Calculate jump speed and jump amount for Kinetic subclass
@@ -1824,6 +1828,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                     if (subclass === "Brawler" && skill === "Survival") return "rgba(216,165,61,0.5)";
                     if (subclass === "Dreadnaught" && skill === "Intimidation") return "rgba(216,61,160,0.5)";
                     if (subclass === "Spectre" && skill === "Stealth") return "rgba(106,61,216,0.5)";
+                    if (subclass === "Ammo Coder" && skill === "Oikomagic") return "rgba(10,57,145,0.5)";
                     return null;
                   };
                   
@@ -2710,6 +2715,10 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
             ) : subclass === 'Spectre' ? (
               <span style={{ fontWeight: 'bold', fontFamily: 'inherit', color: '#000', marginLeft: 4, display: 'flex', alignItems: 'center' }}>
                 {generateSpectreStrikeDamageJSX(sheet)}
+              </span>
+            ) : subclass === 'Ammo Coder' ? (
+              <span style={{ fontWeight: 'bold', fontFamily: 'inherit', color: '#000', marginLeft: 4, display: 'flex', alignItems: 'center' }}>
+                {generateAmmoCoderStrikeDamageJSX(sheet)}
               </span>
             ) : <span style={{ fontWeight: 'bold', fontFamily: 'inherit', color: '#000', marginLeft: 4 }}>{strikeDamage}</span>}
           </div>

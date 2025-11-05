@@ -296,7 +296,14 @@ const CharacterSheetPerks: React.FC<CharacterSheetPerksProps> = ({
               <b><i style={{ color: '#6a3dd8' }}>Quantum Cloaking Array.</i></b> <span style={{ color: '#000' }}>Your suit allows you to become invisible to the naked eye at any time outside of combat. Only the appropriate magical abilities or technological gear can see you. Gain an advantage on related skill rolls.</span>
             </span>
           </div>
-          )}                                          
+          )}
+          {subclass === 'Ammo Coder' && (sheet?.subclassProgressionDots as any)?.ammocoderPerksSkillsDots?.[0] && (
+          <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <span>
+              <b><i style={{ color: '#0a3991' }}>Minor Magician.</i></b> <span style={{ color: '#000' }}>You've picked up some rudimentary Oikomagic skills that you can use in a variety of small but useful ways, such as creating bits of light, noises, or otherwise minor sensory effects. Consult your DM for specifics.</span>
+            </span>
+          </div>
+          )}                                            
         </div>
       </div>
   );
