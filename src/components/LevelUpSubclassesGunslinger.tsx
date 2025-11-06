@@ -6,6 +6,9 @@ import { generateAmmoCoderStrikeJSX } from "../utils/ammocoderStrike";
 import { generateExcessiveDisplayJSX } from "../utils/ordnancerFeature";
 import { generateArtilleryStrikeJSX } from "../utils/ordnancerTechnique";
 import { generateOrdnancerStrikeJSX } from "../utils/ordnancerStrike";
+import { generateHarryJSX } from "../utils/pistoleerFeature";
+import { generateBleedinBulletsJSX } from "../utils/pistoleerTechnique";
+import { generatePistoleerStrikeJSX } from "../utils/pistoleerStrike";
 
 type LevelUpSubclassesGunslingerProps = {
   sheet: CharacterSheet | null;
@@ -89,11 +92,52 @@ const LevelUpSubclassesGunslinger: React.FC<LevelUpSubclassesGunslingerProps> = 
     (sheet?.subclassProgressionDots as any)?.ordnancerPerksSkillsDots || [false]
   );
 
+  // Pistoleer subclass progression dots
+  const [pistoleerFeatureMoveDots, setPistoleerFeatureMoveDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.pistoleerFeatureMoveDots || [false, false]
+  );
+  const [pistoleerTechniqueSpikeRerollDots, setPistoleerTechniqueSpikeRerollDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.pistoleerTechniqueSpikeRerollDots || [false]
+  );
+  const [pistoleerTechniqueIgnoreSpikeImmunityDots, setPistoleerTechniqueIgnoreSpikeImmunityDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.pistoleerTechniqueIgnoreSpikeImmunityDots || [false]
+  );
+  const [pistoleerTechniqueCooldownDots, setPistoleerTechniqueCooldownDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.pistoleerTechniqueCooldownDots || [false, false]
+  );
+  const [pistoleerAttackRepeatDots, setPistoleerAttackRepeatDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.pistoleerAttackRepeatDots || [false, false]
+  );
+  const [pistoleerAttackCritDots, setPistoleerAttackCritDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.pistoleerAttackCritDots || [false, false, false]
+  );
+  const [pistoleerStrikeDots, setPistoleerStrikeDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.pistoleerStrikeDots || [false, false]
+  );
+  const [pistoleerMovementSpeedDots, setPistoleerMovementSpeedDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.pistoleerMovementSpeedDots || [false, false]
+  );
+  const [pistoleerPerksSkillsDots, setPistoleerPerksSkillsDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.pistoleerPerksSkillsDots || [false]
+  );
+
   // State for Coder Carbines dropdown
   const [selectedCoderCarbines, setSelectedCoderCarbines] = useState<string[]>(() => {
     return sheet?.coderCarbines || [];
   });
   const [pendingCoderCarbine, setPendingCoderCarbine] = useState("");
+
+  // State for Rocket Launchers dropdown
+  const [selectedRocketLaunchers, setSelectedRocketLaunchers] = useState<string[]>(() => {
+    return sheet?.rocketLaunchers || [];
+  });
+  const [pendingRocketLauncher, setPendingRocketLauncher] = useState("");
+
+  // State for Dual Pistols dropdown
+  const [selectedDualPistols, setSelectedDualPistols] = useState<string[]>(() => {
+    return sheet?.dualPistols || [];
+  });
+  const [pendingDualPistol, setPendingDualPistol] = useState("");
 
   // Sync selectedCoderCarbines with sheet data when it changes
   React.useEffect(() => {
@@ -102,11 +146,44 @@ const LevelUpSubclassesGunslinger: React.FC<LevelUpSubclassesGunslingerProps> = 
     }
   }, [sheet?.coderCarbines]);
 
+  // Sync selectedRocketLaunchers with sheet data when it changes
+  React.useEffect(() => {
+    if (sheet?.rocketLaunchers) {
+      setSelectedRocketLaunchers(sheet.rocketLaunchers);
+    }
+  }, [sheet?.rocketLaunchers]);
+
+  // Sync selectedDualPistols with sheet data when it changes
+  React.useEffect(() => {
+    if (sheet?.dualPistols) {
+      setSelectedDualPistols(sheet.dualPistols);
+    }
+  }, [sheet?.dualPistols]);
+
   // Helper function to get weapon cost
   const getCoderCarbineCost = (weapon: string): number => {
     switch (weapon) {
       case 'Arcane Railgun': return 175;
       case 'Space Vaporizer': return 165;
+      default: return 0;
+    }
+  };
+
+  // Helper function to get rocket launcher cost
+  const getRocketLauncherCost = (weapon: string): number => {
+    switch (weapon) {
+      case 'Demolitmus': return 160;
+      case 'Steelburst': return 155;
+      default: return 0;
+    }
+  };
+
+  // Helper function to get dual pistol cost
+  const getDualPistolCost = (weapon: string): number => {
+    switch (weapon) {
+      case 'Rise & Shine': return 155;
+      case 'Thoughts & Prayers': return 155;
+      case 'Twin Drivers': return 155;
       default: return 0;
     }
   };
@@ -868,9 +945,140 @@ const LevelUpSubclassesGunslinger: React.FC<LevelUpSubclassesGunslingerProps> = 
           {/* Attack header */}
           <div style={{ color: '#990000', fontWeight: 'bold', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '8px' }}>
             <div style={{ fontWeight: 'bold', color: '#990000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Attack</u></div>
+            
             <div style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
-              <b>Primary <i style={{ color: '#990000' }}>Attack.</i></b><br />
-              <b>Rocket Launcher.</b> 12hx Range, AoE 1hx-Radius, 20+ Crit, 2d6 Damage.
+              <div style={{ marginBottom: '4px' }}>
+                <b><i>Primary</i> <i style={{ color: '#990000' }}>Attack.</i></b>
+              </div>
+              
+              {/* Rocket Launchers dropdown */}
+              <select
+                style={{ 
+                    fontSize: '1em', 
+                    padding: '2px 8px', 
+                    borderRadius: '6px', 
+                    border: '1px solid #ccc', 
+                    background: '#fff', 
+                    color: '#222',
+                    fontWeight: 'bold',
+                    marginBottom: '4px',
+                    textAlign: 'left',
+                    minWidth: '180px'
+                }}
+                defaultValue="Rocket Launchers"
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value !== "Rocket Launchers") {
+                    setPendingRocketLauncher(value);
+                    e.target.value = "Rocket Launchers"; // Reset dropdown
+                  }
+                }}
+              >
+                <option disabled style={{ fontWeight: 'bold' }}>Rocket Launchers</option>
+                <option style={{ fontWeight: 'bold' }}>Demolitmus</option>
+                <option style={{ fontWeight: 'bold' }}>Steelburst</option>
+              </select>
+
+              {/* Buy/Add dialog for Rocket Launcher selection */}
+              {pendingRocketLauncher && (
+                <div style={{ marginTop: '4px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <div style={{ fontWeight: 'bold' }}>
+                    {pendingRocketLauncher}
+                    <span style={{ color: '#bf9000', fontWeight: 'bold', marginLeft: '8px' }}>
+                      {getRocketLauncherCost(pendingRocketLauncher)}c
+                    </span>
+                  </div>
+                  <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                    <button
+                      style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #1976d2', background: '#1976d2', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}
+                      onClick={() => {
+                        const cost = getRocketLauncherCost(pendingRocketLauncher);
+                        const currentCredits = sheet?.credits || 0;
+                        if (currentCredits < cost) {
+                          setNotice('Not enough credits!');
+                          return;
+                        }
+                        const newRocketLaunchers = [...selectedRocketLaunchers, pendingRocketLauncher];
+                        const newCredits = currentCredits - cost;
+                        setSelectedRocketLaunchers(newRocketLaunchers);
+                        
+                        if (sheet && onAutoSave) {
+                          onAutoSave({
+                            rocketLaunchers: newRocketLaunchers,
+                            credits: newCredits
+                          });
+                        }
+                        
+                        setPendingRocketLauncher("");
+                      }}
+                    >Buy</button>
+                    <button
+                      style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #28a745', background: '#28a745', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}
+                      onClick={() => {
+                        const newRocketLaunchers = [...selectedRocketLaunchers, pendingRocketLauncher];
+                        setSelectedRocketLaunchers(newRocketLaunchers);
+                        
+                        if (sheet && onAutoSave) {
+                          onAutoSave({
+                            rocketLaunchers: newRocketLaunchers,
+                            credits: sheet?.credits || 0
+                          });
+                        }
+                        
+                        setPendingRocketLauncher("");
+                      }}
+                    >Add</button>
+                    <button
+                      style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #aaa', background: '#eee', color: '#333', fontWeight: 'bold', cursor: 'pointer' }}
+                      onClick={() => setPendingRocketLauncher("")}
+                    >Cancel</button>
+                  </div>
+                </div>
+              )}
+
+              {/* List of selected Rocket Launchers */}
+              <div style={{ marginTop: '2px' }}>
+                {selectedRocketLaunchers.length > 0 && (
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginLeft: '8px' }}>
+                    {selectedRocketLaunchers.map((weapon, idx) => (
+                      <span key={weapon + idx} style={{ fontStyle: 'italic', display: 'flex', alignItems: 'center', background: '#f5f5f5', borderRadius: '6px', padding: '2px 8px' }}>
+                        {weapon}
+                        <button
+                          style={{ marginLeft: '6px', padding: '0 6px', borderRadius: '50%', border: 'none', background: '#d32f2f', color: 'white', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.9em' }}
+                          title={`Remove ${weapon}`}
+                          onClick={() => {
+                            const newRocketLaunchers = selectedRocketLaunchers.filter((_, i) => i !== idx);
+                            setSelectedRocketLaunchers(newRocketLaunchers);
+                            
+                            if (sheet && onAutoSave) {
+                              onAutoSave({
+                                rocketLaunchers: newRocketLaunchers
+                              });
+                            }
+                          }}
+                        >×</button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Attack stats */}
+              <div style={{ fontSize: '1em', marginTop: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <span><b><u>Range</u></b> <b>[{12 + (sheet?.classCardDots?.[1] ? sheet.classCardDots[1].filter(Boolean).length : 0)}]</b>hx</span>
+                  <span style={{ textAlign: 'right', minWidth: '80px' }}><b><u>Crit</u></b> <b>[{20 - ordnancerAttackCritDots.filter(Boolean).length - (2 + (sheet?.classCardDots?.[0] ? sheet.classCardDots[0].filter(Boolean).length : 0))}]</b>+</span>
+                </div>
+                <div>
+                  <b><u>Target</u></b> AoE <b>[1]</b>hx-Radius
+                </div>
+                <div>
+                  <b><u>Damage</u></b> <b>[{2 + (ordnancerAttackDamageDiceDots.filter(Boolean).length * 2)}]</b>d6
+                </div>
+                <div>
+                  <b><u>Crit Effect</u></b> <b>[{2 + (ordnancerAttackDamageDiceDots.filter(Boolean).length * 2)}]</b>d6, status effect
+                </div>
+              </div>
             </div>
           </div>
 
@@ -1030,6 +1238,539 @@ const LevelUpSubclassesGunslinger: React.FC<LevelUpSubclassesGunslingerProps> = 
                   borderRadius: '50%',
                   display: 'block',
                   background: ordnancerPerksSkillsDots[0] ? '#000' : '#fff',
+                  cursor: 'pointer',
+                  transition: 'background 0.2s'
+                }}
+              ></span>
+            </span>
+          </div>
+        </div>
+      )}
+
+      {/* Pistoleer Subclass */}
+      {subclass === 'Pistoleer' && (
+        <div style={{ width: '100%', marginTop: '1rem', textAlign: 'left', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
+          {/* Feature header */}
+          <div style={{ color: '#0b5394', fontWeight: 'bold', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '8px' }}>
+            <div style={{ fontWeight: 'bold', color: '#0b5394', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Feature</u></div>
+            <span style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
+              {generateHarryJSX(sheet)}
+            </span>
+          </div>
+
+          {/* Feature XP progression table */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 24px 24px 24px',
+            columnGap: '6px',
+            rowGap: '2px',
+            alignItems: 'start',
+            marginBottom: '2px',
+            width: '100%',
+            paddingLeft: '4px'
+          }}>
+            {/* Row 1: XP headers */}
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>10xp</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>18xp</span>
+            <span></span>
+            {/* Row 2: Move +1hx */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}><b><i style={{ color: '#38761d' }}>Move</i></b> +1hx</span>
+            {[0, 1].map(i => (
+              <span key={i} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <span
+                  onClick={() => handleDotClick(pistoleerFeatureMoveDots, setPistoleerFeatureMoveDots, i, [10, 18], 'pistoleerFeatureMoveDots')}
+                  style={{
+                    width: '15px',
+                    height: '15px',
+                    border: '2px solid #000',
+                    borderRadius: '50%',
+                    display: 'block',
+                    background: pistoleerFeatureMoveDots[i] ? '#000' : '#fff',
+                    cursor: (i === 0 || pistoleerFeatureMoveDots[i - 1]) ? 'pointer' : 'not-allowed',
+                    transition: 'background 0.2s'
+                  }}
+                ></span>
+              </span>
+            ))}
+          </div>
+
+          <hr style={{ margin: '16px 0', border: 0, borderTop: '1px solid #ddd' }} />
+
+          {/* Technique header */}
+          <div style={{ color: '#bf9000', fontWeight: 'bold', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '8px' }}>
+            <div style={{ fontWeight: 'bold', color: '#bf9000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Technique</u></div>
+            <span style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
+              {generateBleedinBulletsJSX(sheet)}
+            </span>
+          </div>
+
+          {/* Technique XP progression table */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 24px 24px 24px',
+            columnGap: '6px',
+            rowGap: '2px',
+            alignItems: 'start',
+            marginBottom: '2px',
+            width: '100%',
+            paddingLeft: '4px'
+          }}>
+            {/* Row 1: XP headers */}
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>10xp</span>
+            <span></span>
+            <span></span>
+            {/* Row 2: Extra Spike Damage reroll on 5+ */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>Extra <b><i>Spike</i></b> Damage reroll on 5+</span>
+            <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <span
+                onClick={() => handleDotClick(pistoleerTechniqueSpikeRerollDots, setPistoleerTechniqueSpikeRerollDots, 0, [10], 'pistoleerTechniqueSpikeRerollDots')}
+                style={{
+                  width: '15px',
+                  height: '15px',
+                  border: '2px solid #000',
+                  borderRadius: '50%',
+                  display: 'block',
+                  background: pistoleerTechniqueSpikeRerollDots[0] ? '#000' : '#fff',
+                  cursor: 'pointer',
+                  transition: 'background 0.2s'
+                }}
+              ></span>
+            </span>
+          </div>
+
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 24px 24px 24px',
+            columnGap: '6px',
+            rowGap: '2px',
+            alignItems: 'start',
+            marginBottom: '2px',
+            width: '100%',
+            paddingLeft: '4px'
+          }}>
+            {/* Row 1: XP headers */}
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>6xp</span>
+            {/* Row 2: Ignore Spike Immunity */}
+            <span></span>
+            <span></span>
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>Ignore <b><i>Spike</i></b> Immunity</span>
+            <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <span
+                onClick={() => handleDotClick(pistoleerTechniqueIgnoreSpikeImmunityDots, setPistoleerTechniqueIgnoreSpikeImmunityDots, 0, [6], 'pistoleerTechniqueIgnoreSpikeImmunityDots')}
+                style={{
+                  width: '15px',
+                  height: '15px',
+                  border: '2px solid #000',
+                  borderRadius: '50%',
+                  display: 'block',
+                  background: pistoleerTechniqueIgnoreSpikeImmunityDots[0] ? '#000' : '#fff',
+                  cursor: 'pointer',
+                  transition: 'background 0.2s'
+                }}
+              ></span>
+            </span>
+          </div>
+
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 24px 24px 24px',
+            columnGap: '6px',
+            rowGap: '2px',
+            alignItems: 'start',
+            marginBottom: '2px',
+            width: '100%',
+            paddingLeft: '4px'
+          }}>
+            {/* Row 1: XP headers */}
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>5xp</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>8xp</span>
+            <span></span>
+            {/* Row 2: -1 Cooldown */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>-1 Cooldown</span>
+            {[0, 1].map(i => (
+              <span key={i} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <span
+                  onClick={() => handleDotClick(pistoleerTechniqueCooldownDots, setPistoleerTechniqueCooldownDots, i, [5, 8], 'pistoleerTechniqueCooldownDots')}
+                  style={{
+                    width: '15px',
+                    height: '15px',
+                    border: '2px solid #000',
+                    borderRadius: '50%',
+                    display: 'block',
+                    background: pistoleerTechniqueCooldownDots[i] ? '#000' : '#fff',
+                    cursor: (i === 0 || pistoleerTechniqueCooldownDots[i - 1]) ? 'pointer' : 'not-allowed',
+                    transition: 'background 0.2s'
+                  }}
+                ></span>
+              </span>
+            ))}
+            <span></span>
+          </div>
+
+          <hr style={{ margin: '16px 0', border: 0, borderTop: '1px solid #ddd' }} />
+
+          {/* Attack header */}
+          <div style={{ color: '#990000', fontWeight: 'bold', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '8px' }}>
+            <div style={{ fontWeight: 'bold', color: '#990000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Attack</u></div>
+            
+            <div style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
+              <div style={{ marginBottom: '4px' }}>
+                <b><i>Primary</i> <i style={{ color: '#990000' }}>Attack.</i></b>
+              </div>
+              
+              {/* Dual Pistols dropdown */}
+              <select
+                style={{ 
+                    fontSize: '1em', 
+                    padding: '2px 8px', 
+                    borderRadius: '6px', 
+                    border: '1px solid #ccc', 
+                    background: '#fff', 
+                    color: '#222',
+                    fontWeight: 'bold',
+                    marginBottom: '4px',
+                    textAlign: 'left',
+                    minWidth: '180px'
+                }}
+                defaultValue="Dual Pistols"
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value !== "Dual Pistols") {
+                    setPendingDualPistol(value);
+                    e.target.value = "Dual Pistols"; // Reset dropdown
+                  }
+                }}
+              >
+                <option disabled style={{ fontWeight: 'bold' }}>Dual Pistols</option>
+                <option style={{ fontWeight: 'bold' }}>Rise & Shine</option>
+                <option style={{ fontWeight: 'bold' }}>Thoughts & Prayers</option>
+                <option style={{ fontWeight: 'bold' }}>Twin Drivers</option>
+              </select>
+
+              {/* Buy/Add dialog for Dual Pistol selection */}
+              {pendingDualPistol && (
+                <div style={{ marginTop: '4px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <div style={{ fontWeight: 'bold' }}>
+                    {pendingDualPistol}
+                    <span style={{ color: '#bf9000', fontWeight: 'bold', marginLeft: '8px' }}>
+                      {getDualPistolCost(pendingDualPistol)}c
+                    </span>
+                  </div>
+                  <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                    <button
+                      style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #1976d2', background: '#1976d2', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}
+                      onClick={() => {
+                        const cost = getDualPistolCost(pendingDualPistol);
+                        const currentCredits = sheet?.credits || 0;
+                        if (currentCredits < cost) {
+                          setNotice('Not enough credits!');
+                          return;
+                        }
+                        const newDualPistols = [...selectedDualPistols, pendingDualPistol];
+                        const newCredits = currentCredits - cost;
+                        setSelectedDualPistols(newDualPistols);
+                        
+                        if (sheet && onAutoSave) {
+                          onAutoSave({
+                            dualPistols: newDualPistols,
+                            credits: newCredits
+                          });
+                        }
+                        
+                        setPendingDualPistol("");
+                      }}
+                    >Buy</button>
+                    <button
+                      style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #28a745', background: '#28a745', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}
+                      onClick={() => {
+                        const newDualPistols = [...selectedDualPistols, pendingDualPistol];
+                        setSelectedDualPistols(newDualPistols);
+                        
+                        if (sheet && onAutoSave) {
+                          onAutoSave({
+                            dualPistols: newDualPistols,
+                            credits: sheet?.credits || 0
+                          });
+                        }
+                        
+                        setPendingDualPistol("");
+                      }}
+                    >Add</button>
+                    <button
+                      style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #aaa', background: '#eee', color: '#333', fontWeight: 'bold', cursor: 'pointer' }}
+                      onClick={() => setPendingDualPistol("")}
+                    >Cancel</button>
+                  </div>
+                </div>
+              )}
+
+              {/* List of selected Dual Pistols */}
+              <div style={{ marginTop: '2px' }}>
+                {selectedDualPistols.length > 0 && (
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginLeft: '8px' }}>
+                    {selectedDualPistols.map((weapon, idx) => (
+                      <span key={weapon + idx} style={{ fontStyle: 'italic', display: 'flex', alignItems: 'center', background: '#f5f5f5', borderRadius: '6px', padding: '2px 8px' }}>
+                        {weapon}
+                        <button
+                          style={{ marginLeft: '6px', padding: '0 6px', borderRadius: '50%', border: 'none', background: '#d32f2f', color: 'white', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.9em' }}
+                          title={`Remove ${weapon}`}
+                          onClick={() => {
+                            const newDualPistols = selectedDualPistols.filter((_, i) => i !== idx);
+                            setSelectedDualPistols(newDualPistols);
+                            
+                            if (sheet && onAutoSave) {
+                              onAutoSave({
+                                dualPistols: newDualPistols
+                              });
+                            }
+                          }}
+                        >×</button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Attack stats */}
+              <div style={{ fontSize: '1em', marginTop: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <span><b><u>Range</u></b> <b>[{8 + (sheet?.classCardDots?.[1] ? sheet.classCardDots[1].filter(Boolean).length : 0)}]</b>hx</span>
+                  <span style={{ textAlign: 'right', minWidth: '80px' }}><b><u>Crit</u></b> <b>[{18 - (2 + (sheet?.classCardDots?.[0] ? sheet.classCardDots[0].filter(Boolean).length : 0)) - pistoleerAttackCritDots.filter(Boolean).length}]</b>+</span>
+                </div>
+                <div>
+                  <b><u>Target</u></b> Single, Repeat <b>[{1 + pistoleerAttackRepeatDots.filter(Boolean).length}]</b>
+                </div>
+                <div>
+                  <b><u>Damage</u></b> 1d6
+                </div>
+                <div>
+                  <b><u>Crit Effect</u></b> 1d6, status effect
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Attack XP progression table */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 24px 24px 24px',
+            columnGap: '6px',
+            rowGap: '2px',
+            alignItems: 'start',
+            marginBottom: '2px',
+            width: '100%',
+            paddingLeft: '4px'
+          }}>
+            {/* Row 1: XP headers */}
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>9xp</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>18xp</span>
+            <span></span>
+            {/* Row 2: Repeat +1 */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>Repeat +1</span>
+            {[0, 1].map(i => (
+              <span key={i} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <span
+                  onClick={() => handleDotClick(pistoleerAttackRepeatDots, setPistoleerAttackRepeatDots, i, [9, 18], 'pistoleerAttackRepeatDots')}
+                  style={{
+                    width: '15px',
+                    height: '15px',
+                    border: '2px solid #000',
+                    borderRadius: '50%',
+                    display: 'block',
+                    background: pistoleerAttackRepeatDots[i] ? '#000' : '#fff',
+                    cursor: (i === 0 || pistoleerAttackRepeatDots[i - 1]) ? 'pointer' : 'not-allowed',
+                    transition: 'background 0.2s'
+                  }}
+                ></span>
+              </span>
+            ))}
+            <span></span>
+          </div>
+
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 24px 24px 24px',
+            columnGap: '6px',
+            rowGap: '2px',
+            alignItems: 'start',
+            marginBottom: '2px',
+            width: '100%',
+            paddingLeft: '4px'
+          }}>
+            {/* Row 1: XP headers */}
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>3xp</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>5xp</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>8xp</span>
+            {/* Row 2: +1 Crit */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1 Crit</span>
+            {[0, 1, 2].map(i => (
+              <span key={i} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <span
+                  onClick={() => handleDotClick(pistoleerAttackCritDots, setPistoleerAttackCritDots, i, [3, 5, 8], 'pistoleerAttackCritDots')}
+                  style={{
+                    width: '15px',
+                    height: '15px',
+                    border: '2px solid #000',
+                    borderRadius: '50%',
+                    display: 'block',
+                    background: pistoleerAttackCritDots[i] ? '#000' : '#fff',
+                    cursor: (i === 0 || pistoleerAttackCritDots[i - 1]) ? 'pointer' : 'not-allowed',
+                    transition: 'background 0.2s'
+                  }}
+                ></span>
+              </span>
+            ))}
+          </div>
+
+          <hr style={{ margin: '16px 0', border: 0, borderTop: '1px solid #ddd' }} />
+
+          {/* Strike header */}
+          <div style={{ color: '#351c75', fontWeight: 'bold', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '8px' }}>
+            <div style={{ fontWeight: 'bold', color: '#351c75', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Strike</u></div>
+            <span style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
+              {generatePistoleerStrikeJSX(sheet)}
+            </span>
+          </div>
+
+          {/* Strike XP progression table */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 24px 24px 24px',
+            columnGap: '6px',
+            rowGap: '2px',
+            alignItems: 'start',
+            marginBottom: '2px',
+            width: '100%',
+            paddingLeft: '4px'
+          }}>
+            {/* Row 1: XP headers */}
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>7xp</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>10xp</span>
+            <span></span>
+            {/* Row 2: +1 Strike */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1 <b><i style={{ color: '#351c75' }}>Strike</i></b></span>
+            {[0, 1].map(i => (
+              <span key={i} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <span
+                  onClick={() => handleDotClick(pistoleerStrikeDots, setPistoleerStrikeDots, i, [7, 10], 'pistoleerStrikeDots')}
+                  style={{
+                    width: '15px',
+                    height: '15px',
+                    border: '2px solid #000',
+                    borderRadius: '50%',
+                    display: 'block',
+                    background: pistoleerStrikeDots[i] ? '#000' : '#fff',
+                    cursor: (i === 0 || pistoleerStrikeDots[i - 1]) ? 'pointer' : 'not-allowed',
+                    transition: 'background 0.2s'
+                  }}
+                ></span>
+              </span>
+            ))}
+            <span></span>
+          </div>
+
+          <hr style={{ margin: '16px 0', border: 0, borderTop: '1px solid #ddd' }} />
+
+          {/* Movement header */}
+          <div style={{ color: '#38761d', fontWeight: 'bold', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '8px' }}>
+            <div style={{ fontWeight: 'bold', color: '#38761d', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Movement</u></div>
+            <div style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
+              <b>Enhanced <i style={{ color: '#38761d' }}>Movement</i> Effects.</b>
+            </div>
+          </div>
+
+          {/* Movement XP progression table */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 24px 24px 24px',
+            columnGap: '6px',
+            rowGap: '2px',
+            alignItems: 'start',
+            marginBottom: '2px',
+            width: '100%',
+            paddingLeft: '4px'
+          }}>
+            {/* Row 1: XP headers */}
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>6xp</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>10xp</span>
+            <span></span>
+            {/* Row 2: +1 Speed */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1 Speed</span>
+            {[0, 1].map(i => (
+              <span key={i} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <span
+                  onClick={() => handleDotClick(pistoleerMovementSpeedDots, setPistoleerMovementSpeedDots, i, [6, 10], 'pistoleerMovementSpeedDots')}
+                  style={{
+                    width: '15px',
+                    height: '15px',
+                    border: '2px solid #000',
+                    borderRadius: '50%',
+                    display: 'block',
+                    background: pistoleerMovementSpeedDots[i] ? '#000' : '#fff',
+                    cursor: (i === 0 || pistoleerMovementSpeedDots[i - 1]) ? 'pointer' : 'not-allowed',
+                    transition: 'background 0.2s'
+                  }}
+                ></span>
+              </span>
+            ))}
+            <span></span>
+          </div>
+
+          <hr style={{ margin: '12px', border: 0, borderTop: '1px solid #ddd' }} />
+
+          {/* Perks header */}
+          <div style={{ fontWeight: 'bold', color: '#000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Perks</u></div>
+          <div style={{ fontSize: '1em', color: '#000', marginBottom: '6px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <i><b>Skills.</b> Thievery</i> +2
+          </div>
+
+          {/* Perks SP progression table */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 24px 24px 24px',
+            gridTemplateRows: 'auto auto',
+            columnGap: '6px',
+            rowGap: '2px',
+            alignItems: 'start',
+            marginTop: '-12px',
+            marginBottom: '2px',
+            width: '100%',
+            paddingLeft: '4px'
+          }}>
+            {/* Row 1: Empty cells and 10sp header */}
+            <span></span>
+            <span></span>
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>10sp</span>
+            {/* Row 2: Slippery text and dot */}
+            <div style={{ 
+              fontSize: '1em', 
+              fontFamily: 'Arial, Helvetica, sans-serif', 
+              textAlign: 'left',
+              paddingRight: '8px',
+              lineHeight: '1.2',
+              gridColumn: '1 / 4'
+            }}>
+              <b><i style={{ color: '#4e7211', fontSize: '1em' }}>Slippery.</i></b> You're smooth talkin' and quick walkin' sonuvabitch. You're capable of weaseling your way out sticky situations, whether they're social or physical traps. Gain an advantage on related skills when escaping tricky circumstances.
+            </div>
+            <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start' }}>
+              <span
+                onClick={() => handleSpDotClick(pistoleerPerksSkillsDots, setPistoleerPerksSkillsDots, 0, [10], 'pistoleerPerksSkillsDots')}
+                style={{
+                  width: '15px',
+                  height: '15px',
+                  border: '2px solid #000',
+                  borderRadius: '50%',
+                  display: 'block',
+                  background: pistoleerPerksSkillsDots[0] ? '#000' : '#fff',
                   cursor: 'pointer',
                   transition: 'background 0.2s'
                 }}

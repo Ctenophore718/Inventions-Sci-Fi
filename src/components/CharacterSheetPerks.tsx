@@ -303,7 +303,14 @@ const CharacterSheetPerks: React.FC<CharacterSheetPerksProps> = ({
               <b><i style={{ color: '#0a3991' }}>Minor Magician.</i></b> <span style={{ color: '#000' }}>You've picked up some rudimentary Oikomagic skills that you can use in a variety of small but useful ways, such as creating bits of light, noises, or otherwise minor sensory effects. Consult your DM for specifics.</span>
             </span>
           </div>
-          )}                                            
+          )}
+          {subclass === 'Ordnancer' && (sheet?.subclassProgressionDots as any)?.ordnancerPerksSkillsDots?.[0] && (
+          <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <span>
+              <b><i style={{ color: '#910a0a' }}>Bringin' the Big Guns.</i></b> <span style={{ color: '#000' }}>Your heavy weapons are practically an extension of your personality. Gain an advantage on skill rolls related to displaying your ridiculous arsenal, whether you're showing off, threatening or anything in between.</span>
+            </span>
+          </div>
+          )}                                                       
         </div>
       </div>
   );

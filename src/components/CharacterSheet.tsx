@@ -67,7 +67,9 @@ import { generateExosuitJSX } from "../utils/exospecialistFeature";
 import { generateSharpshooterCharacterSheetJSX } from "../utils/gunslingerFeature";
 import { generateBulletCodeJSX } from "../utils/ammocoderFeature";
 import { generateExcessiveDisplayJSX } from "../utils/ordnancerFeature";
+import { generateHarryCharacterSheetJSX } from "../utils/pistoleerFeature";
 import { generateAmmoCoderStrikeDamageJSX } from "../utils/ammocoderStrike";
+import { generateOrdnancerStrikeDamageJSX } from "../utils/ordnancerStrike";
 
 import CharacterSheetInventory from "./CharacterSheetInventory";
 import CharacterSheetPerks from "./CharacterSheetPerks";
@@ -900,7 +902,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
 
   const pistoleerFeatureJSX = (
     <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#5a910a' }}>Harry.</i></b> When you deal Damage to an enemy, you can immediately <b><i style={{ color: '#38761d' }}>Move</i></b> <b>[1]</b>hx.
+      {generateHarryCharacterSheetJSX(sheet)}
     </span>
   );
 
@@ -1268,6 +1270,23 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
       );
     }
     
+    // Add Rocket Launchers for Gunslinger class (Ordnancer subclass)
+    if (charClass === 'Gunslinger' && subclass === 'Ordnancer') {
+      attacks.push(
+        { name: 'Demolitmus', type: 'Rocket Launcher', cost: 160 },
+        { name: 'Steelburst', type: 'Rocket Launcher', cost: 155 }
+      );
+    }
+    
+    // Add Dual Pistols for Gunslinger class (Pistoleer subclass)
+    if (charClass === 'Gunslinger' && subclass === 'Pistoleer') {
+      attacks.push(
+        { name: 'Rise & Shine', type: 'Dual Pistol', cost: 155 },
+        { name: 'Thoughts & Prayers', type: 'Dual Pistol', cost: 155 },
+        { name: 'Twin Drivers', type: 'Dual Pistol', cost: 155 }
+      );
+    }
+    
     return attacks;
   };
 
@@ -1520,6 +1539,18 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
           coderCarbines: newCoderCarbines,
           credits: credits - cost
         };
+      } else if (type === 'Rocket Launcher') {
+        const newRocketLaunchers = [...(sheet.rocketLaunchers || []), attackName];
+        partialUpdate = { 
+          rocketLaunchers: newRocketLaunchers,
+          credits: credits - cost
+        };
+      } else if (type === 'Dual Pistol') {
+        const newDualPistols = [...(sheet.dualPistols || []), attackName];
+        partialUpdate = { 
+          dualPistols: newDualPistols,
+          credits: credits - cost
+        };
       } else {
         return;
       }
@@ -1576,6 +1607,16 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
         const newCoderCarbines = [...(sheet.coderCarbines || []), attackName];
         partialUpdate = { 
           coderCarbines: newCoderCarbines
+        };
+      } else if (type === 'Rocket Launcher') {
+        const newRocketLaunchers = [...(sheet.rocketLaunchers || []), attackName];
+        partialUpdate = { 
+          rocketLaunchers: newRocketLaunchers
+        };
+      } else if (type === 'Dual Pistol') {
+        const newDualPistols = [...(sheet.dualPistols || []), attackName];
+        partialUpdate = { 
+          dualPistols: newDualPistols
         };
       } else {
         return;
@@ -1830,6 +1871,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                     if (subclass === "Dreadnaught" && skill === "Intimidation") return "rgba(216,61,160,0.5)";
                     if (subclass === "Spectre" && skill === "Stealth") return "rgba(106,61,216,0.5)";
                     if (subclass === "Ammo Coder" && skill === "Oikomagic") return "rgba(10,57,145,0.5)";
+                    if (subclass === "Ordnancer" && skill === "Athletics") return "rgba(145,10,10,0.5)";
                     return null;
                   };
                   
@@ -2559,6 +2601,16 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                       </span>
                     );
                   })()
+                : subclass === 'Pistoleer'
+                ? (() => {
+                    const pistoleerFeatureMoveDots = (sheet?.subclassProgressionDots as any)?.pistoleerFeatureMoveDots || [false, false];
+                    const moveDistance = 1 + pistoleerFeatureMoveDots.filter(Boolean).length;
+                    return (
+                      <span style={{ fontWeight: 'normal', color: '#000' }}>
+                        When you Damage an enemy, <b><i style={{ color: '#38761d' }}>Move</i></b> <b>[{moveDistance}]</b>hx
+                      </span>
+                    );
+                  })()
                 : resistances
             }
           </div>
@@ -2720,6 +2772,10 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
             ) : subclass === 'Ammo Coder' ? (
               <span style={{ fontWeight: 'bold', fontFamily: 'inherit', color: '#000', marginLeft: 4, display: 'flex', alignItems: 'center' }}>
                 {generateAmmoCoderStrikeDamageJSX(sheet)}
+              </span>
+            ) : subclass === 'Ordnancer' ? (
+              <span style={{ fontWeight: 'bold', fontFamily: 'inherit', color: '#000', marginLeft: 4, display: 'flex', alignItems: 'center' }}>
+                {generateOrdnancerStrikeDamageJSX(sheet)}
               </span>
             ) : <span style={{ fontWeight: 'bold', fontFamily: 'inherit', color: '#000', marginLeft: 4 }}>{strikeDamage}</span>}
           </div>

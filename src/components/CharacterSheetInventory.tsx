@@ -59,10 +59,10 @@ const CharacterSheetInventory: React.FC<CharacterSheetInventoryProps> = ({
                     textAlign: 'left',
                     minWidth: '180px'
                   }}
-                  value={pendingAttack || (charClass === 'Chemist' ? 'Dart Guns' : charClass === 'Coder' ? 'Lenses' : charClass === 'Commander' ? 'Rifles' : charClass === 'Contemplative' ? 'Focuses' : charClass === 'Devout' ? 'Incantations' : charClass === 'Elementalist' ? 'Shards' : charClass === 'Exospecialist' ? 'Integrated Blasters' : charClass === 'Gunslinger' ? 'Coder Carbines' : 'Select Primary Attack')}
+                  value={pendingAttack || (charClass === 'Chemist' ? 'Dart Guns' : charClass === 'Coder' ? 'Lenses' : charClass === 'Commander' ? 'Rifles' : charClass === 'Contemplative' ? 'Focuses' : charClass === 'Devout' ? 'Incantations' : charClass === 'Elementalist' ? 'Shards' : charClass === 'Exospecialist' ? 'Integrated Blasters' : charClass === 'Gunslinger' && subclass === 'Ammo Coder' ? 'Coder Carbines' : charClass === 'Gunslinger' && subclass === 'Ordnancer' ? 'Rocket Launchers' : charClass === 'Gunslinger' && subclass === 'Pistoleer' ? 'Dual Pistols' : 'Select Primary Attack')}
                   onChange={(e) => {
                     const value = e.target.value;
-                    if (value !== 'Dart Guns' && value !== 'Lenses' && value !== 'Rifles' && value !== 'Focuses' && value !== 'Incantations' && value !== 'Shards' && value !== 'Integrated Blasters' && value !== 'Coder Carbines' && value !== 'Select Primary Attack') {
+                    if (value !== 'Dart Guns' && value !== 'Lenses' && value !== 'Rifles' && value !== 'Focuses' && value !== 'Incantations' && value !== 'Shards' && value !== 'Integrated Blasters' && value !== 'Coder Carbines' && value !== 'Rocket Launchers' && value !== 'Dual Pistols' && value !== 'Select Primary Attack') {
                       setPendingAttack(value);
                     }
                   }}
@@ -171,6 +171,21 @@ const CharacterSheetInventory: React.FC<CharacterSheetInventoryProps> = ({
                       <option disabled style={{ fontWeight: 'bold' }}>Coder Carbines</option>
                       <option style={{ fontWeight: 'bold' }}>Arcane Railgun</option>
                       <option style={{ fontWeight: 'bold' }}>Space Vaporizer</option>
+                    </>
+                  )}
+                  {charClass === 'Gunslinger' && subclass === 'Ordnancer' && (
+                    <>
+                      <option disabled style={{ fontWeight: 'bold' }}>Rocket Launchers</option>
+                      <option style={{ fontWeight: 'bold' }}>Demolitmus</option>
+                      <option style={{ fontWeight: 'bold' }}>Steelburst</option>
+                    </>
+                  )}
+                  {charClass === 'Gunslinger' && subclass === 'Pistoleer' && (
+                    <>
+                      <option disabled style={{ fontWeight: 'bold' }}>Dual Pistols</option>
+                      <option style={{ fontWeight: 'bold' }}>Rise & Shine</option>
+                      <option style={{ fontWeight: 'bold' }}>Thoughts & Prayers</option>
+                      <option style={{ fontWeight: 'bold' }}>Twin Drivers</option>
                     </>
                   )}
                   {charClass !== 'Chemist' && charClass !== 'Coder' && charClass !== 'Commander' && charClass !== 'Contemplative' && charClass !== 'Devout' && charClass !== 'Elementalist' && charClass !== 'Exospecialist' && charClass !== 'Gunslinger' && (
@@ -398,6 +413,52 @@ const CharacterSheetInventory: React.FC<CharacterSheetInventoryProps> = ({
                                 const updatedSheet = { 
                                   ...sheet, 
                                   coderCarbines: newCoderCarbines
+                                };
+                                handleAutoSave(updatedSheet);
+                              }
+                            }}
+                          >×</button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  {(sheet?.rocketLaunchers && sheet.rocketLaunchers.length > 0) && (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginLeft: '8px' }}>
+                      {sheet?.rocketLaunchers?.map((weapon, idx) => (
+                        <span key={weapon + idx + 'rocketLauncher'} style={{ fontStyle: 'italic', display: 'flex', alignItems: 'center', background: '#f5f5f5', borderRadius: '6px', padding: '2px 8px' }}>
+                          {weapon}
+                          <button
+                            style={{ marginLeft: '6px', padding: '0 6px', borderRadius: '50%', border: 'none', background: '#d32f2f', color: 'white', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.9em' }}
+                            title={`Remove ${weapon}`}
+                            onClick={() => {
+                              if (sheet) {
+                                const newRocketLaunchers = sheet.rocketLaunchers?.filter((_, i) => i !== idx) || [];
+                                const updatedSheet = { 
+                                  ...sheet, 
+                                  rocketLaunchers: newRocketLaunchers
+                                };
+                                handleAutoSave(updatedSheet);
+                              }
+                            }}
+                          >×</button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  {(sheet?.dualPistols && sheet.dualPistols.length > 0) && (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginLeft: '8px' }}>
+                      {sheet?.dualPistols?.map((weapon, idx) => (
+                        <span key={weapon + idx + 'dualPistol'} style={{ fontStyle: 'italic', display: 'flex', alignItems: 'center', background: '#f5f5f5', borderRadius: '6px', padding: '2px 8px' }}>
+                          {weapon}
+                          <button
+                            style={{ marginLeft: '6px', padding: '0 6px', borderRadius: '50%', border: 'none', background: '#d32f2f', color: 'white', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.9em' }}
+                            title={`Remove ${weapon}`}
+                            onClick={() => {
+                              if (sheet) {
+                                const newDualPistols = sheet.dualPistols?.filter((_, i) => i !== idx) || [];
+                                const updatedSheet = { 
+                                  ...sheet, 
+                                  dualPistols: newDualPistols
                                 };
                                 handleAutoSave(updatedSheet);
                               }

@@ -100,6 +100,12 @@ export type CharacterSheet = {
   // Coder Carbines for Ammo Coder subclass (primary attacks)
   coderCarbines?: string[];
 
+  // Rocket Launchers for Ordnancer subclass (primary attacks)
+  rocketLaunchers?: string[];
+
+  // Dual Pistols for Pistoleer subclass (primary attacks)
+  dualPistols?: string[];
+
   // Algorithms for Coder class
   algorithms?: string[];
 
