@@ -70,6 +70,7 @@ import { generateExcessiveDisplayJSX } from "../utils/ordnancerFeature";
 import { generateHarryCharacterSheetJSX } from "../utils/pistoleerFeature";
 import { generateAmmoCoderStrikeDamageJSX } from "../utils/ammocoderStrike";
 import { generateOrdnancerStrikeDamageJSX } from "../utils/ordnancerStrike";
+import { generatePistoleerStrikeDamageJSX } from "../utils/pistoleerStrike";
 
 import CharacterSheetInventory from "./CharacterSheetInventory";
 import CharacterSheetPerks from "./CharacterSheetPerks";
@@ -339,7 +340,10 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
   const ammocoderSpeedBonus = sheet?.subclass === 'Ammo Coder'
     ? ((sheet?.subclassProgressionDots as any)?.ammocoderMovementSpeedDots?.filter(Boolean).length || 0)
     : 0;
-  const totalSpeed = baseSpeed + tacticianSpeedBonus + kineticSpeedBonus + mercurialSpeedBonus + airSpeedBonus + fireSpeedBonus + waterSpeedBonus + aeronautSpeedBonus + brawlerSpeedBonus + spectreSpeedBonus + ammocoderSpeedBonus;
+  const pistoleerSpeedBonus = sheet?.subclass === 'Pistoleer'
+    ? ((sheet?.subclassProgressionDots as any)?.pistoleerMovementSpeedDots?.filter(Boolean).length || 0)
+    : 0;
+  const totalSpeed = baseSpeed + tacticianSpeedBonus + kineticSpeedBonus + mercurialSpeedBonus + airSpeedBonus + fireSpeedBonus + waterSpeedBonus + aeronautSpeedBonus + brawlerSpeedBonus + spectreSpeedBonus + ammocoderSpeedBonus + pistoleerSpeedBonus;
   const speed = totalSpeed > 0 ? `${totalSpeed}` : "0";
   
   // Calculate jump speed and jump amount for Kinetic subclass
@@ -1872,6 +1876,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                     if (subclass === "Spectre" && skill === "Stealth") return "rgba(106,61,216,0.5)";
                     if (subclass === "Ammo Coder" && skill === "Oikomagic") return "rgba(10,57,145,0.5)";
                     if (subclass === "Ordnancer" && skill === "Athletics") return "rgba(145,10,10,0.5)";
+                    if (subclass === "Pistoleer" && skill === "Thievery") return "rgba(90,145,10,0.5)";
                     return null;
                   };
                   
@@ -2777,6 +2782,10 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
               <span style={{ fontWeight: 'bold', fontFamily: 'inherit', color: '#000', marginLeft: 4, display: 'flex', alignItems: 'center' }}>
                 {generateOrdnancerStrikeDamageJSX(sheet)}
               </span>
+            ) : subclass === 'Pistoleer' ? (
+              <span style={{ fontWeight: 'bold', fontFamily: 'inherit', color: '#000', marginLeft: 4, display: 'flex', alignItems: 'center' }}>
+                {generatePistoleerStrikeDamageJSX(sheet)}
+              </span>
             ) : <span style={{ fontWeight: 'bold', fontFamily: 'inherit', color: '#000', marginLeft: 4 }}>{strikeDamage}</span>}
           </div>
           <div className={styles.horizontalLabel} style={{ color: '#351c75', fontWeight: 'bold' }}>Multi Strike <span style={{ color: '#000' }}>{
@@ -2800,7 +2809,9 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                               ? 2
                               : (subclass === 'Spectre' && (sheet?.subclassProgressionDots as any)?.spectreStrikeExtraDots?.[0])
                                 ? 2
-                                : (multiStrike > 0 ? multiStrike : <span style={{ visibility: 'hidden' }}>0</span>)
+                                : (subclass === 'Pistoleer' && ((sheet?.subclassProgressionDots as any)?.pistoleerStrikeDots?.filter(Boolean).length || 0) > 0)
+                                  ? (1 + ((sheet?.subclassProgressionDots as any)?.pistoleerStrikeDots?.filter(Boolean).length || 0))
+                                  : (multiStrike > 0 ? multiStrike : <span style={{ visibility: 'hidden' }}>0</span>)
           }</span></div>
           <div className={styles.horizontalLabel} style={{ color: '#351c75', fontWeight: 'bold' }}>
               Strike Effects {

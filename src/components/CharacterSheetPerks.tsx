@@ -310,7 +310,14 @@ const CharacterSheetPerks: React.FC<CharacterSheetPerksProps> = ({
               <b><i style={{ color: '#910a0a' }}>Bringin' the Big Guns.</i></b> <span style={{ color: '#000' }}>Your heavy weapons are practically an extension of your personality. Gain an advantage on skill rolls related to displaying your ridiculous arsenal, whether you're showing off, threatening or anything in between.</span>
             </span>
           </div>
-          )}                                                       
+          )}
+          {subclass === 'Pistoleer' && (sheet?.subclassProgressionDots as any)?.pistoleerPerksSkillsDots?.[0] && (
+          <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <span>
+              <b><i style={{ color: '#5a910a' }}>Slippery.</i></b> <span style={{ color: '#000' }}>You're smooth talkin' and quick walkin' sonuvabitch. You're capable of weaseling your way out sticky situations, whether they're social or physical traps. Gain an advantage on related skills when escaping tricky circumstances.</span>
+            </span>
+          </div>
+          )}                                                          
         </div>
       </div>
   );

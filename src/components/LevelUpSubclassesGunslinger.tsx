@@ -1682,7 +1682,7 @@ const LevelUpSubclassesGunslinger: React.FC<LevelUpSubclassesGunslingerProps> = 
           <div style={{ color: '#38761d', fontWeight: 'bold', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '8px' }}>
             <div style={{ fontWeight: 'bold', color: '#38761d', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Movement</u></div>
             <div style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
-              <b>Enhanced <i style={{ color: '#38761d' }}>Movement</i> Effects.</b>
+              <b>Enhanced <i style={{ color: '#38761d' }}>Movement</i> Effects.</b>{pistoleerMovementSpeedDots.filter(Boolean).length > 0 && <> +<b>[{pistoleerMovementSpeedDots.filter(Boolean).length}]</b>hx <b><i style={{ color: '#38761d' }}>Speed</i></b>.</>}
             </div>
           </div>
 
@@ -1703,7 +1703,7 @@ const LevelUpSubclassesGunslinger: React.FC<LevelUpSubclassesGunslingerProps> = 
             <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>10xp</span>
             <span></span>
             {/* Row 2: +1 Speed */}
-            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1 Speed</span>
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1hx <b><i style={{ color: '#38761d' }}>Speed</i></b></span>
             {[0, 1].map(i => (
               <span key={i} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                 <span

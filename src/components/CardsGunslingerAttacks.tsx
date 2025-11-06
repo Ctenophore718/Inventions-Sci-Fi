@@ -589,21 +589,21 @@ export const CardsGunslingerAttacks: React.FC<CardsGunslingerAttacksProps> = ({ 
                     <b><u>Damage</u></b> 1d6 <b><u style={{ color: '#d5d52a', display: 'inline-flex', alignItems: 'center' }}>
                     Electric<img src="/Electric.png" alt="Electric" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b><br />
                     <b><u>Crit Effect</u></b> 1d6 <b><u style={{ color: '#d5d52a', display: 'inline-flex', alignItems: 'center' }}>
-                    Electric<img src="/Electric.png" alt="Electric" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>, <b><i>Stun</i></b>
+                    Electric<img src="/Electric.png" alt="Electric" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>, <b><i>Mesmerize</i></b>
                   </>
                 ) : weapon === 'Thoughts & Prayers' ? (
                   <>
-                    <b><u>Damage</u></b> 1d6 <b><u style={{ color: '#a929ff', display: 'inline-flex', alignItems: 'center' }}>
-                    Neural<img src="/Neural.png" alt="Neural" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b><br />
-                    <b><u>Crit Effect</u></b> 1d6 <b><u style={{ color: '#a929ff', display: 'inline-flex', alignItems: 'center' }}>
-                    Neural<img src="/Neural.png" alt="Neural" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>, <b><i>Demoralize</i></b>
+                    <b><u>Damage</u></b> 1d6 <b><u style={{ color: '#a6965f', display: 'inline-flex', alignItems: 'center' }}>
+                    Piercing<img src="/Piercing.png" alt="Piercing" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b><br />
+                    <b><u>Crit Effect</u></b> 1d6 <b><u style={{ color: '#a6965f', display: 'inline-flex', alignItems: 'center' }}>
+                    Piercing<img src="/Piercing.png" alt="Piercing" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>, <b><i>Drain</i></b>
                   </>
                 ) : weapon === 'Twin Drivers' ? (
                   <>
-                    <b><u>Damage</u></b> 1d6 <b><u style={{ color: '#f90102', display: 'inline-flex', alignItems: 'center' }}>
-                    Fire<img src="/Fire.png" alt="Fire" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b><br />
-                    <b><u>Crit Effect</u></b> 1d6 <b><u style={{ color: '#f90102', display: 'inline-flex', alignItems: 'center' }}>
-                    Fire<img src="/Fire.png" alt="Fire" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>, <b><i>Burn</i></b>
+                    <b><u>Damage</u></b> 1d6 <b><u style={{ color: '#516fff', display: 'inline-flex', alignItems: 'center' }}>
+                    Force<img src="/Force.png" alt="Force" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b><br />
+                    <b><u>Crit Effect</u></b> 1d6 <b><u style={{ color: '#516fff', display: 'inline-flex', alignItems: 'center' }}>
+                    Force<img src="/Force.png" alt="Force" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>, <b><i>Slam</i></b> 3hx
                   </>
                 ) : (
                   <>
