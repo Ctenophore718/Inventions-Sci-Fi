@@ -71,6 +71,8 @@ import { generateHarryCharacterSheetJSX } from "../utils/pistoleerFeature";
 import { generateAmmoCoderStrikeDamageJSX } from "../utils/ammocoderStrike";
 import { generateOrdnancerStrikeDamageJSX } from "../utils/ordnancerStrike";
 import { generatePistoleerStrikeDamageJSX } from "../utils/pistoleerStrike";
+import { generateTargeteerCharacterSheetJSX } from "../utils/sniperFeature";
+import { generateSniperStrikeDamageJSX } from "../utils/sniperStrike";
 
 import CharacterSheetInventory from "./CharacterSheetInventory";
 import CharacterSheetPerks from "./CharacterSheetPerks";
@@ -912,7 +914,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
 
   const sniperFeatureJSX = (
     <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#0a6f91' }}>Targeteer.</i></b> When you Crit, in addition to rolling extra Damage dice and dealing an effect, you can choose to inflict <b>[1]</b> of the following conditions: <b><i>Blind</i></b>, <b><i>Demoralized</i></b>, <b><i>Spike</i></b> (weapon Damage type), or <b><i>Restrained</i></b>.
+      {generateTargeteerCharacterSheetJSX(sheet)}
     </span>
   );
 
@@ -1291,6 +1293,14 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
       );
     }
     
+    // Add Sniper Rifles for Gunslinger class (Sniper subclass)
+    if (charClass === 'Gunslinger' && subclass === 'Sniper') {
+      attacks.push(
+        { name: 'Ghost Rifle', type: 'Sniper Rifle', cost: 165 },
+        { name: 'Starseeker', type: 'Sniper Rifle', cost: 160 }
+      );
+    }
+    
     return attacks;
   };
 
@@ -1555,6 +1565,12 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
           dualPistols: newDualPistols,
           credits: credits - cost
         };
+      } else if (type === 'Sniper Rifle') {
+        const newSniperRifles = [...(sheet.sniperRifles || []), attackName];
+        partialUpdate = { 
+          sniperRifles: newSniperRifles,
+          credits: credits - cost
+        };
       } else {
         return;
       }
@@ -1621,6 +1637,11 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
         const newDualPistols = [...(sheet.dualPistols || []), attackName];
         partialUpdate = { 
           dualPistols: newDualPistols
+        };
+      } else if (type === 'Sniper Rifle') {
+        const newSniperRifles = [...(sheet.sniperRifles || []), attackName];
+        partialUpdate = { 
+          sniperRifles: newSniperRifles
         };
       } else {
         return;
@@ -1877,6 +1898,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                     if (subclass === "Ammo Coder" && skill === "Oikomagic") return "rgba(10,57,145,0.5)";
                     if (subclass === "Ordnancer" && skill === "Athletics") return "rgba(145,10,10,0.5)";
                     if (subclass === "Pistoleer" && skill === "Thievery") return "rgba(90,145,10,0.5)";
+                    if (subclass === "Sniper" && skill === "Stealth") return "rgba(10,111,145,0.5)";
                     return null;
                   };
                   
@@ -2591,6 +2613,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
             {sheet?.subclass === 'Air' && (sheet?.subclassProgressionDots as any)?.airMovementFlySpeedDots?.[0] ? ', Fly' : ''}
             {sheet?.subclass === 'Water' && (sheet?.subclassProgressionDots as any)?.waterMovementSwimSpeedDots?.[0] ? ', Swim' : ''}
             {sheet?.subclass === 'Aeronaut' ? ', Fly' : ''}
+            {sheet?.subclass === 'Sniper' && (sheet?.subclassProgressionDots as any)?.sniperMovementClimbDots?.[0] ? ', Climb' : ''}
           </div>
           <div className={styles.horizontalLabel} style={{ color: '#38761d', fontWeight: 'bold' }}>Jump Speed {(kineticJumpSpeedBonus > 0 ? kineticJumpSpeedBonus : mercurialJumpSpeedBonus > 0 ? mercurialJumpSpeedBonus : "") + (kineticJumpSpeedBonus > 0 || mercurialJumpSpeedBonus > 0 ? "hx" : "0hx")}</div>
           <div className={styles.horizontalLabel} style={{ color: '#38761d', fontWeight: 'bold' }}>Jump Amount {kineticJumpAmountBonus > 0 ? kineticJumpAmountBonus : mercurialJumpAmountBonus > 0 ? mercurialJumpAmountBonus : "0"}</div>
@@ -2785,6 +2808,10 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
             ) : subclass === 'Pistoleer' ? (
               <span style={{ fontWeight: 'bold', fontFamily: 'inherit', color: '#000', marginLeft: 4, display: 'flex', alignItems: 'center' }}>
                 {generatePistoleerStrikeDamageJSX(sheet)}
+              </span>
+            ) : subclass === 'Sniper' ? (
+              <span style={{ fontWeight: 'bold', fontFamily: 'inherit', color: '#000', marginLeft: 4, display: 'flex', alignItems: 'center' }}>
+                {generateSniperStrikeDamageJSX(sheet)}
               </span>
             ) : <span style={{ fontWeight: 'bold', fontFamily: 'inherit', color: '#000', marginLeft: 4 }}>{strikeDamage}</span>}
           </div>

@@ -9,6 +9,9 @@ import { generateOrdnancerStrikeJSX } from "../utils/ordnancerStrike";
 import { generateHarryJSX } from "../utils/pistoleerFeature";
 import { generateBleedinBulletsJSX } from "../utils/pistoleerTechnique";
 import { generatePistoleerStrikeJSX } from "../utils/pistoleerStrike";
+import { generateTargeteerJSX } from "../utils/sniperFeature";
+import { generateLayLowJSX } from "../utils/sniperTechnique";
+import { generateSniperStrikeJSX } from "../utils/sniperStrike";
 
 type LevelUpSubclassesGunslingerProps = {
   sheet: CharacterSheet | null;
@@ -121,6 +124,38 @@ const LevelUpSubclassesGunslinger: React.FC<LevelUpSubclassesGunslingerProps> = 
     (sheet?.subclassProgressionDots as any)?.pistoleerPerksSkillsDots || [false]
   );
 
+  // Sniper subclass progression dots
+  const [sniperFeatureConditionDots, setSniperFeatureConditionDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.sniperFeatureConditionDots || [false, false]
+  );
+  const [sniperTechniqueIncludesStrikesDots, setSniperTechniqueIncludesStrikesDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.sniperTechniqueIncludesStrikesDots || [false]
+  );
+  const [sniperTechniqueAutoCritDots, setSniperTechniqueAutoCritDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.sniperTechniqueAutoCritDots || [false]
+  );
+  const [sniperTechniqueCooldownDots, setSniperTechniqueCooldownDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.sniperTechniqueCooldownDots || [false, false]
+  );
+  const [sniperAttackRangeDots, setSniperAttackRangeDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.sniperAttackRangeDots || [false, false, false]
+  );
+  const [sniperAttackDamageDiceDots, setSniperAttackDamageDiceDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.sniperAttackDamageDiceDots || [false, false, false]
+  );
+  const [sniperAttackDieSizeDots, setSniperAttackDieSizeDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.sniperAttackDieSizeDots || [false]
+  );
+  const [sniperAttackCritDots, setSniperAttackCritDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.sniperAttackCritDots || [false, false, false]
+  );
+  const [sniperMovementClimbDots, setSniperMovementClimbDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.sniperMovementClimbDots || [false]
+  );
+  const [sniperPerksSkillsDots, setSniperPerksSkillsDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.sniperPerksSkillsDots || [false]
+  );
+
   // State for Coder Carbines dropdown
   const [selectedCoderCarbines, setSelectedCoderCarbines] = useState<string[]>(() => {
     return sheet?.coderCarbines || [];
@@ -138,6 +173,12 @@ const LevelUpSubclassesGunslinger: React.FC<LevelUpSubclassesGunslingerProps> = 
     return sheet?.dualPistols || [];
   });
   const [pendingDualPistol, setPendingDualPistol] = useState("");
+
+  // State for Sniper Rifles dropdown
+  const [selectedSniperRifles, setSelectedSniperRifles] = useState<string[]>(() => {
+    return sheet?.sniperRifles || [];
+  });
+  const [pendingSniperRifle, setPendingSniperRifle] = useState("");
 
   // Sync selectedCoderCarbines with sheet data when it changes
   React.useEffect(() => {
@@ -159,6 +200,13 @@ const LevelUpSubclassesGunslinger: React.FC<LevelUpSubclassesGunslingerProps> = 
       setSelectedDualPistols(sheet.dualPistols);
     }
   }, [sheet?.dualPistols]);
+
+  // Sync selectedSniperRifles with sheet data when it changes
+  React.useEffect(() => {
+    if (sheet?.sniperRifles) {
+      setSelectedSniperRifles(sheet.sniperRifles);
+    }
+  }, [sheet?.sniperRifles]);
 
   // Helper function to get weapon cost
   const getCoderCarbineCost = (weapon: string): number => {
@@ -184,6 +232,15 @@ const LevelUpSubclassesGunslinger: React.FC<LevelUpSubclassesGunslingerProps> = 
       case 'Rise & Shine': return 155;
       case 'Thoughts & Prayers': return 155;
       case 'Twin Drivers': return 155;
+      default: return 0;
+    }
+  };
+
+  // Helper function to get sniper rifle cost
+  const getSniperRifleCost = (weapon: string): number => {
+    switch (weapon) {
+      case 'Ghost Rifle': return 165;
+      case 'Starseeker': return 160;
       default: return 0;
     }
   };
@@ -1771,6 +1828,558 @@ const LevelUpSubclassesGunslinger: React.FC<LevelUpSubclassesGunslingerProps> = 
                   borderRadius: '50%',
                   display: 'block',
                   background: pistoleerPerksSkillsDots[0] ? '#000' : '#fff',
+                  cursor: 'pointer',
+                  transition: 'background 0.2s'
+                }}
+              ></span>
+            </span>
+          </div>
+        </div>
+      )}
+
+      {/* Sniper Subclass */}
+      {subclass === 'Sniper' && (
+        <div style={{ width: '100%', marginTop: '1rem', textAlign: 'left', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
+          {/* Feature header */}
+          <div style={{ color: '#0b5394', fontWeight: 'bold', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '8px' }}>
+            <div style={{ fontWeight: 'bold', color: '#0b5394', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Feature</u></div>
+            <span style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
+              {generateTargeteerJSX(sheet)}
+            </span>
+          </div>
+
+          {/* Feature XP progression table */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 24px 24px 24px',
+            columnGap: '6px',
+            rowGap: '2px',
+            alignItems: 'start',
+            marginBottom: '2px',
+            width: '100%',
+            paddingLeft: '4px'
+          }}>
+            {/* Row 1: XP headers */}
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>5xp</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>8xp</span>
+            <span></span>
+            {/* Row 2: Inflict +1 condition */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>Inflict +1 condition</span>
+            {[0, 1].map(i => (
+              <span key={i} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <span
+                  onClick={() => handleDotClick(sniperFeatureConditionDots, setSniperFeatureConditionDots, i, [5, 8], 'sniperFeatureConditionDots')}
+                  style={{
+                    width: '15px',
+                    height: '15px',
+                    border: '2px solid #000',
+                    borderRadius: '50%',
+                    display: 'block',
+                    background: sniperFeatureConditionDots[i] ? '#000' : '#fff',
+                    cursor: (i === 0 || sniperFeatureConditionDots[i - 1]) ? 'pointer' : 'not-allowed',
+                    transition: 'background 0.2s'
+                  }}
+                ></span>
+              </span>
+            ))}
+            <span></span>
+          </div>
+
+          <hr style={{ margin: '16px 0', border: 0, borderTop: '1px solid #ddd' }} />
+
+          {/* Technique header */}
+          <div style={{ color: '#bf9000', fontWeight: 'bold', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '8px' }}>
+            <div style={{ fontWeight: 'bold', color: '#bf9000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Technique</u></div>
+            <span style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
+              {generateLayLowJSX(sheet)}
+            </span>
+          </div>
+
+          {/* Technique XP progression table */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 24px 24px 24px',
+            columnGap: '6px',
+            rowGap: '2px',
+            alignItems: 'start',
+            marginBottom: '2px',
+            width: '100%',
+            paddingLeft: '4px'
+          }}>
+            {/* Row 1: XP headers */}
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>4xp</span>
+            <span></span>
+            <span></span>
+            {/* Row 2: Includes Strikes */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>Includes <b><i style={{ color: '#351c75' }}>Strikes</i></b></span>
+            <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <span
+                onClick={() => handleDotClick(sniperTechniqueIncludesStrikesDots, setSniperTechniqueIncludesStrikesDots, 0, [4], 'sniperTechniqueIncludesStrikesDots')}
+                style={{
+                  width: '15px',
+                  height: '15px',
+                  border: '2px solid #000',
+                  borderRadius: '50%',
+                  display: 'block',
+                  background: sniperTechniqueIncludesStrikesDots[0] ? '#000' : '#fff',
+                  cursor: 'pointer',
+                  transition: 'background 0.2s'
+                }}
+              ></span>
+            </span>
+            <span></span>
+            <span></span>
+
+            {/* Row 3: XP headers */}
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>13xp</span>
+            <span></span>
+            <span></span>
+            {/* Row 4: Auto-Crit on all Attacks */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>Auto-Crit on all <b><i style={{ color: '#990000' }}>Attacks</i></b></span>
+            <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <span
+                onClick={() => handleDotClick(sniperTechniqueAutoCritDots, setSniperTechniqueAutoCritDots, 0, [13], 'sniperTechniqueAutoCritDots')}
+                style={{
+                  width: '15px',
+                  height: '15px',
+                  border: '2px solid #000',
+                  borderRadius: '50%',
+                  display: 'block',
+                  background: sniperTechniqueAutoCritDots[0] ? '#000' : '#fff',
+                  cursor: 'pointer',
+                  transition: 'background 0.2s'
+                }}
+              ></span>
+            </span>
+            <span></span>
+            <span></span>
+
+            {/* Row 5: XP headers */}
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>5xp</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>9xp</span>
+            <span></span>
+            {/* Row 6: -1 Cooldown */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>-1 <i>Cooldown</i></span>
+            {[0, 1].map(i => (
+              <span key={i} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <span
+                  onClick={() => handleDotClick(sniperTechniqueCooldownDots, setSniperTechniqueCooldownDots, i, [5, 9], 'sniperTechniqueCooldownDots')}
+                  style={{
+                    width: '15px',
+                    height: '15px',
+                    border: '2px solid #000',
+                    borderRadius: '50%',
+                    display: 'block',
+                    background: sniperTechniqueCooldownDots[i] ? '#000' : '#fff',
+                    cursor: (i === 0 || sniperTechniqueCooldownDots[i - 1]) ? 'pointer' : 'not-allowed',
+                    transition: 'background 0.2s'
+                  }}
+                ></span>
+              </span>
+            ))}
+            <span></span>
+          </div>
+
+          <hr style={{ margin: '16px 0', border: 0, borderTop: '1px solid #ddd' }} />
+
+          {/* Attack header */}
+          <div style={{ color: '#990000', fontWeight: 'bold', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '8px' }}>
+            <div style={{ fontWeight: 'bold', color: '#990000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Attack</u></div>
+            
+            <div style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
+              <div style={{ marginBottom: '4px' }}>
+                <b><i>Primary</i> <i style={{ color: '#990000' }}>Attack.</i></b>
+              </div>
+              
+              {/* Sniper Rifles dropdown */}
+              <select
+                style={{ 
+                    fontSize: '1em', 
+                    padding: '2px 8px', 
+                    borderRadius: '6px', 
+                    border: '1px solid #ccc', 
+                    background: '#fff', 
+                    color: '#222',
+                    fontWeight: 'bold',
+                    marginBottom: '4px',
+                    textAlign: 'left',
+                    minWidth: '180px'
+                }}
+                defaultValue="Sniper Rifles"
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value !== "Sniper Rifles") {
+                    setPendingSniperRifle(value);
+                    e.target.value = "Sniper Rifles"; // Reset dropdown
+                  }
+                }}
+              >
+                <option disabled style={{ fontWeight: 'bold' }}>Sniper Rifles</option>
+                <option style={{ fontWeight: 'bold' }}>Ghost Rifle</option>
+                <option style={{ fontWeight: 'bold' }}>Starseeker</option>
+              </select>
+
+              {/* Buy/Add dialog for Sniper Rifle selection */}
+              {pendingSniperRifle && (
+                <div style={{ marginTop: '4px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <div style={{ fontWeight: 'bold' }}>
+                    {pendingSniperRifle}
+                    <span style={{ color: '#bf9000', fontWeight: 'bold', marginLeft: '8px' }}>
+                      {getSniperRifleCost(pendingSniperRifle)}c
+                    </span>
+                  </div>
+                  <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                    <button
+                      style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #1976d2', background: '#1976d2', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}
+                      onClick={() => {
+                        const cost = getSniperRifleCost(pendingSniperRifle);
+                        const currentCredits = sheet?.credits || 0;
+                        if (currentCredits < cost) {
+                          setNotice('Not enough credits!');
+                          return;
+                        }
+                        const newSniperRifles = [...selectedSniperRifles, pendingSniperRifle];
+                        const newCredits = currentCredits - cost;
+                        setSelectedSniperRifles(newSniperRifles);
+                        
+                        if (sheet && onAutoSave) {
+                          onAutoSave({
+                            sniperRifles: newSniperRifles,
+                            credits: newCredits
+                          });
+                        }
+                        
+                        setPendingSniperRifle("");
+                      }}
+                    >Buy</button>
+                    <button
+                      style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #28a745', background: '#28a745', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}
+                      onClick={() => {
+                        const newSniperRifles = [...selectedSniperRifles, pendingSniperRifle];
+                        setSelectedSniperRifles(newSniperRifles);
+                        
+                        if (sheet && onAutoSave) {
+                          onAutoSave({
+                            sniperRifles: newSniperRifles,
+                            credits: sheet?.credits || 0
+                          });
+                        }
+                        
+                        setPendingSniperRifle("");
+                      }}
+                    >Add</button>
+                    <button
+                      style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #aaa', background: '#eee', color: '#333', fontWeight: 'bold', cursor: 'pointer' }}
+                      onClick={() => setPendingSniperRifle("")}
+                    >Cancel</button>
+                  </div>
+                </div>
+              )}
+
+              {/* List of selected Sniper Rifles */}
+              <div style={{ marginTop: '2px' }}>
+                {selectedSniperRifles.length > 0 && (
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginLeft: '8px' }}>
+                    {selectedSniperRifles.map((weapon, idx) => (
+                      <span key={weapon + idx} style={{ fontStyle: 'italic', display: 'flex', alignItems: 'center', background: '#f5f5f5', borderRadius: '6px', padding: '2px 8px' }}>
+                        {weapon}
+                        <button
+                          style={{ marginLeft: '6px', padding: '0 6px', borderRadius: '50%', border: 'none', background: '#d32f2f', color: 'white', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.9em' }}
+                          title={`Remove ${weapon}`}
+                          onClick={() => {
+                            const newSniperRifles = selectedSniperRifles.filter((_, i) => i !== idx);
+                            setSelectedSniperRifles(newSniperRifles);
+                            
+                            if (sheet && onAutoSave) {
+                              onAutoSave({
+                                sniperRifles: newSniperRifles
+                              });
+                            }
+                          }}
+                        >×</button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Attack stats */}
+              <div style={{ fontSize: '1em', marginTop: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <span><b><u>Range</u></b> <b>[{16 + sniperAttackRangeDots.filter(Boolean).length * 2 + (sheet?.classCardDots?.[1] ? sheet.classCardDots[1].filter(Boolean).length : 0)}]</b>hx</span>
+                  <span style={{ textAlign: 'right', minWidth: '80px' }}><b><u>Crit</u></b> <b>[{16 - sniperAttackCritDots.filter(Boolean).length - (2 + (sheet?.classCardDots?.[0] ? sheet.classCardDots[0].filter(Boolean).length : 0))}]</b>+</span>
+                </div>
+                <div>
+                  <b><u>Target</u></b> Single
+                </div>
+                <div>
+                  <b><u>Damage</u></b> <b>[{1 + sniperAttackDamageDiceDots.filter(Boolean).length}]</b>d<b>[{sniperAttackDieSizeDots[0] ? '12' : '10'}]</b>
+                </div>
+                <div>
+                  <b><u>Crit Effect</u></b> <b>[{1 + sniperAttackDamageDiceDots.filter(Boolean).length}]</b>d<b>[{sniperAttackDieSizeDots[0] ? '12' : '10'}]</b>, status effect
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Attack XP progression table */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 24px 24px 24px',
+            columnGap: '6px',
+            rowGap: '2px',
+            alignItems: 'start',
+            marginBottom: '2px',
+            width: '100%',
+            paddingLeft: '4px'
+          }}>
+            {/* Row 1: XP headers */}
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>5xp</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>8xp</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>15xp</span>
+            {/* Row 2: +2hx Range */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+2hx Range</span>
+            {[0, 1, 2].map(i => (
+              <span key={i} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <span
+                  onClick={() => handleDotClick(sniperAttackRangeDots, setSniperAttackRangeDots, i, [5, 8, 15], 'sniperAttackRangeDots')}
+                  style={{
+                    width: '15px',
+                    height: '15px',
+                    border: '2px solid #000',
+                    borderRadius: '50%',
+                    display: 'block',
+                    background: sniperAttackRangeDots[i] ? '#000' : '#fff',
+                    cursor: (i === 0 || sniperAttackRangeDots[i - 1]) ? 'pointer' : 'not-allowed',
+                    transition: 'background 0.2s'
+                  }}
+                ></span>
+              </span>
+            ))}
+          </div>
+
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 24px 24px 24px',
+            columnGap: '6px',
+            rowGap: '2px',
+            alignItems: 'start',
+            marginBottom: '2px',
+            width: '100%',
+            paddingLeft: '4px'
+          }}>
+            {/* Row 1: XP headers */}
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>5xp</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>8xp</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>12xp</span>
+            {/* Row 2: +1 Damage die */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1 Damage die</span>
+            {[0, 1, 2].map(i => (
+              <span key={i} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <span
+                  onClick={() => handleDotClick(sniperAttackDamageDiceDots, setSniperAttackDamageDiceDots, i, [5, 8, 12], 'sniperAttackDamageDiceDots')}
+                  style={{
+                    width: '15px',
+                    height: '15px',
+                    border: '2px solid #000',
+                    borderRadius: '50%',
+                    display: 'block',
+                    background: sniperAttackDamageDiceDots[i] ? '#000' : '#fff',
+                    cursor: (i === 0 || sniperAttackDamageDiceDots[i - 1]) ? 'pointer' : 'not-allowed',
+                    transition: 'background 0.2s'
+                  }}
+                ></span>
+              </span>
+            ))}
+          </div>
+
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 24px 24px 24px',
+            columnGap: '6px',
+            rowGap: '2px',
+            alignItems: 'start',
+            marginBottom: '2px',
+            width: '100%',
+            paddingLeft: '4px'
+          }}>
+            {/* Row 1: XP headers */}
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>5xp</span>
+            <span></span>
+            <span></span>
+            {/* Row 2: Increase die size */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>Increase die size</span>
+            <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <span
+                onClick={() => handleDotClick(sniperAttackDieSizeDots, setSniperAttackDieSizeDots, 0, [5], 'sniperAttackDieSizeDots')}
+                style={{
+                  width: '15px',
+                  height: '15px',
+                  border: '2px solid #000',
+                  borderRadius: '50%',
+                  display: 'block',
+                  background: sniperAttackDieSizeDots[0] ? '#000' : '#fff',
+                  cursor: 'pointer',
+                  transition: 'background 0.2s'
+                }}
+              ></span>
+            </span>
+            <span></span>
+            <span></span>
+          </div>
+
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 24px 24px 24px',
+            columnGap: '6px',
+            rowGap: '2px',
+            alignItems: 'start',
+            marginBottom: '2px',
+            width: '100%',
+            paddingLeft: '4px'
+          }}>
+            {/* Row 1: XP headers */}
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>2xp</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>4xp</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>6xp</span>
+            {/* Row 2: +1 Crit */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1 Crit</span>
+            {[0, 1, 2].map(i => (
+              <span key={i} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <span
+                  onClick={() => handleDotClick(sniperAttackCritDots, setSniperAttackCritDots, i, [2, 4, 6], 'sniperAttackCritDots')}
+                  style={{
+                    width: '15px',
+                    height: '15px',
+                    border: '2px solid #000',
+                    borderRadius: '50%',
+                    display: 'block',
+                    background: sniperAttackCritDots[i] ? '#000' : '#fff',
+                    cursor: (i === 0 || sniperAttackCritDots[i - 1]) ? 'pointer' : 'not-allowed',
+                    transition: 'background 0.2s'
+                  }}
+                ></span>
+              </span>
+            ))}
+          </div>
+
+          <hr style={{ margin: '16px 0', border: 0, borderTop: '1px solid #ddd' }} />
+
+          {/* Strike header */}
+          <div style={{ color: '#351c75', fontWeight: 'bold', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '8px' }}>
+            <div style={{ fontWeight: 'bold', color: '#351c75', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Strike</u></div>
+            <span style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
+              {generateSniperStrikeJSX(sheet)}
+            </span>
+          </div>
+
+          <hr style={{ margin: '16px 0', border: 0, borderTop: '1px solid #ddd' }} />
+
+          {/* Movement header */}
+          <div style={{ color: '#38761d', fontWeight: 'bold', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '8px' }}>
+            <div style={{ fontWeight: 'bold', color: '#38761d', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Movement</u></div>
+            <div style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
+              <b>Enhanced <i style={{ color: '#38761d' }}>Movement</i> Effects.</b>
+              {sniperMovementClimbDots[0] && (
+                <>
+                  {' '}<b><i style={{ color: '#38761d' }}>Climb Speed</i></b>.
+                </>
+              )}
+            </div>
+          </div>
+
+          {/* Movement XP progression table */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 24px 24px 24px',
+            columnGap: '6px',
+            rowGap: '2px',
+            alignItems: 'start',
+            marginBottom: '2px',
+            width: '100%',
+            paddingLeft: '4px'
+          }}>
+            {/* Row 1: XP headers */}
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>6xp</span>
+            <span></span>
+            <span></span>
+            {/* Row 2: Climb Speed */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}><b><i style={{ color: '#38761d' }}>Climb Speed</i></b></span>
+            <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <span
+                onClick={() => handleDotClick(sniperMovementClimbDots, setSniperMovementClimbDots, 0, [6], 'sniperMovementClimbDots')}
+                style={{
+                  width: '15px',
+                  height: '15px',
+                  border: '2px solid #000',
+                  borderRadius: '50%',
+                  display: 'block',
+                  background: sniperMovementClimbDots[0] ? '#000' : '#fff',
+                  cursor: 'pointer',
+                  transition: 'background 0.2s'
+                }}
+              ></span>
+            </span>
+            <span></span>
+            <span></span>
+          </div>
+
+          <hr style={{ margin: '12px', border: 0, borderTop: '1px solid #ddd' }} />
+
+          {/* Perks header */}
+          <div style={{ fontWeight: 'bold', color: '#000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Perks</u></div>
+          <div style={{ fontSize: '1em', color: '#000', marginBottom: '6px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <i><b>Skills.</b> Stealth</i> +2
+          </div>
+
+          {/* Perks SP progression table */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 24px 24px 24px',
+            gridTemplateRows: 'auto auto',
+            columnGap: '6px',
+            rowGap: '2px',
+            alignItems: 'start',
+            marginTop: '-12px',
+            marginBottom: '2px',
+            width: '100%',
+            paddingLeft: '4px'
+          }}>
+            {/* Row 1: Empty cells and 11sp header */}
+            <span></span>
+            <span></span>
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>11sp</span>
+            {/* Row 2: Skulker text and dot */}
+            <div style={{ 
+              fontSize: '1em', 
+              fontFamily: 'Arial, Helvetica, sans-serif', 
+              textAlign: 'left',
+              paddingRight: '8px',
+              lineHeight: '1.2',
+              gridColumn: '1 / 4'
+            }}>
+              <b><i style={{ color: '#0a6f91', fontSize: '1em' }}>Skulker.</i></b> You are at home in the shadows, capable of sneaking into places and being unseen in almost any situation. You are rarely the center of focus and you often use that to your advantage. Gain an advantage on related skill rolls.
+            </div>
+            <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start' }}>
+              <span
+                onClick={() => handleSpDotClick(sniperPerksSkillsDots, setSniperPerksSkillsDots, 0, [11], 'sniperPerksSkillsDots')}
+                style={{
+                  width: '15px',
+                  height: '15px',
+                  border: '2px solid #000',
+                  borderRadius: '50%',
+                  display: 'block',
+                  background: sniperPerksSkillsDots[0] ? '#000' : '#fff',
                   cursor: 'pointer',
                   transition: 'background 0.2s'
                 }}

@@ -106,6 +106,9 @@ export type CharacterSheet = {
   // Dual Pistols for Pistoleer subclass (primary attacks)
   dualPistols?: string[];
 
+  // Sniper Rifles for Sniper subclass (primary attacks)
+  sniperRifles?: string[];
+
   // Algorithms for Coder class
   algorithms?: string[];
 

@@ -317,7 +317,14 @@ const CharacterSheetPerks: React.FC<CharacterSheetPerksProps> = ({
               <b><i style={{ color: '#5a910a' }}>Slippery.</i></b> <span style={{ color: '#000' }}>You're smooth talkin' and quick walkin' sonuvabitch. You're capable of weaseling your way out sticky situations, whether they're social or physical traps. Gain an advantage on related skills when escaping tricky circumstances.</span>
             </span>
           </div>
-          )}                                                          
+          )}
+          {subclass === 'Sniper' && (sheet?.subclassProgressionDots as any)?.sniperPerksSkillsDots?.[0] && (
+          <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <span>
+              <b><i style={{ color: '#0a6f91' }}>Skulker.</i></b> <span style={{ color: '#000' }}>You are at home in the shadows, capable of sneaking into places and being unseen in almost any situation. You are rarely the center of focus and you often use that to your advantage. Gain an advantage on related skill rolls.</span>
+            </span>
+          </div>
+          )}                                                           
         </div>
       </div>
   );
