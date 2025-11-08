@@ -523,10 +523,10 @@ const CharacterSheetInventory: React.FC<CharacterSheetInventoryProps> = ({
                     textAlign: 'left',
                     minWidth: '180px'
                   }}
-                  value={pendingSecondaryAttack || (charClass === 'Coder' ? 'Algorithms' : charClass === 'Devout' ? 'Relics' : charClass === 'Elementalist' ? 'Elementals' : charClass === 'Exospecialist' ? 'Smart Missiles' : subclass === 'Anatomist' ? 'Super Serums' : subclass === 'Grenadier' ? 'Grenades' : subclass === 'Necro' ? 'Chem Zombies' : subclass === 'Poisoner' ? 'Noxious Fumes' : subclass === 'Beguiler' ? 'Whips' : subclass === 'Galvanic' ? 'Sabres' : subclass === 'Tactician' ? 'Flares' : subclass === 'Tyrant' ? 'Blasters' : (subclass === 'Kinetic' || subclass === 'Mercurial' || subclass === 'Inertial' || subclass === 'Vectorial') ? 'Disciplines' : 'Select Secondary Attack')}
+                  value={pendingSecondaryAttack || (charClass === 'Coder' ? 'Algorithms' : charClass === 'Devout' ? 'Relics' : charClass === 'Elementalist' ? 'Elementals' : charClass === 'Exospecialist' ? 'Smart Missiles' : charClass === 'Technician' ? 'Tech Pulses' : subclass === 'Anatomist' ? 'Super Serums' : subclass === 'Grenadier' ? 'Grenades' : subclass === 'Necro' ? 'Chem Zombies' : subclass === 'Poisoner' ? 'Noxious Fumes' : subclass === 'Beguiler' ? 'Whips' : subclass === 'Galvanic' ? 'Sabres' : subclass === 'Tactician' ? 'Flares' : subclass === 'Tyrant' ? 'Blasters' : (subclass === 'Kinetic' || subclass === 'Mercurial' || subclass === 'Inertial' || subclass === 'Vectorial') ? 'Disciplines' : 'Select Secondary Attack')}
                   onChange={(e) => {
                     const value = e.target.value;
-                    if (value !== 'Algorithms' && value !== 'Relics' && value !== 'Elementals' && value !== 'Smart Missiles' && value !== 'Super Serums' && value !== 'Grenades' && value !== 'Chem Zombies' && value !== 'Noxious Fumes' && value !== 'Whips' && value !== 'Sabres' && value !== 'Flares' && value !== 'Blasters' && value !== 'Disciplines' && value !== 'Select Secondary Attack') {
+                    if (value !== 'Algorithms' && value !== 'Relics' && value !== 'Elementals' && value !== 'Smart Missiles' && value !== 'Tech Pulses' && value !== 'Super Serums' && value !== 'Grenades' && value !== 'Chem Zombies' && value !== 'Noxious Fumes' && value !== 'Whips' && value !== 'Sabres' && value !== 'Flares' && value !== 'Blasters' && value !== 'Disciplines' && value !== 'Select Secondary Attack') {
                       setPendingSecondaryAttack(value);
                     }
                   }}
@@ -697,7 +697,24 @@ const CharacterSheetInventory: React.FC<CharacterSheetInventoryProps> = ({
                       <option style={{ fontWeight: 'bold' }}>Razor Rain</option>
                     </>
                   )}
-                  {charClass !== 'Coder' && charClass !== 'Devout' && charClass !== 'Elementalist' && charClass !== 'Exospecialist' && subclass !== 'Anatomist' && subclass !== 'Grenadier' && subclass !== 'Necro' && subclass !== 'Poisoner' && subclass !== 'Beguiler' && subclass !== 'Galvanic' && subclass !== 'Tactician' && subclass !== 'Tyrant' && subclass !== 'Kinetic' && subclass !== 'Mercurial' && subclass !== 'Inertial' && subclass !== 'Vectorial' && (
+                  {charClass === 'Technician' && (
+                    <>
+                      <option disabled style={{ fontWeight: 'bold' }}>Tech Pulses</option>
+                      {subclass === 'Hacker' && (
+                        <option style={{ fontWeight: 'bold' }}>Cloaker Bubble</option>
+                      )}
+                      {subclass === 'Junker' && (
+                        <option style={{ fontWeight: 'bold' }}>Shrap Happy</option>
+                      )}
+                      {subclass === 'Nanoboticist' && (
+                        <option style={{ fontWeight: 'bold' }}>Swarm Surge</option>
+                      )}
+                      {subclass === 'Tanker' && (
+                        <option style={{ fontWeight: 'bold' }}>Rubblemaker</option>
+                      )}
+                    </>
+                  )}
+                  {charClass !== 'Coder' && charClass !== 'Devout' && charClass !== 'Elementalist' && charClass !== 'Exospecialist' && charClass !== 'Technician' && subclass !== 'Anatomist' && subclass !== 'Grenadier' && subclass !== 'Necro' && subclass !== 'Poisoner' && subclass !== 'Beguiler' && subclass !== 'Galvanic' && subclass !== 'Tactician' && subclass !== 'Tyrant' && subclass !== 'Kinetic' && subclass !== 'Mercurial' && subclass !== 'Inertial' && subclass !== 'Vectorial' && (
                     <option disabled style={{ fontWeight: 'bold' }}>Select Secondary Attack</option>
                   )}
                 </select>
@@ -1037,6 +1054,29 @@ const CharacterSheetInventory: React.FC<CharacterSheetInventoryProps> = ({
                                 const updatedSheet = { 
                                   ...sheet, 
                                   smartMissiles: newSmartMissiles
+                                };
+                                handleAutoSave(updatedSheet);
+                              }
+                            }}
+                          >×</button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  {(sheet?.techPulses && sheet.techPulses.length > 0) && (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginLeft: '8px' }}>
+                      {sheet?.techPulses?.map((pulse, idx) => (
+                        <span key={pulse + idx + 'techPulse'} style={{ fontStyle: 'italic', display: 'flex', alignItems: 'center', background: '#f5f5f5', borderRadius: '6px', padding: '2px 8px' }}>
+                          {pulse}
+                          <button
+                            style={{ marginLeft: '6px', padding: '0 6px', borderRadius: '50%', border: 'none', background: '#d32f2f', color: 'white', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.9em' }}
+                            title={`Remove ${pulse}`}
+                            onClick={() => {
+                              if (sheet) {
+                                const newTechPulses = sheet.techPulses?.filter((_, i) => i !== idx) || [];
+                                const updatedSheet = { 
+                                  ...sheet, 
+                                  techPulses: newTechPulses
                                 };
                                 handleAutoSave(updatedSheet);
                               }

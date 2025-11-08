@@ -18,6 +18,7 @@ import { generateEncodeWeaknessCardJSX } from "../utils/ammocoderTechnique";
 import { generateArtilleryStrikeCardJSX } from "../utils/ordnancerTechnique";
 import { generateBleedinBulletsCardJSX } from "../utils/pistoleerTechnique";
 import { generateLayLowCardJSX } from "../utils/sniperTechnique";
+import { generateTrapmakerCardJSX } from "../utils/technicianTechnique";
 import React from "react";
 import type { CharacterSheet } from "../types/CharacterSheet";
 import { loadSheetById, saveCharacterSheet } from "../utils/storage";
@@ -51,6 +52,7 @@ import { CardsElementalistAttacks } from "./CardsElementalistAttacks";
 import { CardsElementalistSecondaryAttacks } from "./CardsElementalistSecondaryAttacks";
 import { CardsExospecialistAttacks } from "./CardsExospecialistAttacks";
 import { CardsGunslingerAttacks } from "./CardsGunslingerAttacks";
+import { CardsTechnicianSecondaryAttacks } from "./CardsTechnicianSecondaryAttacks";
 import { calculateChemistFeatureData } from "../utils/chemistFeature";
 
 type CardsProps = {
@@ -619,15 +621,7 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                   })()
                    : charClass === 'Technician' ? (() => {
                     // Technician Trapmaker card logic
-                    const hxChain = 3 + (charClass === 'Technician' && localSheet?.classCardDots?.[2] ? localSheet.classCardDots[2].filter(Boolean).length * 2 : 0);
-                    const includesSleep = charClass === 'Technician' && localSheet?.classCardDots?.[3]?.[0];
-                    const affectsFly = charClass === 'Technician' && localSheet?.classCardDots?.[4]?.[0];
-                    const extraCondition = charClass === 'Technician' && localSheet?.classCardDots?.[5]?.[0] ? 1 : 0;
-                    return (
-                      <div style={{ fontSize: '0.95em' }}>
-                        You create <i>Dangerous Terrain</i> in an <i>AoE</i> <b>[{hxChain}]</b>hx-chain originating from a point up to 3hx away from you. <b>[{1 + extraCondition}]</b> effect(s) of the <i>Terrain</i> can be chosen from the following: <b><i>Blind</i></b>, <b><i>Confuse</i></b>, <b><i>Demoralize</i></b>, <b><i>Drain</i></b>, <b><i>Restrain</i></b>, <b><i>Spike</i></b> (any Damage type), or <br /><b>[{includesSleep ? <i>Sleep</i> : ' - '}]</b>. This <i>Terrain</i> affects <b>[{affectsFly ? <i><span style={{ color: '#38761d' }}>Fly</span></i> : ' - '}]</b> and lasts until the end of battle or is dismantled.
-                      </div>
-                    );
+                    return generateTrapmakerCardJSX(localSheet?.classCardDots);
                   })()
                   : 'Card stats.'}
               </div>
@@ -1499,6 +1493,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
             </div>
           </div>
         )}
+
+        {/* Technician Tech Pulse Secondary Attack Cards */}
+        {charClass === 'Technician' && <CardsTechnicianSecondaryAttacks sheet={localSheet} />}
 
       </div>
       

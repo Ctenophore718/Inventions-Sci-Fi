@@ -73,6 +73,7 @@ import { generateOrdnancerStrikeDamageJSX } from "../utils/ordnancerStrike";
 import { generatePistoleerStrikeDamageJSX } from "../utils/pistoleerStrike";
 import { generateTargeteerCharacterSheetJSX } from "../utils/sniperFeature";
 import { generateSniperStrikeDamageJSX } from "../utils/sniperStrike";
+import { generateMasterMechanicCharacterSheetJSX } from "../utils/technicianFeature";
 
 import CharacterSheetInventory from "./CharacterSheetInventory";
 import CharacterSheetPerks from "./CharacterSheetPerks";
@@ -293,7 +294,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
 
   const technicianFeatureJSX = (
     <span style={{ color: '#000', fontWeight: 400 }}>
-  <b><i style={{ color: '#724811' }}>Master Mechanic.</i></b> Friendly <i>Drones</i>, <i style={{ color: '#2b3b5f' }}>Cognizants</i>, and <i style={{ color: '#117233' }}>Exospecialists</i> that start their turn within <b>[{3 + (charClass === 'Technician' && sheet?.classCardDots?.[0] ? sheet.classCardDots[0].filter(Boolean).length : 0)}]</b>hx of you gain <b>[{1 + (charClass === 'Technician' && sheet?.classCardDots?.[1] ? sheet.classCardDots[1].filter(Boolean).length : 0)}]</b>d6 <b><i style={{ color: '#990000' }}>Hit Points</i></b>.
+      {generateMasterMechanicCharacterSheetJSX(sheet)}
     </span>
   );
 
@@ -1487,6 +1488,19 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
         { name: 'Razor Rain', type: 'Smart Missile', cost: 250 }
       );
     }
+
+    // Add Tech Pulses for Technician class
+    if (charClass === 'Technician') {
+      if (subclass === 'Hacker') {
+        attacks.push({ name: 'Cloaker Bubble', type: 'Tech Pulse', cost: 290 });
+      } else if (subclass === 'Junker') {
+        attacks.push({ name: 'Shrap Happy', type: 'Tech Pulse', cost: 210 });
+      } else if (subclass === 'Nanoboticist') {
+        attacks.push({ name: 'Swarm Surge', type: 'Tech Pulse', cost: 255 });
+      } else if (subclass === 'Tanker') {
+        attacks.push({ name: 'Rubblemaker', type: 'Tech Pulse', cost: 285 });
+      }
+    }
     
     return attacks;
   };
@@ -1738,6 +1752,12 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
           smartMissiles: newSmartMissiles,
           credits: credits - cost
         };
+      } else if (type === 'Tech Pulse') {
+        const newTechPulses = [...(sheet.techPulses || []), attackName];
+        partialUpdate = { 
+          techPulses: newTechPulses,
+          credits: credits - cost
+        };
       } else {
         return;
       }
@@ -1815,6 +1835,11 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
         const newSmartMissiles = [...(sheet.smartMissiles || []), attackName];
         partialUpdate = { 
           smartMissiles: newSmartMissiles
+        };
+      } else if (type === 'Tech Pulse') {
+        const newTechPulses = [...(sheet.techPulses || []), attackName];
+        partialUpdate = { 
+          techPulses: newTechPulses
         };
       } else {
         return;

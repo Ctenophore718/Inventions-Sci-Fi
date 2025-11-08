@@ -1348,6 +1348,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                     charClass={charClass}
                     _subclass={subclass}
                     onAutoSave={handleAutoSave}
+                    onCreditsChange={handleCreditsChangeNoSave}
                     xpTotal={xpTotal}
                     spTotal={spTotal}
                     xpSpent={xpSpent}

@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import type { CharacterSheet } from "../types/CharacterSheet";
+import { generateMasterMechanicJSX } from "../utils/technicianFeature";
+import { generateTrapmakerJSX } from "../utils/technicianTechnique";
 
 // Default Technician Dots: 13 arrays for each row, with appropriate dot counts
 const defaultTechnicianDots: boolean[][] = [
@@ -27,6 +29,7 @@ type LevelUpClassTechnicianProps = {
   _subclass: string;
   onXpSpChange?: (xpDelta: number, spDelta: number) => void;
   onAutoSave?: (updates: Partial<CharacterSheet>) => void;
+  onCreditsChange?: (creditsDelta: number) => void;
   xpTotal: number;
   spTotal: number;
   xpSpent: number;
@@ -42,6 +45,7 @@ const LevelUpClassTechnician: React.FC<LevelUpClassTechnicianProps> = ({
   _subclass, 
   onXpSpChange,
   onAutoSave,
+  onCreditsChange,
   xpTotal,
   spTotal, 
   xpSpent,
@@ -58,6 +62,23 @@ const LevelUpClassTechnician: React.FC<LevelUpClassTechnicianProps> = ({
       }
       return defaultTechnicianDots.map(row => [...row]);
     });
+
+    // Local state for selected Tech Pulses (secondary attacks)
+    const [selectedTechPulses, setSelectedTechPulses] = useState<string[]>(() => {
+      return sheet?.techPulses || [];
+    });
+    // Local state for pending Tech Pulse selection
+    const [pendingTechPulse, setPendingTechPulse] = useState<string>("");
+
+    // Get credits from sheet
+    const credits = sheet?.credits || 0;
+
+    // Sync selectedTechPulses with sheet data when it changes
+    useEffect(() => {
+      if (sheet?.techPulses) {
+        setSelectedTechPulses(sheet.techPulses);
+      }
+    }, [sheet?.techPulses]);
   
     // Helper function to safely access classCardDots array
     const safeGetDotsArray = (index: number): boolean[] => {
@@ -95,6 +116,17 @@ const LevelUpClassTechnician: React.FC<LevelUpClassTechnicianProps> = ({
       setXpSpent(newXpSpent);
       if (sheet && onAutoSave) {
         onAutoSave({ classCardDots: newDots, spSpent: newSpSpent, xpSpent: newXpSpent });
+      }
+    };
+
+    // Helper function to get Tech Pulse cost based on name and subclass
+    const getTechPulseCost = (pulseName: string): number => {
+      switch (pulseName) {
+        case 'Cloaker Bubble': return 290;
+        case 'Shrap Happy': return 210;
+        case 'Swarm Surge': return 255;
+        case 'Rubblemaker': return 285;
+        default: return 0;
       }
     };
     
@@ -169,7 +201,7 @@ const LevelUpClassTechnician: React.FC<LevelUpClassTechnicianProps> = ({
                   <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32, fontFamily: 'Arial, Helvetica, sans-serif' }}>
                     <div style={{ fontWeight: 'bold', color: '#0b5394', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Feature</u></div>
                     <span style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
-                      <b><i style={{ color: '#724811', fontSize: '1em' }}>Master Mechanic.</i></b> <span style={{ fontSize: '1em', fontWeight: 400 }}>Friendly <i>Drones</i>, <i><span style={{ color: '#2b3b5f' }}>Cognizants</span></i>, and <i><span style={{ color: '#117233' }}>Exospecialists</span></i> that start their turn within 3hx of you gain 1d6 <i><b><span style={{ color: '#990000' }}>Hit Points</span></b></i>.</span>
+                      {generateMasterMechanicJSX(sheet)}
                     </span>
                   </span>
                 </div>
@@ -283,7 +315,7 @@ const LevelUpClassTechnician: React.FC<LevelUpClassTechnicianProps> = ({
                 <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
                   <div style={{ fontWeight: 'bold', color: '#bf9000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Technique</u></div>
                   <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
-                    <b><i style={{ color: '#724811', fontSize: '1em' }}>Trapmaker</i></b> <i style={{ color: '#724811', fontSize: '1em' }}>(Cooldown 4).</i> You create <i>Dangerous Terrain</i> in an <i>AoE</i> 3hx-chain originating from a point up to 3hx away from you. The effect of the <i>Terrain</i> can be chosen from the following: <b><i>Blind</i></b>, <b><i>Confuse</i></b>, <b><i>Demoralize</i></b>, <b><i>Drain</i></b>, <b><i>Restrain</i></b>, <b><i>Spike</i></b> (any Damage type). This <i>Terrain</i> lasts until the end of battle or is dismantled.
+                    {generateTrapmakerJSX(sheet?.classCardDots)}
                   </div>
                   <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px' }}>
                     <div style={{
@@ -539,10 +571,154 @@ const LevelUpClassTechnician: React.FC<LevelUpClassTechnicianProps> = ({
                 {/* Attack section */}
                 <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
                   <div style={{ fontWeight: 'bold', color: '#990000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Attack</u></div>
+                  
+                  {/* Tech Pulses Dropdown */}
                   <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
-                    <b><i>Secondary <span style={{ color: '#990000' }}>Attack</span></i></b> <i>(Cooldown 4).</i><br />
-                    <i>Tech Pulse.</i> Self Range, <i>AoE</i> 5hx-Radius, 18+ Crit, Condition/Battlefield Effect
+                    <div style={{ marginBottom: '6px' }}>
+                      <b><i>Secondary <span style={{ color: '#990000' }}>Attack</span></i></b> <i>(Cooldown <b>[{Math.max(1, 4 - (safeGetDotsArray(10).filter(Boolean).length || 0))}]</b>).</i>
+                    </div>
+                    <div style={{ marginTop: '8px', marginBottom: '8px' }}>
+                      <div style={{ marginBottom: '4px' }}>
+                        <select
+                          style={{
+                            fontSize: '1em',
+                            padding: '2px 8px',
+                            borderRadius: '6px',
+                            border: '1px solid #ccc',
+                            background: '#fff',
+                            color: '#222',
+                            fontWeight: 'bold',
+                            marginBottom: '2px',
+                            textAlign: 'left',
+                            minWidth: '180px'
+                          }}
+                          value={pendingTechPulse || 'Tech Pulses'}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            if (value !== 'Tech Pulses') {
+                              setPendingTechPulse(value);
+                            }
+                          }}
+                        >
+                          <option disabled style={{ fontWeight: 'bold' }}>Tech Pulses</option>
+                          {_subclass === 'Hacker' && (
+                            <option style={{ fontWeight: 'bold' }}>Cloaker Bubble</option>
+                          )}
+                          {_subclass === 'Junker' && (
+                            <option style={{ fontWeight: 'bold' }}>Shrap Happy</option>
+                          )}
+                          {_subclass === 'Nanoboticist' && (
+                            <option style={{ fontWeight: 'bold' }}>Swarm Surge</option>
+                          )}
+                          {_subclass === 'Tanker' && (
+                            <option style={{ fontWeight: 'bold' }}>Rubblemaker</option>
+                          )}
+                        </select>
+                      {/* Buy/Add dialog for Tech Pulse selection */}
+                      {pendingTechPulse && (
+                        <div style={{ marginTop: '4px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                          <div style={{ fontWeight: 'bold' }}>
+                            {pendingTechPulse}
+                            <span style={{ color: '#bf9000', fontWeight: 'bold', marginLeft: '8px' }}>
+                              {getTechPulseCost(pendingTechPulse)}c
+                            </span>
+                          </div>
+                          <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                            <button
+                              style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #1976d2', background: '#1976d2', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}
+                              onClick={() => {
+                                const cost = getTechPulseCost(pendingTechPulse);
+                                if (credits < cost) {
+                                  setNotice('Not enough credits!');
+                                  return;
+                                }
+                                const newTechPulses = [...selectedTechPulses, pendingTechPulse];
+                                const newCredits = credits - cost;
+                                setSelectedTechPulses(newTechPulses);
+                                
+                                if (sheet && onAutoSave) {
+                                  onAutoSave({ 
+                                    techPulses: newTechPulses,
+                                    credits: newCredits
+                                  });
+                                }
+                                
+                                onCreditsChange?.(-cost);
+                                setPendingTechPulse("");
+                              }}
+                            >Buy</button>
+                            <button
+                              style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #28a745', background: '#28a745', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}
+                              onClick={() => {
+                                const newTechPulses = [...selectedTechPulses, pendingTechPulse];
+                                setSelectedTechPulses(newTechPulses);
+                                
+                                if (sheet && onAutoSave) {
+                                  onAutoSave({ 
+                                    techPulses: newTechPulses,
+                                    credits: credits
+                                  });
+                                }
+                                
+                                setPendingTechPulse("");
+                              }}
+                            >Add</button>
+                            <button
+                              style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #aaa', background: '#eee', color: '#333', fontWeight: 'bold', cursor: 'pointer' }}
+                              onClick={() => setPendingTechPulse("")}
+                            >Cancel</button>
+                          </div>
+                        </div>
+                      )}
+                      
+                      {/* Display added Tech Pulses */}
+                      <div style={{ marginTop: '4px' }}>
+                        {selectedTechPulses.length > 0 && (
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                            {selectedTechPulses.map((pulse, idx) => (
+                              <span key={pulse + idx} style={{ fontStyle: 'italic', display: 'flex', alignItems: 'center', background: '#f5f5f5', borderRadius: '6px', padding: '2px 8px' }}>
+                                {pulse}
+                                <button
+                                  style={{ marginLeft: '6px', padding: '0 6px', borderRadius: '50%', border: 'none', background: '#d32f2f', color: 'white', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.9em' }}
+                                  title={`Remove ${pulse}`}
+                                  onClick={() => {
+                                    const newTechPulses = selectedTechPulses.filter((_, i) => i !== idx);
+                                    setSelectedTechPulses(newTechPulses);
+                                    
+                                    if (sheet && onAutoSave) {
+                                      onAutoSave({ 
+                                        techPulses: newTechPulses
+                                      });
+                                    }
+                                  }}
+                                >×</button>
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   </div>
+
+                  {/* Attack stats */}
+                    <div style={{ fontSize: '1em', marginTop: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <span><b><u>Range</u></b> Self or <b>[{safeGetDotsArray(8)[0] ? 'Drone Self' : ' - '}]</b></span>
+                        <span style={{ textAlign: 'right', minWidth: '80px' }}><b><u>Crit</u></b> <b>[{18 - safeGetDotsArray(9).filter(Boolean).length}]</b>+</span>
+                      </div>
+                      <div>
+                        <b><u>Target</u></b> <i>AoE</i> <b>[{5 + safeGetDotsArray(7).filter(Boolean).length}]</b>hx-Radius
+                      </div>
+                      <div>
+                        <b><u>Effect</u></b> Battlefield or status effect
+                      </div>
+                      <div>
+                        <b><u>Crit Effect</u></b> Battlefield or status effect
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Attack XP progression table */}
                   <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px' }}>
                     <div style={{
                       display: 'grid',

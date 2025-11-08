@@ -109,6 +109,9 @@ export type CharacterSheet = {
   // Sniper Rifles for Sniper subclass (primary attacks)
   sniperRifles?: string[];
 
+  // Tech Pulses for Technician class (secondary attacks)
+  techPulses?: string[];
+
   // Algorithms for Coder class
   algorithms?: string[];
 
