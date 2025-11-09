@@ -74,6 +74,8 @@ import { generatePistoleerStrikeDamageJSX } from "../utils/pistoleerStrike";
 import { generateTargeteerCharacterSheetJSX } from "../utils/sniperFeature";
 import { generateSniperStrikeDamageJSX } from "../utils/sniperStrike";
 import { generateMasterMechanicCharacterSheetJSX } from "../utils/technicianFeature";
+import { generateForcedTeleportationCharacterSheetJSX } from "../utils/hackerStrike";
+import { generateSalvageJSX } from "../utils/junkerFeature";
 
 import CharacterSheetInventory from "./CharacterSheetInventory";
 import CharacterSheetPerks from "./CharacterSheetPerks";
@@ -927,7 +929,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
 
   const junkerFeatureJSX = (
     <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#6db857' }}>Salvage.</i></b> Your <i>Drone</i> gains the Crit effect of a <b>[1]</b> ally's <b><i><span style={{ color: '#000' }}>Primary</span> <span style={{ color: '#990000' }}>Attack</span></i></b> within <b>[3]</b>hx of it.
+      {generateSalvageJSX(sheet)}
     </span>
   );
 
@@ -1302,6 +1304,14 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
       );
     }
     
+    // Add Stealth Drones for Technician class (Hacker subclass)
+    if (charClass === 'Technician' && subclass === 'Hacker') {
+      attacks.push(
+        { name: 'Blind Silence', type: 'Stealth Drone', cost: 165 },
+        { name: 'Will-o\'-the-Wisp', type: 'Stealth Drone', cost: 160 }
+      );
+    }
+    
     return attacks;
   };
 
@@ -1585,6 +1595,12 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
           sniperRifles: newSniperRifles,
           credits: credits - cost
         };
+      } else if (type === 'Stealth Drone') {
+        const newStealthDrones = [...(sheet.stealthDrones || []), attackName];
+        partialUpdate = { 
+          stealthDrones: newStealthDrones,
+          credits: credits - cost
+        };
       } else {
         return;
       }
@@ -1656,6 +1672,11 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
         const newSniperRifles = [...(sheet.sniperRifles || []), attackName];
         partialUpdate = { 
           sniperRifles: newSniperRifles
+        };
+      } else if (type === 'Stealth Drone') {
+        const newStealthDrones = [...(sheet.stealthDrones || []), attackName];
+        partialUpdate = { 
+          stealthDrones: newStealthDrones
         };
       } else {
         return;
@@ -1924,6 +1945,8 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                     if (subclass === "Ordnancer" && skill === "Athletics") return "rgba(145,10,10,0.5)";
                     if (subclass === "Pistoleer" && skill === "Thievery") return "rgba(90,145,10,0.5)";
                     if (subclass === "Sniper" && skill === "Stealth") return "rgba(10,111,145,0.5)";
+                    if (subclass === "Hacker" && skill === "Computers") return "rgba(92,87,184,0.5)";
+                    if (subclass === "Junker" && skill === "Thievery") return "rgba(109,184,87,0.5)";
                     return null;
                   };
                   
@@ -2909,6 +2932,8 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                     ? <span style={{ color: '#000', fontWeight: 'normal' }}><b><i>Demoralize</i></b></span>
                   : (subclass === 'Brawler')
                     ? generateBrawlerStrikeEffectsJSX(sheet) || strikeEffects
+                  : (subclass === 'Hacker' && (sheet?.subclassProgressionDots as any)?.hackerStrikeForcedTeleportationDots?.[0])
+                    ? <span style={{ color: '#000', fontWeight: 'normal' }}>Forced <b><i style={{ color: '#38761d' }}>Teleportation</i></b> to hx adjacent to <i>Drone</i> against 3hx or smaller enemy</span>
                     : strikeEffects
               }
           </div>

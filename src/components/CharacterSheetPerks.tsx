@@ -324,7 +324,21 @@ const CharacterSheetPerks: React.FC<CharacterSheetPerksProps> = ({
               <b><i style={{ color: '#0a6f91' }}>Skulker.</i></b> <span style={{ color: '#000' }}>You are at home in the shadows, capable of sneaking into places and being unseen in almost any situation. You are rarely the center of focus and you often use that to your advantage. Gain an advantage on related skill rolls.</span>
             </span>
           </div>
-          )}                                                           
+          )} 
+          {subclass === 'Hacker' && (sheet?.subclassProgressionDots as any)?.hackerPerksSkillsDots?.[0] && (
+          <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <span>
+              <b><i style={{ color: '#5c57b8' }}>Cyberpunk.</i></b> <span style={{ color: '#000' }}>You're a savant when it comes to working with computer interfaces and communications devices of all kinds. Gain an advantage on related skills when operating any type of screen or user interface.</span>
+            </span>
+          </div>
+          )}
+          {subclass === 'Junker' && (sheet?.subclassProgressionDots as any)?.junkerPerksSkillsDots?.[0] && (
+          <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <span>
+              <b><i style={{ color: '#6db857' }}>Scavenger.</i></b> <span style={{ color: '#000' }}>You have a knack for always being able to find, steal, or make the part you need to make something mechanical work. Gain an advantage on related skill rolls.</span>
+            </span>
+          </div>
+          )}                                                              
         </div>
       </div>
   );

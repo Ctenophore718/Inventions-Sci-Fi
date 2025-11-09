@@ -112,6 +112,12 @@ export type CharacterSheet = {
   // Tech Pulses for Technician class (secondary attacks)
   techPulses?: string[];
 
+  // Stealth Drones for Hacker subclass (primary attacks)
+  stealthDrones?: string[];
+
+  // Junker Drones for Junker subclass (primary attacks)
+  junkerDrones?: string[];
+
   // Algorithms for Coder class
   algorithms?: string[];
 
@@ -333,6 +339,16 @@ export type CharacterSheet = {
     spectreStrikeExtraDots?: boolean[];
     spectreMovementSpeedDots?: boolean[];
     spectrePerksSkillsDots?: boolean[];
+    // Hacker subclass progression (Technician)
+    hackerTechniqueHitPointsDots?: boolean[];
+    hackerTechniqueSpikeDots?: boolean[];
+    hackerTechniqueCooldownDots?: boolean[];
+    hackerPrimaryAttackDieSizeDots?: boolean[];
+    hackerPrimaryAttackSpeedDots?: boolean[];
+    hackerPrimaryAttackCritDots?: boolean[];
+    hackerPrimaryAttackHitPointsDots?: boolean[];
+    hackerStrikeForcedTeleportationDots?: boolean[];
+    hackerPerksSkillsDots?: boolean[];
     // Add other subclasses as needed
   };
 };

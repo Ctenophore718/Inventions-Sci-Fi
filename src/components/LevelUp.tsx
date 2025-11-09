@@ -20,6 +20,7 @@ import LevelUpSubclassesDevout from "./LevelUpSubclassesDevout";
 import LevelUpSubclassesElementalist from "./LevelUpSubclassesElementalist";
 import LevelUpSubclassesExospecialist from "./LevelUpSubclassesExospecialist";
 import LevelUpSubclassesGunslinger from "./LevelUpSubclassesGunslinger";
+import LevelUpSubclassesTechnician from "./LevelUpSubclassesTechnician";
 import { calculateChemistFeatureData } from "../utils/chemistFeature";
 
 
@@ -1605,6 +1606,24 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                 setNotice={setNotice}
               />
             )}
+
+            {/* Technician Subclass Content */}
+            {charClass === "Technician" && subclass && (
+              <LevelUpSubclassesTechnician
+                sheet={sheet}
+                charClass={charClass}
+                subclass={subclass}
+                onAutoSave={handleAutoSave}
+                xpTotal={xpTotal}
+                spTotal={spTotal}
+                xpSpent={xpSpent}
+                spSpent={spSpent}
+                credits={credits}
+                setXpSpent={setXpSpent}
+                setSpSpent={setSpSpent}
+                setNotice={setNotice}
+              />
+            )}
         </div>
 
 
@@ -2052,8 +2071,16 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                           // Sniper Stealth booster always goes at position 2, same as class boosters
                           const isSniperStealth = subclass === "Sniper" && skill === "Stealth" && i === 2;
 
+                          // Check for Hacker Computers booster dot
+                          // Hacker Computers booster always goes at position 2, same as class boosters
+                          const isHackerComputers = subclass === "Hacker" && skill === "Computers" && i === 2;
 
-                          if (isChemistInvestigation || isCoderOikomagic || isCommanderDiplomacy || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine || isGrenadierIntimidation || isNecroSurvival || isPoisonerThievery || isCoerciveDeception || isBeguilerDeception || isDivinistInvestigation || isNaturalistSurvival || isTechnologistTechnology || isGalvanicAthletics || isTacticianAwareness || isTyrantIntimidation || isInertialDiplomacy || isKineticAthletics || isMercurialAcrobatics || isVectorialPiloting || isAstralMedicine || isChaosIntimidation || isOrderCulture || isVoidStealth || isAirAcrobatics || isEarthSurvival || isFireIntimidation || isWaterMedicine || isAeronautPiloting || isBrawlerSurvival || isDreadnaughtIntimidation || isSpectreStealth || isAmmoCoderOikomagic || isOrdnancerAthletics || isPistoleerThievery || isSniperStealth) {
+                          // Check for Junker Thievery booster dot
+                          // Junker Thievery booster always goes at position 2, same as class boosters
+                          const isJunkerThievery = subclass === "Junker" && skill === "Thievery" && i === 2;
+
+
+                          if (isChemistInvestigation || isCoderOikomagic || isCommanderDiplomacy || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine || isGrenadierIntimidation || isNecroSurvival || isPoisonerThievery || isCoerciveDeception || isBeguilerDeception || isDivinistInvestigation || isNaturalistSurvival || isTechnologistTechnology || isGalvanicAthletics || isTacticianAwareness || isTyrantIntimidation || isInertialDiplomacy || isKineticAthletics || isMercurialAcrobatics || isVectorialPiloting || isAstralMedicine || isChaosIntimidation || isOrderCulture || isVoidStealth || isAirAcrobatics || isEarthSurvival || isFireIntimidation || isWaterMedicine || isAeronautPiloting || isBrawlerSurvival || isDreadnaughtIntimidation || isSpectreStealth || isAmmoCoderOikomagic || isOrdnancerAthletics || isPistoleerThievery || isSniperStealth || isHackerComputers || isJunkerThievery) {
                             checked = true; // Force third dot to be filled for class booster dots
                           }
 
@@ -2100,6 +2127,8 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                             if (isOrdnancerAthletics) return "rgba(145,10,10,0.5)";
                             if (isPistoleerThievery) return "rgba(90,145,10,0.5)";
                             if (isSniperStealth) return "rgba(10,111,145,0.5)";
+                            if (isHackerComputers) return "rgba(92,87,184,0.5)";
+                            if (isJunkerThievery) return "rgba(109,184,87,0.5)";
                             // Add other class colors here in the future
                             return "#d0d0d0"; // fallback color
                           };
@@ -2158,7 +2187,9 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                                     (subclass === "Ammo Coder" && skill === "Oikomagic") ||
                                     (subclass === "Ordnancer" && skill === "Athletics") ||
                                     (subclass === "Pistoleer" && skill === "Thievery") ||
-                                    (subclass === "Sniper" && skill === "Stealth")
+                                    (subclass === "Sniper" && skill === "Stealth") ||
+                                    (subclass === "Hacker" && skill === "Computers") ||
+                                    (subclass === "Junker" && skill === "Thievery")
                                   ))
                               )) {
                                 spCostForThisDot += [1, 1, 2, 2, 3, 4, 5, 6, 8, 10][j];
@@ -2209,7 +2240,9 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                                     (subclass === "Ammo Coder" && skill === "Oikomagic") ||
                                     (subclass === "Ordnancer" && skill === "Athletics") ||
                                     (subclass === "Pistoleer" && skill === "Thievery") ||
-                                    (subclass === "Sniper" && skill === "Stealth")
+                                    (subclass === "Sniper" && skill === "Stealth") ||
+                                    (subclass === "Hacker" && skill === "Computers") ||
+                                    (subclass === "Junker" && skill === "Thievery")
                                   ))
                               )) {
                                 spCostForThisDot += [1, 1, 2, 2, 3, 4, 5, 6, 8, 10][j];
@@ -2236,7 +2269,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                                   if (isLockedColumn) return;
                                   
                                   // Prevent clicking on class-based automatic skill dots
-                                  if (isChemistInvestigation || isCoderOikomagic || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isCommanderDiplomacy || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine || isGrenadierIntimidation || isNecroSurvival || isPoisonerThievery || isCoerciveDeception || isBeguilerDeception || isDivinistInvestigation || isNaturalistSurvival || isTechnologistTechnology || isGalvanicAthletics || isTacticianAwareness || isTyrantIntimidation || isInertialDiplomacy || isKineticAthletics || isMercurialAcrobatics || isVectorialPiloting || isAstralMedicine || isChaosIntimidation || isOrderCulture || isVoidStealth || isAirAcrobatics || isEarthSurvival || isFireIntimidation || isWaterMedicine || isAeronautPiloting || isBrawlerSurvival || isDreadnaughtIntimidation || isSpectreStealth || isAmmoCoderOikomagic || isOrdnancerAthletics || isPistoleerThievery|| isSniperStealth) return;
+                                  if (isChemistInvestigation || isCoderOikomagic || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isCommanderDiplomacy || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine || isGrenadierIntimidation || isNecroSurvival || isPoisonerThievery || isCoerciveDeception || isBeguilerDeception || isDivinistInvestigation || isNaturalistSurvival || isTechnologistTechnology || isGalvanicAthletics || isTacticianAwareness || isTyrantIntimidation || isInertialDiplomacy || isKineticAthletics || isMercurialAcrobatics || isVectorialPiloting || isAstralMedicine || isChaosIntimidation || isOrderCulture || isVoidStealth || isAirAcrobatics || isEarthSurvival || isFireIntimidation || isWaterMedicine || isAeronautPiloting || isBrawlerSurvival || isDreadnaughtIntimidation || isSpectreStealth || isAmmoCoderOikomagic || isOrdnancerAthletics || isPistoleerThievery|| isSniperStealth || isHackerComputers || isJunkerThievery) return;
 
                                   // SP costs for each skill dot position: [1sp, 1sp, 2sp, 2sp, 3sp, 4sp, 5sp, 6sp, 8sp, 10sp]
                                   const spCosts = [1, 1, 2, 2, 3, 4, 5, 6, 8, 10];
@@ -2295,6 +2328,8 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                                       if (subclass === "Ordnancer" && skillName === "Athletics") return true;
                                       if (subclass === "Pistoleer" && skillName === "Thievery") return true;
                                       if (subclass === "Sniper" && skillName === "Stealth") return true;
+                                      if (subclass === "Hacker" && skillName === "Computers") return true;
+                                      if (subclass === "Junker" && skillName === "Thievery") return true;
                                     }
                                     
                                     return false;
@@ -2405,13 +2440,13 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                                   width: isMobile ? 14 : 18,
                                   height: isMobile ? 14 : 18,
                                   borderRadius: '50%',
-                                  border: (isChemistInvestigation || isCoderOikomagic || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isCommanderDiplomacy || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine || isGrenadierIntimidation || isNecroSurvival || isPoisonerThievery || isCoerciveDeception || isBeguilerDeception || isDivinistInvestigation || isNaturalistSurvival || isTechnologistTechnology || isGalvanicAthletics || isTacticianAwareness || isTyrantIntimidation || isInertialDiplomacy || isKineticAthletics || isMercurialAcrobatics || isVectorialPiloting || isAstralMedicine || isChaosIntimidation || isOrderCulture || isVoidStealth || isAirAcrobatics || isEarthSurvival || isFireIntimidation || isWaterMedicine || isAeronautPiloting || isBrawlerSurvival || isDreadnaughtIntimidation || isSpectreStealth || isAmmoCoderOikomagic || isOrdnancerAthletics|| isPistoleerThievery|| isSniperStealth) ? `2px solid ${classBoostColor}` : (isLockedColumn ? '2px solid #666' : '2px solid #000'),
-                                  background: checked ? ((isChemistInvestigation || isCoderOikomagic || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isCommanderDiplomacy || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine || isGrenadierIntimidation || isNecroSurvival || isPoisonerThievery || isCoerciveDeception || isBeguilerDeception || isDivinistInvestigation || isNaturalistSurvival || isTechnologistTechnology || isGalvanicAthletics || isTacticianAwareness || isTyrantIntimidation || isInertialDiplomacy || isKineticAthletics || isMercurialAcrobatics || isVectorialPiloting || isAstralMedicine || isChaosIntimidation || isOrderCulture || isVoidStealth || isAirAcrobatics || isEarthSurvival || isFireIntimidation || isWaterMedicine || isAeronautPiloting || isBrawlerSurvival || isDreadnaughtIntimidation || isSpectreStealth || isAmmoCoderOikomagic || isOrdnancerAthletics|| isPistoleerThievery|| isSniperStealth) ? classBoostColor : (isLockedColumn ? '#666' : '#000')) : '#fff',
-                                  cursor: (isLockedColumn || isChemistInvestigation || isCoderOikomagic || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isCommanderDiplomacy || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine || isGrenadierIntimidation || isNecroSurvival || isPoisonerThievery || isCoerciveDeception || isBeguilerDeception || isDivinistInvestigation || isNaturalistSurvival || isTechnologistTechnology || isGalvanicAthletics || isTacticianAwareness || isTyrantIntimidation || isInertialDiplomacy || isKineticAthletics || isMercurialAcrobatics || isVectorialPiloting || isAstralMedicine || isChaosIntimidation || isOrderCulture || isVoidStealth || isAirAcrobatics || isEarthSurvival || isFireIntimidation || isWaterMedicine || isAeronautPiloting || isBrawlerSurvival || isDreadnaughtIntimidation || isSpectreStealth || isAmmoCoderOikomagic || isOrdnancerAthletics|| isPistoleerThievery|| isSniperStealth) ? 'not-allowed' : (canAffordCheck || canUncheck ? 'pointer' : 'not-allowed'),
-                                  opacity: (isLockedColumn || isChemistInvestigation || isCoderOikomagic || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isCommanderDiplomacy || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine || isGrenadierIntimidation || isNecroSurvival || isPoisonerThievery || isCoerciveDeception || isBeguilerDeception || isDivinistInvestigation || isNaturalistSurvival || isTechnologistTechnology || isGalvanicAthletics || isTacticianAwareness || isTyrantIntimidation || isInertialDiplomacy || isKineticAthletics || isMercurialAcrobatics || isVectorialPiloting || isAstralMedicine || isChaosIntimidation || isOrderCulture || isVoidStealth || isAirAcrobatics || isEarthSurvival || isFireIntimidation || isWaterMedicine || isAeronautPiloting || isBrawlerSurvival || isDreadnaughtIntimidation || isSpectreStealth || isAmmoCoderOikomagic || isOrdnancerAthletics|| isPistoleerThievery|| isSniperStealth) ? 0.6 : (canAffordCheck || canUncheck ? 1 : 0.4),
+                                  border: (isChemistInvestigation || isCoderOikomagic || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isCommanderDiplomacy || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine || isGrenadierIntimidation || isNecroSurvival || isPoisonerThievery || isCoerciveDeception || isBeguilerDeception || isDivinistInvestigation || isNaturalistSurvival || isTechnologistTechnology || isGalvanicAthletics || isTacticianAwareness || isTyrantIntimidation || isInertialDiplomacy || isKineticAthletics || isMercurialAcrobatics || isVectorialPiloting || isAstralMedicine || isChaosIntimidation || isOrderCulture || isVoidStealth || isAirAcrobatics || isEarthSurvival || isFireIntimidation || isWaterMedicine || isAeronautPiloting || isBrawlerSurvival || isDreadnaughtIntimidation || isSpectreStealth || isAmmoCoderOikomagic || isOrdnancerAthletics|| isPistoleerThievery|| isSniperStealth|| isHackerComputers|| isJunkerThievery) ? `2px solid ${classBoostColor}` : (isLockedColumn ? '2px solid #666' : '2px solid #000'),
+                                  background: checked ? ((isChemistInvestigation || isCoderOikomagic || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isCommanderDiplomacy || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine || isGrenadierIntimidation || isNecroSurvival || isPoisonerThievery || isCoerciveDeception || isBeguilerDeception || isDivinistInvestigation || isNaturalistSurvival || isTechnologistTechnology || isGalvanicAthletics || isTacticianAwareness || isTyrantIntimidation || isInertialDiplomacy || isKineticAthletics || isMercurialAcrobatics || isVectorialPiloting || isAstralMedicine || isChaosIntimidation || isOrderCulture || isVoidStealth || isAirAcrobatics || isEarthSurvival || isFireIntimidation || isWaterMedicine || isAeronautPiloting || isBrawlerSurvival || isDreadnaughtIntimidation || isSpectreStealth || isAmmoCoderOikomagic || isOrdnancerAthletics|| isPistoleerThievery|| isSniperStealth|| isHackerComputers|| isJunkerThievery) ? classBoostColor : (isLockedColumn ? '#666' : '#000')) : '#fff',
+                                  cursor: (isLockedColumn || isChemistInvestigation || isCoderOikomagic || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isCommanderDiplomacy || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine || isGrenadierIntimidation || isNecroSurvival || isPoisonerThievery || isCoerciveDeception || isBeguilerDeception || isDivinistInvestigation || isNaturalistSurvival || isTechnologistTechnology || isGalvanicAthletics || isTacticianAwareness || isTyrantIntimidation || isInertialDiplomacy || isKineticAthletics || isMercurialAcrobatics || isVectorialPiloting || isAstralMedicine || isChaosIntimidation || isOrderCulture || isVoidStealth || isAirAcrobatics || isEarthSurvival || isFireIntimidation || isWaterMedicine || isAeronautPiloting || isBrawlerSurvival || isDreadnaughtIntimidation || isSpectreStealth || isAmmoCoderOikomagic || isOrdnancerAthletics|| isPistoleerThievery|| isSniperStealth|| isHackerComputers|| isJunkerThievery) ? 'not-allowed' : (canAffordCheck || canUncheck ? 'pointer' : 'not-allowed'),
+                                  opacity: (isLockedColumn || isChemistInvestigation || isCoderOikomagic || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isCommanderDiplomacy || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine || isGrenadierIntimidation || isNecroSurvival || isPoisonerThievery || isCoerciveDeception || isBeguilerDeception || isDivinistInvestigation || isNaturalistSurvival || isTechnologistTechnology || isGalvanicAthletics || isTacticianAwareness || isTyrantIntimidation || isInertialDiplomacy || isKineticAthletics || isMercurialAcrobatics || isVectorialPiloting || isAstralMedicine || isChaosIntimidation || isOrderCulture || isVoidStealth || isAirAcrobatics || isEarthSurvival || isFireIntimidation || isWaterMedicine || isAeronautPiloting || isBrawlerSurvival || isDreadnaughtIntimidation || isSpectreStealth || isAmmoCoderOikomagic || isOrdnancerAthletics|| isPistoleerThievery|| isSniperStealth|| isHackerComputers|| isJunkerThievery) ? 0.6 : (canAffordCheck || canUncheck ? 1 : 0.4),
                                 }}
                                 title={
-                                  isChemistInvestigation || isCoderOikomagic || isCommanderDiplomacy || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine || isGrenadierIntimidation || isNecroSurvival || isPoisonerThievery || isCoerciveDeception || isBeguilerDeception || isDivinistInvestigation || isNaturalistSurvival || isTechnologistTechnology || isGalvanicAthletics || isTacticianAwareness || isTyrantIntimidation || isInertialDiplomacy || isKineticAthletics || isMercurialAcrobatics || isVectorialPiloting || isAstralMedicine || isChaosIntimidation || isOrderCulture || isVoidStealth || isAirAcrobatics || isEarthSurvival || isFireIntimidation || isWaterMedicine || isAeronautPiloting || isBrawlerSurvival || isDreadnaughtIntimidation || isSpectreStealth || isAmmoCoderOikomagic || isOrdnancerAthletics|| isPistoleerThievery|| isSniperStealth
+                                  isChemistInvestigation || isCoderOikomagic || isCommanderDiplomacy || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine || isGrenadierIntimidation || isNecroSurvival || isPoisonerThievery || isCoerciveDeception || isBeguilerDeception || isDivinistInvestigation || isNaturalistSurvival || isTechnologistTechnology || isGalvanicAthletics || isTacticianAwareness || isTyrantIntimidation || isInertialDiplomacy || isKineticAthletics || isMercurialAcrobatics || isVectorialPiloting || isAstralMedicine || isChaosIntimidation || isOrderCulture || isVoidStealth || isAirAcrobatics || isEarthSurvival || isFireIntimidation || isWaterMedicine || isAeronautPiloting || isBrawlerSurvival || isDreadnaughtIntimidation || isSpectreStealth || isAmmoCoderOikomagic || isOrdnancerAthletics|| isPistoleerThievery|| isSniperStealth|| isHackerComputers|| isJunkerThievery
                                     ? 'Class bonus skill dot (cannot be changed)'
                                     : isLockedColumn 
                                     ? 'Starting skill dots (cannot be changed)'

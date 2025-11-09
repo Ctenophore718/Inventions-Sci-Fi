@@ -575,7 +575,7 @@ const LevelUpClassTechnician: React.FC<LevelUpClassTechnicianProps> = ({
                   {/* Tech Pulses Dropdown */}
                   <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
                     <div style={{ marginBottom: '6px' }}>
-                      <b><i>Secondary <span style={{ color: '#990000' }}>Attack</span></i></b> <i>(Cooldown <b>[{Math.max(1, 4 - (safeGetDotsArray(10).filter(Boolean).length || 0))}]</b>).</i>
+                      <b><i>Secondary <span style={{ color: '#990000' }}>Attack</span></i></b> <i style={{ color: '#990000', fontSize: '1em' }}>(Cooldown <b style={{ color: '#000', fontStyle: 'normal' }}>[{Math.max(1, 4 - (safeGetDotsArray(10).filter(Boolean).length || 0))}]</b>).</i>
                     </div>
                     <div style={{ marginTop: '8px', marginBottom: '8px' }}>
                       <div style={{ marginBottom: '4px' }}>
@@ -923,12 +923,20 @@ const LevelUpClassTechnician: React.FC<LevelUpClassTechnicianProps> = ({
                 <div style={{ marginTop: '16px', borderTop: '1px solid #ddd', paddingTop: '12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
                   <div style={{ fontWeight: 'bold', color: '#351c75', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Strike</u></div>
                   <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
-                    <i><b><span style={{ color: '#351c75' }}>Strike</span> Damage.</b></i> 1d6 <b><u style={{ color: '#d5d52a' }}>Electric</u></b><img src="/Electric.png" alt="Electric" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} />.
+                    {(() => {
+                      const damageDots = safeGetDotsArray(11).filter(Boolean).length;
+                      const damageDie = 1 + damageDots;
+                      return (
+                        <>
+                          <i><b><span style={{ color: '#351c75' }}>Strike</span> Damage.</b></i> <b>[{damageDie}]</b>d6 <b><u style={{ color: '#d5d52a' }}>Electric</u></b><img src="/Electric.png" alt="Electric" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} />.
+                        </>
+                      );
+                    })()}
                   </div>
                   <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px' }}>
                     <div style={{
                       display: 'grid',
-                      gridTemplateColumns: '1fr 24px 24px',
+                      gridTemplateColumns: '1fr 24px 24px 24px',
                       gridTemplateRows: 'repeat(2, auto)',
                       columnGap: '6px',
                       rowGap: '2px',
@@ -941,6 +949,7 @@ const LevelUpClassTechnician: React.FC<LevelUpClassTechnicianProps> = ({
                       <span></span>
                       <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>6xp</span>
                       <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>10xp</span>
+                      <span></span>
                       {/* Row 2: +1 Damage die dots (interactive) */}
                       <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>+1 Damage die</span>
                       {[0,1].map(idx => {

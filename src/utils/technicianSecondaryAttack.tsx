@@ -55,10 +55,12 @@ export function generateTechnicianSecondaryAttackStatsJSX(
             <b><u>Target</u></b> <i>AoE</i> <b>[{targetAoE}]</b>hx-Radius
           </div>
           <div>
-            <b><u>Effect</u></b> Invisibility field
+            <b><u>Effect</u></b> Allies gain 50% Cover until <br />
+            <span style={{ display: 'block', textAlign: 'right' }}>the beginning of the next turn</span>
           </div>
           <div>
-            <b><u>Crit Effect</u></b> Extended invisibility
+            <b><u>Crit Effect</u></b> Allies cannot be targeted until <br />
+            <span style={{ display: 'block', textAlign: 'right' }}>the beginning of the next turn</span>
           </div>
         </>
       ) : techPulseName === 'Shrap Happy' ? (
@@ -71,13 +73,14 @@ export function generateTechnicianSecondaryAttackStatsJSX(
             <b><u>Target</u></b> <i>AoE</i> <b>[{targetAoE}]</b>hx-Radius
           </div>
           <div>
-            <b><u>Damage</u></b> <b>[2]</b>d8 <b><u style={{ color: '#a6965f', display: 'inline-flex', alignItems: 'center' }}>
-            Piercing<img src="/Piercing.png" alt="Piercing" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>
+            <b><u>Effect</u></b> Enemies suffer <i><b>Spike</b></i> <br />
+            <span style={{ display: 'block', textAlign: 'right' }}><b>(</b><b><u style={{ color: '#808080', display: 'inline-flex', alignItems: 'center' }}>
+            Slashing<img src="/Slashing.png" alt="Slashing" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b><b>)</b> </span>
           </div>
           <div>
-            <b><u>Crit Effect</u></b> <b>[2]</b>d8 <b><u style={{ color: '#a6965f', display: 'inline-flex', alignItems: 'center' }}>
-            Piercing<img src="/Piercing.png" alt="Piercing" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>,
-            <span style={{ display: 'block', textAlign: 'right' }}><b><i>Bleed</i></b></span>
+            <b><u>Crit Effect</u></b> Enemies suffer two more <br />
+            <span style={{ display: 'block', textAlign: 'right' }}>instances of <i><b>Spike</b></i> <b>(</b><b><u style={{ color: '#808080', display: 'inline-flex', alignItems: 'center' }}>
+            Slashing<img src="/Slashing.png" alt="Slashing" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b><b>)</b> </span>
           </div>
         </>
       ) : techPulseName === 'Swarm Surge' ? (
@@ -90,15 +93,12 @@ export function generateTechnicianSecondaryAttackStatsJSX(
             <b><u>Target</u></b> <i>AoE</i> <b>[{targetAoE}]</b>hx-Radius
           </div>
           <div>
-            <b><u>Damage</u></b> <b>[1]</b>d10 <b><u style={{ color: '#02b900', display: 'inline-flex', alignItems: 'center' }}>
-            Toxic<img src="/Toxic.png" alt="Toxic" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>,
-            <span style={{ display: 'block', textAlign: 'right' }}><b><i>Spike</i></b> <b>(</b><b><u style={{ color: '#02b900', display: 'inline-flex', alignItems: 'center' }}>
-            Toxic<img src="/Toxic.png" alt="Toxic" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b><b>)</b></span>
+            <b><u>Effect</u></b> Push or Pull all creatures up to <i>AoE</i> <br />
+            <span style={{ display: 'block', textAlign: 'right' }}>Radius hx (counts as <b><i>Slam</i></b>)</span>
           </div>
           <div>
-            <b><u>Crit Effect</u></b> <b>[1]</b>d10 <b><u style={{ color: '#02b900', display: 'inline-flex', alignItems: 'center' }}>
-            Toxic<img src="/Toxic.png" alt="Toxic" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>,
-            <span style={{ display: 'block', textAlign: 'right' }}><b><i>Restrain</i></b></span>
+            <b><u>Crit Effect</u></b> Counts as <b><i>Bounce</i></b> and <br />
+            <span style={{ display: 'block', textAlign: 'right' }}>ignores <b><i>Slam</i></b> and <b><i>Bounce</i></b> <i>Immunity</i></span>
           </div>
         </>
       ) : techPulseName === 'Rubblemaker' ? (
@@ -111,14 +111,13 @@ export function generateTechnicianSecondaryAttackStatsJSX(
             <b><u>Target</u></b> <i>AoE</i> <b>[{targetAoE}]</b>hx-Radius
           </div>
           <div>
-            <b><u>Damage</u></b> <b>[2]</b>d10 <b><u style={{ color: '#915927', display: 'inline-flex', alignItems: 'center' }}>
-            Bludgeoning<img src="/Bludgeoning.png" alt="Bludgeoning" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>,
-            <span style={{ display: 'block', textAlign: 'right' }}><b><i>Slam</i></b> 3hx</span>
+            <b><u>Effect</u></b> <i>AoE</i> becomes <i>Rough Terrain</i> for <br />
+            <span style={{ display: 'block', textAlign: 'right' }}>your enemies until the end of the battle</span>
           </div>
           <div>
-            <b><u>Crit Effect</u></b> <b>[2]</b>d10 <b><u style={{ color: '#915927', display: 'inline-flex', alignItems: 'center' }}>
-            Bludgeoning<img src="/Bludgeoning.png" alt="Bludgeoning" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>,
-            <span style={{ display: 'block', textAlign: 'right' }}><b><i>Demoralize</i></b></span>
+            <b><u>Crit Effect</u></b> <i>AoE</i> becomes <i>Dangerous</i> <br />
+            <span style={{ display: 'block', textAlign: 'right' }}><i>Terrain</i> <b><i>Spike</i></b> <b>(</b><b><u style={{ color: '#a6965f', display: 'inline-flex', alignItems: 'center' }}>
+            Piercing<img src="/Piercing.png" alt="Piercing" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b><b>)</b> for enemies</span>
           </div>
         </>
       ) : (

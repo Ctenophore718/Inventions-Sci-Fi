@@ -1,6 +1,7 @@
 ﻿import React from "react";
 import styles from './CharacterSheet.module.css';
 import type { CharacterSheet } from "../types/CharacterSheet";
+import { getJunkerDroneCost } from "../utils/junkerPrimaryAttack";
 
 type CharacterSheetInventoryProps = {
   sheet: CharacterSheet | null;
@@ -59,11 +60,12 @@ const CharacterSheetInventory: React.FC<CharacterSheetInventoryProps> = ({
                     textAlign: 'left',
                     minWidth: '180px'
                   }}
-                  value={pendingAttack || (charClass === 'Chemist' ? 'Dart Guns' : charClass === 'Coder' ? 'Lenses' : charClass === 'Commander' ? 'Rifles' : charClass === 'Contemplative' ? 'Focuses' : charClass === 'Devout' ? 'Incantations' : charClass === 'Elementalist' ? 'Shards' : charClass === 'Exospecialist' ? 'Integrated Blasters' : charClass === 'Gunslinger' && subclass === 'Ammo Coder' ? 'Coder Carbines' : charClass === 'Gunslinger' && subclass === 'Ordnancer' ? 'Rocket Launchers' : charClass === 'Gunslinger' && subclass === 'Pistoleer' ? 'Dual Pistols' : charClass === 'Gunslinger' && subclass === 'Sniper' ? 'Sniper Rifles' : 'Select Primary Attack')}
+                  value={charClass === 'Technician' && subclass === 'Hacker' ? 'Stealth Drones' : charClass === 'Technician' && subclass === 'Junker' ? 'Junker Drones' : pendingAttack || (charClass === 'Chemist' ? 'Dart Guns' : charClass === 'Coder' ? 'Lenses' : charClass === 'Commander' ? 'Rifles' : charClass === 'Contemplative' ? 'Focuses' : charClass === 'Devout' ? 'Incantations' : charClass === 'Elementalist' ? 'Shards' : charClass === 'Exospecialist' ? 'Integrated Blasters' : charClass === 'Gunslinger' && subclass === 'Ammo Coder' ? 'Coder Carbines' : charClass === 'Gunslinger' && subclass === 'Ordnancer' ? 'Rocket Launchers' : charClass === 'Gunslinger' && subclass === 'Pistoleer' ? 'Dual Pistols' : charClass === 'Gunslinger' && subclass === 'Sniper' ? 'Sniper Rifles' : 'Select Primary Attack')}
                   onChange={(e) => {
                     const value = e.target.value;
-                    if (value !== 'Dart Guns' && value !== 'Lenses' && value !== 'Rifles' && value !== 'Focuses' && value !== 'Incantations' && value !== 'Shards' && value !== 'Integrated Blasters' && value !== 'Coder Carbines' && value !== 'Rocket Launchers' && value !== 'Dual Pistols' && value !== 'Sniper Rifles' && value !== 'Select Primary Attack') {
+                    if (value !== 'Dart Guns' && value !== 'Lenses' && value !== 'Rifles' && value !== 'Focuses' && value !== 'Incantations' && value !== 'Shards' && value !== 'Integrated Blasters' && value !== 'Coder Carbines' && value !== 'Rocket Launchers' && value !== 'Dual Pistols' && value !== 'Sniper Rifles' && value !== 'Stealth Drones' && value !== 'Junker Drones' && value !== 'Select Primary Attack') {
                       setPendingAttack(value);
+                      e.target.value = charClass === 'Technician' && subclass === 'Hacker' ? 'Stealth Drones' : charClass === 'Technician' && subclass === 'Junker' ? 'Junker Drones' : (charClass === 'Chemist' ? 'Dart Guns' : charClass === 'Coder' ? 'Lenses' : charClass === 'Commander' ? 'Rifles' : charClass === 'Contemplative' ? 'Focuses' : charClass === 'Devout' ? 'Incantations' : charClass === 'Elementalist' ? 'Shards' : charClass === 'Exospecialist' ? 'Integrated Blasters' : charClass === 'Gunslinger' && subclass === 'Ammo Coder' ? 'Coder Carbines' : charClass === 'Gunslinger' && subclass === 'Ordnancer' ? 'Rocket Launchers' : charClass === 'Gunslinger' && subclass === 'Pistoleer' ? 'Dual Pistols' : charClass === 'Gunslinger' && subclass === 'Sniper' ? 'Sniper Rifles' : 'Select Primary Attack');
                     }
                   }}
                 >
@@ -195,7 +197,22 @@ const CharacterSheetInventory: React.FC<CharacterSheetInventoryProps> = ({
                       <option style={{ fontWeight: 'bold' }}>Starseeker</option>
                     </>
                   )}
-                  {charClass !== 'Chemist' && charClass !== 'Coder' && charClass !== 'Commander' && charClass !== 'Contemplative' && charClass !== 'Devout' && charClass !== 'Elementalist' && charClass !== 'Exospecialist' && charClass !== 'Gunslinger' && (
+                  {charClass === 'Technician' && subclass === 'Hacker' && (
+                    <>
+                      <option disabled style={{ fontWeight: 'bold' }}>Stealth Drones</option>
+                      <option style={{ fontWeight: 'bold' }}>Blind Silence</option>
+                      <option style={{ fontWeight: 'bold' }}>Will-o'-the-Wisp</option>
+                    </>
+                  )}
+                  {charClass === 'Technician' && subclass === 'Junker' && (
+                    <>
+                      <option disabled style={{ fontWeight: 'bold' }}>Junker Drones</option>
+                      <option style={{ fontWeight: 'bold' }}>Big Hugs Gas Can</option>
+                      <option style={{ fontWeight: 'bold' }}>Shrapnel-Matic 500</option>
+                      <option style={{ fontWeight: 'bold' }}>Smash Hands XBot</option>
+                    </>
+                  )}
+                  {charClass !== 'Chemist' && charClass !== 'Coder' && charClass !== 'Commander' && charClass !== 'Contemplative' && charClass !== 'Devout' && charClass !== 'Elementalist' && charClass !== 'Exospecialist' && charClass !== 'Gunslinger' && !(charClass === 'Technician' && subclass === 'Hacker') && !(charClass === 'Technician' && subclass === 'Junker') && (
                     <option disabled style={{ fontWeight: 'bold' }}>Select Primary Attack</option>
                   )}
                 </select>
@@ -206,6 +223,11 @@ const CharacterSheetInventory: React.FC<CharacterSheetInventoryProps> = ({
                       {pendingAttack}
                       <span style={{ color: '#bf9000', fontWeight: 'bold', marginLeft: '8px' }}>
                         {(() => {
+                          // Check if it's a Junker Drone
+                          if (charClass === 'Technician' && subclass === 'Junker' && 
+                              (pendingAttack === 'Big Hugs Gas Can' || pendingAttack === 'Shrapnel-Matic 500' || pendingAttack === 'Smash Hands XBot')) {
+                            return `${getJunkerDroneCost(pendingAttack)}c`;
+                          }
                           const selectedAttack = getAvailablePrimaryAttacks().find(attack => attack.name === pendingAttack);
                           return selectedAttack ? `${selectedAttack.cost}c` : '';
                         })()}
@@ -215,6 +237,25 @@ const CharacterSheetInventory: React.FC<CharacterSheetInventoryProps> = ({
                       <button
                         style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #1976d2', background: '#1976d2', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}
                         onClick={() => {
+                          // Handle Junker Drones
+                          if (charClass === 'Technician' && subclass === 'Junker' && 
+                              (pendingAttack === 'Big Hugs Gas Can' || pendingAttack === 'Shrapnel-Matic 500' || pendingAttack === 'Smash Hands XBot')) {
+                            const cost = getJunkerDroneCost(pendingAttack);
+                            const currentCredits = sheet?.credits || 0;
+                            if (currentCredits < cost) {
+                              alert('Not enough credits!');
+                              return;
+                            }
+                            const newJunkerDrones = [...(sheet?.junkerDrones || []), pendingAttack];
+                            const newCredits = currentCredits - cost;
+                            handleAutoSave({
+                              junkerDrones: newJunkerDrones,
+                              credits: newCredits
+                            });
+                            setPendingAttack('');
+                            return;
+                          }
+                          
                           const selectedAttack = getAvailablePrimaryAttacks().find(attack => attack.name === pendingAttack);
                           if (selectedAttack) {
                             handleAttackPurchase(selectedAttack.name, selectedAttack.cost, selectedAttack.type);
@@ -226,6 +267,17 @@ const CharacterSheetInventory: React.FC<CharacterSheetInventoryProps> = ({
                       <button
                         style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #28a745', background: '#28a745', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}
                         onClick={() => {
+                          // Handle Junker Drones
+                          if (charClass === 'Technician' && subclass === 'Junker' && 
+                              (pendingAttack === 'Big Hugs Gas Can' || pendingAttack === 'Shrapnel-Matic 500' || pendingAttack === 'Smash Hands XBot')) {
+                            const newJunkerDrones = [...(sheet?.junkerDrones || []), pendingAttack];
+                            handleAutoSave({
+                              junkerDrones: newJunkerDrones
+                            });
+                            setPendingAttack('');
+                            return;
+                          }
+                          
                           const selectedAttack = getAvailablePrimaryAttacks().find(attack => attack.name === pendingAttack);
                           if (selectedAttack) {
                             handleAttackAdd(selectedAttack.name, selectedAttack.type);
@@ -489,6 +541,52 @@ const CharacterSheetInventory: React.FC<CharacterSheetInventoryProps> = ({
                                 const updatedSheet = { 
                                   ...sheet, 
                                   sniperRifles: newSniperRifles
+                                };
+                                handleAutoSave(updatedSheet);
+                              }
+                            }}
+                          >×</button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  {(sheet?.stealthDrones && sheet.stealthDrones.length > 0) && (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginLeft: '8px' }}>
+                      {sheet?.stealthDrones?.map((drone, idx) => (
+                        <span key={drone + idx + 'stealthDrone'} style={{ fontStyle: 'italic', display: 'flex', alignItems: 'center', background: '#f5f5f5', borderRadius: '6px', padding: '2px 8px' }}>
+                          {drone}
+                          <button
+                            style={{ marginLeft: '6px', padding: '0 6px', borderRadius: '50%', border: 'none', background: '#d32f2f', color: 'white', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.9em' }}
+                            title={`Remove ${drone}`}
+                            onClick={() => {
+                              if (sheet) {
+                                const newStealthDrones = sheet.stealthDrones?.filter((_, i) => i !== idx) || [];
+                                const updatedSheet = { 
+                                  ...sheet, 
+                                  stealthDrones: newStealthDrones
+                                };
+                                handleAutoSave(updatedSheet);
+                              }
+                            }}
+                          >×</button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  {(sheet?.junkerDrones && sheet.junkerDrones.length > 0) && (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginLeft: '8px' }}>
+                      {sheet?.junkerDrones?.map((drone: string, idx: number) => (
+                        <span key={drone + idx + 'junkerDrone'} style={{ fontStyle: 'italic', display: 'flex', alignItems: 'center', background: '#f5f5f5', borderRadius: '6px', padding: '2px 8px' }}>
+                          {drone}
+                          <button
+                            style={{ marginLeft: '6px', padding: '0 6px', borderRadius: '50%', border: 'none', background: '#d32f2f', color: 'white', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.9em' }}
+                            title={`Remove ${drone}`}
+                            onClick={() => {
+                              if (sheet) {
+                                const newJunkerDrones = sheet.junkerDrones?.filter((_: string, i: number) => i !== idx) || [];
+                                const updatedSheet = { 
+                                  ...sheet, 
+                                  junkerDrones: newJunkerDrones
                                 };
                                 handleAutoSave(updatedSheet);
                               }

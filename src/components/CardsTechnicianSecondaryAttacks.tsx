@@ -30,10 +30,10 @@ export const CardsTechnicianSecondaryAttacks: React.FC<CardsTechnicianSecondaryA
   const getHeaderColor = (techPulse: string): string => {
     const subclass = getTechPulseSubclass(techPulse);
     switch (subclass) {
-      case 'Hacker': return '#1c6f8c';
-      case 'Junker': return '#8c5e1c';
-      case 'Nanoboticist': return '#1c8c3e';
-      case 'Tanker': return '#8c1c1c';
+      case 'Hacker': return '#5c57b8';
+      case 'Junker': return '#6db857';
+      case 'Nanoboticist': return '#57b8b0';
+      case 'Tanker': return '#b8578b';
       default: return '#724811';
     }
   };
@@ -42,13 +42,13 @@ export const CardsTechnicianSecondaryAttacks: React.FC<CardsTechnicianSecondaryA
   const getTechPulseFlavorText = (techPulse: string): string => {
     switch (techPulse) {
       case 'Cloaker Bubble':
-        return 'Flavor text.';
+        return '"I could go into detail about the quantum mirror arrays involved, but really it just makes all your friends invisible." --Jeddison, Human Hacker';
       case 'Shrap Happy':
-        return 'Flavor text.';
+        return '"I mean, it\'s like a big shrapnel grenade that I can just pull the pin on and target only the baddies. What\'s not to like about it?" Breev, Mustelid Junker';
       case 'Swarm Surge':
-        return 'Flavor text.';
+        return 'Waves of nanobot swarms emit from this tech pulse, causing enemies to be pushed and pulled around the battlefield against their will.';
       case 'Rubblemaker':
-        return 'Flavor text.';
+        return 'This contraption simply embeds itself in the ground and emits an extremely low frequency sound wave that makes a mess out of the ground in the area.';
       default:
         return 'Flavor text.';
     }
