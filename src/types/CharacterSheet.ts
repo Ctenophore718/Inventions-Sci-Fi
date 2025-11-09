@@ -118,6 +118,9 @@ export type CharacterSheet = {
   // Junker Drones for Junker subclass (primary attacks)
   junkerDrones?: string[];
 
+  // Nanodrone Swarms for Nanoboticist subclass (primary attacks)
+  nanodroneSwarms?: string[];
+
   // Algorithms for Coder class
   algorithms?: string[];
 
@@ -349,6 +352,34 @@ export type CharacterSheet = {
     hackerPrimaryAttackHitPointsDots?: boolean[];
     hackerStrikeForcedTeleportationDots?: boolean[];
     hackerPerksSkillsDots?: boolean[];
+    // Junker subclass progression (Technician)
+    junkerFeatureRangeDots?: boolean[];
+    junkerFeatureAllyDots?: boolean[];
+    junkerFeatureCritDamageDot?: boolean[];
+    junkerTechniqueAoEDots?: boolean[];
+    junkerTechniqueSpikeDots?: boolean[];
+    junkerTechniqueCooldownDots?: boolean[];
+    junkerPrimaryAttackDieSizeDots?: boolean[];
+    junkerPrimaryAttackRepeatDots?: boolean[];
+    junkerPrimaryAttackSpeedDots?: boolean[];
+    junkerPrimaryAttackCritDots?: boolean[];
+    junkerPrimaryAttackHitPointsDots?: boolean[];
+    junkerPerksSkillsDots?: boolean[];
+    // Nanoboticist subclass progression (Technician)
+    nanoboticistFeatureRangeDots?: boolean[];
+    nanoboticistFeatureIncludesAlliesDot?: boolean[];
+    nanoboticistTechniqueRangeDots?: boolean[];
+    nanoboticistTechniqueConditionDots?: boolean[];
+    nanoboticistTechniqueCooldownDots?: boolean[];
+    nanoboticistTechniqueFromDroneDot?: boolean[];
+    nanoboticistPrimaryAttackTargetDots?: boolean[];
+    nanoboticistPrimaryAttackDieSizeDots?: boolean[];
+    nanoboticistPrimaryAttackSpeedDots?: boolean[];
+    nanoboticistPrimaryAttackHitPointsDots?: boolean[];
+    nanoboticistPrimaryAttackSwarmDots?: boolean[];
+    nanoboticistPrimaryAttackSpikeDot?: boolean[];
+    nanoboticistMovementFlightDot?: boolean[];
+    nanoboticistPerksSkillsDots?: boolean[];
     // Add other subclasses as needed
   };
 };

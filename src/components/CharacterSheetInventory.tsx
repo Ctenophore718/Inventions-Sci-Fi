@@ -2,6 +2,7 @@
 import styles from './CharacterSheet.module.css';
 import type { CharacterSheet } from "../types/CharacterSheet";
 import { getJunkerDroneCost } from "../utils/junkerPrimaryAttack";
+import { getNanodroneSwarmCost } from "../utils/nanoboticistPrimaryAttack";
 
 type CharacterSheetInventoryProps = {
   sheet: CharacterSheet | null;
@@ -60,12 +61,12 @@ const CharacterSheetInventory: React.FC<CharacterSheetInventoryProps> = ({
                     textAlign: 'left',
                     minWidth: '180px'
                   }}
-                  value={charClass === 'Technician' && subclass === 'Hacker' ? 'Stealth Drones' : charClass === 'Technician' && subclass === 'Junker' ? 'Junker Drones' : pendingAttack || (charClass === 'Chemist' ? 'Dart Guns' : charClass === 'Coder' ? 'Lenses' : charClass === 'Commander' ? 'Rifles' : charClass === 'Contemplative' ? 'Focuses' : charClass === 'Devout' ? 'Incantations' : charClass === 'Elementalist' ? 'Shards' : charClass === 'Exospecialist' ? 'Integrated Blasters' : charClass === 'Gunslinger' && subclass === 'Ammo Coder' ? 'Coder Carbines' : charClass === 'Gunslinger' && subclass === 'Ordnancer' ? 'Rocket Launchers' : charClass === 'Gunslinger' && subclass === 'Pistoleer' ? 'Dual Pistols' : charClass === 'Gunslinger' && subclass === 'Sniper' ? 'Sniper Rifles' : 'Select Primary Attack')}
+                  value={charClass === 'Technician' && subclass === 'Hacker' ? 'Stealth Drones' : charClass === 'Technician' && subclass === 'Junker' ? 'Junker Drones' : charClass === 'Technician' && subclass === 'Nanoboticist' ? 'Nanodrone Swarms' : pendingAttack || (charClass === 'Chemist' ? 'Dart Guns' : charClass === 'Coder' ? 'Lenses' : charClass === 'Commander' ? 'Rifles' : charClass === 'Contemplative' ? 'Focuses' : charClass === 'Devout' ? 'Incantations' : charClass === 'Elementalist' ? 'Shards' : charClass === 'Exospecialist' ? 'Integrated Blasters' : charClass === 'Gunslinger' && subclass === 'Ammo Coder' ? 'Coder Carbines' : charClass === 'Gunslinger' && subclass === 'Ordnancer' ? 'Rocket Launchers' : charClass === 'Gunslinger' && subclass === 'Pistoleer' ? 'Dual Pistols' : charClass === 'Gunslinger' && subclass === 'Sniper' ? 'Sniper Rifles' : 'Select Primary Attack')}
                   onChange={(e) => {
                     const value = e.target.value;
-                    if (value !== 'Dart Guns' && value !== 'Lenses' && value !== 'Rifles' && value !== 'Focuses' && value !== 'Incantations' && value !== 'Shards' && value !== 'Integrated Blasters' && value !== 'Coder Carbines' && value !== 'Rocket Launchers' && value !== 'Dual Pistols' && value !== 'Sniper Rifles' && value !== 'Stealth Drones' && value !== 'Junker Drones' && value !== 'Select Primary Attack') {
+                    if (value !== 'Dart Guns' && value !== 'Lenses' && value !== 'Rifles' && value !== 'Focuses' && value !== 'Incantations' && value !== 'Shards' && value !== 'Integrated Blasters' && value !== 'Coder Carbines' && value !== 'Rocket Launchers' && value !== 'Dual Pistols' && value !== 'Sniper Rifles' && value !== 'Stealth Drones' && value !== 'Junker Drones' && value !== 'Nanodrone Swarms' && value !== 'Select Primary Attack') {
                       setPendingAttack(value);
-                      e.target.value = charClass === 'Technician' && subclass === 'Hacker' ? 'Stealth Drones' : charClass === 'Technician' && subclass === 'Junker' ? 'Junker Drones' : (charClass === 'Chemist' ? 'Dart Guns' : charClass === 'Coder' ? 'Lenses' : charClass === 'Commander' ? 'Rifles' : charClass === 'Contemplative' ? 'Focuses' : charClass === 'Devout' ? 'Incantations' : charClass === 'Elementalist' ? 'Shards' : charClass === 'Exospecialist' ? 'Integrated Blasters' : charClass === 'Gunslinger' && subclass === 'Ammo Coder' ? 'Coder Carbines' : charClass === 'Gunslinger' && subclass === 'Ordnancer' ? 'Rocket Launchers' : charClass === 'Gunslinger' && subclass === 'Pistoleer' ? 'Dual Pistols' : charClass === 'Gunslinger' && subclass === 'Sniper' ? 'Sniper Rifles' : 'Select Primary Attack');
+                      e.target.value = charClass === 'Technician' && subclass === 'Hacker' ? 'Stealth Drones' : charClass === 'Technician' && subclass === 'Junker' ? 'Junker Drones' : charClass === 'Technician' && subclass === 'Nanoboticist' ? 'Nanodrone Swarms' : (charClass === 'Chemist' ? 'Dart Guns' : charClass === 'Coder' ? 'Lenses' : charClass === 'Commander' ? 'Rifles' : charClass === 'Contemplative' ? 'Focuses' : charClass === 'Devout' ? 'Incantations' : charClass === 'Elementalist' ? 'Shards' : charClass === 'Exospecialist' ? 'Integrated Blasters' : charClass === 'Gunslinger' && subclass === 'Ammo Coder' ? 'Coder Carbines' : charClass === 'Gunslinger' && subclass === 'Ordnancer' ? 'Rocket Launchers' : charClass === 'Gunslinger' && subclass === 'Pistoleer' ? 'Dual Pistols' : charClass === 'Gunslinger' && subclass === 'Sniper' ? 'Sniper Rifles' : 'Select Primary Attack');
                     }
                   }}
                 >
@@ -212,7 +213,15 @@ const CharacterSheetInventory: React.FC<CharacterSheetInventoryProps> = ({
                       <option style={{ fontWeight: 'bold' }}>Smash Hands XBot</option>
                     </>
                   )}
-                  {charClass !== 'Chemist' && charClass !== 'Coder' && charClass !== 'Commander' && charClass !== 'Contemplative' && charClass !== 'Devout' && charClass !== 'Elementalist' && charClass !== 'Exospecialist' && charClass !== 'Gunslinger' && !(charClass === 'Technician' && subclass === 'Hacker') && !(charClass === 'Technician' && subclass === 'Junker') && (
+                  {charClass === 'Technician' && subclass === 'Nanoboticist' && (
+                    <>
+                      <option disabled style={{ fontWeight: 'bold' }}>Nanodrone Swarms</option>
+                      <option style={{ fontWeight: 'bold' }}>Blockwave</option>
+                      <option style={{ fontWeight: 'bold' }}>Mech-Arachnids</option>
+                      <option style={{ fontWeight: 'bold' }}>Toxic Cloudbot</option>
+                    </>
+                  )}
+                  {charClass !== 'Chemist' && charClass !== 'Coder' && charClass !== 'Commander' && charClass !== 'Contemplative' && charClass !== 'Devout' && charClass !== 'Elementalist' && charClass !== 'Exospecialist' && charClass !== 'Gunslinger' && !(charClass === 'Technician' && subclass === 'Hacker') && !(charClass === 'Technician' && subclass === 'Junker') && !(charClass === 'Technician' && subclass === 'Nanoboticist') && (
                     <option disabled style={{ fontWeight: 'bold' }}>Select Primary Attack</option>
                   )}
                 </select>
@@ -227,6 +236,11 @@ const CharacterSheetInventory: React.FC<CharacterSheetInventoryProps> = ({
                           if (charClass === 'Technician' && subclass === 'Junker' && 
                               (pendingAttack === 'Big Hugs Gas Can' || pendingAttack === 'Shrapnel-Matic 500' || pendingAttack === 'Smash Hands XBot')) {
                             return `${getJunkerDroneCost(pendingAttack)}c`;
+                          }
+                          // Check if it's a Nanodrone Swarm
+                          if (charClass === 'Technician' && subclass === 'Nanoboticist' && 
+                              (pendingAttack === 'Blockwave' || pendingAttack === 'Mech-Arachnids' || pendingAttack === 'Toxic Cloudbot')) {
+                            return `${getNanodroneSwarmCost(pendingAttack)}c`;
                           }
                           const selectedAttack = getAvailablePrimaryAttacks().find(attack => attack.name === pendingAttack);
                           return selectedAttack ? `${selectedAttack.cost}c` : '';
@@ -256,6 +270,25 @@ const CharacterSheetInventory: React.FC<CharacterSheetInventoryProps> = ({
                             return;
                           }
                           
+                          // Handle Nanodrone Swarms
+                          if (charClass === 'Technician' && subclass === 'Nanoboticist' && 
+                              (pendingAttack === 'Blockwave' || pendingAttack === 'Mech-Arachnids' || pendingAttack === 'Toxic Cloudbot')) {
+                            const cost = getNanodroneSwarmCost(pendingAttack);
+                            const currentCredits = sheet?.credits || 0;
+                            if (currentCredits < cost) {
+                              alert('Not enough credits!');
+                              return;
+                            }
+                            const newNanodroneSwarms = [...(sheet?.nanodroneSwarms || []), pendingAttack];
+                            const newCredits = currentCredits - cost;
+                            handleAutoSave({
+                              nanodroneSwarms: newNanodroneSwarms,
+                              credits: newCredits
+                            });
+                            setPendingAttack('');
+                            return;
+                          }
+                          
                           const selectedAttack = getAvailablePrimaryAttacks().find(attack => attack.name === pendingAttack);
                           if (selectedAttack) {
                             handleAttackPurchase(selectedAttack.name, selectedAttack.cost, selectedAttack.type);
@@ -273,6 +306,17 @@ const CharacterSheetInventory: React.FC<CharacterSheetInventoryProps> = ({
                             const newJunkerDrones = [...(sheet?.junkerDrones || []), pendingAttack];
                             handleAutoSave({
                               junkerDrones: newJunkerDrones
+                            });
+                            setPendingAttack('');
+                            return;
+                          }
+                          
+                          // Handle Nanodrone Swarms
+                          if (charClass === 'Technician' && subclass === 'Nanoboticist' && 
+                              (pendingAttack === 'Blockwave' || pendingAttack === 'Mech-Arachnids' || pendingAttack === 'Toxic Cloudbot')) {
+                            const newNanodroneSwarms = [...(sheet?.nanodroneSwarms || []), pendingAttack];
+                            handleAutoSave({
+                              nanodroneSwarms: newNanodroneSwarms
                             });
                             setPendingAttack('');
                             return;
@@ -587,6 +631,29 @@ const CharacterSheetInventory: React.FC<CharacterSheetInventoryProps> = ({
                                 const updatedSheet = { 
                                   ...sheet, 
                                   junkerDrones: newJunkerDrones
+                                };
+                                handleAutoSave(updatedSheet);
+                              }
+                            }}
+                          >×</button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  {(sheet?.nanodroneSwarms && sheet.nanodroneSwarms.length > 0) && (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginLeft: '8px' }}>
+                      {sheet?.nanodroneSwarms?.map((swarm: string, idx: number) => (
+                        <span key={swarm + idx + 'nanodroneSwarm'} style={{ fontStyle: 'italic', display: 'flex', alignItems: 'center', background: '#f5f5f5', borderRadius: '6px', padding: '2px 8px' }}>
+                          {swarm}
+                          <button
+                            style={{ marginLeft: '6px', padding: '0 6px', borderRadius: '50%', border: 'none', background: '#d32f2f', color: 'white', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.9em' }}
+                            title={`Remove ${swarm}`}
+                            onClick={() => {
+                              if (sheet) {
+                                const newNanodroneSwarms = sheet.nanodroneSwarms?.filter((_: string, i: number) => i !== idx) || [];
+                                const updatedSheet = { 
+                                  ...sheet, 
+                                  nanodroneSwarms: newNanodroneSwarms
                                 };
                                 handleAutoSave(updatedSheet);
                               }

@@ -76,6 +76,7 @@ import { generateSniperStrikeDamageJSX } from "../utils/sniperStrike";
 import { generateMasterMechanicCharacterSheetJSX } from "../utils/technicianFeature";
 import { generateForcedTeleportationCharacterSheetJSX } from "../utils/hackerStrike";
 import { generateSalvageJSX } from "../utils/junkerFeature";
+import { generateProtectiveSwarmJSX } from "../utils/nanoboticistFeature";
 
 import CharacterSheetInventory from "./CharacterSheetInventory";
 import CharacterSheetPerks from "./CharacterSheetPerks";
@@ -935,7 +936,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
 
   const nanoboticistFeatureJSX = (
     <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#57b8b0' }}>Protective Swarm.</i></b> While your <i>Drone</i> is <b>[1]</b>hx away from you, any <b><i><span style={{ color: '#990000' }}>Attack</span></i></b> that targets you automatically targets your <i>Drone</i> instead.
+      {generateProtectiveSwarmJSX(sheet)}
     </span>
   );
 

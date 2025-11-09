@@ -2,6 +2,7 @@ import React from 'react';
 import type { CharacterSheet } from '../types/CharacterSheet';
 import { generateStealthDroneCardStatsJSX } from '../utils/hackerPrimaryAttack';
 import { generateJunkerDroneCardStatsJSX } from '../utils/junkerPrimaryAttack';
+import { generateNanodroneSwarmCardStatsJSX } from '../utils/nanoboticistPrimaryAttack';
 
 interface CardsTechnicianPrimaryAttacksProps {
   sheet: CharacterSheet | null;
@@ -23,12 +24,22 @@ function getFlavorText(droneName: string): string {
   if (droneName === 'Smash Hands XBot') {
     return '"Hey! Ya need a bunch of bricks? Well find ya self a wall and I\'ll sic ol\' Smash Hands on it for ya! Only cost ya \'bout tree-fiddy." --Grooks, Petran Junker';
   }
+  if (droneName === 'Blockwave') {
+    return 'A swarm of nanodrones that form a dense barrier, forcefully repelling anything in their path.';
+  }
+  if (droneName === 'Mech-Arachnids') {
+    return 'Spider-like nanodrones that crawl across any surface, injecting targets with a potent toxin.';
+  }
+  if (droneName === 'Toxic Cloudbot') {
+    return 'Airborne nanodrones that release a corrosive mist, dissolving everything within their cloud.';
+  }
   return '"Flavor text."';
 }
 
 export const CardsTechnicianPrimaryAttacks: React.FC<CardsTechnicianPrimaryAttacksProps> = ({ sheet }) => {
   const stealthDrones = sheet?.stealthDrones || [];
   const junkerDrones = sheet?.junkerDrones || [];
+  const nanodroneSwarms = sheet?.nanodroneSwarms || [];
   
   return (
     <>
@@ -328,6 +339,156 @@ export const CardsTechnicianPrimaryAttacks: React.FC<CardsTechnicianPrimaryAttac
             textAlign: 'left'
           }}>
             {getFlavorText(droneName)}
+          </div>
+        </div>
+      ))}
+
+      {/* Nanodrone Swarms (Nanoboticist subclass) */}
+      {nanodroneSwarms.map((swarmName: string, index: number) => (
+        <div
+          key={`${swarmName}-${index}`}
+          style={{
+            width: '240px',
+            height: '336px',
+            background: '#fff',
+            border: '5px solid #990000',
+            borderRadius: 8,
+            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+            padding: '1.2rem',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexShrink: 0,
+            position: 'relative',
+            overflow: 'hidden'
+          }}
+        >
+          {/* Card Header */}
+          <div style={{
+            position: 'absolute',
+            top: -4,
+            left: 0,
+            width: '100%',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'flex-end',
+            padding: '0 10px',
+            boxSizing: 'border-box',
+            minHeight: '2.1em'
+          }}>
+            <span style={{
+              fontFamily: 'Arial, Helvetica, sans-serif',
+              fontWeight: 'bold',
+              fontSize: 'clamp(0.8em, 4vw, 1.25em)',
+              color: '#ff6600',
+              lineHeight: 1,
+              textAlign: 'left',
+              whiteSpace: 'nowrap',
+              maxWidth: 'calc(100% - 87px)',
+              minWidth: 0,
+              flexShrink: 1,
+              marginRight: '5px'
+            }}>
+              {swarmName}
+            </span>
+            {/* Nanodrone Swarm Subheader */}
+            <span style={{
+              fontFamily: 'Arial, Helvetica, sans-serif',
+              fontStyle: 'italic',
+              fontSize: '0.75em',
+              lineHeight: 1,
+              color: '#ff6600',
+              whiteSpace: 'pre-line',
+              wordBreak: 'keep-all',
+              overflowWrap: 'anywhere',
+              maxWidth: '72px',
+              display: 'inline-block',
+              textAlign: 'right'
+            }}>
+              {'Nanodrone\nSwarm'}
+            </span>
+          </div>
+
+          {/* Card Image */}
+          <img
+            src={`/${swarmName}.png`}
+            alt={swarmName}
+            style={{
+              position: 'absolute',
+              top: 35,
+              left: 10,
+              right: 10,
+              width: 'calc(100% - 20px)',
+              height: 'calc(50% - 55px)',
+              objectFit: 'cover',
+              zIndex: 1,
+              borderRadius: 8
+            }}
+          />
+
+          {/* Card Type */}
+          <div style={{
+            position: 'absolute',
+            top: 'calc(50% - 15px)',
+            left: 0,
+            width: '100%',
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'flex-start',
+            paddingLeft: 10,
+            paddingRight: 10,
+            zIndex: 3
+          }}>
+            <span style={{ 
+              color: '#990000', 
+              fontFamily: 'Arial, Helvetica, sans-serif', 
+              fontWeight: 'bold', 
+              fontSize: '1.1em', 
+              textAlign: 'left' 
+            }}>
+              Primary Attack
+            </span>
+          </div>
+
+          {/* Card Stats */}
+          <div style={{
+            position: 'absolute',
+            top: 'calc(50% + 10px)',
+            left: 10,
+            right: 10,
+            bottom: 45,
+            color: '#000',
+            fontFamily: 'Arial, Helvetica, sans-serif',
+            fontWeight: 400,
+            overflow: 'auto',
+            wordWrap: 'break-word',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'flex-start',
+            zIndex: 2,
+            lineHeight: 1.2
+          }}>
+            {generateNanodroneSwarmCardStatsJSX(sheet, swarmName)}
+          </div>
+
+          {/* Flavor Text */}
+          <div style={{
+            position: 'absolute',
+            top: 330,
+            bottom: 5,
+            left: 10,
+            right: 10,
+            color: '#000',
+            fontFamily: 'Arial, Helvetica, sans-serif',
+            fontStyle: 'italic',
+            fontSize: '0.70em',
+            fontWeight: 400,
+            zIndex: 3,
+            textAlign: 'left'
+          }}>
+            {getFlavorText(swarmName)}
           </div>
         </div>
       ))}

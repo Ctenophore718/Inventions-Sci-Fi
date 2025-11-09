@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import type { CharacterSheet } from "../types/CharacterSheet";
+// Technician subclass progression component
 import { generateMobileGateJSX } from "../utils/HackerFeature";
 import { generatePortalSwapJSX } from "../utils/HackerTechnique";
 import { generateStealthDroneJSX, getStealthDroneCost } from "../utils/hackerPrimaryAttack";
@@ -7,6 +8,9 @@ import { generateForcedTeleportationJSX } from "../utils/hackerStrike";
 import { generateSalvageJSX } from "../utils/junkerFeature";
 import { generateDetonateJSX } from "../utils/junkerTechnique";
 import { generateJunkerDroneJSX, getJunkerDroneCost } from "../utils/junkerPrimaryAttack";
+import { generateProtectiveSwarmJSX } from "../utils/nanoboticistFeature";
+import { generateVersatileSwarmJSX } from "../utils/nanoboticistTechnique";
+import { generateNanodroneSwarmJSX, getNanodroneSwarmCost } from "../utils/nanoboticistPrimaryAttack";
 
 type LevelUpSubclassesTechnicianProps = {
   sheet: CharacterSheet | null;
@@ -78,6 +82,17 @@ const LevelUpSubclassesTechnician: React.FC<LevelUpSubclassesTechnicianProps> = 
     sheet?.junkerDrones || []
   );
 
+  // State for Nanodrone Swarms dropdown
+  const [pendingNanodroneSwarm, setPendingNanodroneSwarm] = useState<string>("");
+  const [selectedNanodroneSwarms, setSelectedNanodroneSwarms] = useState<string[]>(
+    sheet?.nanodroneSwarms || []
+  );
+
+  // Sync selectedNanodroneSwarms with sheet changes
+  useEffect(() => {
+    setSelectedNanodroneSwarms(sheet?.nanodroneSwarms || []);
+  }, [sheet?.nanodroneSwarms]);
+
   // Independent state for Junker dots
   const [junkerFeatureRangeDots, setJunkerFeatureRangeDots] = useState<boolean[]>(
     (sheet?.subclassProgressionDots as any)?.junkerFeatureRangeDots || [false, false, false]
@@ -114,6 +129,50 @@ const LevelUpSubclassesTechnician: React.FC<LevelUpSubclassesTechnicianProps> = 
   );
   const [junkerPerksSkillsDots, setJunkerPerksSkillsDots] = useState<boolean[]>(
     (sheet?.subclassProgressionDots as any)?.junkerPerksSkillsDots || [false]
+  );
+
+  // Independent state for Nanoboticist dots
+  const [nanoboticistFeatureRangeDots, setNanoboticistFeatureRangeDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.nanoboticistFeatureRangeDots || [false, false, false]
+  );
+  const [nanoboticistFeatureIncludesAlliesDot, setNanoboticistFeatureIncludesAlliesDot] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.nanoboticistFeatureIncludesAlliesDot || [false]
+  );
+  const [nanoboticistTechniqueRangeDots, setNanoboticistTechniqueRangeDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.nanoboticistTechniqueRangeDots || [false, false, false]
+  );
+  const [nanoboticistTechniqueConditionDots, setNanoboticistTechniqueConditionDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.nanoboticistTechniqueConditionDots || [false, false]
+  );
+  const [nanoboticistTechniqueCooldownDots, setNanoboticistTechniqueCooldownDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.nanoboticistTechniqueCooldownDots || [false, false]
+  );
+  const [nanoboticistTechniqueFromDroneDot, setNanoboticistTechniqueFromDroneDot] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.nanoboticistTechniqueFromDroneDot || [false]
+  );
+  const [nanoboticistPrimaryAttackTargetDots, setNanoboticistPrimaryAttackTargetDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.nanoboticistPrimaryAttackTargetDots || [false, false, false]
+  );
+  const [nanoboticistPrimaryAttackDieSizeDots, setNanoboticistPrimaryAttackDieSizeDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.nanoboticistPrimaryAttackDieSizeDots || [false, false, false]
+  );
+  const [nanoboticistPrimaryAttackSpeedDots, setNanoboticistPrimaryAttackSpeedDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.nanoboticistPrimaryAttackSpeedDots || [false, false, false]
+  );
+  const [nanoboticistPrimaryAttackHitPointsDots, setNanoboticistPrimaryAttackHitPointsDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.nanoboticistPrimaryAttackHitPointsDots || [false, false]
+  );
+  const [nanoboticistPrimaryAttackSwarmDots, setNanoboticistPrimaryAttackSwarmDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.nanoboticistPrimaryAttackSwarmDots || [false, false]
+  );
+  const [nanoboticistPrimaryAttackSpikeDot, setNanoboticistPrimaryAttackSpikeDot] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.nanoboticistPrimaryAttackSpikeDot || [false]
+  );
+  const [nanoboticistMovementFlightDot, setNanoboticistMovementFlightDot] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.nanoboticistMovementFlightDot || [false]
+  );
+  const [nanoboticistPerksSkillsDots, setNanoboticistPerksSkillsDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.nanoboticistPerksSkillsDots || [false]
   );
 
   // Helper function to handle XP dot clicking with sequential requirement
@@ -247,7 +306,33 @@ const LevelUpSubclassesTechnician: React.FC<LevelUpSubclassesTechnicianProps> = 
       hackerPrimaryAttackCritDots,
       hackerPrimaryAttackHitPointsDots,
       hackerStrikeForcedTeleportationDots,
-      hackerPerksSkillsDots
+      hackerPerksSkillsDots,
+      junkerFeatureRangeDots,
+      junkerFeatureAllyDots,
+      junkerFeatureCritDamageDot,
+      junkerTechniqueAoEDots,
+      junkerTechniqueSpikeDots,
+      junkerTechniqueCooldownDots,
+      junkerPrimaryAttackDieSizeDots,
+      junkerPrimaryAttackRepeatDots,
+      junkerPrimaryAttackSpeedDots,
+      junkerPrimaryAttackCritDots,
+      junkerPrimaryAttackHitPointsDots,
+      junkerPerksSkillsDots,
+      nanoboticistFeatureRangeDots,
+      nanoboticistFeatureIncludesAlliesDot,
+      nanoboticistTechniqueRangeDots,
+      nanoboticistTechniqueConditionDots,
+      nanoboticistTechniqueCooldownDots,
+      nanoboticistTechniqueFromDroneDot,
+      nanoboticistPrimaryAttackTargetDots,
+      nanoboticistPrimaryAttackDieSizeDots,
+      nanoboticistPrimaryAttackSpeedDots,
+      nanoboticistPrimaryAttackHitPointsDots,
+      nanoboticistPrimaryAttackSwarmDots,
+      nanoboticistPrimaryAttackSpikeDot,
+      nanoboticistMovementFlightDot,
+      nanoboticistPerksSkillsDots
     }
   } : null;
 
@@ -1237,6 +1322,614 @@ const LevelUpSubclassesTechnician: React.FC<LevelUpSubclassesTechnicianProps> = 
                   borderRadius: '50%',
                   display: 'block',
                   background: junkerPerksSkillsDots[0] ? '#000' : '#fff',
+                  cursor: 'pointer',
+                  transition: 'background 0.2s'
+                }}
+              ></span>
+            </span>
+          </div>
+        </div>
+      )}
+
+      {subclass === 'Nanoboticist' && (
+        <div style={{ width: '100%', marginTop: '1rem', textAlign: 'left', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
+          {/* Feature header */}
+          <div style={{ fontWeight: 'bold', color: '#0b5394', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Feature</u></div>
+          <div style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '8px' }}>
+            {generateProtectiveSwarmJSX(tempSheet)}
+          </div>
+
+          {/* Feature XP progression table */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 24px 24px 24px',
+            gridTemplateRows: 'auto auto auto auto',
+            columnGap: '6px',
+            rowGap: '2px',
+            alignItems: 'start',
+            marginBottom: '2px',
+            width: '100%',
+            paddingLeft: '4px'
+          }}>
+            {/* Row 1: Empty cell and XP headers */}
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>6xp</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>10xp</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>16xp</span>
+            {/* Row 2: +1hx and dots */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1hx</span>
+            {[0, 1, 2].map(idx => (
+              <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <span
+                  onClick={() => handleDotClick(nanoboticistFeatureRangeDots, setNanoboticistFeatureRangeDots, idx, [6, 10, 16], 'nanoboticistFeatureRangeDots')}
+                  style={{
+                    width: '15px',
+                    height: '15px',
+                    border: '2px solid #000',
+                    borderRadius: '50%',
+                    display: 'block',
+                    background: nanoboticistFeatureRangeDots[idx] ? '#000' : '#fff',
+                    cursor: (idx === 0 || nanoboticistFeatureRangeDots[idx - 1]) ? 'pointer' : 'not-allowed',
+                    transition: 'background 0.2s'
+                  }}
+                ></span>
+              </span>
+            ))}
+            
+            {/* Row 3: XP header */}
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>10xp</span>
+            {/* Row 4: Includes allies */}
+            <span></span>
+            <span></span>
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>Includes allies</span>
+            <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <span
+                onClick={() => handleDotClick(nanoboticistFeatureIncludesAlliesDot, setNanoboticistFeatureIncludesAlliesDot, 0, [10], 'nanoboticistFeatureIncludesAlliesDot')}
+                style={{
+                  width: '15px',
+                  height: '15px',
+                  border: '2px solid #000',
+                  borderRadius: '50%',
+                  display: 'block',
+                  background: nanoboticistFeatureIncludesAlliesDot[0] ? '#000' : '#fff',
+                  cursor: 'pointer',
+                  transition: 'background 0.2s'
+                }}
+              ></span>
+            </span>
+            <span></span>
+          </div>
+
+          <hr style={{ margin: '12px', border: 0, borderTop: '1px solid #ddd' }} />
+
+          {/* Technique header */}
+          <div style={{ fontWeight: 'bold', color: '#bf9000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Technique</u></div>
+          <div style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '8px' }}>
+            {generateVersatileSwarmJSX(tempSheet)}
+          </div>
+
+          {/* Technique XP progression table */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 24px 24px 24px',
+            columnGap: '6px',
+            rowGap: '2px',
+            alignItems: 'start',
+            marginBottom: '2px',
+            width: '100%',
+            paddingLeft: '4px'
+          }}>
+            {/* Row 1: XP header */}
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>4xp</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>7xp</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>11xp</span>
+            {/* Row 2: +1hx */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1hx</span>
+            {[0, 1, 2].map(idx => (
+              <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <span
+                  onClick={() => handleDotClick(nanoboticistTechniqueRangeDots, setNanoboticistTechniqueRangeDots, idx, [4, 7, 11], 'nanoboticistTechniqueRangeDots')}
+                  style={{
+                    width: '15px',
+                    height: '15px',
+                    border: '2px solid #000',
+                    borderRadius: '50%',
+                    display: 'block',
+                    background: nanoboticistTechniqueRangeDots[idx] ? '#000' : '#fff',
+                    cursor: (idx === 0 || nanoboticistTechniqueRangeDots[idx - 1]) ? 'pointer' : 'not-allowed',
+                    transition: 'background 0.2s'
+                  }}
+                ></span>
+              </span>
+            ))}
+
+            {/* Row 3: XP header */}
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>8xp</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>13xp</span>
+            <span></span>
+            {/* Row 4: +1 condition effect */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1 condition effect</span>
+            <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <span
+                onClick={() => handleDotClick(nanoboticistTechniqueConditionDots, setNanoboticistTechniqueConditionDots, 0, [8], 'nanoboticistTechniqueConditionDots')}
+                style={{
+                  width: '15px',
+                  height: '15px',
+                  border: '2px solid #000',
+                  borderRadius: '50%',
+                  display: 'block',
+                  background: nanoboticistTechniqueConditionDots[0] ? '#000' : '#fff',
+                  cursor: 'pointer',
+                  transition: 'background 0.2s'
+                }}
+              ></span>
+            </span>
+            <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <span
+                onClick={() => handleDotClick(nanoboticistTechniqueConditionDots, setNanoboticistTechniqueConditionDots, 1, [8, 13], 'nanoboticistTechniqueConditionDots')}
+                style={{
+                  width: '15px',
+                  height: '15px',
+                  border: '2px solid #000',
+                  borderRadius: '50%',
+                  display: 'block',
+                  background: nanoboticistTechniqueConditionDots[1] ? '#000' : '#fff',
+                  cursor: nanoboticistTechniqueConditionDots[0] ? 'pointer' : 'not-allowed',
+                  transition: 'background 0.2s'
+                }}
+              ></span>
+            </span>
+            <span></span>
+
+            {/* Row 5: XP header */}
+            <span></span>
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>12xp</span>
+            <span></span>
+            {/* Row 6: Can be from a Drone instead */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>Can be from a Drone instead</span>
+            <span></span>
+            <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <span
+                onClick={() => handleDotClick(nanoboticistTechniqueFromDroneDot, setNanoboticistTechniqueFromDroneDot, 0, [12], 'nanoboticistTechniqueFromDroneDot')}
+                style={{
+                  width: '15px',
+                  height: '15px',
+                  border: '2px solid #000',
+                  borderRadius: '50%',
+                  display: 'block',
+                  background: nanoboticistTechniqueFromDroneDot[0] ? '#000' : '#fff',
+                  cursor: 'pointer',
+                  transition: 'background 0.2s'
+                }}
+              ></span>
+            </span>
+            <span></span>
+
+            {/* Row 7: XP header */}
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>5xp</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>8xp</span>
+            <span></span>
+            {/* Row 8: -1 Cooldown */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>-1 Cooldown</span>
+            <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <span
+                onClick={() => handleDotClick(nanoboticistTechniqueCooldownDots, setNanoboticistTechniqueCooldownDots, 0, [5], 'nanoboticistTechniqueCooldownDots')}
+                style={{
+                  width: '15px',
+                  height: '15px',
+                  border: '2px solid #000',
+                  borderRadius: '50%',
+                  display: 'block',
+                  background: nanoboticistTechniqueCooldownDots[0] ? '#000' : '#fff',
+                  cursor: 'pointer',
+                  transition: 'background 0.2s'
+                }}
+              ></span>
+            </span>
+            <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <span
+                onClick={() => handleDotClick(nanoboticistTechniqueCooldownDots, setNanoboticistTechniqueCooldownDots, 1, [5, 8], 'nanoboticistTechniqueCooldownDots')}
+                style={{
+                  width: '15px',
+                  height: '15px',
+                  border: '2px solid #000',
+                  borderRadius: '50%',
+                  display: 'block',
+                  background: nanoboticistTechniqueCooldownDots[1] ? '#000' : '#fff',
+                  cursor: nanoboticistTechniqueCooldownDots[0] ? 'pointer' : 'not-allowed',
+                  transition: 'background 0.2s'
+                }}
+              ></span>
+            </span>
+            <span></span>
+          </div>
+
+          <hr style={{ margin: '12px', border: 0, borderTop: '1px solid #ddd' }} />
+
+          {/* Attack header */}
+          <div style={{ fontWeight: 'bold', color: '#000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Attack</u></div>
+          <div style={{ fontSize: '1em', color: '#000', marginBottom: '6px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <i><b>Primary Attack.</b></i>
+          </div>
+          
+          <div style={{ marginBottom: '8px' }}>
+            {/* Nanodrone Swarms dropdown */}
+            <select
+              style={{ 
+                  fontSize: '1em', 
+                  padding: '2px 8px', 
+                  borderRadius: '6px', 
+                  border: '1px solid #ccc', 
+                  background: '#fff', 
+                  color: '#222',
+                  fontWeight: 'bold',
+                  marginBottom: '4px',
+                  textAlign: 'left',
+                  minWidth: '180px'
+              }}
+              defaultValue="Nanodrone Swarms"
+              onChange={(e) => {
+                const value = e.target.value;
+                if (value !== "Nanodrone Swarms") {
+                  setPendingNanodroneSwarm(value);
+                  e.target.value = "Nanodrone Swarms"; // Reset dropdown
+                }
+              }}
+            >
+              <option disabled style={{ fontWeight: 'bold' }}>Nanodrone Swarms</option>
+              <option style={{ fontWeight: 'bold' }}>Blockwave</option>
+              <option style={{ fontWeight: 'bold' }}>Mech-Arachnids</option>
+              <option style={{ fontWeight: 'bold' }}>Toxic Cloudbot</option>
+            </select>
+
+            {/* Buy/Add dialog for Nanodrone Swarm selection */}
+            {pendingNanodroneSwarm && (
+              <div style={{ marginTop: '4px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <div style={{ fontWeight: 'bold' }}>
+                  {pendingNanodroneSwarm}
+                  <span style={{ color: '#bf9000', fontWeight: 'bold', marginLeft: '8px' }}>
+                    {getNanodroneSwarmCost(pendingNanodroneSwarm)}c
+                  </span>
+                </div>
+                <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                  <button
+                    style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #1976d2', background: '#1976d2', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}
+                    onClick={() => {
+                      const cost = getNanodroneSwarmCost(pendingNanodroneSwarm);
+                      const currentCredits = credits || sheet?.credits || 0;
+                      if (currentCredits < cost) {
+                        setNotice('Not enough credits!');
+                        return;
+                      }
+                      const newNanodroneSwarms = [...selectedNanodroneSwarms, pendingNanodroneSwarm];
+                      const newCredits = currentCredits - cost;
+                      setSelectedNanodroneSwarms(newNanodroneSwarms);
+                      
+                      if (sheet && onAutoSave) {
+                        onAutoSave({
+                          nanodroneSwarms: newNanodroneSwarms,
+                          credits: newCredits
+                        });
+                      }
+                      
+                      setPendingNanodroneSwarm("");
+                    }}
+                  >Buy</button>
+                  <button
+                    style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #28a745', background: '#28a745', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}
+                    onClick={() => {
+                      const newNanodroneSwarms = [...selectedNanodroneSwarms, pendingNanodroneSwarm];
+                      setSelectedNanodroneSwarms(newNanodroneSwarms);
+                      
+                      if (sheet && onAutoSave) {
+                        onAutoSave({
+                          nanodroneSwarms: newNanodroneSwarms,
+                          credits: credits || sheet?.credits || 0
+                        });
+                      }
+                      
+                      setPendingNanodroneSwarm("");
+                    }}
+                  >Add</button>
+                  <button
+                    style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #aaa', background: '#eee', color: '#333', fontWeight: 'bold', cursor: 'pointer' }}
+                    onClick={() => setPendingNanodroneSwarm("")}
+                  >Cancel</button>
+                </div>
+              </div>
+            )}
+
+            {/* List of selected Nanodrone Swarms */}
+            <div style={{ marginTop: '2px' }}>
+              {selectedNanodroneSwarms.length > 0 && (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginLeft: '8px' }}>
+                  {selectedNanodroneSwarms.map((swarm, idx) => (
+                    <span key={swarm + idx} style={{ fontStyle: 'italic', display: 'flex', alignItems: 'center', background: '#f5f5f5', borderRadius: '6px', padding: '2px 8px' }}>
+                      {swarm}
+                      <button
+                        style={{ marginLeft: '6px', padding: '0 6px', borderRadius: '50%', border: 'none', background: '#d32f2f', color: 'white', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.9em' }}
+                        title={`Remove ${swarm}`}
+                        onClick={() => {
+                          const newNanodroneSwarms = selectedNanodroneSwarms.filter((_, i) => i !== idx);
+                          setSelectedNanodroneSwarms(newNanodroneSwarms);
+                          
+                          if (sheet && onAutoSave) {
+                            onAutoSave({
+                              nanodroneSwarms: newNanodroneSwarms
+                            });
+                          }
+                        }}
+                      >×</button>
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Attack stats */}
+            <div style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginTop: '8px' }}>
+              {generateNanodroneSwarmJSX(tempSheet)}
+            </div>
+          </div>
+
+          {/* Primary Attack XP progression table */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 24px 24px 24px',
+            columnGap: '6px',
+            rowGap: '2px',
+            alignItems: 'start',
+            marginBottom: '2px',
+            width: '100%',
+            paddingLeft: '4px'
+          }}>
+            {/* Row 1: XP header */}
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>5xp</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>8xp</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>15xp</span>
+            {/* Row 2: +1 Strike target */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1 Strike target</span>
+            {[0, 1, 2].map(idx => (
+              <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <span
+                  onClick={() => handleDotClick(nanoboticistPrimaryAttackTargetDots, setNanoboticistPrimaryAttackTargetDots, idx, [5, 8, 15], 'nanoboticistPrimaryAttackTargetDots')}
+                  style={{
+                    width: '15px',
+                    height: '15px',
+                    border: '2px solid #000',
+                    borderRadius: '50%',
+                    display: 'block',
+                    background: nanoboticistPrimaryAttackTargetDots[idx] ? '#000' : '#fff',
+                    cursor: (idx === 0 || nanoboticistPrimaryAttackTargetDots[idx - 1]) ? 'pointer' : 'not-allowed',
+                    transition: 'background 0.2s'
+                  }}
+                ></span>
+              </span>
+            ))}
+
+            {/* Row 3: XP header */}
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>5xp</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>8xp</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>13xp</span>
+            {/* Row 4: +1 Damage die */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1 Damage die</span>
+            {[0, 1, 2].map(idx => (
+              <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <span
+                  onClick={() => handleDotClick(nanoboticistPrimaryAttackDieSizeDots, setNanoboticistPrimaryAttackDieSizeDots, idx, [5, 8, 13], 'nanoboticistPrimaryAttackDieSizeDots')}
+                  style={{
+                    width: '15px',
+                    height: '15px',
+                    border: '2px solid #000',
+                    borderRadius: '50%',
+                    display: 'block',
+                    background: nanoboticistPrimaryAttackDieSizeDots[idx] ? '#000' : '#fff',
+                    cursor: (idx === 0 || nanoboticistPrimaryAttackDieSizeDots[idx - 1]) ? 'pointer' : 'not-allowed',
+                    transition: 'background 0.2s'
+                  }}
+                ></span>
+              </span>
+            ))}
+
+            {/* Row 5: XP header */}
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>8xp</span>
+            <span></span>
+            <span></span>
+            {/* Row 6: Inflict Spike */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>Inflict Spike</span>
+            <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <span
+                onClick={() => handleDotClick(nanoboticistPrimaryAttackSpikeDot, setNanoboticistPrimaryAttackSpikeDot, 0, [8], 'nanoboticistPrimaryAttackSpikeDot')}
+                style={{
+                  width: '15px',
+                  height: '15px',
+                  border: '2px solid #000',
+                  borderRadius: '50%',
+                  display: 'block',
+                  background: nanoboticistPrimaryAttackSpikeDot[0] ? '#000' : '#fff',
+                  cursor: 'pointer',
+                  transition: 'background 0.2s'
+                }}
+              ></span>
+            </span>
+            <span></span>
+            <span></span>
+
+            {/* Row 7: XP header */}
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>4xp</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>7xp</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>11xp</span>
+            {/* Row 8: +1 Speed */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1 Speed</span>
+            {[0, 1, 2].map(idx => (
+              <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <span
+                  onClick={() => handleDotClick(nanoboticistPrimaryAttackSpeedDots, setNanoboticistPrimaryAttackSpeedDots, idx, [4, 7, 11], 'nanoboticistPrimaryAttackSpeedDots')}
+                  style={{
+                    width: '15px',
+                    height: '15px',
+                    border: '2px solid #000',
+                    borderRadius: '50%',
+                    display: 'block',
+                    background: nanoboticistPrimaryAttackSpeedDots[idx] ? '#000' : '#fff',
+                    cursor: (idx === 0 || nanoboticistPrimaryAttackSpeedDots[idx - 1]) ? 'pointer' : 'not-allowed',
+                    transition: 'background 0.2s'
+                  }}
+                ></span>
+              </span>
+            ))}
+
+            {/* Row 9: XP header */}
+            <span></span>
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>4xp</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>6xp</span>
+            {/* Row 10: Summon +5 Hit Points */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}><i><b>Summon</b></i> +5 <b><i style={{ color: '#990000' }}>Hit Points</i></b></span>
+            <span></span>
+            {[0, 1].map(idx => (
+              <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <span
+                  onClick={() => handleDotClick(nanoboticistPrimaryAttackHitPointsDots, setNanoboticistPrimaryAttackHitPointsDots, idx, [4, 6], 'nanoboticistPrimaryAttackHitPointsDots')}
+                  style={{
+                    width: '15px',
+                    height: '15px',
+                    border: '2px solid #000',
+                    borderRadius: '50%',
+                    display: 'block',
+                    background: nanoboticistPrimaryAttackHitPointsDots[idx] ? '#000' : '#fff',
+                    cursor: (idx === 0 || nanoboticistPrimaryAttackHitPointsDots[idx - 1]) ? 'pointer' : 'not-allowed',
+                    transition: 'background 0.2s'
+                  }}
+                ></span>
+              </span>
+            ))}
+
+            {/* Row 11: XP header */}
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>7xp</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>11xp</span>
+            <span></span>
+            {/* Row 12: +1 Nanodrone Swarm */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1 Nanodrone Swarm (all summoned simultaneously)</span>
+            {[0, 1].map(idx => (
+              <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <span
+                  onClick={() => handleDotClick(nanoboticistPrimaryAttackSwarmDots, setNanoboticistPrimaryAttackSwarmDots, idx, [7, 11], 'nanoboticistPrimaryAttackSwarmDots')}
+                  style={{
+                    width: '15px',
+                    height: '15px',
+                    border: '2px solid #000',
+                    borderRadius: '50%',
+                    display: 'block',
+                    background: nanoboticistPrimaryAttackSwarmDots[idx] ? '#000' : '#fff',
+                    cursor: (idx === 0 || nanoboticistPrimaryAttackSwarmDots[idx - 1]) ? 'pointer' : 'not-allowed',
+                    transition: 'background 0.2s'
+                  }}
+                ></span>
+              </span>
+            ))}
+            <span></span>
+          </div>
+
+          <hr style={{ margin: '12px', border: 0, borderTop: '1px solid #ddd' }} />
+
+          {/* Movement header */}
+          <div style={{ fontWeight: 'bold', color: '#000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Movement</u></div>
+          <div style={{ fontSize: '1em', color: '#000', marginBottom: '6px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <i><b>Enhanced Movement Effects.</b></i>
+          </div>
+
+          {/* Movement XP progression table */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 24px 24px 24px',
+            gridTemplateRows: 'auto auto',
+            columnGap: '6px',
+            rowGap: '2px',
+            alignItems: 'start',
+            marginBottom: '2px',
+            width: '100%',
+            paddingLeft: '4px'
+          }}>
+            {/* Row 1: XP header */}
+            <span></span>
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>17xp</span>
+            <span></span>
+            {/* Row 2: Flight Speed */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}><b><i style={{ color: '#38761d' }}>Flight Speed</i></b></span>
+            <span></span>
+            <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <span
+                onClick={() => handleDotClick(nanoboticistMovementFlightDot, setNanoboticistMovementFlightDot, 0, [17], 'nanoboticistMovementFlightDot')}
+                style={{
+                  width: '15px',
+                  height: '15px',
+                  border: '2px solid #000',
+                  borderRadius: '50%',
+                  display: 'block',
+                  background: nanoboticistMovementFlightDot[0] ? '#000' : '#fff',
+                  cursor: 'pointer',
+                  transition: 'background 0.2s'
+                }}
+              ></span>
+            </span>
+            <span></span>
+          </div>
+
+          <hr style={{ margin: '12px', border: 0, borderTop: '1px solid #ddd' }} />
+
+          {/* Perks header */}
+          <div style={{ fontWeight: 'bold', color: '#000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Perks</u></div>
+          <div style={{ fontSize: '1em', color: '#000', marginBottom: '6px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <i><b>Skills.</b> Acrobatics</i> +2
+          </div>
+          <div style={{ fontSize: '1em', color: '#000', marginBottom: '6px', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '-12px' }}>
+            <b><i style={{ color: '#e69138', fontSize: '1em' }}>Nanodrone Hand.</i></b> Your Nanodrone Swarm allows you to manipulate objects at up to a 5hx Range, such as pulling a lever, pushing a button, opening a door or grabbing an item.
+          </div>
+
+          {/* Perks SP progression table */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 24px 24px 24px',
+            gridTemplateRows: 'auto',
+            columnGap: '6px',
+            rowGap: '2px',
+            alignItems: 'start',
+            marginTop: '-12px',
+            marginBottom: '2px',
+            width: '100%',
+            paddingLeft: '4px'
+          }}>
+            {/* Row 1: Empty cells and 10sp header */}
+            <span></span>
+            <span></span>
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>10sp</span>
+            {/* Row 2: Skills dot */}
+            <span></span>
+            <span></span>
+            <span></span>
+            <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start' }}>
+              <span
+                onClick={() => handleSpDotClick(nanoboticistPerksSkillsDots, setNanoboticistPerksSkillsDots, 0, [10], 'nanoboticistPerksSkillsDots')}
+                style={{
+                  width: '15px',
+                  height: '15px',
+                  border: '2px solid #000',
+                  borderRadius: '50%',
+                  display: 'block',
+                  background: nanoboticistPerksSkillsDots[0] ? '#000' : '#fff',
                   cursor: 'pointer',
                   transition: 'background 0.2s'
                 }}
