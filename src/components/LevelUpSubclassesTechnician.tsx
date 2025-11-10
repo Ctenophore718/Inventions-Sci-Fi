@@ -11,6 +11,9 @@ import { generateJunkerDroneJSX, getJunkerDroneCost } from "../utils/junkerPrima
 import { generateProtectiveSwarmJSX } from "../utils/nanoboticistFeature";
 import { generateVersatileSwarmJSX } from "../utils/nanoboticistTechnique";
 import { generateNanodroneSwarmJSX, getNanodroneSwarmCost } from "../utils/nanoboticistPrimaryAttack";
+import { generateIroncladJSX } from "../utils/tankerFeature";
+import { generateBulletMagnetJSX } from "../utils/tankerTechnique";
+import { generateSiegeDroneJSX, getSiegeDroneCost } from "../utils/tankerPrimaryAttack";
 
 type LevelUpSubclassesTechnicianProps = {
   sheet: CharacterSheet | null;
@@ -88,10 +91,21 @@ const LevelUpSubclassesTechnician: React.FC<LevelUpSubclassesTechnicianProps> = 
     sheet?.nanodroneSwarms || []
   );
 
+  // State for Siege Drones dropdown
+  const [pendingSiegeDrone, setPendingSiegeDrone] = useState<string>("");
+  const [selectedSiegeDrones, setSelectedSiegeDrones] = useState<string[]>(
+    sheet?.siegeDrones || []
+  );
+
   // Sync selectedNanodroneSwarms with sheet changes
   useEffect(() => {
     setSelectedNanodroneSwarms(sheet?.nanodroneSwarms || []);
   }, [sheet?.nanodroneSwarms]);
+
+  // Sync selectedSiegeDrones with sheet changes
+  useEffect(() => {
+    setSelectedSiegeDrones(sheet?.siegeDrones || []);
+  }, [sheet?.siegeDrones]);
 
   // Independent state for Junker dots
   const [junkerFeatureRangeDots, setJunkerFeatureRangeDots] = useState<boolean[]>(
@@ -173,6 +187,50 @@ const LevelUpSubclassesTechnician: React.FC<LevelUpSubclassesTechnicianProps> = 
   );
   const [nanoboticistPerksSkillsDots, setNanoboticistPerksSkillsDots] = useState<boolean[]>(
     (sheet?.subclassProgressionDots as any)?.nanoboticistPerksSkillsDots || [false]
+  );
+
+  // Independent state for Tanker dots
+  const [tankerFeatureRangeDots, setTankerFeatureRangeDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.tankerFeatureRangeDots || [false, false, false]
+  );
+  const [tankerFeatureResistDot, setTankerFeatureResistDot] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.tankerFeatureResistDot || [false]
+  );
+  const [tankerFeatureImmuneDot, setTankerFeatureImmuneDot] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.tankerFeatureImmuneDot || [false]
+  );
+  const [tankerTechniqueCooldownDots, setTankerTechniqueCooldownDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.tankerTechniqueCooldownDots || [false, false]
+  );
+  const [tankerTechniqueRangeDots, setTankerTechniqueRangeDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.tankerTechniqueRangeDots || [false, false, false]
+  );
+  const [tankerTechniqueResistDot, setTankerTechniqueResistDot] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.tankerTechniqueResistDot || [false]
+  );
+  const [tankerTechniqueImmuneDot, setTankerTechniqueImmuneDot] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.tankerTechniqueImmuneDot || [false]
+  );
+  const [tankerPrimaryAttackAoEDots, setTankerPrimaryAttackAoEDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.tankerPrimaryAttackAoEDots || [false, false, false]
+  );
+  const [tankerPrimaryAttackDieSizeDots, setTankerPrimaryAttackDieSizeDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.tankerPrimaryAttackDieSizeDots || [false, false]
+  );
+  const [tankerPrimaryAttackCritDots, setTankerPrimaryAttackCritDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.tankerPrimaryAttackCritDots || [false, false, false]
+  );
+  const [tankerPrimaryAttackSpeedDots, setTankerPrimaryAttackSpeedDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.tankerPrimaryAttackSpeedDots || [false, false, false]
+  );
+  const [tankerPrimaryAttackHitPointsDots, setTankerPrimaryAttackHitPointsDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.tankerPrimaryAttackHitPointsDots || [false, false, false]
+  );
+  const [tankerPerksSkillsDots, setTankerPerksSkillsDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.tankerPerksSkillsDots || [false]
+  );
+  const [tankerPerksHeavyMetalDots, setTankerPerksHeavyMetalDots] = useState<boolean[]>(
+    (sheet?.subclassProgressionDots as any)?.tankerPerksHeavyMetalDots || [false]
   );
 
   // Helper function to handle XP dot clicking with sequential requirement
@@ -1486,12 +1544,11 @@ const LevelUpSubclassesTechnician: React.FC<LevelUpSubclassesTechnicianProps> = 
 
             {/* Row 5: XP header */}
             <span></span>
-            <span></span>
             <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>12xp</span>
             <span></span>
-            {/* Row 6: Can be from a Drone instead */}
-            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>Can be from a Drone instead</span>
             <span></span>
+            {/* Row 6: Can be from a Drone instead */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>Can be from your <i>Drone(s)</i> instead</span>
             <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
               <span
                 onClick={() => handleDotClick(nanoboticistTechniqueFromDroneDot, setNanoboticistTechniqueFromDroneDot, 0, [12], 'nanoboticistTechniqueFromDroneDot')}
@@ -1511,11 +1568,12 @@ const LevelUpSubclassesTechnician: React.FC<LevelUpSubclassesTechnicianProps> = 
 
             {/* Row 7: XP header */}
             <span></span>
+            <span></span>
             <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>5xp</span>
             <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>8xp</span>
             <span></span>
             {/* Row 8: -1 Cooldown */}
-            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>-1 Cooldown</span>
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>-1 <i>Cooldown</i></span>
             <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
               <span
                 onClick={() => handleDotClick(nanoboticistTechniqueCooldownDots, setNanoboticistTechniqueCooldownDots, 0, [5], 'nanoboticistTechniqueCooldownDots')}
@@ -1554,7 +1612,7 @@ const LevelUpSubclassesTechnician: React.FC<LevelUpSubclassesTechnicianProps> = 
           {/* Attack header */}
           <div style={{ fontWeight: 'bold', color: '#000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Attack</u></div>
           <div style={{ fontSize: '1em', color: '#000', marginBottom: '6px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
-            <i><b>Primary Attack.</b></i>
+            <i><b>Primary <span style={{ color: '#990000' }}>Attack.</span></b></i>
           </div>
           
           <div style={{ marginBottom: '8px' }}>
@@ -1694,7 +1752,7 @@ const LevelUpSubclassesTechnician: React.FC<LevelUpSubclassesTechnicianProps> = 
             <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>8xp</span>
             <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>15xp</span>
             {/* Row 2: +1 Strike target */}
-            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1 Strike target</span>
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1 <b><i style={{ color: '#351c75' }}>Strike</i></b> target</span>
             {[0, 1, 2].map(idx => (
               <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                 <span
@@ -1744,7 +1802,7 @@ const LevelUpSubclassesTechnician: React.FC<LevelUpSubclassesTechnicianProps> = 
             <span></span>
             <span></span>
             {/* Row 6: Inflict Spike */}
-            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>Inflict Spike</span>
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>Inflict <b><i>Spike</i></b></span>
             <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
               <span
                 onClick={() => handleDotClick(nanoboticistPrimaryAttackSpikeDot, setNanoboticistPrimaryAttackSpikeDot, 0, [8], 'nanoboticistPrimaryAttackSpikeDot')}
@@ -1769,7 +1827,7 @@ const LevelUpSubclassesTechnician: React.FC<LevelUpSubclassesTechnicianProps> = 
             <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>7xp</span>
             <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>11xp</span>
             {/* Row 8: +1 Speed */}
-            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1 Speed</span>
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1hx <b><i style={{ color: '#38761d' }}>Speed</i></b></span>
             {[0, 1, 2].map(idx => (
               <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                 <span
@@ -1790,12 +1848,11 @@ const LevelUpSubclassesTechnician: React.FC<LevelUpSubclassesTechnicianProps> = 
 
             {/* Row 9: XP header */}
             <span></span>
-            <span></span>
             <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>4xp</span>
             <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>6xp</span>
+            <span></span>
             {/* Row 10: Summon +5 Hit Points */}
             <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}><i><b>Summon</b></i> +5 <b><i style={{ color: '#990000' }}>Hit Points</i></b></span>
-            <span></span>
             {[0, 1].map(idx => (
               <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                 <span
@@ -1816,11 +1873,12 @@ const LevelUpSubclassesTechnician: React.FC<LevelUpSubclassesTechnicianProps> = 
 
             {/* Row 11: XP header */}
             <span></span>
+            <span></span>
             <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>7xp</span>
             <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>11xp</span>
             <span></span>
             {/* Row 12: +1 Nanodrone Swarm */}
-            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1 Nanodrone Swarm (all summoned simultaneously)</span>
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1 <i>Nanodrone Swarm</i> (all summoned simultaneously)</span>
             {[0, 1].map(idx => (
               <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                 <span
@@ -1844,9 +1902,9 @@ const LevelUpSubclassesTechnician: React.FC<LevelUpSubclassesTechnicianProps> = 
           <hr style={{ margin: '12px', border: 0, borderTop: '1px solid #ddd' }} />
 
           {/* Movement header */}
-          <div style={{ fontWeight: 'bold', color: '#000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Movement</u></div>
+          <div style={{ fontWeight: 'bold', color: '#38761d', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Movement</u></div>
           <div style={{ fontSize: '1em', color: '#000', marginBottom: '6px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
-            <i><b>Enhanced Movement Effects.</b></i>
+            <i><b>Enhanced <span style={{ color: '#38761d' }}>Movement</span> Effects.</b></i>{nanoboticistMovementFlightDot[0] ? <b><i style={{ color: '#38761d' }}> Fly Speed.</i></b> : ''}
           </div>
 
           {/* Movement XP progression table */}
@@ -1863,12 +1921,11 @@ const LevelUpSubclassesTechnician: React.FC<LevelUpSubclassesTechnicianProps> = 
           }}>
             {/* Row 1: XP header */}
             <span></span>
-            <span></span>
             <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>17xp</span>
             <span></span>
-            {/* Row 2: Flight Speed */}
-            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}><b><i style={{ color: '#38761d' }}>Flight Speed</i></b></span>
             <span></span>
+            {/* Row 2: Flight Speed */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}><b><i style={{ color: '#38761d' }}>Fly Speed</i></b></span>
             <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
               <span
                 onClick={() => handleDotClick(nanoboticistMovementFlightDot, setNanoboticistMovementFlightDot, 0, [17], 'nanoboticistMovementFlightDot')}
@@ -1894,15 +1951,12 @@ const LevelUpSubclassesTechnician: React.FC<LevelUpSubclassesTechnicianProps> = 
           <div style={{ fontSize: '1em', color: '#000', marginBottom: '6px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
             <i><b>Skills.</b> Acrobatics</i> +2
           </div>
-          <div style={{ fontSize: '1em', color: '#000', marginBottom: '6px', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '-12px' }}>
-            <b><i style={{ color: '#e69138', fontSize: '1em' }}>Nanodrone Hand.</i></b> Your Nanodrone Swarm allows you to manipulate objects at up to a 5hx Range, such as pulling a lever, pushing a button, opening a door or grabbing an item.
-          </div>
 
           {/* Perks SP progression table */}
           <div style={{
             display: 'grid',
             gridTemplateColumns: '1fr 24px 24px 24px',
-            gridTemplateRows: 'auto',
+            gridTemplateRows: 'auto auto',
             columnGap: '6px',
             rowGap: '2px',
             alignItems: 'start',
@@ -1916,10 +1970,17 @@ const LevelUpSubclassesTechnician: React.FC<LevelUpSubclassesTechnicianProps> = 
             <span></span>
             <span></span>
             <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>10sp</span>
-            {/* Row 2: Skills dot */}
-            <span></span>
-            <span></span>
-            <span></span>
+            {/* Row 2: Nanodrone Hand text and dot */}
+            <div style={{ 
+              fontSize: '1em', 
+              fontFamily: 'Arial, Helvetica, sans-serif', 
+              textAlign: 'left',
+              paddingRight: '8px',
+              lineHeight: '1.2',
+              gridColumn: '1 / 4'
+            }}>
+              <b><i style={{ color: '#57b8b0', fontSize: '1em' }}>Nanodrone Hand.</i></b> Your Nanodrone Swarm allows you to manipulate objects at up to a 5hx Range, such as pulling a lever, pushing a button, opening a door or grabbing an item.
+            </div>
             <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start' }}>
               <span
                 onClick={() => handleSpDotClick(nanoboticistPerksSkillsDots, setNanoboticistPerksSkillsDots, 0, [10], 'nanoboticistPerksSkillsDots')}
@@ -1930,6 +1991,474 @@ const LevelUpSubclassesTechnician: React.FC<LevelUpSubclassesTechnicianProps> = 
                   borderRadius: '50%',
                   display: 'block',
                   background: nanoboticistPerksSkillsDots[0] ? '#000' : '#fff',
+                  cursor: 'pointer',
+                  transition: 'background 0.2s'
+                }}
+              ></span>
+            </span>
+          </div>
+        </div>
+      )}
+
+      {/* Tanker */}
+      {subclass === 'Tanker' && (
+        <div style={{ width: '100%', marginTop: '1rem', textAlign: 'left', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
+          {/* Feature header */}
+          <div style={{ color: '#0b5394', fontWeight: 'bold', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '8px' }}>
+            <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <div style={{ fontWeight: 'bold', color: '#0b5394', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Feature</u></div>
+              <span style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
+                {generateIroncladJSX(sheet)}
+              </span>
+            </span>
+          </div>
+
+          <hr style={{ margin: '16px 0', border: 0, borderTop: '1px solid #ddd' }} />
+
+          {/* Technique header */}
+          <div style={{ color: '#bf9000', fontWeight: 'bold', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '8px' }}>
+            <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <div style={{ fontWeight: 'bold', color: '#bf9000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Technique</u></div>
+              <span style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
+                {generateBulletMagnetJSX(sheet)}
+              </span>
+            </span>
+          </div>
+
+          {/* Technique XP progression table */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 24px 24px 24px',
+            columnGap: '6px',
+            rowGap: '2px',
+            alignItems: 'start',
+            marginBottom: '2px',
+            width: '100%',
+            paddingLeft: '4px'
+          }}>
+            {/* Row 1: XP header */}
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>4xp</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>7xp</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>11xp</span>
+            
+            {/* Row 2: +1hx */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1hx</span>
+            {[0, 1, 2].map(idx => (
+              <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <span
+                  onClick={() => handleDotClick(tankerTechniqueRangeDots, setTankerTechniqueRangeDots, idx, [4, 7, 11], 'tankerTechniqueRangeDots')}
+                  style={{
+                    width: '15px',
+                    height: '15px',
+                    border: '2px solid #000',
+                    borderRadius: '50%',
+                    display: 'block',
+                    background: tankerTechniqueRangeDots[idx] ? '#000' : '#fff',
+                    cursor: (idx === 0 || tankerTechniqueRangeDots[idx - 1]) ? 'pointer' : 'not-allowed',
+                    transition: 'background 0.2s'
+                  }}
+                ></span>
+              </span>
+            ))}
+            <span></span>
+
+            {/* Row 3: XP header */}
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>8xp</span>
+            <span></span>
+            <span></span>
+            
+            
+            {/* Row 4: Resist all Damage */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}><i>Resist</i> all Damage</span>
+            <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <span
+                onClick={() => handleDotClick(tankerTechniqueResistDot, setTankerTechniqueResistDot, 0, [8], 'tankerTechniqueResistDot')}
+                style={{
+                  width: '15px',
+                  height: '15px',
+                  border: '2px solid #000',
+                  borderRadius: '50%',
+                  display: 'block',
+                  background: tankerTechniqueResistDot[0] ? '#000' : '#fff',
+                  cursor: 'pointer',
+                  transition: 'background 0.2s'
+                }}
+              ></span>
+            </span>
+            <span></span>
+            <span></span>
+            <span></span>
+
+            {/* Row 5: XP header */}
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>8xp</span>
+            <span></span>
+            <span></span>
+            
+            {/* Row 6: Immune to all conditions */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}><i>Immune</i> to all conditions</span>
+            <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <span
+                onClick={() => handleDotClick(tankerTechniqueImmuneDot, setTankerTechniqueImmuneDot, 0, [8], 'tankerTechniqueImmuneDot')}
+                style={{
+                  width: '15px',
+                  height: '15px',
+                  border: '2px solid #000',
+                  borderRadius: '50%',
+                  display: 'block',
+                  background: tankerTechniqueImmuneDot[0] ? '#000' : '#fff',
+                  cursor: 'pointer',
+                  transition: 'background 0.2s'
+                }}
+              ></span>
+            </span>
+            <span></span>
+            <span></span>
+            <span></span>
+
+            {/* Row 7: XP header */}
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>5xp</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>8xp</span>
+            <span></span>
+            
+            {/* Row 8: -1 Cooldown */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>-1 <i>Cooldown</i></span>
+            {[0, 1].map(idx => (
+              <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <span
+                  onClick={() => handleDotClick(tankerTechniqueCooldownDots, setTankerTechniqueCooldownDots, idx, [5, 8], 'tankerTechniqueCooldownDots')}
+                  style={{
+                    width: '15px',
+                    height: '15px',
+                    border: '2px solid #000',
+                    borderRadius: '50%',
+                    display: 'block',
+                    background: tankerTechniqueCooldownDots[idx] ? '#000' : '#fff',
+                    cursor: (idx === 0 || tankerTechniqueCooldownDots[idx - 1]) ? 'pointer' : 'not-allowed',
+                    transition: 'background 0.2s'
+                  }}
+                ></span>
+              </span>
+            ))}
+            <span></span>
+            <span></span>
+          </div>
+
+          <hr style={{ margin: '16px 0', border: 0, borderTop: '1px solid #ddd' }} />
+
+          {/* Attack header */}
+          <div style={{ color: '#990000', fontWeight: 'bold', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '8px' }}>
+            <div style={{ fontWeight: 'bold', color: '#990000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Attack</u></div>
+            
+            <div style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
+              <div style={{ marginBottom: '8px' }}>
+                <b><i>Primary</i> <i style={{ color: '#990000' }}>Attack.</i></b>
+              </div>
+              
+              {/* Siege Drones dropdown */}
+              <select
+                style={{ 
+                    fontSize: '1em', 
+                    padding: '2px 8px', 
+                    borderRadius: '6px', 
+                    border: '1px solid #ccc', 
+                    background: '#fff', 
+                    color: '#222',
+                    fontWeight: 'bold',
+                    marginBottom: '4px',
+                    textAlign: 'left',
+                    minWidth: '180px'
+                }}
+                defaultValue="Siege Drones"
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value !== "Siege Drones") {
+                    setPendingSiegeDrone(value);
+                    e.target.value = "Siege Drones"; // Reset dropdown
+                  }
+                }}
+              >
+                <option disabled style={{ fontWeight: 'bold' }}>Siege Drones</option>
+                <option style={{ fontWeight: 'bold' }}>Chewy Tank</option>
+                <option style={{ fontWeight: 'bold' }}>Goblin Kisses</option>
+              </select>
+
+              {/* Buy/Add dialog for Siege Drone selection */}
+              {pendingSiegeDrone && (
+                <div style={{ marginTop: '4px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <div style={{ fontWeight: 'bold' }}>
+                    {pendingSiegeDrone}
+                    <span style={{ color: '#bf9000', fontWeight: 'bold', marginLeft: '8px' }}>
+                      {getSiegeDroneCost(pendingSiegeDrone)}c
+                    </span>
+                  </div>
+                  <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                    <button
+                      style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #1976d2', background: '#1976d2', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}
+                      onClick={() => {
+                        const cost = getSiegeDroneCost(pendingSiegeDrone);
+                        const currentCredits = credits || sheet?.credits || 0;
+                        if (currentCredits < cost) {
+                          setNotice('Not enough credits!');
+                          return;
+                        }
+                        const newSiegeDrones = [...selectedSiegeDrones, pendingSiegeDrone];
+                        const newCredits = currentCredits - cost;
+                        setSelectedSiegeDrones(newSiegeDrones);
+                        
+                        if (sheet && onAutoSave) {
+                          onAutoSave({
+                            siegeDrones: newSiegeDrones,
+                            credits: newCredits
+                          });
+                        }
+                        
+                        setPendingSiegeDrone("");
+                      }}
+                    >Buy</button>
+                    <button
+                      style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #28a745', background: '#28a745', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}
+                      onClick={() => {
+                        const newSiegeDrones = [...selectedSiegeDrones, pendingSiegeDrone];
+                        setSelectedSiegeDrones(newSiegeDrones);
+                        
+                        if (sheet && onAutoSave) {
+                          onAutoSave({
+                            siegeDrones: newSiegeDrones,
+                            credits: credits || sheet?.credits || 0
+                          });
+                        }
+                        
+                        setPendingSiegeDrone("");
+                      }}
+                    >Add</button>
+                    <button
+                      style={{ padding: '2px 10px', borderRadius: '4px', border: '1px solid #aaa', background: '#eee', color: '#333', fontWeight: 'bold', cursor: 'pointer' }}
+                      onClick={() => setPendingSiegeDrone("")}
+                    >Cancel</button>
+                  </div>
+                </div>
+              )}
+
+              {/* List of selected Siege Drones */}
+              <div style={{ marginTop: '2px' }}>
+                {selectedSiegeDrones.length > 0 && (
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginLeft: '8px' }}>
+                    {selectedSiegeDrones.map((drone, idx) => (
+                      <span key={drone + idx} style={{ fontStyle: 'italic', display: 'flex', alignItems: 'center', background: '#f5f5f5', borderRadius: '6px', padding: '2px 8px' }}>
+                        {drone}
+                        <button
+                          style={{ marginLeft: '6px', padding: '0 6px', borderRadius: '50%', border: 'none', background: '#d32f2f', color: 'white', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.9em' }}
+                          title={`Remove ${drone}`}
+                          onClick={() => {
+                            const newSiegeDrones = selectedSiegeDrones.filter((_, i) => i !== idx);
+                            setSelectedSiegeDrones(newSiegeDrones);
+                            
+                            if (sheet && onAutoSave) {
+                              onAutoSave({
+                                siegeDrones: newSiegeDrones
+                              });
+                            }
+                          }}
+                        >×</button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Attack stats */}
+              {generateSiegeDroneJSX(sheet)}
+            </div>
+          </div>
+
+          {/* Attack XP progression table */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 24px 24px 24px',
+            gridTemplateRows: 'repeat(5, auto)',
+            columnGap: '6px',
+            rowGap: '2px',
+            alignItems: 'start',
+            marginBottom: '2px',
+            width: '100%',
+            paddingLeft: '4px'
+          }}>
+            {/* Row 1: XP header */}
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>5xp</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>8xp</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>15xp</span>
+            {/* Row 2: +1hx-Radius AoE */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1hx-Radius <i>AoE</i></span>
+            {[0, 1, 2].map(idx => (
+              <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <span
+                  onClick={() => handleDotClick(tankerPrimaryAttackAoEDots, setTankerPrimaryAttackAoEDots, idx, [5, 8, 15], 'tankerPrimaryAttackAoEDots')}
+                  style={{
+                    width: '15px',
+                    height: '15px',
+                    border: '2px solid #000',
+                    borderRadius: '50%',
+                    display: 'block',
+                    background: tankerPrimaryAttackAoEDots[idx] ? '#000' : '#fff',
+                    cursor: (idx === 0 || tankerPrimaryAttackAoEDots[idx - 1]) ? 'pointer' : 'not-allowed',
+                    transition: 'background 0.2s'
+                  }}
+                ></span>
+              </span>
+            ))}
+            <span></span>
+
+            {/* Row 3: XP header */}
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>5xp</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>8xp</span>
+            <span></span>
+            {/* Row 4: Increase Die Size */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>Increase die size</span>
+            {[0, 1].map(idx => (
+              <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <span
+                  onClick={() => handleDotClick(tankerPrimaryAttackDieSizeDots, setTankerPrimaryAttackDieSizeDots, idx, [5, 8], 'tankerPrimaryAttackDieSizeDots')}
+                  style={{
+                    width: '15px',
+                    height: '15px',
+                    border: '2px solid #000',
+                    borderRadius: '50%',
+                    display: 'block',
+                    background: tankerPrimaryAttackDieSizeDots[idx] ? '#000' : '#fff',
+                    cursor: (idx === 0 || tankerPrimaryAttackDieSizeDots[idx - 1]) ? 'pointer' : 'not-allowed',
+                    transition: 'background 0.2s'
+                  }}
+                ></span>
+              </span>
+            ))}
+            <span></span>
+            <span></span>
+
+            {/* Row 5: XP header */}
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>3xp</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>5xp</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>8xp</span>
+            {/* Row 6: +1 Crit */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1 Crit</span>
+            {[0, 1, 2].map(idx => (
+              <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <span
+                  onClick={() => handleDotClick(tankerPrimaryAttackCritDots, setTankerPrimaryAttackCritDots, idx, [3, 5, 8], 'tankerPrimaryAttackCritDots')}
+                  style={{
+                    width: '15px',
+                    height: '15px',
+                    border: '2px solid #000',
+                    borderRadius: '50%',
+                    display: 'block',
+                    background: tankerPrimaryAttackCritDots[idx] ? '#000' : '#fff',
+                    cursor: (idx === 0 || tankerPrimaryAttackCritDots[idx - 1]) ? 'pointer' : 'not-allowed',
+                    transition: 'background 0.2s'
+                  }}
+                ></span>
+              </span>
+            ))}
+            <span></span>
+
+            {/* Row 7: XP header */}
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>5xp</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>8xp</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>15xp</span>
+            {/* Row 8: +1hx Speed */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1hx <i><b style={{ color: '#38761d' }}>Speed</b></i></span>
+            {[0, 1, 2].map(idx => (
+              <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <span
+                  onClick={() => handleDotClick(tankerPrimaryAttackSpeedDots, setTankerPrimaryAttackSpeedDots, idx, [5, 8, 15], 'tankerPrimaryAttackSpeedDots')}
+                  style={{
+                    width: '15px',
+                    height: '15px',
+                    border: '2px solid #000',
+                    borderRadius: '50%',
+                    display: 'block',
+                    background: tankerPrimaryAttackSpeedDots[idx] ? '#000' : '#fff',
+                    cursor: (idx === 0 || tankerPrimaryAttackSpeedDots[idx - 1]) ? 'pointer' : 'not-allowed',
+                    transition: 'background 0.2s'
+                  }}
+                ></span>
+              </span>
+            ))}
+            <span></span>
+
+            {/* Row 9: XP header */}
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>5xp</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>8xp</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center' }}>13xp</span>
+            {/* Row 10: +5 Hit Points */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}><b><i>Summon</i></b> +5 <b><i style={{ color: '#990000' }}>Hit Points</i></b></span>
+            {[0, 1, 2].map(idx => (
+              <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <span
+                  onClick={() => handleDotClick(tankerPrimaryAttackHitPointsDots, setTankerPrimaryAttackHitPointsDots, idx, [5, 8, 13], 'tankerPrimaryAttackHitPointsDots')}
+                  style={{
+                    width: '15px',
+                    height: '15px',
+                    border: '2px solid #000',
+                    borderRadius: '50%',
+                    display: 'block',
+                    background: tankerPrimaryAttackHitPointsDots[idx] ? '#000' : '#fff',
+                    cursor: (idx === 0 || tankerPrimaryAttackHitPointsDots[idx - 1]) ? 'pointer' : 'not-allowed',
+                    transition: 'background 0.2s'
+                  }}
+                ></span>
+              </span>
+            ))}
+            <span></span>
+          </div>
+
+          <hr style={{ margin: '16px 0', border: 0, borderTop: '1px solid #ddd' }} />
+
+          {/* Perks header */}
+          <div style={{ fontWeight: 'bold', color: '#000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Perks</u></div>
+          <div style={{ fontSize: '1em', color: '#000', marginBottom: '6px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <i><b>Skills.</b> Piloting</i> +2
+          </div>
+
+          {/* Perks SP progression table */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 24px 24px 24px',
+            gridTemplateRows: 'auto auto',
+            columnGap: '6px',
+            rowGap: '2px',
+            alignItems: 'start',
+            marginTop: '-12px',
+            marginBottom: '2px',
+            width: '100%',
+            paddingLeft: '4px'
+          }}>
+            {/* Row 1: Empty cells and 10sp header */}
+            <span></span>
+            <span></span>
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>10sp</span>
+            {/* Row 2: Heavy Metal text and dot */}
+            <div style={{ 
+              fontSize: '1em', 
+              fontFamily: 'Arial, Helvetica, sans-serif', 
+              textAlign: 'left',
+              paddingRight: '8px',
+              lineHeight: '1.2',
+              gridColumn: '1 / 4'
+            }}>
+              <b><i style={{ color: '#b8578b', fontSize: '1em' }}>Heavy Metal.</i></b> You excel at operating heavy machinery of all sorts, including large drones, cranes, boom lifts, etc. Gain an advantage on related skill rolls.
+            </div>
+            <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start' }}>
+              <span
+                onClick={() => handleSpDotClick(tankerPerksHeavyMetalDots, setTankerPerksHeavyMetalDots, 0, [10], 'tankerPerksHeavyMetalDots')}
+                style={{
+                  width: '15px',
+                  height: '15px',
+                  border: '2px solid #000',
+                  borderRadius: '50%',
+                  display: 'block',
+                  background: tankerPerksHeavyMetalDots[0] ? '#000' : '#fff',
                   cursor: 'pointer',
                   transition: 'background 0.2s'
                 }}

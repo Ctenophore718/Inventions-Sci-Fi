@@ -121,6 +121,9 @@ export type CharacterSheet = {
   // Nanodrone Swarms for Nanoboticist subclass (primary attacks)
   nanodroneSwarms?: string[];
 
+  // Siege Drones for Tanker subclass (primary attacks)
+  siegeDrones?: string[];
+
   // Algorithms for Coder class
   algorithms?: string[];
 

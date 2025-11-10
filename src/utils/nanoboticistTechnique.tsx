@@ -19,7 +19,7 @@ export const generateVersatileSwarmJSX = (sheet: CharacterSheet | null): React.J
   
   return (
     <>
-      <b><i style={{ color: '#57b8b0', fontSize: '1em' }}>Versatile Swarm</i></b> <i style={{ color: '#57b8b0', fontSize: '1em' }}>(Cooldown <b style={{ color: '#000', fontStyle: 'normal' }}>[{cooldown}]</b>).</i> Enemies within <b>[{totalRange}]</b>hx of you or <b>[{fromDrone ? 'your Drone' : ' - '}]</b> are subjected to your choice of <b>[{totalConditions}]</b> of the following conditions: <b><i>Blind</i></b>, <b><i>Spike</i></b> <b>(</b><b><u style={{ color: '#666', display: 'inline-flex', alignItems: 'center' }}>Piercing<img src="/Piercing.png" alt="Piercing" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b><b>)</b>, <b><i>Restrain</i></b>, or <b><i>Slam</i></b> 3hx.
+      <b><i style={{ color: '#57b8b0', fontSize: '1em' }}>Versatile Swarm</i></b> <i style={{ color: '#57b8b0', fontSize: '1em' }}>(Cooldown <b style={{ color: '#000', fontStyle: 'normal' }}>[{cooldown}]</b>).</i> Enemies within <b>[{totalRange}]</b>hx of you or <b>[{fromDrone ? 'your Drone(s)' : ' - '}]</b> are subjected to your choice of <b>[{totalConditions}]</b> of the following conditions: <b><i>Blind</i></b>, <b><i>Spike</i></b> <b>(</b><b><u style={{ color: '#666', display: 'inline-flex', alignItems: 'center' }}>Piercing<img src="/Piercing.png" alt="Piercing" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b><b>)</b>, <b><i>Restrain</i></b>, or <b><i>Slam</i></b> 3hx.
     </>
   );
 };
@@ -42,7 +42,7 @@ export const generateVersatileSwarmCardJSX = (sheet: CharacterSheet | null): Rea
   
   return (
     <>
-    Enemies within <b>[{totalRange}]</b>hx of you or <b>[{fromDrone ? 'your Drone' : ' - '}]</b> are subjected to your choice of <b>[{totalConditions}]</b> of the following conditions: <b><i>Blind</i></b>, <b><i>Spike</i></b> <br />
+    Enemies within <b>[{totalRange}]</b>hx of you or <b>[{fromDrone ? 'your Drone(s)' : ' - '}]</b> are subjected to your choice of <b>[{totalConditions}]</b> of the following conditions: <b><i>Blind</i></b>, <b><i>Spike</i></b> <br />
     <b>(</b><b><u style={{ color: '#666', display: 'inline-flex', alignItems: 'center' }}>Piercing<img src="/Piercing.png" alt="Piercing" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b><b>)</b>, <b><i>Restrain</i></b>, or <b><i>Slam</i></b> 3hx.
     </>
   );

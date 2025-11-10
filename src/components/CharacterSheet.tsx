@@ -77,6 +77,7 @@ import { generateMasterMechanicCharacterSheetJSX } from "../utils/technicianFeat
 import { generateForcedTeleportationCharacterSheetJSX } from "../utils/hackerStrike";
 import { generateSalvageJSX } from "../utils/junkerFeature";
 import { generateProtectiveSwarmJSX } from "../utils/nanoboticistFeature";
+import { generateIroncladJSX } from "../utils/tankerFeature";
 
 import CharacterSheetInventory from "./CharacterSheetInventory";
 import CharacterSheetPerks from "./CharacterSheetPerks";
@@ -942,7 +943,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
 
   const tankerFeatureJSX = (
     <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#b8578b' }}>Ironclad.</i></b> Your <i>Drone</i> has the <i>Mount</i> keyword. While <i>Mounting</i> the <i>Drone</i>, the <i>Rider</i> cannot be directly targeted by <b><i><span style={{ color: '#990000' }}>Attacks</span></i></b> or <b><i style={{ color: '#351c75' }}>Strikes</i></b>.
+    {generateIroncladJSX(sheet)}
     </span>
   );
 
@@ -1948,6 +1949,8 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                     if (subclass === "Sniper" && skill === "Stealth") return "rgba(10,111,145,0.5)";
                     if (subclass === "Hacker" && skill === "Computers") return "rgba(92,87,184,0.5)";
                     if (subclass === "Junker" && skill === "Thievery") return "rgba(109,184,87,0.5)";
+                    if (subclass === "Nanoboticist" && skill === "Acrobatics") return "rgba(87,184,176,0.5)";
+                    if (subclass === "Tanker" && skill === "Piloting") return "rgba(184,87,139,0.5)";
                     return null;
                   };
                   
@@ -2663,6 +2666,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
             {sheet?.subclass === 'Water' && (sheet?.subclassProgressionDots as any)?.waterMovementSwimSpeedDots?.[0] ? ', Swim' : ''}
             {sheet?.subclass === 'Aeronaut' ? ', Fly' : ''}
             {sheet?.subclass === 'Sniper' && (sheet?.subclassProgressionDots as any)?.sniperMovementClimbDots?.[0] ? ', Climb' : ''}
+            {sheet?.subclass === 'Nanoboticist' && (sheet?.subclassProgressionDots as any)?.nanoboticistMovementFlightDot?.[0] ? ', Fly' : ''}
           </div>
           <div className={styles.horizontalLabel} style={{ color: '#38761d', fontWeight: 'bold' }}>Jump Speed {(kineticJumpSpeedBonus > 0 ? kineticJumpSpeedBonus : mercurialJumpSpeedBonus > 0 ? mercurialJumpSpeedBonus : "") + (kineticJumpSpeedBonus > 0 || mercurialJumpSpeedBonus > 0 ? "hx" : "0hx")}</div>
           <div className={styles.horizontalLabel} style={{ color: '#38761d', fontWeight: 'bold' }}>Jump Amount {kineticJumpAmountBonus > 0 ? kineticJumpAmountBonus : mercurialJumpAmountBonus > 0 ? mercurialJumpAmountBonus : "0"}</div>

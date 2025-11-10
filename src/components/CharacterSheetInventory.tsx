@@ -3,6 +3,7 @@ import styles from './CharacterSheet.module.css';
 import type { CharacterSheet } from "../types/CharacterSheet";
 import { getJunkerDroneCost } from "../utils/junkerPrimaryAttack";
 import { getNanodroneSwarmCost } from "../utils/nanoboticistPrimaryAttack";
+import { getSiegeDroneCost } from "../utils/tankerPrimaryAttack";
 
 type CharacterSheetInventoryProps = {
   sheet: CharacterSheet | null;
@@ -61,12 +62,12 @@ const CharacterSheetInventory: React.FC<CharacterSheetInventoryProps> = ({
                     textAlign: 'left',
                     minWidth: '180px'
                   }}
-                  value={charClass === 'Technician' && subclass === 'Hacker' ? 'Stealth Drones' : charClass === 'Technician' && subclass === 'Junker' ? 'Junker Drones' : charClass === 'Technician' && subclass === 'Nanoboticist' ? 'Nanodrone Swarms' : pendingAttack || (charClass === 'Chemist' ? 'Dart Guns' : charClass === 'Coder' ? 'Lenses' : charClass === 'Commander' ? 'Rifles' : charClass === 'Contemplative' ? 'Focuses' : charClass === 'Devout' ? 'Incantations' : charClass === 'Elementalist' ? 'Shards' : charClass === 'Exospecialist' ? 'Integrated Blasters' : charClass === 'Gunslinger' && subclass === 'Ammo Coder' ? 'Coder Carbines' : charClass === 'Gunslinger' && subclass === 'Ordnancer' ? 'Rocket Launchers' : charClass === 'Gunslinger' && subclass === 'Pistoleer' ? 'Dual Pistols' : charClass === 'Gunslinger' && subclass === 'Sniper' ? 'Sniper Rifles' : 'Select Primary Attack')}
+                  value={charClass === 'Technician' && subclass === 'Hacker' ? 'Stealth Drones' : charClass === 'Technician' && subclass === 'Junker' ? 'Junker Drones' : charClass === 'Technician' && subclass === 'Nanoboticist' ? 'Nanodrone Swarms' : charClass === 'Technician' && subclass === 'Tanker' ? 'Siege Drones' : pendingAttack || (charClass === 'Chemist' ? 'Dart Guns' : charClass === 'Coder' ? 'Lenses' : charClass === 'Commander' ? 'Rifles' : charClass === 'Contemplative' ? 'Focuses' : charClass === 'Devout' ? 'Incantations' : charClass === 'Elementalist' ? 'Shards' : charClass === 'Exospecialist' ? 'Integrated Blasters' : charClass === 'Gunslinger' && subclass === 'Ammo Coder' ? 'Coder Carbines' : charClass === 'Gunslinger' && subclass === 'Ordnancer' ? 'Rocket Launchers' : charClass === 'Gunslinger' && subclass === 'Pistoleer' ? 'Dual Pistols' : charClass === 'Gunslinger' && subclass === 'Sniper' ? 'Sniper Rifles' : 'Select Primary Attack')}
                   onChange={(e) => {
                     const value = e.target.value;
-                    if (value !== 'Dart Guns' && value !== 'Lenses' && value !== 'Rifles' && value !== 'Focuses' && value !== 'Incantations' && value !== 'Shards' && value !== 'Integrated Blasters' && value !== 'Coder Carbines' && value !== 'Rocket Launchers' && value !== 'Dual Pistols' && value !== 'Sniper Rifles' && value !== 'Stealth Drones' && value !== 'Junker Drones' && value !== 'Nanodrone Swarms' && value !== 'Select Primary Attack') {
+                    if (value !== 'Dart Guns' && value !== 'Lenses' && value !== 'Rifles' && value !== 'Focuses' && value !== 'Incantations' && value !== 'Shards' && value !== 'Integrated Blasters' && value !== 'Coder Carbines' && value !== 'Rocket Launchers' && value !== 'Dual Pistols' && value !== 'Sniper Rifles' && value !== 'Stealth Drones' && value !== 'Junker Drones' && value !== 'Nanodrone Swarms' && value !== 'Siege Drones' && value !== 'Select Primary Attack') {
                       setPendingAttack(value);
-                      e.target.value = charClass === 'Technician' && subclass === 'Hacker' ? 'Stealth Drones' : charClass === 'Technician' && subclass === 'Junker' ? 'Junker Drones' : charClass === 'Technician' && subclass === 'Nanoboticist' ? 'Nanodrone Swarms' : (charClass === 'Chemist' ? 'Dart Guns' : charClass === 'Coder' ? 'Lenses' : charClass === 'Commander' ? 'Rifles' : charClass === 'Contemplative' ? 'Focuses' : charClass === 'Devout' ? 'Incantations' : charClass === 'Elementalist' ? 'Shards' : charClass === 'Exospecialist' ? 'Integrated Blasters' : charClass === 'Gunslinger' && subclass === 'Ammo Coder' ? 'Coder Carbines' : charClass === 'Gunslinger' && subclass === 'Ordnancer' ? 'Rocket Launchers' : charClass === 'Gunslinger' && subclass === 'Pistoleer' ? 'Dual Pistols' : charClass === 'Gunslinger' && subclass === 'Sniper' ? 'Sniper Rifles' : 'Select Primary Attack');
+                      e.target.value = charClass === 'Technician' && subclass === 'Hacker' ? 'Stealth Drones' : charClass === 'Technician' && subclass === 'Junker' ? 'Junker Drones' : charClass === 'Technician' && subclass === 'Nanoboticist' ? 'Nanodrone Swarms' : charClass === 'Technician' && subclass === 'Tanker' ? 'Siege Drones' : (charClass === 'Chemist' ? 'Dart Guns' : charClass === 'Coder' ? 'Lenses' : charClass === 'Commander' ? 'Rifles' : charClass === 'Contemplative' ? 'Focuses' : charClass === 'Devout' ? 'Incantations' : charClass === 'Elementalist' ? 'Shards' : charClass === 'Exospecialist' ? 'Integrated Blasters' : charClass === 'Gunslinger' && subclass === 'Ammo Coder' ? 'Coder Carbines' : charClass === 'Gunslinger' && subclass === 'Ordnancer' ? 'Rocket Launchers' : charClass === 'Gunslinger' && subclass === 'Pistoleer' ? 'Dual Pistols' : charClass === 'Gunslinger' && subclass === 'Sniper' ? 'Sniper Rifles' : 'Select Primary Attack');
                     }
                   }}
                 >
@@ -221,7 +222,14 @@ const CharacterSheetInventory: React.FC<CharacterSheetInventoryProps> = ({
                       <option style={{ fontWeight: 'bold' }}>Toxic Cloudbot</option>
                     </>
                   )}
-                  {charClass !== 'Chemist' && charClass !== 'Coder' && charClass !== 'Commander' && charClass !== 'Contemplative' && charClass !== 'Devout' && charClass !== 'Elementalist' && charClass !== 'Exospecialist' && charClass !== 'Gunslinger' && !(charClass === 'Technician' && subclass === 'Hacker') && !(charClass === 'Technician' && subclass === 'Junker') && !(charClass === 'Technician' && subclass === 'Nanoboticist') && (
+                  {charClass === 'Technician' && subclass === 'Tanker' && (
+                    <>
+                      <option disabled style={{ fontWeight: 'bold' }}>Siege Drones</option>
+                      <option style={{ fontWeight: 'bold' }}>Chewy Tank</option>
+                      <option style={{ fontWeight: 'bold' }}>Goblin Kisses</option>
+                    </>
+                  )}
+                  {charClass !== 'Chemist' && charClass !== 'Coder' && charClass !== 'Commander' && charClass !== 'Contemplative' && charClass !== 'Devout' && charClass !== 'Elementalist' && charClass !== 'Exospecialist' && charClass !== 'Gunslinger' && !(charClass === 'Technician' && subclass === 'Hacker') && !(charClass === 'Technician' && subclass === 'Junker') && !(charClass === 'Technician' && subclass === 'Nanoboticist') && !(charClass === 'Technician' && subclass === 'Tanker') && (
                     <option disabled style={{ fontWeight: 'bold' }}>Select Primary Attack</option>
                   )}
                 </select>
@@ -241,6 +249,11 @@ const CharacterSheetInventory: React.FC<CharacterSheetInventoryProps> = ({
                           if (charClass === 'Technician' && subclass === 'Nanoboticist' && 
                               (pendingAttack === 'Blockwave' || pendingAttack === 'Mech-Arachnids' || pendingAttack === 'Toxic Cloudbot')) {
                             return `${getNanodroneSwarmCost(pendingAttack)}c`;
+                          }
+                          // Check if it's a Siege Drone
+                          if (charClass === 'Technician' && subclass === 'Tanker' && 
+                              (pendingAttack === 'Chewy Tank' || pendingAttack === 'Goblin Kisses')) {
+                            return `${getSiegeDroneCost(pendingAttack)}c`;
                           }
                           const selectedAttack = getAvailablePrimaryAttacks().find(attack => attack.name === pendingAttack);
                           return selectedAttack ? `${selectedAttack.cost}c` : '';
@@ -289,6 +302,25 @@ const CharacterSheetInventory: React.FC<CharacterSheetInventoryProps> = ({
                             return;
                           }
                           
+                          // Handle Siege Drones
+                          if (charClass === 'Technician' && subclass === 'Tanker' && 
+                              (pendingAttack === 'Chewy Tank' || pendingAttack === 'Goblin Kisses')) {
+                            const cost = getSiegeDroneCost(pendingAttack);
+                            const currentCredits = sheet?.credits || 0;
+                            if (currentCredits < cost) {
+                              alert('Not enough credits!');
+                              return;
+                            }
+                            const newSiegeDrones = [...(sheet?.siegeDrones || []), pendingAttack];
+                            const newCredits = currentCredits - cost;
+                            handleAutoSave({
+                              siegeDrones: newSiegeDrones,
+                              credits: newCredits
+                            });
+                            setPendingAttack('');
+                            return;
+                          }
+                          
                           const selectedAttack = getAvailablePrimaryAttacks().find(attack => attack.name === pendingAttack);
                           if (selectedAttack) {
                             handleAttackPurchase(selectedAttack.name, selectedAttack.cost, selectedAttack.type);
@@ -317,6 +349,17 @@ const CharacterSheetInventory: React.FC<CharacterSheetInventoryProps> = ({
                             const newNanodroneSwarms = [...(sheet?.nanodroneSwarms || []), pendingAttack];
                             handleAutoSave({
                               nanodroneSwarms: newNanodroneSwarms
+                            });
+                            setPendingAttack('');
+                            return;
+                          }
+                          
+                          // Handle Siege Drones
+                          if (charClass === 'Technician' && subclass === 'Tanker' && 
+                              (pendingAttack === 'Chewy Tank' || pendingAttack === 'Goblin Kisses')) {
+                            const newSiegeDrones = [...(sheet?.siegeDrones || []), pendingAttack];
+                            handleAutoSave({
+                              siegeDrones: newSiegeDrones
                             });
                             setPendingAttack('');
                             return;
@@ -654,6 +697,29 @@ const CharacterSheetInventory: React.FC<CharacterSheetInventoryProps> = ({
                                 const updatedSheet = { 
                                   ...sheet, 
                                   nanodroneSwarms: newNanodroneSwarms
+                                };
+                                handleAutoSave(updatedSheet);
+                              }
+                            }}
+                          >×</button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  {(sheet?.siegeDrones && sheet.siegeDrones.length > 0) && (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginLeft: '8px' }}>
+                      {sheet?.siegeDrones?.map((drone: string, idx: number) => (
+                        <span key={drone + idx + 'siegeDrone'} style={{ fontStyle: 'italic', display: 'flex', alignItems: 'center', background: '#f5f5f5', borderRadius: '6px', padding: '2px 8px' }}>
+                          {drone}
+                          <button
+                            style={{ marginLeft: '6px', padding: '0 6px', borderRadius: '50%', border: 'none', background: '#d32f2f', color: 'white', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.9em' }}
+                            title={`Remove ${drone}`}
+                            onClick={() => {
+                              if (sheet) {
+                                const newSiegeDrones = sheet.siegeDrones?.filter((_: string, i: number) => i !== idx) || [];
+                                const updatedSheet = { 
+                                  ...sheet, 
+                                  siegeDrones: newSiegeDrones
                                 };
                                 handleAutoSave(updatedSheet);
                               }

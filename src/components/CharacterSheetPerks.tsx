@@ -338,7 +338,21 @@ const CharacterSheetPerks: React.FC<CharacterSheetPerksProps> = ({
               <b><i style={{ color: '#6db857' }}>Scavenger.</i></b> <span style={{ color: '#000' }}>You have a knack for always being able to find, steal, or make the part you need to make something mechanical work. Gain an advantage on related skill rolls.</span>
             </span>
           </div>
-          )}                                                              
+          )} 
+          {subclass === 'Nanoboticist' && (sheet?.subclassProgressionDots as any)?.nanoboticistPerksSkillsDots?.[0] && (
+          <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <span>
+              <b><i style={{ color: '#57b8b0' }}>Nanodrone Hand.</i></b> <span style={{ color: '#000' }}>Your Nanodrone Swarm allows you to manipulate objects at up to a 5hx Range, such as pulling a lever, pushing a button, opening a door or grabbing an item.</span>
+            </span>
+          </div>
+          )} 
+          {subclass === 'Tanker' && (sheet?.subclassProgressionDots as any)?.tankerPerksHeavyMetalDots?.[0] && (
+          <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <span>
+              <b><i style={{ color: '#b8578b' }}>Heavy Metal.</i></b> <span style={{ color: '#000' }}>You excel at operating heavy machinery of all sorts, including large drones, cranes, boom lifts, etc. Gain an advantage on related skill rolls.</span>
+            </span>
+          </div>
+          )}                                                             
         </div>
       </div>
   );
