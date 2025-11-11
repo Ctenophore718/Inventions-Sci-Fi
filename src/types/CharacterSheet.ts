@@ -38,6 +38,8 @@ export type CharacterSheet = {
   deathCount: number;
   credits: number;
   chemTokens?: number; // For Chemist class
+  currentSummonHp?: number; // For Elementalist and Technician classes
+  maxSummonHp?: number; // For Elementalist and Technician classes
   // Hit Points UI
   deathDots: boolean[]; // 10 elements, true if selected
 
@@ -63,6 +65,9 @@ export type CharacterSheet = {
 
   // Persistent state for Level Up Class Card dots (rows of booleans)
   classCardDots?: boolean[][];
+
+  // Persistent state for Species Card dots (rows of booleans)
+  speciesCardDots?: boolean[][];
 
   // Dart guns for Chemist class
   dartGuns?: string[];

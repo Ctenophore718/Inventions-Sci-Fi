@@ -9,7 +9,7 @@ interface CardsTechnicianPrimaryAttacksProps {
   sheet: CharacterSheet | null;
 }
 
-function getFlavorText(droneName: string): string {
+function getFlavorText(droneName: string): string | React.JSX.Element {
   if (droneName === 'Blind Silence') {
     return 'The hollow within its torso contains a strong electrical current that, when deployed, shocks everyone nearby into temporary blindness.';
   }
@@ -35,7 +35,13 @@ function getFlavorText(droneName: string): string {
     return '"I saw the green cloud moving as if it had a life of its own. It wasn\'t until later that I realized it was given artificial life through its Nanoboticist." --Anonymous';
   }
   if (droneName === 'Chewy Tank') {
-    return '"This tank will slurp up the ground and chew it up \'til it\'s unrecognizable… Grrr, now I\'m hungry…" --George \'da Tanker, Massive Human';
+    return (
+      <>
+        "This tank will slurp up the ground and chew it up 'til it's unrecognizable… Grrr, now I'm hungry…"
+        <br />
+        --George 'da Tanker, Massive Human
+      </>
+    );
   }
   if (droneName === 'Goblin Kisses') {
     return '"Bleefin\' bloobin\' blorfin\' bang! \'Tis the words my mother sang!" --Goblin Kisses';

@@ -1090,6 +1090,21 @@
   color: white !important;
 }
 
+/* Summon HP Button Styles - colors change based on selected class */
+.summonHpButton {
+  color: white !important;
+}
+
+.summonHpButton[data-class="Elementalist"] {
+  background-color: #231172 !important;
+  background: #231172 !important;
+}
+
+.summonHpButton[data-class="Technician"] {
+  background-color: #724811 !important;
+  background: #724811 !important;
+}
+
 .redMinusButton {
   background-color: #ff4444 !important;
   background: #ff4444 !important;

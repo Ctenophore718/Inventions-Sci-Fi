@@ -21,6 +21,7 @@ import LevelUpSubclassesElementalist from "./LevelUpSubclassesElementalist";
 import LevelUpSubclassesExospecialist from "./LevelUpSubclassesExospecialist";
 import LevelUpSubclassesGunslinger from "./LevelUpSubclassesGunslinger";
 import LevelUpSubclassesTechnician from "./LevelUpSubclassesTechnician";
+import LevelUpSpeciesAvenoch from "./LevelUpSpeciesAvenoch";
 import { calculateChemistFeatureData } from "../utils/chemistFeature";
 
 
@@ -144,6 +145,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
   const [isHpMenuExpanded, setIsHpMenuExpanded] = useState(false);
   const [isCreditsMenuExpanded, setIsCreditsMenuExpanded] = useState(false);
   const [isChemTokensMenuExpanded, setIsChemTokensMenuExpanded] = useState(false);
+  const [isSummonHpMenuExpanded, setIsSummonHpMenuExpanded] = useState(false);
   // For add/subtract HP section
   const [hpDelta, setHpDelta] = useState<number>(0);
   // Credits management
@@ -151,6 +153,11 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
   const [creditsDelta, setCreditsDelta] = useState<number>(0);
   // Chem Tokens management (for Chemist class)
   const [chemTokens, setChemTokens] = useState<number>(sheet?.chemTokens ?? 0);
+  
+  // Summon HP management (for Elementalist and Technician classes)
+  const [currentSummonHp, setCurrentSummonHp] = useState<number>(sheet?.currentSummonHp ?? 0);
+  const [maxSummonHp, setMaxSummonHp] = useState<number>(sheet?.maxSummonHp ?? 0);
+  const [summonHpDelta, setSummonHpDelta] = useState<number>(0);
   
   // Calculate effective Max Hit Points (base + class bonuses)
   const calculateEffectiveMaxHP = (baseHP: number, charClass: string): number => {
@@ -239,6 +246,8 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
   const creditsButtonRef = React.useRef<HTMLButtonElement>(null);
   const chemTokensMenuRef = React.useRef<HTMLDivElement>(null);
   const chemTokensButtonRef = React.useRef<HTMLButtonElement>(null);
+  const summonHpMenuRef = React.useRef<HTMLDivElement>(null);
+  const summonHpButtonRef = React.useRef<HTMLButtonElement>(null);
   React.useEffect(() => {
     if (!isNavExpanded) return;
     function handleClick(e: MouseEvent) {
@@ -310,6 +319,20 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
   }, [isChemTokensMenuExpanded]);
 
   React.useEffect(() => {
+    if (!isSummonHpMenuExpanded) return;
+    function handleClick(e: MouseEvent) {
+      if (
+        summonHpMenuRef.current && !summonHpMenuRef.current.contains(e.target as Node) &&
+        summonHpButtonRef.current && !summonHpButtonRef.current.contains(e.target as Node)
+      ) {
+        setIsSummonHpMenuExpanded(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [isSummonHpMenuExpanded]);
+
+  React.useEffect(() => {
     setXpTotal(sheet?.xpTotal ?? 0);
     setSpTotal(sheet?.spTotal ?? 0);
     setSpSpent(sheet?.spSpent ?? 0);
@@ -317,6 +340,8 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
     setCurrentHitPoints(sheet?.currentHitPoints ?? sheet?.maxHitPoints ?? 0);
     setCredits(sheet?.credits ?? 0);
     setChemTokens(sheet?.chemTokens ?? 0);
+    setCurrentSummonHp(sheet?.currentSummonHp ?? 0);
+    setMaxSummonHp(sheet?.maxSummonHp ?? 0);
     setDeathCount(sheet?.deathCount || 0);
     setBackground(sheet?.background || "");
     // Update skillDots when sheet changes
@@ -1688,6 +1713,22 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                 ))}
               </select>
             </div>
+
+            {/* Avenoch Species Content */}
+            {species === "Avenoch" && (
+              <LevelUpSpeciesAvenoch
+                sheet={sheet}
+                species={species}
+                onAutoSave={handleAutoSave}
+                xpTotal={xpTotal}
+                spTotal={spTotal}
+                xpSpent={xpSpent}
+                spSpent={spSpent}
+                setXpSpent={setXpSpent}
+                setSpSpent={setSpSpent}
+                setNotice={setNotice}
+              />
+            )}
         </div>
         {/* Subspecies Card */}
         <div style={{ background: '#fff', border: '2px solid #333', borderRadius: 8, boxShadow: '0 2px 4px rgba(0,0,0,0.1)', minHeight: 80, padding: '1.2rem', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -3330,6 +3371,164 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
           }}
         >
           <img src="/Chem Token.png" alt="Chem Token" style={{ height: '1.2em', verticalAlign: 'top', marginLeft: '0px', marginRight: '2px' }}/>: {chemTokens}
+        </button>
+      </div>
+    )}
+
+    {/* Summon HP Button (only for Elementalist and Technician classes) */}
+    {(charClass === 'Elementalist' || charClass === 'Technician') && (
+      <div style={{
+        position: 'fixed',
+        bottom: '60px',
+        right: '20px',
+        zIndex: 999
+      }}>
+        {/* Summon HP Menu (expanded state) */}
+        {isSummonHpMenuExpanded && (
+          <div ref={summonHpMenuRef} style={{
+            position: 'absolute',
+            bottom: '50px',
+            right: '0px',
+            background: 'white',
+            border: `2px solid ${charClass === 'Elementalist' ? '#231172' : '#724811'}`,
+            borderRadius: '12px',
+            padding: '16px',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+            minWidth: '320px',
+            animation: 'fadeIn 0.2s ease-out'
+          }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontWeight: 'bold', minWidth: '145px', fontSize: '16px' }}>Summon Hit Points:</span>
+                <button
+                  className={styles.redMinusButton}
+                  style={{ width: '26px', height: '26px', fontSize: '14px' }}
+                  onClick={() => {
+                    const newValue = Math.max(0, currentSummonHp - 1);
+                    setCurrentSummonHp(newValue);
+                    handleAutoSave({ currentSummonHp: newValue });
+                  }}
+                >
+                  −
+                </button>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  value={currentSummonHp}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/[^0-9]/g, '');
+                    const newValue = Math.max(0, parseInt(val) || 0);
+                    setCurrentSummonHp(newValue);
+                    handleAutoSave({ currentSummonHp: newValue });
+                  }}
+                  style={{
+                    width: '60px',
+                    textAlign: 'center',
+                    border: '1px solid #ccc',
+                    borderRadius: '4px',
+                    padding: '4px 8px',
+                    fontSize: '16px'
+                  }}
+                />
+                <button
+                  className={styles.greenPlusButton}
+                  style={{ width: '26px', height: '26px', fontSize: '14px' }}
+                  onClick={() => {
+                    const newValue = currentSummonHp + 1;
+                    setCurrentSummonHp(newValue);
+                    handleAutoSave({ currentSummonHp: newValue });
+                  }}
+                >
+                  +
+                </button>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontWeight: 'bold', minWidth: '145px' }}>Max Hit Points:</span>
+                <span style={{ minWidth: '40px', textAlign: 'center' }}>{maxSummonHp}</span>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontWeight: 'bold', minWidth: '145px', fontSize: '14px' }}>Add/Subtract:</span>
+                <button
+                  className={styles.redMinusButton}
+                  style={{ width: '26px', height: '26px', fontSize: '14px' }}
+                  onClick={() => {
+                    if (!summonHpDelta) return;
+                    const newValue = Math.max(0, currentSummonHp - summonHpDelta);
+                    setCurrentSummonHp(newValue);
+                    handleAutoSave({ currentSummonHp: newValue });
+                  }}
+                >
+                  −
+                </button>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  value={summonHpDelta || ''}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/[^0-9]/g, '');
+                    setSummonHpDelta(val ? parseInt(val) : 0);
+                  }}
+                  style={{
+                    width: '60px',
+                    textAlign: 'center',
+                    border: '1px solid #ccc',
+                    borderRadius: '4px',
+                    padding: '4px 8px',
+                    fontSize: '16px'
+                  }}
+                  placeholder="#"
+                />
+                <button
+                  className={styles.greenPlusButton}
+                  style={{ width: '26px', height: '26px', fontSize: '14px' }}
+                  onClick={() => {
+                    if (!summonHpDelta) return;
+                    const newValue = currentSummonHp + summonHpDelta;
+                    setCurrentSummonHp(newValue);
+                    handleAutoSave({ currentSummonHp: newValue });
+                  }}
+                >
+                  +
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <button
+          ref={summonHpButtonRef}
+          className={styles.summonHpButton}
+          data-class={charClass}
+          onClick={() => setIsSummonHpMenuExpanded((open) => !open)}
+          style={{
+            padding: '8px 16px',
+            borderRadius: '20px',
+            border: 'none',
+            cursor: 'pointer',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+            fontSize: '14px',
+            fontWeight: 'bold',
+            transition: 'all 0.3s ease',
+            transform: isSummonHpMenuExpanded ? 'scale(1.05)' : 'scale(1)'
+          }}
+          onMouseEnter={(e) => {
+            if (!isSummonHpMenuExpanded) {
+              e.currentTarget.style.transform = 'scale(1.05)';
+              e.currentTarget.style.boxShadow = '0 6px 16px rgba(0,0,0,0.2)';
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (!isSummonHpMenuExpanded) {
+              e.currentTarget.style.transform = 'scale(1)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+            }
+          }}
+        >
+          <img src="/Summon.PNG" alt="Summon" style={{ height: '1.2em', verticalAlign: 'top', marginLeft: '0px', marginRight: '2px' }}/> hp: {currentSummonHp}/{maxSummonHp}
         </button>
       </div>
     )}
