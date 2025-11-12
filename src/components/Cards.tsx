@@ -23,6 +23,7 @@ import { generatePortalSwapCardJSX } from "../utils/HackerTechnique";
 import { generateDetonateCardJSX } from "../utils/junkerTechnique";
 import { generateVersatileSwarmCardJSX } from "../utils/nanoboticistTechnique";
 import { generateBulletMagnetCardJSX } from "../utils/tankerTechnique";
+import { generateAvianGazeCardJSX, calculateAvianGazeData } from "../utils/avenochTechnique";
 import React from "react";
 import type { CharacterSheet } from "../types/CharacterSheet";
 import { loadSheetById, saveCharacterSheet } from "../utils/storage";
@@ -49,7 +50,6 @@ import { generateHasteCardJSX } from "../utils/mercurialTechnique";
 import { generateVectorCloneCardJSX } from "../utils/vectorialTechnique";
 import { CardsChemistAttacks } from "./CardsChemistAttacks";
 import { CardsCoderAttacks } from "./CardsCoderAttacks";
-import CardsSpeciesTechniques from "./CardsSpeciesTechniques";
 import { CardsCommanderAttacks } from "./CardsCommanderAttacks";
 import { CardsContemplativeAttacks } from "./CardsContemplativeAttacks";
 import { CardsDevoutAttacks } from "./CardsDevoutAttacks";
@@ -312,10 +312,25 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
   // Calculate effective max HP with class bonuses
   const calculateEffectiveMaxHP = (): number => {
     const baseHP = localSheet?.maxHitPoints ?? 0;
+    let effectiveHP = baseHP;
+    
+    // Add Avenoch species bonus
+    if (localSheet?.species === 'Avenoch') {
+      const speciesDots = localSheet?.speciesCardDots || [];
+      const hp5Dots = speciesDots[4] || [];
+      const hp10Dots = speciesDots[5] || [];
+      const hp15Dots = speciesDots[6] || [];
+      
+      const hp5Bonus = hp5Dots.filter(Boolean).length * 5;
+      const hp10Bonus = hp10Dots.filter(Boolean).length * 10;
+      const hp15Bonus = (hp15Dots[0] ? 15 : 0);
+      
+      effectiveHP += 35 + hp5Bonus + hp10Bonus + hp15Bonus;
+    }
     
     // Add class-specific bonuses
     if (localSheet?.charClass === 'Exospecialist') {
-      let effectiveHP = baseHP + 20;
+      effectiveHP += 20;
       
       // Aeronaut subclass gets +5 Hit Points per dot
       if (localSheet?.subclass === 'Aeronaut') {
@@ -341,11 +356,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
         const spectreHitPointsBonus = ((localSheet?.subclassProgressionDots as any)?.spectreHitPointsDots?.filter(Boolean).length || 0) * 10;
         effectiveHP += spectreHitPointsBonus;
       }
-      
-      return effectiveHP;
     }
     
-    return baseHP;
+    return effectiveHP;
   };
 
   const effectiveMaxHP = calculateEffectiveMaxHP();
@@ -1124,7 +1137,7 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                 fontFamily: 'Arial, Helvetica, sans-serif',
                 fontWeight: 'bold',
                 fontSize: 'clamp(0.8em, 4vw, 1.25em)',
-                color: 'black',
+                color: localSheet?.species === 'Avenoch' ? '#2b5f59' : 'black',
                 lineHeight: 1,
                 textAlign: 'left',
                 whiteSpace: 'nowrap',
@@ -1133,13 +1146,13 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                 flexShrink: 1,
                 marginRight: '5px'
               }}>
-                Species Card Name
+                {localSheet?.species === 'Avenoch' ? 'Avian Gaze' : 'Species Card Name'}
               </span>
               <span style={{
                 fontFamily: 'Arial, Helvetica, sans-serif',
                 fontStyle: 'italic',
                 fontSize: '0.75em',
-                color: 'black',
+                color: localSheet?.species === 'Avenoch' ? '#2b5f59' : 'black',
                 lineHeight: 1,
                 whiteSpace: 'normal',
                 wordBreak: 'keep-all',
@@ -1147,11 +1160,11 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                 maxWidth: '72px',
                 display: 'inline-block',
                 textAlign: 'right'
-              }}>Species</span>
+              }}>{localSheet?.species === 'Avenoch' ? 'Avenoch' : 'Species'}</span>
             </div>
             <img 
-              src="/Blank Card.png"
-              alt="Blank Card"
+              src={localSheet?.species === 'Avenoch' ? "/Avian Gaze.png" : "/Blank Card.png"}
+              alt={localSheet?.species === 'Avenoch' ? "Avian Gaze" : "Blank Card"}
               style={{
                 position: 'absolute',
                 top: 35,
@@ -1178,7 +1191,11 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
               zIndex: 3
             }}>
               <span style={{ color: '#bf9000', fontFamily: 'Arial, Helvetica, sans-serif', fontWeight: 'bold', fontSize: '1.1em', textAlign: 'left' }}>Technique</span>
-              {localSheet?.subclass === 'Air' ? (
+              {localSheet?.species === 'Avenoch' ? (
+                <span style={{ color: '#bf9000', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '0.875em', fontStyle: 'italic', marginRight: 22, whiteSpace: 'nowrap', maxWidth: 'calc(100% - 120px)', overflow: 'hidden', textOverflow: 'ellipsis', textAlign: 'right' }}>
+                  Cooldown <span style={{ fontWeight: 'bold', fontStyle: 'normal' }}>[{calculateAvianGazeData(localSheet?.speciesCardDots).cooldown}]</span>
+                </span>
+              ) : localSheet?.subclass === 'Air' ? (
                 <span style={{ color: '#bf9000', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '0.875em', fontStyle: 'italic', marginRight: 22, whiteSpace: 'nowrap', maxWidth: 'calc(100% - 120px)', overflow: 'hidden', textOverflow: 'ellipsis', textAlign: 'right' }}>
                   Cooldown <span style={{ fontWeight: 'bold', fontStyle: 'normal' }}>[{4 - ((localSheet?.subclassProgressionDots as any)?.airTechniqueCooldownDots?.filter(Boolean).length || 0)}]</span>
                 </span>
@@ -1216,7 +1233,7 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                 maxHeight: '100%',
                 overflow: 'hidden'
               }}>
-                Card stats.
+                {localSheet?.species === 'Avenoch' ? generateAvianGazeCardJSX(localSheet?.speciesCardDots) : 'Card stats.'}
               </div>
             </div>
             <div style={{
@@ -1233,7 +1250,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
               zIndex: 3,
               textAlign: 'left'
             }}>
-              Flavor text.
+              {localSheet?.species === 'Avenoch' 
+                ? 'Avenochs were designed from the get-go for their accuracy and range in combat. Their eyesight is unparalleled in the creations of Dr. Hans Cripioma.' 
+                : 'Flavor text.'}
             </div>
         </div>
         
@@ -1371,9 +1390,6 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
               Flavor text.
             </div>
         </div>
-        
-        {/* Species Technique Cards */}
-        <CardsSpeciesTechniques species={localSheet?.species || ''} sheet={localSheet} />
         
         {/* Attack Cards */}
         {/* Chemist Attack Cards */}
@@ -2078,56 +2094,60 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
             minWidth: '280px',
             animation: 'fadeIn 0.2s ease-out'
           }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              {/* Current HP Section */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ fontWeight: 'bold', minWidth: '20px' }}>Current Hit Points:</span>
-                <button
-                  className={styles.redMinusButton}
-                  onClick={() => {
-                    const newValue = Math.max(0, currentHitPoints - 1);
-                    setCurrentHitPoints(newValue);
-                    handleAutoSave({ currentHitPoints: newValue });
-                  }}
-                >
-                  -
-                </button>
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  pattern="[0-9]*"
-                  value={currentHitPoints}
-                  onChange={(e) => {
-                    const val = e.target.value.replace(/[^0-9]/g, '');
-                    const newValue = Math.max(0, parseInt(val) || 0);
-                    setCurrentHitPoints(newValue);
-                    handleAutoSave({ currentHitPoints: newValue });
-                  }}
-                  style={{
-                    minWidth: '40px',
-                    width: '60px',
-                    textAlign: 'center',
-                    fontWeight: 'bold',
-                    border: '1px solid #ccc',
-                    borderRadius: '4px',
-                    padding: '4px',
-                    MozAppearance: 'textfield',
-                  }}
-                  autoComplete="off"
-                />
-                <button
-                  className={styles.greenPlusButton}
-                  onClick={() => {
-                    const newValue = currentHitPoints + 1;
-                    setCurrentHitPoints(newValue);
-                    handleAutoSave({ currentHitPoints: newValue });
-                  }}
-                >
-                  +
-                </button>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {/* Current HP Section - Top Row */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <span style={{ fontWeight: 'bold', fontSize: '14px' }}>Current Hit Points:</span>
+                  <button
+                    className={styles.redMinusButton}
+                    style={{ width: '26px', height: '26px', fontSize: '14px' }}
+                    onClick={() => {
+                      const newValue = Math.max(0, currentHitPoints - 1);
+                      setCurrentHitPoints(newValue);
+                      handleAutoSave({ currentHitPoints: newValue });
+                    }}
+                  >
+                    −
+                  </button>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    value={currentHitPoints}
+                    onChange={(e) => {
+                      const val = e.target.value.replace(/[^0-9]/g, '');
+                      const newValue = Math.max(0, parseInt(val) || 0);
+                      setCurrentHitPoints(newValue);
+                      handleAutoSave({ currentHitPoints: newValue });
+                    }}
+                    style={{
+                      minWidth: '40px',
+                      width: '50px',
+                      textAlign: 'center',
+                      fontWeight: 'bold',
+                      border: '1px solid #ccc',
+                      borderRadius: '4px',
+                      padding: '4px',
+                      MozAppearance: 'textfield',
+                    }}
+                    autoComplete="off"
+                  />
+                  <button
+                    className={styles.greenPlusButton}
+                    style={{ width: '26px', height: '26px', fontSize: '14px' }}
+                    onClick={() => {
+                      const newValue = currentHitPoints + 1;
+                      setCurrentHitPoints(newValue);
+                      handleAutoSave({ currentHitPoints: newValue });
+                    }}
+                  >
+                    +
+                  </button>
+                </div>
 
-                {/* Add/Subtract Section */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginLeft: '16px' }}>
+                {/* Add/Subtract Section - Top Right */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
                   <input
                     type="text"
                     inputMode="numeric"
@@ -2139,12 +2159,12 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                       const val = e.target.value.replace(/[^0-9]/g, '');
                       setHpDelta(val ? parseInt(val) : 0);
                     }}
-                    style={{ width: '48px', textAlign: 'center', border: '1px solid #ccc', borderRadius: '4px', padding: '2px 4px' }}
+                    style={{ width: '40px', textAlign: 'center', border: '1px solid #ccc', borderRadius: '4px', padding: '2px 4px' }}
                     placeholder="#"
                   />
                   <button
                     className={styles.redMinusButton}
-                    style={{ minWidth: 28, padding: '2px 8px' }}
+                    style={{ width: '24px', height: '24px', fontSize: '12px', padding: '0' }}
                     onClick={() => {
                       if (!hpDelta) return;
                       const newValue = Math.max(0, currentHitPoints - hpDelta);
@@ -2157,7 +2177,7 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                   </button>
                   <button
                     className={styles.greenPlusButton}
-                    style={{ minWidth: 28, padding: '2px 8px' }}
+                    style={{ width: '24px', height: '24px', fontSize: '12px', padding: '0' }}
                     onClick={() => {
                       if (!hpDelta) return;
                       const newValue = currentHitPoints + hpDelta;
@@ -2171,12 +2191,26 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                 </div>
               </div>
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ fontWeight: 'bold', minWidth: '120px' }}>Max Hit Points:</span>
-                <span style={{ minWidth: '40px', textAlign: 'center' }}>{effectiveMaxHP}</span>
+              {/* Max HP Section - Bottom Row */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ fontWeight: 'bold', fontSize: '14px' }}>Max Hit Points:</span>
+                  <span style={{ minWidth: '40px', textAlign: 'center' }}>{effectiveMaxHP}</span>
+                </div>
+                <button
+                  className={styles.greenPlusButton}
+                  style={{ padding: '6px 36px', fontSize: '14px', whiteSpace: 'nowrap' }}
+                  onClick={() => {
+                    setCurrentHitPoints(effectiveMaxHP);
+                    handleAutoSave({ currentHitPoints: effectiveMaxHP });
+                  }}
+                  title="Full Heal"
+                >
+                  Full Heal
+                </button>
               </div>
 
-              <hr style={{ margin: '8px 0', border: '1px solid #eee' }} />
+              <hr style={{ margin: '0px 0', border: '1px solid #eee' }} />
 
               {/* Death Count Section - Centered, in black bar, white font, dots turn black when selected */}
               <div style={{

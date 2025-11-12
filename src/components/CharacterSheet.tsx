@@ -363,13 +363,23 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
   const spectreSpeedBonus = sheet?.subclass === 'Spectre'
     ? ((sheet?.subclassProgressionDots as any)?.spectreMovementSpeedDots?.filter(Boolean).length || 0)
     : 0;
+  
+  // Calculate Avenoch species speed bonus (6 base + dots)
+  const avenochSpeedBonus = sheet?.species === 'Avenoch'
+    ? (() => {
+        const speciesDots = sheet?.speciesCardDots || [];
+        const speedDots = speciesDots[7] || [];
+        return 6 + speedDots.filter(Boolean).length;
+      })()
+    : 0;
+  
   const ammocoderSpeedBonus = sheet?.subclass === 'Ammo Coder'
     ? ((sheet?.subclassProgressionDots as any)?.ammocoderMovementSpeedDots?.filter(Boolean).length || 0)
     : 0;
   const pistoleerSpeedBonus = sheet?.subclass === 'Pistoleer'
     ? ((sheet?.subclassProgressionDots as any)?.pistoleerMovementSpeedDots?.filter(Boolean).length || 0)
     : 0;
-  const totalSpeed = baseSpeed + tacticianSpeedBonus + kineticSpeedBonus + mercurialSpeedBonus + airSpeedBonus + fireSpeedBonus + waterSpeedBonus + aeronautSpeedBonus + brawlerSpeedBonus + spectreSpeedBonus + ammocoderSpeedBonus + pistoleerSpeedBonus;
+  const totalSpeed = baseSpeed + tacticianSpeedBonus + kineticSpeedBonus + mercurialSpeedBonus + airSpeedBonus + fireSpeedBonus + waterSpeedBonus + aeronautSpeedBonus + brawlerSpeedBonus + spectreSpeedBonus + avenochSpeedBonus + ammocoderSpeedBonus + pistoleerSpeedBonus;
   const speed = totalSpeed > 0 ? `${totalSpeed}` : "0";
   
   // Calculate jump speed and jump amount for Kinetic subclass
@@ -411,6 +421,22 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
   // Calculate Spectre hit points bonus
   const spectreHitPointsBonus = sheet?.subclass === 'Spectre'
     ? ((sheet?.subclassProgressionDots as any)?.spectreHitPointsDots?.filter(Boolean).length || 0) * 10
+    : 0;
+  
+  // Calculate Avenoch species hit points bonus
+  const avenochHitPointsBonus = sheet?.species === 'Avenoch'
+    ? (() => {
+        const speciesDots = sheet?.speciesCardDots || [];
+        const hp5Dots = speciesDots[4] || [];
+        const hp10Dots = speciesDots[5] || [];
+        const hp15Dots = speciesDots[6] || [];
+        
+        const hp5Bonus = hp5Dots.filter(Boolean).length * 5;
+        const hp10Bonus = hp10Dots.filter(Boolean).length * 10;
+        const hp15Bonus = (hp15Dots[0] ? 15 : 0);
+        
+        return 35 + hp5Bonus + hp10Bonus + hp15Bonus;
+      })()
     : 0;
   
   const [deathCount, setDeathCount] = useState(sheet?.deathCount || 0);
@@ -2695,6 +2721,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
             {sheet?.subclass === 'Aeronaut' ? ', Fly' : ''}
             {sheet?.subclass === 'Sniper' && (sheet?.subclassProgressionDots as any)?.sniperMovementClimbDots?.[0] ? ', Climb' : ''}
             {sheet?.subclass === 'Nanoboticist' && (sheet?.subclassProgressionDots as any)?.nanoboticistMovementFlightDot?.[0] ? ', Fly' : ''}
+            {sheet?.species === 'Avenoch' ? ', Fly' : ''}
           </div>
           <div className={styles.horizontalLabel} style={{ color: '#38761d', fontWeight: 'bold' }}>Jump Speed {(kineticJumpSpeedBonus > 0 ? kineticJumpSpeedBonus : mercurialJumpSpeedBonus > 0 ? mercurialJumpSpeedBonus : "") + (kineticJumpSpeedBonus > 0 || mercurialJumpSpeedBonus > 0 ? "hx" : "0hx")}</div>
           <div className={styles.horizontalLabel} style={{ color: '#38761d', fontWeight: 'bold' }}>Jump Amount {kineticJumpAmountBonus > 0 ? kineticJumpAmountBonus : mercurialJumpAmountBonus > 0 ? mercurialJumpAmountBonus : "0"}</div>
@@ -2719,6 +2746,25 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                     return (
                       <span style={{ fontWeight: 'normal', color: '#000' }}>
                         When you Damage an enemy, <b><i style={{ color: '#38761d' }}>Move</i></b> <b>[{moveDistance}]</b>hx
+                      </span>
+                    );
+                  })()
+                : sheet?.species === 'Avenoch'
+                ? (() => {
+                    const moveAfterCritDots = sheet?.speciesCardDots?.[0] || [false, false, false];
+                    const moveWhenHitDots = sheet?.speciesCardDots?.[1] || [false, false, false];
+                    const moveAfterCrit = 2 + moveAfterCritDots.filter(Boolean).length * 2;
+                    const moveWhenHit = moveWhenHitDots.filter(Boolean).length;
+                    const hasWhenHit = moveWhenHit > 0;
+                    
+                    return (
+                      <span style={{ fontWeight: 'normal', color: '#000' }}>
+                        <b><i style={{ color: '#38761d' }}>Move</i></b> <b>[{moveAfterCrit}]</b>hx after a Crit on an <b><i style={{ color: '#990000' }}>Attack</i></b>
+                        {hasWhenHit && (
+                          <>
+                            ; <b><i style={{ color: '#38761d' }}>Move</i></b> <b>[{moveWhenHit}]</b>hx when hit by a <b><i style={{ color: '#351c75' }}>Strike</i></b>
+                          </>
+                        )}
                       </span>
                     );
                   })()
@@ -3870,57 +3916,59 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
             animation: 'fadeIn 0.2s ease-out'
           }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              {/* Current HP Section */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
-                <span style={{ fontWeight: 'bold', minWidth: '120px', fontSize: '14px' }}>Current Hit Points:</span>
-                <button
-                  className={styles.redMinusButton}
-                  style={{ width: '26px', height: '26px', fontSize: '14px' }}
-                  onClick={() => {
-                    const newValue = Math.max(0, currentHitPoints - 1);
-                    setCurrentHitPoints(newValue);
-                    handleAutoSave({ currentHitPoints: newValue });
-                  }}
-                >
-                  −
-                </button>
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  pattern="[0-9]*"
-                  value={currentHitPoints}
-                  onChange={(e) => {
-                    const val = e.target.value.replace(/[^0-9]/g, '');
-                    const newValue = Math.max(0, parseInt(val) || 0);
-                    setCurrentHitPoints(newValue);
-                    handleAutoSave({ currentHitPoints: newValue });
-                  }}
-                  style={{
-                    minWidth: '40px',
-                    width: '50px',
-                    textAlign: 'center',
-                    fontWeight: 'bold',
-                    border: '1px solid #ccc',
-                    borderRadius: '4px',
-                    padding: '4px',
-                    MozAppearance: 'textfield',
-                  }}
-                  autoComplete="off"
-                />
-                <button
-                  className={styles.greenPlusButton}
-                  style={{ width: '26px', height: '26px', fontSize: '14px' }}
-                  onClick={() => {
-                    const newValue = currentHitPoints + 1;
-                    setCurrentHitPoints(newValue);
-                    handleAutoSave({ currentHitPoints: newValue });
-                  }}
-                >
-                  +
-                </button>
+              {/* Current HP Section - Top Row */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <span style={{ fontWeight: 'bold', fontSize: '14px' }}>Current Hit Points:</span>
+                  <button
+                    className={styles.redMinusButton}
+                    style={{ width: '26px', height: '26px', fontSize: '14px' }}
+                    onClick={() => {
+                      const newValue = Math.max(0, currentHitPoints - 1);
+                      setCurrentHitPoints(newValue);
+                      handleAutoSave({ currentHitPoints: newValue });
+                    }}
+                  >
+                    −
+                  </button>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    value={currentHitPoints}
+                    onChange={(e) => {
+                      const val = e.target.value.replace(/[^0-9]/g, '');
+                      const newValue = Math.max(0, parseInt(val) || 0);
+                      setCurrentHitPoints(newValue);
+                      handleAutoSave({ currentHitPoints: newValue });
+                    }}
+                    style={{
+                      minWidth: '40px',
+                      width: '50px',
+                      textAlign: 'center',
+                      fontWeight: 'bold',
+                      border: '1px solid #ccc',
+                      borderRadius: '4px',
+                      padding: '4px',
+                      MozAppearance: 'textfield',
+                    }}
+                    autoComplete="off"
+                  />
+                  <button
+                    className={styles.greenPlusButton}
+                    style={{ width: '26px', height: '26px', fontSize: '14px' }}
+                    onClick={() => {
+                      const newValue = currentHitPoints + 1;
+                      setCurrentHitPoints(newValue);
+                      handleAutoSave({ currentHitPoints: newValue });
+                    }}
+                  >
+                    +
+                  </button>
+                </div>
 
-                {/* Add/Subtract Section */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '3px', marginLeft: '8px' }}>
+                {/* Add/Subtract Section - Top Right */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
                   <input
                     type="text"
                     inputMode="numeric"
@@ -3964,12 +4012,33 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                 </div>
               </div>
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ fontWeight: 'bold', minWidth: '120px' }}>Max Hit Points:</span>
-                <span style={{ minWidth: '40px', textAlign: 'center' }}>{charClass === "Exospecialist" ? maxHitPoints + 20 + aeronautHitPointsBonus + brawlerHitPointsBonus + dreadnaughtHitPointsBonus + spectreHitPointsBonus : maxHitPoints}</span>
+              {/* Max HP Section - Bottom Row */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ fontWeight: 'bold', fontSize: '14px' }}>Max Hit Points:</span>
+                  <span style={{ minWidth: '40px', textAlign: 'center' }}>
+                    {charClass === "Exospecialist" 
+                      ? maxHitPoints + 20 + aeronautHitPointsBonus + brawlerHitPointsBonus + dreadnaughtHitPointsBonus + spectreHitPointsBonus + avenochHitPointsBonus
+                      : maxHitPoints + avenochHitPointsBonus}
+                  </span>
+                </div>
+                <button
+                  className={styles.greenPlusButton}
+                  style={{ padding: '6px 36px', fontSize: '14px', whiteSpace: 'nowrap' }}
+                  onClick={() => {
+                    const maxHP = charClass === "Exospecialist" 
+                      ? maxHitPoints + 20 + aeronautHitPointsBonus + brawlerHitPointsBonus + dreadnaughtHitPointsBonus + spectreHitPointsBonus + avenochHitPointsBonus
+                      : maxHitPoints + avenochHitPointsBonus;
+                    setCurrentHitPoints(maxHP);
+                    handleAutoSave({ currentHitPoints: maxHP });
+                  }}
+                  title="Full Heal"
+                >
+                  Full Heal
+                </button>
               </div>
 
-              <hr style={{ margin: '8px 0', border: '1px solid #eee' }} />
+              <hr style={{ margin: '0px 0', border: '1px solid #eee' }} />
 
             {/* Death Count Section - Centered, in black bar, white font, dots turn black when selected */}
             <div style={{
@@ -4048,7 +4117,9 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
             }
           }}
         >
-          hp: {currentHitPoints}/{charClass === "Exospecialist" ? maxHitPoints + 20 + aeronautHitPointsBonus + brawlerHitPointsBonus + dreadnaughtHitPointsBonus + spectreHitPointsBonus : maxHitPoints}
+          hp: {currentHitPoints}/{charClass === "Exospecialist" 
+            ? maxHitPoints + 20 + aeronautHitPointsBonus + brawlerHitPointsBonus + dreadnaughtHitPointsBonus + spectreHitPointsBonus + avenochHitPointsBonus
+            : maxHitPoints + avenochHitPointsBonus}
         </button>
       </div>
 

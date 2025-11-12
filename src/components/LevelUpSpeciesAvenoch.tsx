@@ -31,9 +31,8 @@ const LevelUpSpeciesAvenoch: React.FC<LevelUpSpeciesAvenochProps> = ({
   
   // Avenoch species card dots default structure
   const defaultAvenochDots = [ 
-    [false, false, false], // Move: +2hx (3 dots)
-    [false, false],        // +1 Crit (2 dots)
-    [false, false, false], // Attack Range: +2hx (3 dots)
+    [false, false, false], // Move: +2hx after Crit (3 dots)
+    [false, false, false], // Move: +1hx when hit by Strike (3 dots)
     [false, false, false], // Technique: +2hx Range (3 dots)
     [false],               // Technique: -1 Cooldown (1 dot)
     [false, false, false], // Hit Points: +5 (3 dots)
@@ -67,6 +66,25 @@ const LevelUpSpeciesAvenoch: React.FC<LevelUpSpeciesAvenochProps> = ({
     return speciesCardDots.map(row => Array.isArray(row) ? [...row] : []);
   };
 
+  // Helper function to calculate HP bonus from dots
+  const calculateHPBonus = (dots: boolean[][]): number => {
+    const hp5Dots = dots[4] || [];
+    const hp10Dots = dots[5] || [];
+    const hp15Dots = dots[6] || [];
+    
+    const hp5Bonus = hp5Dots.filter(Boolean).length * 5;
+    const hp10Bonus = hp10Dots.filter(Boolean).length * 10;
+    const hp15Bonus = (hp15Dots[0] ? 15 : 0);
+    
+    return hp5Bonus + hp10Bonus + hp15Bonus;
+  };
+
+  // Helper function to calculate Speed bonus from dots
+  const calculateSpeedBonus = (dots: boolean[][]): number => {
+    const speedDots = dots[7] || [];
+    return speedDots.filter(Boolean).length;
+  };
+
   // Save to sheet and localStorage
   const persistSpeciesCardDots = (newDots: boolean[][], spSpentDelta: number = 0, xpSpentDelta: number = 0) => {
     let newSpSpent = spSpent + spSpentDelta;
@@ -89,7 +107,12 @@ const LevelUpSpeciesAvenoch: React.FC<LevelUpSpeciesAvenochProps> = ({
     setXpSpent(newXpSpent);
     
     if (sheet && onAutoSave) {
-      onAutoSave({ speciesCardDots: newDots, spSpent: newSpSpent, xpSpent: newXpSpent });
+      // Only update dots and XP/SP, don't modify HP
+      onAutoSave({ 
+        speciesCardDots: newDots, 
+        spSpent: newSpSpent, 
+        xpSpent: newXpSpent
+      });
     }
   };
 
@@ -104,33 +127,32 @@ const LevelUpSpeciesAvenoch: React.FC<LevelUpSpeciesAvenochProps> = ({
             <div style={{ fontWeight: 'bold', color: '#0b5394', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Feature</u></div>
             <span style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
               {generateFirstInFlightJSX({
-                crit: safeGetDotsArray(1).filter(Boolean).length,
-                range: safeGetDotsArray(2).filter(Boolean).length * 2,
                 move: 2 + safeGetDotsArray(0).filter(Boolean).length * 2,
+                moveWhenHit: safeGetDotsArray(1).filter(Boolean).length,
               })}
             </span>
           </div>
 
-          {/* Move and Crit Table */}
+          {/* Move Table */}
           <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px', marginBottom: '16px' }}>
             <div style={{
               display: 'grid',
               gridTemplateColumns: '1fr 24px 24px 24px',
-              gridTemplateRows: 'repeat(5, auto)',
+              gridTemplateRows: 'repeat(4, auto)',
               columnGap: '6px',
               rowGap: '2px',
               alignItems: 'start',
               width: '100%',
               paddingLeft: '4px'
             }}>
-              {/* Row 1: XP header for Move */}
+              {/* Row 1: XP header for Move after Crit */}
               <span></span>
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>4xp</span>
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>6xp</span>
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>10xp</span>
               
-              {/* Row 2: Move +2hx dots */}
-              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}><b><i style={{ color: '#38761d' }}>Move</i></b> +2hx</span>
+              {/* Row 2: Move +2hx after Crit dots */}
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}><b><i style={{ color: '#38761d' }}>Move</i></b> +2hx after Crit</span>
               {[0,1,2].map(idx => {
                 const arr = safeGetDotsArray(0);
                 const canCheck = idx === 0 || arr.slice(0, idx).every(Boolean);
@@ -170,20 +192,20 @@ const LevelUpSpeciesAvenoch: React.FC<LevelUpSpeciesAvenochProps> = ({
                 );
               })}
 
-              {/* Row 3: XP header for Crit */}
+              {/* Row 3: XP header for Move when hit by Strike */}
               <span></span>
-              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>3xp</span>
-              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>5xp</span>
-              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>4xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>6xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>10xp</span>
               
-              {/* Row 4: +1 Crit dots */}
-              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1 Crit</span>
-              {[0,1].map(idx => {
+              {/* Row 4: Move +1hx when hit by Strike dots */}
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}><b><i style={{ color: '#38761d' }}>Move</i></b> +1hx when hit by a <b><i style={{ color: '#351c75' }}>Strike</i></b></span>
+              {[0,1,2].map(idx => {
                 const arr = safeGetDotsArray(1);
                 const canCheck = idx === 0 || arr.slice(0, idx).every(Boolean);
                 const rightmostChecked = arr.lastIndexOf(true);
                 const canUncheck = arr[idx] && idx === rightmostChecked;
-                const xpCosts = [3, 5];
+                const xpCosts = [4, 6, 10];
                 return (
                   <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
                     <span
@@ -216,16 +238,37 @@ const LevelUpSpeciesAvenoch: React.FC<LevelUpSpeciesAvenochProps> = ({
                   </span>
                 );
               })}
-              <span></span>
+            </div>
+          </div>
 
-              {/* Row 1: XP header */}
+          {/* Technique Section */}
+          <div style={{ color: '#bf9000', fontWeight: 'bold', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '12px', marginTop: '20px' }}>
+            <div style={{ fontWeight: 'bold', color: '#bf9000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Technique</u></div>
+            <span style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
+              {generateAvianGazeJSX(sheet?.speciesCardDots)}
+            </span>
+          </div>
+
+          {/* Technique Upgrades Table */}
+          <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px', marginBottom: '16px' }}>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 24px 24px 24px',
+              gridTemplateRows: 'repeat(4, auto)',
+              columnGap: '6px',
+              rowGap: '2px',
+              alignItems: 'start',
+              width: '100%',
+              paddingLeft: '4px'
+            }}>
+              {/* Row 1: XP header for Range */}
               <span></span>
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>4xp</span>
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>6xp</span>
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>10xp</span>
               
-              {/* Row 2: +2hx Attack Range dots */}
-              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+2hx <b><i style={{ color: '#990000' }}>Attack</i></b> Range</span>
+              {/* Row 2: +2hx Range dots */}
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+2hx Range</span>
               {[0,1,2].map(idx => {
                 const arr = safeGetDotsArray(2);
                 const canCheck = idx === 0 || arr.slice(0, idx).every(Boolean);
@@ -264,75 +307,6 @@ const LevelUpSpeciesAvenoch: React.FC<LevelUpSpeciesAvenochProps> = ({
                   </span>
                 );
               })}
-            </div>
-          </div>
-
-          {/* Technique Section */}
-          <div style={{ color: '#0b5394', fontWeight: 'bold', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '12px', marginTop: '20px' }}>
-            <div style={{ fontWeight: 'bold', color: '#0b5394', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Technique</u></div>
-            <span style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
-              {generateAvianGazeJSX(sheet?.speciesCardDots)}
-            </span>
-          </div>
-
-          {/* Technique Upgrades Table */}
-          <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px', marginBottom: '16px' }}>
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: '1fr 24px 24px 24px',
-              gridTemplateRows: 'repeat(4, auto)',
-              columnGap: '6px',
-              rowGap: '2px',
-              alignItems: 'start',
-              width: '100%',
-              paddingLeft: '4px'
-            }}>
-              {/* Row 1: XP header for Range */}
-              <span></span>
-              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>4xp</span>
-              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>6xp</span>
-              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>10xp</span>
-              
-              {/* Row 2: +2hx Range dots */}
-              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+2hx Range</span>
-              {[0,1,2].map(idx => {
-                const arr = safeGetDotsArray(3);
-                const canCheck = idx === 0 || arr.slice(0, idx).every(Boolean);
-                const rightmostChecked = arr.lastIndexOf(true);
-                const canUncheck = arr[idx] && idx === rightmostChecked;
-                const xpCosts = [4, 6, 10];
-                return (
-                  <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
-                    <span
-                      onClick={() => {
-                        if (!arr[idx] && canCheck) {
-                          const newDots = safeCloneSpeciesCardDots();
-                          for (let j = 0; j <= idx; ++j) newDots[3][j] = true;
-                          let delta = 0;
-                          for (let j = 0; j <= idx; ++j) if (!arr[j]) delta += xpCosts[j];
-                          persistSpeciesCardDots(newDots, 0, delta);
-                        } else if (arr[idx] && canUncheck) {
-                          const newDots = safeCloneSpeciesCardDots();
-                          for (let j = idx; j < arr.length; ++j) newDots[3][j] = false;
-                          let delta = 0;
-                          for (let j = idx; j < arr.length; ++j) if (arr[j]) delta -= xpCosts[j];
-                          persistSpeciesCardDots(newDots, 0, delta);
-                        }
-                      }}
-                      style={{
-                        width: '15px',
-                        height: '15px',
-                        border: '2px solid #000',
-                        borderRadius: '50%',
-                        display: 'block',
-                        background: arr[idx] ? '#000' : '#fff',
-                        cursor: (canCheck && !arr[idx]) || canUncheck ? 'pointer' : 'not-allowed',
-                        transition: 'background 0.2s'
-                      }}
-                    ></span>
-                  </span>
-                );
-              })}
 
               {/* Row 3: XP header for Cooldown */}
               <span></span>
@@ -341,9 +315,9 @@ const LevelUpSpeciesAvenoch: React.FC<LevelUpSpeciesAvenochProps> = ({
               <span></span>
               
               {/* Row 4: -1 Cooldown dot */}
-              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>-1 Cooldown</span>
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>-1 <i>Cooldown</i></span>
               {[0].map(idx => {
-                const arr = safeGetDotsArray(4);
+                const arr = safeGetDotsArray(3);
                 const xpCosts = [4];
                 return (
                   <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
@@ -351,10 +325,10 @@ const LevelUpSpeciesAvenoch: React.FC<LevelUpSpeciesAvenochProps> = ({
                       onClick={() => {
                         const newDots = safeCloneSpeciesCardDots();
                         if (!arr[idx]) {
-                          newDots[4][idx] = true;
+                          newDots[3][idx] = true;
                           persistSpeciesCardDots(newDots, 0, xpCosts[idx]);
                         } else {
-                          newDots[4][idx] = false;
+                          newDots[3][idx] = false;
                           persistSpeciesCardDots(newDots, 0, -xpCosts[idx]);
                         }
                       }}
@@ -381,7 +355,7 @@ const LevelUpSpeciesAvenoch: React.FC<LevelUpSpeciesAvenochProps> = ({
           <div style={{ color: '#990000', fontWeight: 'bold', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '12px', marginTop: '20px' }}>
             <div style={{ fontWeight: 'bold', color: '#990000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Hit Points</u></div>
             <span style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
-              <b><i>Starting Hit Points.</i></b> 35
+              <b><i>Starting <span style={{ color: '#990000' }}>Hit Points.</span></i></b> 35 +<b>[{calculateHPBonus(speciesCardDots)}]</b> <b><i style={{ color: '#990000' }}>Hit Points</i></b>.
             </span>
           </div>
 
@@ -404,13 +378,60 @@ const LevelUpSpeciesAvenoch: React.FC<LevelUpSpeciesAvenochProps> = ({
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>5xp</span>
               
               {/* Row 2: +5 Hit Points dots */}
-              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+5 Hit Points</span>
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+5 <b><i style={{ color: '#990000' }}>Hit Points</i></b></span>
               {[0,1,2].map(idx => {
-                const arr = safeGetDotsArray(5);
+                const arr = safeGetDotsArray(4);
                 const canCheck = idx === 0 || arr.slice(0, idx).every(Boolean);
                 const rightmostChecked = arr.lastIndexOf(true);
                 const canUncheck = arr[idx] && idx === rightmostChecked;
                 const xpCosts = [3, 4, 5];
+                return (
+                  <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
+                    <span
+                      onClick={() => {
+                        if (!arr[idx] && canCheck) {
+                          const newDots = safeCloneSpeciesCardDots();
+                          for (let j = 0; j <= idx; ++j) newDots[4][j] = true;
+                          let delta = 0;
+                          for (let j = 0; j <= idx; ++j) if (!arr[j]) delta += xpCosts[j];
+                          persistSpeciesCardDots(newDots, 0, delta);
+                        } else if (arr[idx] && canUncheck) {
+                          const newDots = safeCloneSpeciesCardDots();
+                          for (let j = idx; j < arr.length; ++j) newDots[4][j] = false;
+                          let delta = 0;
+                          for (let j = idx; j < arr.length; ++j) if (arr[j]) delta -= xpCosts[j];
+                          persistSpeciesCardDots(newDots, 0, delta);
+                        }
+                      }}
+                      style={{
+                        width: '15px',
+                        height: '15px',
+                        border: '2px solid #000',
+                        borderRadius: '50%',
+                        display: 'block',
+                        background: arr[idx] ? '#000' : '#fff',
+                        cursor: (canCheck && !arr[idx]) || canUncheck ? 'pointer' : 'not-allowed',
+                        transition: 'background 0.2s'
+                      }}
+                    ></span>
+                  </span>
+                );
+              })}
+
+              {/* Row 3: XP header for +10 HP */}
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>7xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>9xp</span>
+              <span></span>
+              
+              {/* Row 4: +10 Hit Points dots */}
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+10 <b><i style={{ color: '#990000' }}>Hit Points</i></b></span>
+              {[0,1].map(idx => {
+                const arr = safeGetDotsArray(5);
+                const canCheck = idx === 0 || arr.slice(0, idx).every(Boolean);
+                const rightmostChecked = arr.lastIndexOf(true);
+                const canUncheck = arr[idx] && idx === rightmostChecked;
+                const xpCosts = [7, 9];
                 return (
                   <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
                     <span
@@ -443,53 +464,6 @@ const LevelUpSpeciesAvenoch: React.FC<LevelUpSpeciesAvenochProps> = ({
                   </span>
                 );
               })}
-
-              {/* Row 3: XP header for +10 HP */}
-              <span></span>
-              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>7xp</span>
-              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>9xp</span>
-              <span></span>
-              
-              {/* Row 4: +10 Hit Points dots */}
-              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+10 Hit Points</span>
-              {[0,1].map(idx => {
-                const arr = safeGetDotsArray(6);
-                const canCheck = idx === 0 || arr.slice(0, idx).every(Boolean);
-                const rightmostChecked = arr.lastIndexOf(true);
-                const canUncheck = arr[idx] && idx === rightmostChecked;
-                const xpCosts = [7, 9];
-                return (
-                  <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
-                    <span
-                      onClick={() => {
-                        if (!arr[idx] && canCheck) {
-                          const newDots = safeCloneSpeciesCardDots();
-                          for (let j = 0; j <= idx; ++j) newDots[6][j] = true;
-                          let delta = 0;
-                          for (let j = 0; j <= idx; ++j) if (!arr[j]) delta += xpCosts[j];
-                          persistSpeciesCardDots(newDots, 0, delta);
-                        } else if (arr[idx] && canUncheck) {
-                          const newDots = safeCloneSpeciesCardDots();
-                          for (let j = idx; j < arr.length; ++j) newDots[6][j] = false;
-                          let delta = 0;
-                          for (let j = idx; j < arr.length; ++j) if (arr[j]) delta -= xpCosts[j];
-                          persistSpeciesCardDots(newDots, 0, delta);
-                        }
-                      }}
-                      style={{
-                        width: '15px',
-                        height: '15px',
-                        border: '2px solid #000',
-                        borderRadius: '50%',
-                        display: 'block',
-                        background: arr[idx] ? '#000' : '#fff',
-                        cursor: (canCheck && !arr[idx]) || canUncheck ? 'pointer' : 'not-allowed',
-                        transition: 'background 0.2s'
-                      }}
-                    ></span>
-                  </span>
-                );
-              })}
               <span></span>
 
               {/* Row 5: XP header for +15 HP */}
@@ -499,9 +473,9 @@ const LevelUpSpeciesAvenoch: React.FC<LevelUpSpeciesAvenochProps> = ({
               <span></span>
               
               {/* Row 6: +15 Hit Points dot */}
-              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+15 Hit Points</span>
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+15 <b><i style={{ color: '#990000' }}>Hit Points</i></b></span>
               {[0].map(idx => {
-                const arr = safeGetDotsArray(7);
+                const arr = safeGetDotsArray(6);
                 const xpCosts = [16];
                 return (
                   <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
@@ -509,10 +483,10 @@ const LevelUpSpeciesAvenoch: React.FC<LevelUpSpeciesAvenochProps> = ({
                       onClick={() => {
                         const newDots = safeCloneSpeciesCardDots();
                         if (!arr[idx]) {
-                          newDots[7][idx] = true;
+                          newDots[6][idx] = true;
                           persistSpeciesCardDots(newDots, 0, xpCosts[idx]);
                         } else {
-                          newDots[7][idx] = false;
+                          newDots[6][idx] = false;
                           persistSpeciesCardDots(newDots, 0, -xpCosts[idx]);
                         }
                       }}
@@ -539,7 +513,7 @@ const LevelUpSpeciesAvenoch: React.FC<LevelUpSpeciesAvenochProps> = ({
           <div style={{ color: '#38761d', fontWeight: 'bold', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '12px', marginTop: '20px' }}>
             <div style={{ fontWeight: 'bold', color: '#38761d', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Movement</u></div>
             <span style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
-              <b><i>Starting Speed.</i></b> 6hx.
+              <b><i>Starting <span style={{ color: '#38761d' }}>Speed.</span></i></b> 6hx +<b>[{calculateSpeedBonus(speciesCardDots)}]</b>hx.
             </span>
           </div>
 
@@ -562,9 +536,9 @@ const LevelUpSpeciesAvenoch: React.FC<LevelUpSpeciesAvenochProps> = ({
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>12xp</span>
               
               {/* Row 2: +1 Speed dots */}
-              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1 Speed</span>
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1hx <b><i><span style={{ color: '#38761d' }}>Speed</span></i></b></span>
               {[0,1,2].map(idx => {
-                const arr = safeGetDotsArray(8);
+                const arr = safeGetDotsArray(7);
                 const canCheck = idx === 0 || arr.slice(0, idx).every(Boolean);
                 const rightmostChecked = arr.lastIndexOf(true);
                 const canUncheck = arr[idx] && idx === rightmostChecked;
@@ -575,13 +549,13 @@ const LevelUpSpeciesAvenoch: React.FC<LevelUpSpeciesAvenochProps> = ({
                       onClick={() => {
                         if (!arr[idx] && canCheck) {
                           const newDots = safeCloneSpeciesCardDots();
-                          for (let j = 0; j <= idx; ++j) newDots[8][j] = true;
+                          for (let j = 0; j <= idx; ++j) newDots[7][j] = true;
                           let delta = 0;
                           for (let j = 0; j <= idx; ++j) if (!arr[j]) delta += xpCosts[j];
                           persistSpeciesCardDots(newDots, 0, delta);
                         } else if (arr[idx] && canUncheck) {
                           const newDots = safeCloneSpeciesCardDots();
-                          for (let j = idx; j < arr.length; ++j) newDots[8][j] = false;
+                          for (let j = idx; j < arr.length; ++j) newDots[7][j] = false;
                           let delta = 0;
                           for (let j = idx; j < arr.length; ++j) if (arr[j]) delta -= xpCosts[j];
                           persistSpeciesCardDots(newDots, 0, delta);
@@ -607,63 +581,70 @@ const LevelUpSpeciesAvenoch: React.FC<LevelUpSpeciesAvenochProps> = ({
           {/* Perks Section */}
           <div style={{ color: '#000', fontWeight: 'bold', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '12px', marginTop: '20px' }}>
             <div style={{ fontWeight: 'bold', color: '#000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Perks</u></div>
-            <span style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
-              <b><i>Skills.</i></b> Awareness +2<br/>
-              <b><i>Languages.</i></b> Avenoch
-            </span>
           </div>
 
-          {/* Keen Eyes Perk */}
-          <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px', marginBottom: '16px' }}>
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: '1fr 24px',
-              gridTemplateRows: 'repeat(2, auto)',
-              columnGap: '6px',
-              rowGap: '2px',
-              alignItems: 'start',
-              width: '100%',
-              paddingLeft: '4px'
+          {/* Skills */}
+          <div style={{ fontSize: '1em', color: '#000', marginBottom: '6px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <i><b>Skills.</b> Awareness</i> +2
+          </div>
+          <div style={{ fontSize: '1em', color: '#000', marginBottom: '6px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <i><b>Languages.</b> Avenoch</i>
+          </div>
+
+          {/* Perks SP progression table */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 24px 24px 24px',
+            gridTemplateRows: 'auto auto',
+            columnGap: '6px',
+            rowGap: '2px',
+            alignItems: 'start',
+            marginTop: '-12px',
+            marginBottom: '2px',
+            width: '100%',
+            paddingLeft: '4px'
+          }}>
+            {/* Row 1: Empty cells and 11sp header */}
+            <span></span>
+            <span></span>
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>11sp</span>
+            {/* Row 2: Keen Eyes text and dot */}
+            <div style={{ 
+              fontSize: '1em', 
+              fontFamily: 'Arial, Helvetica, sans-serif', 
+              textAlign: 'left',
+              paddingRight: '8px',
+              lineHeight: '1.2',
+              gridColumn: '1 / 4'
             }}>
-              {/* Row 1: SP header */}
-              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'left' }}>
-                <b><i>Keen Eyes.</i></b> You are naturally adept at being aware of your visual surroundings, picking up on subtle patterns in the tapestry of the situation, or otherwise being highly observant. Gain an advantage on related skill rolls using your sight.
-              </span>
-              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>11sp</span>
-              
-              {/* Row 2: Keen Eyes dot */}
-              <span></span>
-              {[0].map(idx => {
-                const arr = safeGetDotsArray(9);
-                const spCosts = [11];
-                return (
-                  <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
-                    <span
-                      onClick={() => {
-                        const newDots = safeCloneSpeciesCardDots();
-                        if (!arr[idx]) {
-                          newDots[9][idx] = true;
-                          persistSpeciesCardDots(newDots, spCosts[idx], 0);
-                        } else {
-                          newDots[9][idx] = false;
-                          persistSpeciesCardDots(newDots, -spCosts[idx], 0);
-                        }
-                      }}
-                      style={{
-                        width: '15px',
-                        height: '15px',
-                        border: '2px solid #000',
-                        borderRadius: '50%',
-                        display: 'block',
-                        background: arr[idx] ? '#000' : '#fff',
-                        cursor: 'pointer',
-                        transition: 'background 0.2s'
-                      }}
-                    ></span>
-                  </span>
-                );
-              })}
+              <b><i style={{ color: '#6db857', fontSize: '1em' }}>Keen Eyes.</i></b> You are naturally adept at being aware of your visual surroundings, picking up on subtle patterns in the tapestry of the situation, or otherwise being highly observant. Gain an advantage on related skill rolls using your sight.
             </div>
+            <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start' }}>
+              <span
+                onClick={() => {
+                  const newDots = safeCloneSpeciesCardDots();
+                  const arr = safeGetDotsArray(8);
+                  if (!arr[0]) {
+                    newDots[8][0] = true;
+                    persistSpeciesCardDots(newDots, 11, 0);
+                  } else {
+                    newDots[8][0] = false;
+                    persistSpeciesCardDots(newDots, -11, 0);
+                  }
+                }}
+                style={{
+                  width: '15px',
+                  height: '15px',
+                  border: '2px solid #000',
+                  borderRadius: '50%',
+                  display: 'block',
+                  background: safeGetDotsArray(8)[0] ? '#000' : '#fff',
+                  cursor: 'pointer',
+                  transition: 'background 0.2s'
+                }}
+              ></span>
+            </span>
           </div>
 
         </div>
