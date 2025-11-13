@@ -75,6 +75,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
   // Local state for XP/SP totals (mirroring CharacterSheet)
   const [xpTotal, setXpTotal] = useState(sheet?.xpTotal ?? 0);
   const [spTotal, setSpTotal] = useState(sheet?.spTotal ?? 0);
+  const [maxHitPoints, setMaxHitPoints] = useState(sheet?.maxHitPoints ?? 0);
   // Optionally, update local state if sheet changes
   const [spSpent, setSpSpent] = useState(sheet?.spSpent ?? 0);
   const [xpSpent, setXpSpent] = useState(sheet?.xpSpent ?? 0);
@@ -212,7 +213,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
     return effectiveHP;
   };
 
-  const effectiveMaxHP = calculateEffectiveMaxHP(sheet?.maxHitPoints ?? 0, charClass);
+  const effectiveMaxHP = calculateEffectiveMaxHP(maxHitPoints, charClass);
   
   // Background state
   const [background, setBackground] = useState(sheet?.background || "");
@@ -349,6 +350,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
   React.useEffect(() => {
     setXpTotal(sheet?.xpTotal ?? 0);
     setSpTotal(sheet?.spTotal ?? 0);
+    setMaxHitPoints(sheet?.maxHitPoints ?? 0);
     setSpSpent(sheet?.spSpent ?? 0);
     setXpSpent(sheet?.xpSpent ?? 0);
     setCurrentHitPoints(sheet?.currentHitPoints ?? sheet?.maxHitPoints ?? 0);
@@ -673,6 +675,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
           // Only update state if values have actually changed
           if (updatedSheet.xpTotal !== xpTotal) setXpTotal(updatedSheet.xpTotal ?? 0);
           if (updatedSheet.spTotal !== spTotal) setSpTotal(updatedSheet.spTotal ?? 0);
+          if (updatedSheet.maxHitPoints !== maxHitPoints) setMaxHitPoints(updatedSheet.maxHitPoints ?? 0);
           if (updatedSheet.xpSpent !== xpSpent) setXpSpent(updatedSheet.xpSpent ?? 0);
           if (updatedSheet.spSpent !== spSpent) setSpSpent(updatedSheet.spSpent ?? 0);
           if (updatedSheet.credits !== credits) setCredits(updatedSheet.credits ?? 0);
@@ -703,6 +706,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
         // Only update state if values have actually changed
         if (updatedSheet.xpTotal !== xpTotal) setXpTotal(updatedSheet.xpTotal ?? 0);
         if (updatedSheet.spTotal !== spTotal) setSpTotal(updatedSheet.spTotal ?? 0);
+        if (updatedSheet.maxHitPoints !== maxHitPoints) setMaxHitPoints(updatedSheet.maxHitPoints ?? 0);
         if (updatedSheet.xpSpent !== xpSpent) setXpSpent(updatedSheet.xpSpent ?? 0);
         if (updatedSheet.spSpent !== spSpent) setSpSpent(updatedSheet.spSpent ?? 0);
         if (updatedSheet.credits !== credits) setCredits(updatedSheet.credits ?? 0);
@@ -1965,7 +1969,83 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                     </tr>
                   </thead>
                   <tbody>
-                    {skillList && skillList.map(skill => (
+                    {(() => {
+                      // Helper function to get all booster sources for a skill
+                      const getBoosterSources = (skillName: string) => {
+                        const sources = [];
+                        
+                        // Class boosters
+                        if (charClass === "Chemist" && skillName === "Investigation") sources.push({ type: 'class', color: "rgba(114,17,49,0.5)" });
+                        if (charClass === "Coder" && skillName === "Oikomagic") sources.push({ type: 'class', color: "rgba(17,33,114,0.5)" });
+                        if (charClass === "Commander" && skillName === "Diplomacy") sources.push({ type: 'class', color: "rgba(113,114,17,0.5)" });
+                        if (charClass === "Contemplative" && skillName === "Awareness") sources.push({ type: 'class', color: "rgba(17,99,114,0.5)" });
+                        if (charClass === "Devout" && skillName === "Xenomagic") sources.push({ type: 'class', color: "rgba(107,17,114,0.5)" });
+                        if (charClass === "Elementalist" && skillName === "Xenomagic") sources.push({ type: 'class', color: "rgba(35,17,114,0.5)" });
+                        if (charClass === "Exospecialist" && skillName === "Athletics") sources.push({ type: 'class', color: "rgba(17,114,51,0.5)" });
+                        if (charClass === "Gunslinger" && skillName === "Deception") sources.push({ type: 'class', color: "rgba(78,114,17,0.5)" });
+                        if (charClass === "Technician" && skillName === "Technology") sources.push({ type: 'class', color: "rgba(114,72,17,0.5)" });
+                        
+                        // Subclass boosters
+                        if (subclass === "Anatomist" && skillName === "Medicine") sources.push({ type: 'subclass', color: "rgba(102,207,0,0.5)" });
+                        if (subclass === "Grenadier" && skillName === "Intimidation") sources.push({ type: 'subclass', color: "rgba(207,0,0,0.5)" });
+                        if (subclass === "Necro" && skillName === "Survival") sources.push({ type: 'subclass', color: "rgba(0,51,207,0.5)" });
+                        if (subclass === "Poisoner" && skillName === "Thievery") sources.push({ type: 'subclass', color: "rgba(207,118,0,0.5)" });
+                        if (subclass === "Coercive" && skillName === "Deception") sources.push({ type: 'subclass', color: "rgba(67,201,255,0.5)" });
+                        if (subclass === "Divinist" && skillName === "Investigation") sources.push({ type: 'subclass', color: "rgba(255,67,67,0.5)" });
+                        if (subclass === "Naturalist" && skillName === "Survival") sources.push({ type: 'subclass', color: "rgba(102,207,0,0.5)" });
+                        if (subclass === "Technologist" && skillName === "Technology") sources.push({ type: 'subclass', color: "rgba(140,67,255,0.5)" });
+                        if (subclass === "Beguiler" && skillName === "Deception") sources.push({ type: 'subclass', color: "rgba(31,33,206,0.5)" });
+                        if (subclass === "Galvanic" && skillName === "Athletics") sources.push({ type: 'subclass', color: "rgba(111,206,31,0.5)" });
+                        if (subclass === "Tactician" && skillName === "Awareness") sources.push({ type: 'subclass', color: "rgba(206,195,31,0.5)" });
+                        if (subclass === "Tyrant" && skillName === "Intimidation") sources.push({ type: 'subclass', color: "rgba(206,31,31,0.5)" });
+                        if (subclass === "Inertial" && skillName === "Diplomacy") sources.push({ type: 'subclass', color: "rgba(28,148,94,0.5)" });
+                        if (subclass === "Kinetic" && skillName === "Athletics") sources.push({ type: 'subclass', color: "rgba(123,148,28,0.5)" });
+                        if (subclass === "Mercurial" && skillName === "Acrobatics") sources.push({ type: 'subclass', color: "rgba(148,28,108,0.5)" });
+                        if (subclass === "Vectorial" && skillName === "Piloting") sources.push({ type: 'subclass', color: "rgba(83,28,148,0.5)" });
+                        if (subclass === "Astral" && skillName === "Medicine") sources.push({ type: 'subclass', color: "rgba(91,177,175,0.5)" });
+                        if (subclass === "Chaos" && skillName === "Intimidation") sources.push({ type: 'subclass', color: "rgba(177,91,108,0.5)" });
+                        if (subclass === "Order" && skillName === "Culture") sources.push({ type: 'subclass', color: "rgba(174,177,91,0.5)" });
+                        if (subclass === "Void" && skillName === "Stealth") sources.push({ type: 'subclass', color: "rgba(91,115,177,0.5)" });
+                        if (subclass === "Air" && skillName === "Acrobatics") sources.push({ type: 'subclass', color: "rgba(14,226,223,0.5)" });
+                        if (subclass === "Earth" && skillName === "Survival") sources.push({ type: 'subclass', color: "rgba(226,185,14,0.5)" });
+                        if (subclass === "Fire" && skillName === "Intimidation") sources.push({ type: 'subclass', color: "rgba(226,14,14,0.5)" });
+                        if (subclass === "Water" && skillName === "Medicine") sources.push({ type: 'subclass', color: "rgba(14,66,226,0.5)" });
+                        if (subclass === "Aeronaut" && skillName === "Piloting") sources.push({ type: 'subclass', color: "rgba(61,161,216,0.5)" });
+                        if (subclass === "Brawler" && skillName === "Survival") sources.push({ type: 'subclass', color: "rgba(216,165,61,0.5)" });
+                        if (subclass === "Dreadnaught" && skillName === "Intimidation") sources.push({ type: 'subclass', color: "rgba(216,61,160,0.5)" });
+                        if (subclass === "Spectre" && skillName === "Stealth") sources.push({ type: 'subclass', color: "rgba(106,61,216,0.5)" });
+                        if (subclass === "Ammo Coder" && skillName === "Oikomagic") sources.push({ type: 'subclass', color: "rgba(10,57,145,0.5)" });
+                        if (subclass === "Ordnancer" && skillName === "Athletics") sources.push({ type: 'subclass', color: "rgba(145,10,10,0.5)" });
+                        if (subclass === "Pistoleer" && skillName === "Thievery") sources.push({ type: 'subclass', color: "rgba(90,145,10,0.5)" });
+                        if (subclass === "Sniper" && skillName === "Stealth") sources.push({ type: 'subclass', color: "rgba(10,111,145,0.5)" });
+                        if (subclass === "Hacker" && skillName === "Computers") sources.push({ type: 'subclass', color: "rgba(92,87,184,0.5)" });
+                        if (subclass === "Junker" && skillName === "Thievery") sources.push({ type: 'subclass', color: "rgba(109,184,87,0.5)" });
+                        if (subclass === "Nanoboticist" && skillName === "Acrobatics") sources.push({ type: 'subclass', color: "rgba(87,184,176,0.5)" });
+                        if (subclass === "Tanker" && skillName === "Piloting") sources.push({ type: 'subclass', color: "rgba(184,87,139,0.5)" });
+                        
+                        // Species boosters
+                        if (species === "Avenoch" && skillName === "Awareness") sources.push({ type: 'species', color: "rgba(43,95,89,0.5)" });
+                        
+                        return sources;
+                      };
+                      
+                      // Helper function to get booster positions for a skill (handles overlaps)
+                      const getBoosterPositions = (skillName: string) => {
+                        const sources = getBoosterSources(skillName);
+                        if (sources.length === 0) return [];
+                        
+                        // Assign positions: first booster at position 2, second at position 3, third at position 4, etc.
+                        return sources.map((source, index) => ({
+                          position: 2 + index,
+                          color: source.color,
+                          type: source.type
+                        }));
+                      };
+                      
+                      return skillList && skillList.map(skill => {
+                        const boosterPositions = getBoosterPositions(skill);
+                        
+                        return (
                       <tr key={skill}>
                         <td style={{ 
                           fontSize: '0.92em', 
@@ -1987,6 +2067,14 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                             checked = true;
                           }
                           
+                          // Check if this position has a booster dot (handles overlaps)
+                          const boosterAtThisPosition = boosterPositions.find(bp => bp.position === i);
+                          if (boosterAtThisPosition) {
+                            checked = true;
+                          }
+                          
+                          // Legacy individual booster checks (kept for compatibility with color function below)
+                          // These are now superseded by the boosterPositions logic above
                           // Check for class-based automatic skill dots
                           const isChemistInvestigation = charClass === "Chemist" && skill === "Investigation" && i === 2;
                           const isCoderOikomagic = charClass === "Coder" && skill === "Oikomagic" && i === 2;
@@ -2142,8 +2230,12 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                           // Tanker Piloting booster always goes at position 2, same as class boosters
                           const isTankerPiloting = subclass === "Tanker" && skill === "Piloting" && i === 2;
 
+                          // Check for Avenoch Awareness species booster dot
+                          // Avenoch Awareness booster always goes at position 2, same as class boosters
+                          const isAvenochAwareness = species === "Avenoch" && skill === "Awareness" && i === 2;
 
-                          if (isChemistInvestigation || isCoderOikomagic || isCommanderDiplomacy || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine || isGrenadierIntimidation || isNecroSurvival || isPoisonerThievery || isCoerciveDeception || isBeguilerDeception || isDivinistInvestigation || isNaturalistSurvival || isTechnologistTechnology || isGalvanicAthletics || isTacticianAwareness || isTyrantIntimidation || isInertialDiplomacy || isKineticAthletics || isMercurialAcrobatics || isVectorialPiloting || isAstralMedicine || isChaosIntimidation || isOrderCulture || isVoidStealth || isAirAcrobatics || isEarthSurvival || isFireIntimidation || isWaterMedicine || isAeronautPiloting || isBrawlerSurvival || isDreadnaughtIntimidation || isSpectreStealth || isAmmoCoderOikomagic || isOrdnancerAthletics || isPistoleerThievery || isSniperStealth || isHackerComputers || isJunkerThievery || isNanoboticistAcrobatics || isTankerPiloting) {
+
+                          if (isChemistInvestigation || isCoderOikomagic || isCommanderDiplomacy || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine || isGrenadierIntimidation || isNecroSurvival || isPoisonerThievery || isCoerciveDeception || isBeguilerDeception || isDivinistInvestigation || isNaturalistSurvival || isTechnologistTechnology || isGalvanicAthletics || isTacticianAwareness || isTyrantIntimidation || isInertialDiplomacy || isKineticAthletics || isMercurialAcrobatics || isVectorialPiloting || isAstralMedicine || isChaosIntimidation || isOrderCulture || isVoidStealth || isAirAcrobatics || isEarthSurvival || isFireIntimidation || isWaterMedicine || isAeronautPiloting || isBrawlerSurvival || isDreadnaughtIntimidation || isSpectreStealth || isAmmoCoderOikomagic || isOrdnancerAthletics || isPistoleerThievery || isSniperStealth || isHackerComputers || isJunkerThievery || isNanoboticistAcrobatics || isTankerPiloting || isAvenochAwareness) {
                             checked = true; // Force third dot to be filled for class booster dots
                           }
 
@@ -2194,6 +2286,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                             if (isJunkerThievery) return "rgba(109,184,87,0.5)";
                             if (isNanoboticistAcrobatics) return "rgba(87,184,176,0.5)";
                             if (isTankerPiloting) return "rgba(184,87,139,0.5)";
+                            if (isAvenochAwareness) return "rgba(43,95,89,0.5)";
                             // Add other class colors here in the future
                             return "#d0d0d0"; // fallback color
                           };
@@ -2256,7 +2349,8 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                                     (subclass === "Hacker" && skill === "Computers") ||
                                     (subclass === "Junker" && skill === "Thievery") ||
                                     (subclass === "Nanoboticist" && skill === "Acrobatics") ||
-                                    (subclass === "Tanker" && skill === "Piloting")
+                                    (subclass === "Tanker" && skill === "Piloting") ||
+                                    (species === "Avenoch" && skill === "Awareness")
                                   ))
                               )) {
                                 spCostForThisDot += [1, 1, 2, 2, 3, 4, 5, 6, 8, 10][j];
@@ -2311,7 +2405,8 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                                     (subclass === "Hacker" && skill === "Computers") ||
                                     (subclass === "Junker" && skill === "Thievery") ||
                                     (subclass === "Nanoboticist" && skill === "Acrobatics") ||
-                                    (subclass === "Tanker" && skill === "Piloting")
+                                    (subclass === "Tanker" && skill === "Piloting") ||
+                                    (species === "Avenoch" && skill === "Awareness")
                                   ))
                               )) {
                                 spCostForThisDot += [1, 1, 2, 2, 3, 4, 5, 6, 8, 10][j];
@@ -2337,8 +2432,8 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                                   // Prevent clicking on locked columns for new characters
                                   if (isLockedColumn) return;
                                   
-                                  // Prevent clicking on class-based automatic skill dots
-                                  if (isChemistInvestigation || isCoderOikomagic || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isCommanderDiplomacy || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine || isGrenadierIntimidation || isNecroSurvival || isPoisonerThievery || isCoerciveDeception || isBeguilerDeception || isDivinistInvestigation || isNaturalistSurvival || isTechnologistTechnology || isGalvanicAthletics || isTacticianAwareness || isTyrantIntimidation || isInertialDiplomacy || isKineticAthletics || isMercurialAcrobatics || isVectorialPiloting || isAstralMedicine || isChaosIntimidation || isOrderCulture || isVoidStealth || isAirAcrobatics || isEarthSurvival || isFireIntimidation || isWaterMedicine || isAeronautPiloting || isBrawlerSurvival || isDreadnaughtIntimidation || isSpectreStealth || isAmmoCoderOikomagic || isOrdnancerAthletics || isPistoleerThievery|| isSniperStealth || isHackerComputers || isJunkerThievery || isNanoboticistAcrobatics) return;
+                                  // Prevent clicking on booster dots (handles all boosters including overlaps)
+                                  if (boosterAtThisPosition) return;
 
                                   // SP costs for each skill dot position: [1sp, 1sp, 2sp, 2sp, 3sp, 4sp, 5sp, 6sp, 8sp, 10sp]
                                   const spCosts = [1, 1, 2, 2, 3, 4, 5, 6, 8, 10];
@@ -2351,59 +2446,9 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                                       return true;
                                     }
                                     
-                                    // All booster dots are at position 2
-                                    if (position === 2) {
-                                      // Class booster dots
-                                      if (charClass === "Chemist" && skillName === "Investigation") return true;
-                                      if (charClass === "Coder" && skillName === "Oikomagic") return true;
-                                      if (charClass === "Contemplative" && skillName === "Awareness") return true;
-                                      if (charClass === "Devout" && skillName === "Xenomagic") return true;
-                                      if (charClass === "Elementalist" && skillName === "Xenomagic") return true;
-                                      if (charClass === "Exospecialist" && skillName === "Athletics") return true;
-                                      if (charClass === "Gunslinger" && skillName === "Deception") return true;
-                                      if (charClass === "Commander" && skillName === "Diplomacy") return true;
-                                      if (charClass === "Technician" && skillName === "Technology") return true;
-                                      
-                                      // Subclass booster dots
-                                      if (subclass === "Anatomist" && skillName === "Medicine") return true;
-                                      if (subclass === "Grenadier" && skillName === "Intimidation") return true;
-                                      if (subclass === "Necro" && skillName === "Survival") return true;
-                                      if (subclass === "Poisoner" && skillName === "Thievery") return true;
-                                      if (subclass === "Coercive" && skillName === "Deception") return true;
-                                      if (subclass === "Divinist" && skillName === "Investigation") return true;
-                                      if (subclass === "Naturalist" && skillName === "Survival") return true;
-                                      if (subclass === "Technologist" && skillName === "Technology") return true;
-                                      if (subclass === "Galvanic" && skillName === "Athletics") return true;
-                                      if (subclass === "Tactician" && skillName === "Awareness") return true;
-                                      if (subclass === "Beguiler" && skillName === "Deception") return true;
-                                      if (subclass === "Tyrant" && skillName === "Intimidation") return true;
-                                      if (subclass === "Inertial" && skillName === "Diplomacy") return true;
-                                      if (subclass === "Kinetic" && skillName === "Athletics") return true;
-                                      if (subclass === "Mercurial" && skillName === "Acrobatics") return true;
-                                      if (subclass === "Vectorial" && skillName === "Piloting") return true;
-                                      if (subclass === "Astral" && skillName === "Medicine") return true;
-                                      if (subclass === "Chaos" && skillName === "Intimidation") return true;
-                                      if (subclass === "Order" && skillName === "Culture") return true;
-                                      if (subclass === "Void" && skillName === "Stealth") return true;
-                                      if (subclass === "Air" && skillName === "Acrobatics") return true;
-                                      if (subclass === "Earth" && skillName === "Survival") return true;
-                                      if (subclass === "Fire" && skillName === "Intimidation") return true;
-                                      if (subclass === "Water" && skillName === "Medicine") return true;
-                                      if (subclass === "Aeronaut" && skillName === "Piloting") return true;
-                                      if (subclass === "Brawler" && skillName === "Survival") return true;
-                                      if (subclass === "Dreadnaught" && skillName === "Intimidation") return true;
-                                      if (subclass === "Spectre" && skillName === "Stealth") return true;
-                                      if (subclass === "Ammo Coder" && skillName === "Oikomagic") return true;
-                                      if (subclass === "Ordnancer" && skillName === "Athletics") return true;
-                                      if (subclass === "Pistoleer" && skillName === "Thievery") return true;
-                                      if (subclass === "Sniper" && skillName === "Stealth") return true;
-                                      if (subclass === "Hacker" && skillName === "Computers") return true;
-                                      if (subclass === "Junker" && skillName === "Thievery") return true;
-                                      if (subclass === "Nanoboticist" && skillName === "Acrobatics") return true;
-                                      if (subclass === "Tanker" && skillName === "Piloting") return true;
-                                    }
-                                    
-                                    return false;
+                                    // Check if this position has a booster dot (handles overlaps)
+                                    const skillBoosterPositions = getBoosterPositions(skillName);
+                                    return skillBoosterPositions.some(bp => bp.position === position);
                                   };
                                   
                                   const rightmostChecked = currentSkillDots.lastIndexOf(true);
@@ -2511,14 +2556,14 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                                   width: isMobile ? 14 : 18,
                                   height: isMobile ? 14 : 18,
                                   borderRadius: '50%',
-                                  border: (isChemistInvestigation || isCoderOikomagic || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isCommanderDiplomacy || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine || isGrenadierIntimidation || isNecroSurvival || isPoisonerThievery || isCoerciveDeception || isBeguilerDeception || isDivinistInvestigation || isNaturalistSurvival || isTechnologistTechnology || isGalvanicAthletics || isTacticianAwareness || isTyrantIntimidation || isInertialDiplomacy || isKineticAthletics || isMercurialAcrobatics || isVectorialPiloting || isAstralMedicine || isChaosIntimidation || isOrderCulture || isVoidStealth || isAirAcrobatics || isEarthSurvival || isFireIntimidation || isWaterMedicine || isAeronautPiloting || isBrawlerSurvival || isDreadnaughtIntimidation || isSpectreStealth || isAmmoCoderOikomagic || isOrdnancerAthletics|| isPistoleerThievery|| isSniperStealth|| isHackerComputers|| isJunkerThievery|| isNanoboticistAcrobatics|| isTankerPiloting) ? `2px solid ${classBoostColor}` : (isLockedColumn ? '2px solid #666' : '2px solid #000'),
-                                  background: checked ? ((isChemistInvestigation || isCoderOikomagic || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isCommanderDiplomacy || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine || isGrenadierIntimidation || isNecroSurvival || isPoisonerThievery || isCoerciveDeception || isBeguilerDeception || isDivinistInvestigation || isNaturalistSurvival || isTechnologistTechnology || isGalvanicAthletics || isTacticianAwareness || isTyrantIntimidation || isInertialDiplomacy || isKineticAthletics || isMercurialAcrobatics || isVectorialPiloting || isAstralMedicine || isChaosIntimidation || isOrderCulture || isVoidStealth || isAirAcrobatics || isEarthSurvival || isFireIntimidation || isWaterMedicine || isAeronautPiloting || isBrawlerSurvival || isDreadnaughtIntimidation || isSpectreStealth || isAmmoCoderOikomagic || isOrdnancerAthletics|| isPistoleerThievery|| isSniperStealth|| isHackerComputers|| isJunkerThievery|| isNanoboticistAcrobatics|| isTankerPiloting) ? classBoostColor : (isLockedColumn ? '#666' : '#000')) : '#fff',
-                                  cursor: (isLockedColumn || isChemistInvestigation || isCoderOikomagic || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isCommanderDiplomacy || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine || isGrenadierIntimidation || isNecroSurvival || isPoisonerThievery || isCoerciveDeception || isBeguilerDeception || isDivinistInvestigation || isNaturalistSurvival || isTechnologistTechnology || isGalvanicAthletics || isTacticianAwareness || isTyrantIntimidation || isInertialDiplomacy || isKineticAthletics || isMercurialAcrobatics || isVectorialPiloting || isAstralMedicine || isChaosIntimidation || isOrderCulture || isVoidStealth || isAirAcrobatics || isEarthSurvival || isFireIntimidation || isWaterMedicine || isAeronautPiloting || isBrawlerSurvival || isDreadnaughtIntimidation || isSpectreStealth || isAmmoCoderOikomagic || isOrdnancerAthletics|| isPistoleerThievery|| isSniperStealth|| isHackerComputers|| isJunkerThievery|| isNanoboticistAcrobatics|| isTankerPiloting) ? 'not-allowed' : (canAffordCheck || canUncheck ? 'pointer' : 'not-allowed'),
-                                  opacity: (isLockedColumn || isChemistInvestigation || isCoderOikomagic || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isCommanderDiplomacy || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine || isGrenadierIntimidation || isNecroSurvival || isPoisonerThievery || isCoerciveDeception || isBeguilerDeception || isDivinistInvestigation || isNaturalistSurvival || isTechnologistTechnology || isGalvanicAthletics || isTacticianAwareness || isTyrantIntimidation || isInertialDiplomacy || isKineticAthletics || isMercurialAcrobatics || isVectorialPiloting || isAstralMedicine || isChaosIntimidation || isOrderCulture || isVoidStealth || isAirAcrobatics || isEarthSurvival || isFireIntimidation || isWaterMedicine || isAeronautPiloting || isBrawlerSurvival || isDreadnaughtIntimidation || isSpectreStealth || isAmmoCoderOikomagic || isOrdnancerAthletics|| isPistoleerThievery|| isSniperStealth|| isHackerComputers|| isJunkerThievery|| isNanoboticistAcrobatics|| isTankerPiloting) ? 0.6 : (canAffordCheck || canUncheck ? 1 : 0.4),
+                                  border: (boosterAtThisPosition || isLockedColumn) ? `2px solid ${boosterAtThisPosition ? boosterAtThisPosition.color : '#666'}` : '2px solid #000',
+                                  background: checked ? (boosterAtThisPosition ? boosterAtThisPosition.color : (isLockedColumn ? '#666' : '#000')) : '#fff',
+                                  cursor: (isLockedColumn || boosterAtThisPosition) ? 'not-allowed' : (canAffordCheck || canUncheck ? 'pointer' : 'not-allowed'),
+                                  opacity: (isLockedColumn || boosterAtThisPosition) ? 0.6 : (canAffordCheck || canUncheck ? 1 : 0.4),
                                 }}
                                 title={
-                                  isChemistInvestigation || isCoderOikomagic || isCommanderDiplomacy || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine || isGrenadierIntimidation || isNecroSurvival || isPoisonerThievery || isCoerciveDeception || isBeguilerDeception || isDivinistInvestigation || isNaturalistSurvival || isTechnologistTechnology || isGalvanicAthletics || isTacticianAwareness || isTyrantIntimidation || isInertialDiplomacy || isKineticAthletics || isMercurialAcrobatics || isVectorialPiloting || isAstralMedicine || isChaosIntimidation || isOrderCulture || isVoidStealth || isAirAcrobatics || isEarthSurvival || isFireIntimidation || isWaterMedicine || isAeronautPiloting || isBrawlerSurvival || isDreadnaughtIntimidation || isSpectreStealth || isAmmoCoderOikomagic || isOrdnancerAthletics|| isPistoleerThievery|| isSniperStealth|| isHackerComputers|| isJunkerThievery|| isNanoboticistAcrobatics|| isTankerPiloting
-                                    ? 'Class bonus skill dot (cannot be changed)'
+                                  boosterAtThisPosition
+                                    ? `${boosterAtThisPosition.type.charAt(0).toUpperCase() + boosterAtThisPosition.type.slice(1)} bonus skill dot (cannot be changed)`
                                     : isLockedColumn 
                                     ? 'Starting skill dots (cannot be changed)'
                                     : (!checked && canCheck)
@@ -2530,7 +2575,9 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                           );
                         })}
                       </tr>
-                    ))}
+                        );
+                      });
+                    })()}
                   </tbody>
                 </table>
               </div>

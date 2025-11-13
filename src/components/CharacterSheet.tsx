@@ -401,7 +401,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
     : 0;
   
   const strikeDamage = sheet?.strikeDamage || "";
-  const maxHitPoints = sheet?.maxHitPoints || 0;
+  const [maxHitPoints, setMaxHitPoints] = useState(sheet?.maxHitPoints || 0);
   
   // Calculate Aeronaut hit points bonus
   const aeronautHitPointsBonus = sheet?.subclass === 'Aeronaut'
@@ -507,6 +507,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
         if (updatedSheet.chemTokens !== chemTokens) setChemTokens(updatedSheet.chemTokens ?? 0);
         if (updatedSheet.currentSummonHp !== currentSummonHp) setCurrentSummonHp(updatedSheet.currentSummonHp ?? 0);
         if (updatedSheet.maxSummonHp !== maxSummonHp) setMaxSummonHp(updatedSheet.maxSummonHp ?? 0);
+        if (updatedSheet.maxHitPoints !== maxHitPoints) setMaxHitPoints(updatedSheet.maxHitPoints ?? 0);
         if (updatedSheet.classFeature !== classFeature) setClassFeature(updatedSheet.classFeature || "");
         if (updatedSheet.portrait !== portraitUrl) setPortraitUrl(updatedSheet.portrait || null);
         if (updatedSheet.spSpent !== spSpent) setSpSpent(updatedSheet.spSpent ?? 0);
@@ -563,7 +564,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
       window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('character-updated', handleCharacterUpdate as EventListener);
     };
-  }, [sheet?.id, charClass, subclass, species, subspecies, credits, chemTokens]);
+  }, [sheet?.id, charClass, subclass, species, subspecies, credits, chemTokens, maxHitPoints]);
 
   const classOptions = [
     { label: "Chemist", value: "Chemist", color: "#721131" },
@@ -1952,78 +1953,100 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                 // Check if this is a new character without skill dots initialized
                 const isNewCharacter = !sheet || !sheet.hasFreeSkillStarterDots || !sheet.skillDots;
                 
+                // Helper function to get all booster sources for a skill
+                const getBoosterSources = (skillName: string) => {
+                  const sources = [];
+                  
+                  // Class boosters
+                  if (charClass === "Chemist" && skillName === "Investigation") sources.push({ type: 'class', color: "rgba(114,17,49,0.5)" });
+                  if (charClass === "Coder" && skillName === "Oikomagic") sources.push({ type: 'class', color: "rgba(17,33,114,0.5)" });
+                  if (charClass === "Commander" && skillName === "Diplomacy") sources.push({ type: 'class', color: "rgba(113,114,17,0.5)" });
+                  if (charClass === "Contemplative" && skillName === "Awareness") sources.push({ type: 'class', color: "rgba(17,99,114,0.5)" });
+                  if (charClass === "Devout" && skillName === "Xenomagic") sources.push({ type: 'class', color: "rgba(107,17,114,0.5)" });
+                  if (charClass === "Elementalist" && skillName === "Xenomagic") sources.push({ type: 'class', color: "rgba(35,17,114,0.5)" });
+                  if (charClass === "Exospecialist" && skillName === "Athletics") sources.push({ type: 'class', color: "rgba(17,114,51,0.5)" });
+                  if (charClass === "Gunslinger" && skillName === "Deception") sources.push({ type: 'class', color: "rgba(78,114,17,0.5)" });
+                  if (charClass === "Technician" && skillName === "Technology") sources.push({ type: 'class', color: "rgba(114,72,17,0.5)" });
+                  
+                  // Subclass boosters
+                  if (subclass === "Anatomist" && skillName === "Medicine") sources.push({ type: 'subclass', color: "rgba(102,207,0,0.5)" });
+                  if (subclass === "Grenadier" && skillName === "Intimidation") sources.push({ type: 'subclass', color: "rgba(207,0,0,0.5)" });
+                  if (subclass === "Necro" && skillName === "Survival") sources.push({ type: 'subclass', color: "rgba(0,51,207,0.5)" });
+                  if (subclass === "Poisoner" && skillName === "Thievery") sources.push({ type: 'subclass', color: "rgba(207,118,0,0.5)" });
+                  if (subclass === "Coercive" && skillName === "Deception") sources.push({ type: 'subclass', color: "rgba(67,201,255,0.5)" });
+                  if (subclass === "Divinist" && skillName === "Investigation") sources.push({ type: 'subclass', color: "rgba(255,67,67,0.5)" });
+                  if (subclass === "Naturalist" && skillName === "Survival") sources.push({ type: 'subclass', color: "rgba(102,207,0,0.5)" });
+                  if (subclass === "Technologist" && skillName === "Technology") sources.push({ type: 'subclass', color: "rgba(140,67,255,0.5)" });
+                  if (subclass === "Beguiler" && skillName === "Deception") sources.push({ type: 'subclass', color: "rgba(31,33,206,0.5)" });
+                  if (subclass === "Galvanic" && skillName === "Athletics") sources.push({ type: 'subclass', color: "rgba(111,206,31,0.5)" });
+                  if (subclass === "Tactician" && skillName === "Awareness") sources.push({ type: 'subclass', color: "rgba(206,195,31,0.5)" });
+                  if (subclass === "Tyrant" && skillName === "Intimidation") sources.push({ type: 'subclass', color: "rgba(206,31,195,0.5)" });
+                  if (subclass === "Inertial" && skillName === "Diplomacy") sources.push({ type: 'subclass', color: "rgba(28,148,94,0.5)" });
+                  if (subclass === "Kinetic" && skillName === "Athletics") sources.push({ type: 'subclass', color: "rgba(123,148,28,0.5)" });
+                  if (subclass === "Mercurial" && skillName === "Acrobatics") sources.push({ type: 'subclass', color: "rgba(148,28,108,0.5)" });
+                  if (subclass === "Vectorial" && skillName === "Piloting") sources.push({ type: 'subclass', color: "rgba(83,28,148,0.5)" });
+                  if (subclass === "Astral" && skillName === "Medicine") sources.push({ type: 'subclass', color: "rgba(91,177,175,0.5)" });
+                  if (subclass === "Chaos" && skillName === "Intimidation") sources.push({ type: 'subclass', color: "rgba(177,91,108,0.5)" });
+                  if (subclass === "Order" && skillName === "Culture") sources.push({ type: 'subclass', color: "rgba(174,177,91,0.5)" });
+                  if (subclass === "Void" && skillName === "Stealth") sources.push({ type: 'subclass', color: "rgba(91,115,177,0.5)" });
+                  if (subclass === "Air" && skillName === "Acrobatics") sources.push({ type: 'subclass', color: "rgba(14,226,223,0.5)" });
+                  if (subclass === "Earth" && skillName === "Survival") sources.push({ type: 'subclass', color: "rgba(226,185,14,0.5)" });
+                  if (subclass === "Fire" && skillName === "Intimidation") sources.push({ type: 'subclass', color: "rgba(226,14,14,0.5)" });
+                  if (subclass === "Water" && skillName === "Medicine") sources.push({ type: 'subclass', color: "rgba(14,66,226,0.5)" });
+                  if (subclass === "Aeronaut" && skillName === "Piloting") sources.push({ type: 'subclass', color: "rgba(61,161,216,0.5)" });
+                  if (subclass === "Brawler" && skillName === "Survival") sources.push({ type: 'subclass', color: "rgba(216,165,61,0.5)" });
+                  if (subclass === "Dreadnaught" && skillName === "Intimidation") sources.push({ type: 'subclass', color: "rgba(216,61,160,0.5)" });
+                  if (subclass === "Spectre" && skillName === "Stealth") sources.push({ type: 'subclass', color: "rgba(106,61,216,0.5)" });
+                  if (subclass === "Ammo Coder" && skillName === "Oikomagic") sources.push({ type: 'subclass', color: "rgba(10,57,145,0.5)" });
+                  if (subclass === "Ordnancer" && skillName === "Athletics") sources.push({ type: 'subclass', color: "rgba(145,10,10,0.5)" });
+                  if (subclass === "Pistoleer" && skillName === "Thievery") sources.push({ type: 'subclass', color: "rgba(90,145,10,0.5)" });
+                  if (subclass === "Sniper" && skillName === "Stealth") sources.push({ type: 'subclass', color: "rgba(10,111,145,0.5)" });
+                  if (subclass === "Hacker" && skillName === "Computers") sources.push({ type: 'subclass', color: "rgba(92,87,184,0.5)" });
+                  if (subclass === "Junker" && skillName === "Thievery") sources.push({ type: 'subclass', color: "rgba(109,184,87,0.5)" });
+                  if (subclass === "Nanoboticist" && skillName === "Acrobatics") sources.push({ type: 'subclass', color: "rgba(87,184,176,0.5)" });
+                  if (subclass === "Tanker" && skillName === "Piloting") sources.push({ type: 'subclass', color: "rgba(184,87,139,0.5)" });
+                  
+                  // Species boosters
+                  if (sheet?.species === "Avenoch" && skillName === "Awareness") sources.push({ type: 'species', color: "rgba(43,95,89,0.5)" });
+                  
+                  return sources;
+                };
+                
+                // Helper function to get booster positions for a skill (handles overlaps)
+                const getBoosterPositions = (skillName: string) => {
+                  const sources = getBoosterSources(skillName);
+                  if (sources.length === 0) return [];
+                  
+                  // Assign positions: first booster at position 2, second at position 3, third at position 4, etc.
+                  return sources.map((source, index) => ({
+                    position: 2 + index,
+                    color: source.color,
+                    type: source.type
+                  }));
+                };
+                
                 return skillList.map(skill => {
                   const dots = sheet?.skillDots?.[skill] || [];
-                  
-                  // Helper to get booster dot color
-                  const getBoosterColor = (skill: string) => {
-                    // Class booster colors
-                    if (charClass === "Chemist" && skill === "Investigation") return "rgba(114,17,49,0.5)";
-                    if (charClass === "Coder" && skill === "Oikomagic") return "rgba(17,33,114,0.5)";
-                    if (charClass === "Commander" && skill === "Diplomacy") return "rgba(113,114,17,0.5)";
-                    if (charClass === "Contemplative" && skill === "Awareness") return "rgba(17,99,114,0.5)";
-                    if (charClass === "Devout" && skill === "Xenomagic") return "rgba(107,17,114,0.5)";
-                    if (charClass === "Elementalist" && skill === "Xenomagic") return "rgba(35,17,114,0.5)";
-                    if (charClass === "Exospecialist" && skill === "Athletics") return "rgba(17,114,51,0.5)";
-                    if (charClass === "Gunslinger" && skill === "Deception") return "rgba(78,114,17,0.5)";
-                    if (charClass === "Technician" && skill === "Technology") return "rgba(114,72,17,0.5)";
-                    
-                    // Subclass booster colors
-                    if (subclass === "Anatomist" && skill === "Medicine") return "rgba(102,207,0,0.5)";
-                    if (subclass === "Grenadier" && skill === "Intimidation") return "rgba(207,0,0,0.5)";
-                    if (subclass === "Necro" && skill === "Survival") return "rgba(0,51,207,0.5)";
-                    if (subclass === "Poisoner" && skill === "Thievery") return "rgba(207,118,0,0.5)";
-                    if (subclass === "Coercive" && skill === "Deception") return "rgba(67,201,255,0.5)";
-                    if (subclass === "Divinist" && skill === "Investigation") return "rgba(255,67,67,0.5)";
-                    if (subclass === "Naturalist" && skill === "Survival") return "rgba(102,207,0,0.5)";
-                    if (subclass === "Technologist" && skill === "Technology") return "rgba(140,67,255,0.5)";
-                    if (subclass === "Beguiler" && skill === "Deception") return "rgba(31,33,206,0.5)";
-                    if (subclass === "Galvanic" && skill === "Athletics") return "rgba(111,206,31,0.5)";
-                    if (subclass === "Tactician" && skill === "Awareness") return "rgba(206,195,31,0.5)";
-                    if (subclass === "Tyrant" && skill === "Intimidation") return "rgba(206,31,195,0.5)";
-                    if (subclass === "Inertial" && skill === "Diplomacy") return "rgba(28,148,94,0.5)";
-                    if (subclass === "Kinetic" && skill === "Athletics") return "rgba(123,148,28,0.5)";
-                    if (subclass === "Mercurial" && skill === "Acrobatics") return "rgba(148,28,108,0.5)";
-                    if (subclass === "Vectorial" && skill === "Piloting") return "rgba(83,28,148,0.5)";
-                    if (subclass === "Astral" && skill === "Medicine") return "rgba(91,177,175,0.5)";
-                    if (subclass === "Chaos" && skill === "Intimidation") return "rgba(177,91,108,0.5)";
-                    if (subclass === "Order" && skill === "Culture") return "rgba(174,177,91,0.5)";
-                    if (subclass === "Void" && skill === "Stealth") return "rgba(91,115,177,0.5)";
-                    if (subclass === "Air" && skill === "Acrobatics") return "rgba(14,226,223,0.5)";
-                    if (subclass === "Earth" && skill === "Survival") return "rgba(226,185,14,0.5)";
-                    if (subclass === "Fire" && skill === "Intimidation") return "rgba(226,14,14,0.5)";
-                    if (subclass === "Water" && skill === "Medicine") return "rgba(14,66,226,0.5)";
-                    if (subclass === "Aeronaut" && skill === "Piloting") return "rgba(61,161,216,0.5)";
-                    if (subclass === "Brawler" && skill === "Survival") return "rgba(216,165,61,0.5)";
-                    if (subclass === "Dreadnaught" && skill === "Intimidation") return "rgba(216,61,160,0.5)";
-                    if (subclass === "Spectre" && skill === "Stealth") return "rgba(106,61,216,0.5)";
-                    if (subclass === "Ammo Coder" && skill === "Oikomagic") return "rgba(10,57,145,0.5)";
-                    if (subclass === "Ordnancer" && skill === "Athletics") return "rgba(145,10,10,0.5)";
-                    if (subclass === "Pistoleer" && skill === "Thievery") return "rgba(90,145,10,0.5)";
-                    if (subclass === "Sniper" && skill === "Stealth") return "rgba(10,111,145,0.5)";
-                    if (subclass === "Hacker" && skill === "Computers") return "rgba(92,87,184,0.5)";
-                    if (subclass === "Junker" && skill === "Thievery") return "rgba(109,184,87,0.5)";
-                    if (subclass === "Nanoboticist" && skill === "Acrobatics") return "rgba(87,184,176,0.5)";
-                    if (subclass === "Tanker" && skill === "Piloting") return "rgba(184,87,139,0.5)";
-                    return null;
-                  };
-                  
-                  // Check if this skill has a booster dot at position 2
-                  const boosterColor = getBoosterColor(skill);
-                  const hasBooster = boosterColor !== null;
+                  const boosterPositions = getBoosterPositions(skill);
                   
                   let value;
                   let displayDots = [];
                   
                   if (isNewCharacter) {
-                    // New characters default to first two dots, plus booster if applicable
+                    // New characters default to first two dots, plus any booster dots
                     displayDots = [true, true];
-                    if (hasBooster) {
-                      displayDots.push(true);
-                      value = "16+";
-                    } else {
-                      value = "18+";
-                    }
+                    
+                    // Add booster dots at their appropriate positions
+                    boosterPositions.forEach(bp => {
+                      while (displayDots.length <= bp.position) {
+                        displayDots.push(false);
+                      }
+                      displayDots[bp.position] = true;
+                    });
+                    
+                    // Calculate value based on rightmost filled dot
+                    const lastFilledIndex = displayDots.lastIndexOf(true);
+                    value = lastFilledIndex >= 0 ? skillColumnValues[lastFilledIndex] + "+" : "18+";
                   } else {
                     // For existing characters, ensure first two dots are always present
                     displayDots = [...dots];
@@ -2036,15 +2059,13 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                     displayDots[0] = true;
                     displayDots[1] = true;
                     
-                    // Ensure booster dot is shown if applicable
-                    if (hasBooster) {
-                      // Make sure we have at least 3 elements
-                      while (displayDots.length < 3) {
+                    // Ensure all booster dots are shown at their proper positions
+                    boosterPositions.forEach(bp => {
+                      while (displayDots.length <= bp.position) {
                         displayDots.push(false);
                       }
-                      // Force the booster dot (index 2) to be true
-                      displayDots[2] = true;
-                    }
+                      displayDots[bp.position] = true;
+                    });
                     
                     let idx = displayDots.lastIndexOf(true);
                     value = idx >= 0 ? skillColumnValues[idx] + "+" : "-";
@@ -2054,9 +2075,9 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                   const dotElements = displayDots.map((isFilled, dotIndex) => {
                     if (!isFilled) return null;
                     
-                    // Check if this is the booster dot
-                    const isBoosterDot = hasBooster && dotIndex === 2;
-                    const dotColor = isBoosterDot ? boosterColor : '#666';
+                    // Check if this is a booster dot
+                    const boosterAtPosition = boosterPositions.find(bp => bp.position === dotIndex);
+                    const dotColor = boosterAtPosition ? boosterAtPosition.color : '#666';
                     
                     return (
                       <span

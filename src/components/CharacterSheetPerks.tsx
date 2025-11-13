@@ -19,6 +19,11 @@ const CharacterSheetPerks: React.FC<CharacterSheetPerksProps> = ({
         <div className={styles.cardContent}>
           <div style={{ fontWeight: 'bold', marginBottom: 6, fontFamily: 'Arial, sans-serif', display: 'flex', alignItems: 'center', gap: 8 }}>
             <span>Languages</span>
+            {sheet?.species === 'Avenoch' && (
+              <span style={{ fontWeight: 'normal', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', color: '#000' }}>
+                Avenoch
+              </span>
+            )}
             {charClass === 'Coder' && (
               <span style={{ fontWeight: 'normal', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', color: '#000' }}>
                 Oikovox
@@ -96,6 +101,15 @@ const CharacterSheetPerks: React.FC<CharacterSheetPerksProps> = ({
             <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
               <span>
                 <b><i style={{ color: '#724811' }}>Machinist.</i></b> <span style={{ color: '#000' }}>You are a whiz when it comes to machinery of all kinds. While repairing, rewiring, reprogramming, building or dismantling various machines, gain an advantage on related skill rolls.</span>
+              </span>
+            </div>
+          )}
+          
+          {/* Species Perks */}
+          {sheet?.species === 'Avenoch' && sheet?.speciesCardDots?.[8]?.[0] && (
+            <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <span>
+                <b><i style={{ color: '#2b5f59' }}>Keen Eyes.</i></b> <span style={{ color: '#000' }}>You are naturally adept at being aware of your visual surroundings, picking up on subtle patterns in the tapestry of the situation, or otherwise being highly observant. Gain an advantage on related skill rolls using your sight.</span>
               </span>
             </div>
           )}

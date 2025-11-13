@@ -618,7 +618,7 @@ const LevelUpSpeciesAvenoch: React.FC<LevelUpSpeciesAvenochProps> = ({
               lineHeight: '1.2',
               gridColumn: '1 / 4'
             }}>
-              <b><i style={{ color: '#6db857', fontSize: '1em' }}>Keen Eyes.</i></b> You are naturally adept at being aware of your visual surroundings, picking up on subtle patterns in the tapestry of the situation, or otherwise being highly observant. Gain an advantage on related skill rolls using your sight.
+              <b><i style={{ color: '#2b5f59', fontSize: '1em' }}>Keen Eyes.</i></b> You are naturally adept at being aware of your visual surroundings, picking up on subtle patterns in the tapestry of the situation, or otherwise being highly observant. Gain an advantage on related skill rolls using your sight.
             </div>
             <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start' }}>
               <span
