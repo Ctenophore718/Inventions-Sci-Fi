@@ -6,12 +6,14 @@ type CharacterSheetPerksProps = {
   sheet: CharacterSheet | null;
   charClass: string;
   subclass: string;
+  subspecies: string;
 };
 
 const CharacterSheetPerks: React.FC<CharacterSheetPerksProps> = ({
   sheet,
   charClass,
-  subclass
+  subclass,
+  subspecies
 }) => {
   return (
     <div className={styles.perksCard}>
@@ -366,7 +368,15 @@ const CharacterSheetPerks: React.FC<CharacterSheetPerksProps> = ({
               <b><i style={{ color: '#b8578b' }}>Heavy Metal.</i></b> <span style={{ color: '#000' }}>You excel at operating heavy machinery of all sorts, including large drones, cranes, boom lifts, etc. Gain an advantage on related skill rolls.</span>
             </span>
           </div>
-          )}                                                             
+          )}
+          {/* Subspecies Perks */}
+          {subspecies === 'Corvid' && sheet?.subspeciesCardDots?.[5]?.[0] && (
+          <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <span>
+              <b><i style={{ color: '#75904e' }}>Skill Mimicry.</i></b> <span style={{ color: '#000' }}>You are innately capable of copying others in what they're good at. While adjacent to an ally, you can use their skill bonuses in place of your own when you make a skill roll.</span>
+            </span>
+          </div>
+          )}
         </div>
       </div>
   );

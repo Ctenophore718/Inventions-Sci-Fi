@@ -69,6 +69,9 @@ export type CharacterSheet = {
   // Persistent state for Species Card dots (rows of booleans)
   speciesCardDots?: boolean[][];
 
+  // Persistent state for Subspecies Card dots (rows of booleans)
+  subspeciesCardDots?: boolean[][];
+
   // Dart guns for Chemist class
   dartGuns?: string[];
 

@@ -24,6 +24,8 @@ import { generateDetonateCardJSX } from "../utils/junkerTechnique";
 import { generateVersatileSwarmCardJSX } from "../utils/nanoboticistTechnique";
 import { generateBulletMagnetCardJSX } from "../utils/tankerTechnique";
 import { generateAvianGazeCardJSX, calculateAvianGazeData } from "../utils/avenochTechnique";
+import { generateDarkenedDisplacerCardJSX } from "../utils/corvidTechnique";
+import { generateFalconDiveCardJSX } from "../utils/falcadorTechnique";
 import React from "react";
 import type { CharacterSheet } from "../types/CharacterSheet";
 import { loadSheetById, saveCharacterSheet } from "../utils/storage";
@@ -1287,8 +1289,12 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
               <span style={{
                 fontFamily: 'Arial, Helvetica, sans-serif',
                 fontWeight: 'bold',
-                fontSize: 'clamp(0.8em, 4vw, 1.08em)',
-                color: 'black',
+                fontSize: 'clamp(0.8em, 4vw, 1.25em)',
+                color: localSheet?.subspecies === 'Corvid' 
+                  ? '#75904e'
+                  : localSheet?.subspecies === 'Falcador'
+                    ? '#6d7156'
+                    : 'black',
                 lineHeight: 1,
                 textAlign: 'left', 
                 whiteSpace: 'nowrap',
@@ -1297,13 +1303,21 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                 flexShrink: 1,
                 marginRight: '5px'
               }}>
-                Subspecies Card Name
+                {localSheet?.subspecies === 'Corvid' 
+                  ? 'Darkened Displacer' 
+                  : localSheet?.subspecies === 'Falcador'
+                    ? 'Falcon Dive'
+                    : 'Subspecies Card Name'}
               </span>
               <span style={{
                 fontFamily: 'Arial, Helvetica, sans-serif',
                 fontStyle: 'italic',
                 fontSize: '0.75em',
-                color: 'black',
+                color: localSheet?.subspecies === 'Corvid' 
+                  ? '#75904e'
+                  : localSheet?.subspecies === 'Falcador'
+                    ? '#6d7156'
+                    : 'black',
                 lineHeight: 1,
                 whiteSpace: 'normal',
                 wordBreak: 'keep-all',
@@ -1311,11 +1325,23 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                 maxWidth: '72px',
                 display: 'inline-block',
                 textAlign: 'right'
-              }}>Subspecies</span>
+              }}>{localSheet?.subspecies === 'Corvid' 
+                  ? 'Corvid' 
+                  : localSheet?.subspecies === 'Falcador'
+                    ? 'Falcador'
+                    : 'Subspecies'}</span>
             </div>
             <img 
-              src="/Blank Card.png"
-              alt="Blank Card"
+              src={localSheet?.subspecies === 'Corvid' 
+                ? "/Darkened Displacer.png" 
+                : localSheet?.subspecies === 'Falcador'
+                  ? "/Falcon Dive.png"
+                  : "/Blank Card.png"}
+              alt={localSheet?.subspecies === 'Corvid' 
+                ? "Darkened Displacer" 
+                : localSheet?.subspecies === 'Falcador'
+                  ? "Falcon Dive"
+                  : "Blank Card"}
               style={{
                 position: 'absolute',
                 top: 35,
@@ -1343,7 +1369,13 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
             }}>
               <span style={{ color: '#bf9000', fontFamily: 'Arial, Helvetica, sans-serif', fontWeight: 'bold', fontSize: '1.1em', textAlign: 'left' }}>Technique</span>
               <span style={{ color: '#bf9000', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '0.875em', fontStyle: 'italic', marginRight: 22, whiteSpace: 'nowrap', maxWidth: 'calc(100% - 120px)', overflow: 'hidden', textOverflow: 'ellipsis', textAlign: 'right' }}>
-                Cooldown <span style={{ fontWeight: 'bold', fontStyle: 'normal' }}>[#]</span>
+                Cooldown <span style={{ fontWeight: 'bold', fontStyle: 'normal' }}>
+                  {localSheet?.subspecies === 'Corvid' 
+                    ? `[${4 - (localSheet?.subspeciesCardDots?.[3]?.filter(Boolean).length ?? 0)}]`
+                    : localSheet?.subspecies === 'Falcador'
+                      ? `[${3 - (localSheet?.subspeciesCardDots?.[3]?.filter(Boolean).length ?? 0)}]`
+                      : '[#]'}
+                </span>
               </span>
             </div>
             
@@ -1370,7 +1402,17 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                 maxHeight: '100%',
                 overflow: 'hidden'
               }}>
-                Card stats.
+                {localSheet?.subspecies === 'Corvid' 
+                  ? generateDarkenedDisplacerCardJSX({ 
+                      range: 6 + (localSheet?.subspeciesCardDots?.[1]?.filter(Boolean).length ?? 0) * 2,
+                      inflictDemoralize: localSheet?.subspeciesCardDots?.[2]?.[0] ?? false
+                    })
+                  : localSheet?.subspecies === 'Falcador'
+                    ? generateFalconDiveCardJSX({
+                        speedMultiplier: localSheet?.subspeciesCardDots?.[2]?.[0] ? 3 : 2,
+                        cooldown: 3 - (localSheet?.subspeciesCardDots?.[3]?.filter(Boolean).length ?? 0)
+                      })
+                    : 'Card stats.'}
               </div>
             </div>
             <div style={{
@@ -1387,7 +1429,11 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
               zIndex: 3,
               textAlign: 'left'
             }}>
-              Flavor text.
+              {localSheet?.subspecies === 'Corvid' 
+                ? '"You can hear their caws echo elsewhere, and in a flurry of black feathers, they\'re gone. And suddenly some other bloke is at your throat!" --Anonymous'
+                : localSheet?.subspecies === 'Falcador'
+                  ? 'A bullet through the air, the Falcador has the capability of flying faster than any other creature on the battlefield.'
+                  : 'Flavor text.'}
             </div>
         </div>
         

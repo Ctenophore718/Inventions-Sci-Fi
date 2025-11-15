@@ -1737,6 +1737,8 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
               <LevelUpSpeciesAvenoch
                 sheet={sheet}
                 species={species}
+                subspecies={subspecies}
+                contentType="species"
                 onAutoSave={handleAutoSave}
                 xpTotal={xpTotal}
                 spTotal={spTotal}
@@ -1805,6 +1807,42 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                 ))}
               </select>
             </div>
+            
+            {/* Corvid Subspecies Content */}
+            {subspecies === "Corvid" && (
+              <LevelUpSpeciesAvenoch
+                sheet={sheet}
+                species={species}
+                subspecies={subspecies}
+                contentType="subspecies"
+                onAutoSave={handleAutoSave}
+                xpTotal={xpTotal}
+                spTotal={spTotal}
+                xpSpent={xpSpent}
+                spSpent={spSpent}
+                setXpSpent={setXpSpent}
+                setSpSpent={setSpSpent}
+                setNotice={setNotice}
+              />
+            )}
+            
+            {/* Falcador Subspecies Content */}
+            {subspecies === "Falcador" && (
+              <LevelUpSpeciesAvenoch
+                sheet={sheet}
+                species={species}
+                subspecies={subspecies}
+                contentType="subspecies"
+                onAutoSave={handleAutoSave}
+                xpTotal={xpTotal}
+                spTotal={spTotal}
+                xpSpent={xpSpent}
+                spSpent={spSpent}
+                setXpSpent={setXpSpent}
+                setSpSpent={setSpSpent}
+                setNotice={setNotice}
+              />
+            )}
         </div>
 
 
@@ -2025,6 +2063,10 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                         
                         // Species boosters
                         if (species === "Avenoch" && skillName === "Awareness") sources.push({ type: 'species', color: "rgba(43,95,89,0.5)" });
+                        
+                        // Subspecies boosters
+                        if (subspecies === "Corvid" && skillName === "Thievery") sources.push({ type: 'subspecies', color: "rgba(117,144,78,0.5)" });
+                        if (subspecies === "Falcador" && skillName === "Intimidation") sources.push({ type: 'subspecies', color: "rgba(109,113,86,0.5)" });
                         
                         return sources;
                       };

@@ -29,6 +29,9 @@ import { generateFinalFistsJSX } from "../utils/kineticFeature";
 import { generateKineticStrikeJSX, generateKineticStrikeDamageJSX, generateKineticStrikeEffectsJSX } from "../utils/kineticStrike";
 import { generateMercurialStrikeDamageJSX, generateMercurialStrikeEffectsJSX } from "../utils/mercurialStrike";
 import { generateUnreasonableAccuracyJSX } from "../utils/vectorialFeature";
+import { generateCrowsCunningJSX } from "../utils/corvidFeature";
+import { generateRendingTalonsJSX } from "../utils/falcadorFeature";
+import { generateFirstInFlightJSX } from "../utils/avenochFeature";
 import { generateVectorialStrikeDamageJSX, generateVectorialStrikeRangeJSX } from "../utils/vectorialStrike";
 
 import { generateBloodTradeJSX } from "../utils/devoutFeature";
@@ -373,13 +376,18 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
       })()
     : 0;
   
+  // Calculate Falcador subspecies speed bonus
+  const falcadorSpeedBonus = sheet?.subspecies === 'Falcador'
+    ? (sheet?.subspeciesCardDots?.[4]?.filter(Boolean).length || 0)
+    : 0;
+  
   const ammocoderSpeedBonus = sheet?.subclass === 'Ammo Coder'
     ? ((sheet?.subclassProgressionDots as any)?.ammocoderMovementSpeedDots?.filter(Boolean).length || 0)
     : 0;
   const pistoleerSpeedBonus = sheet?.subclass === 'Pistoleer'
     ? ((sheet?.subclassProgressionDots as any)?.pistoleerMovementSpeedDots?.filter(Boolean).length || 0)
     : 0;
-  const totalSpeed = baseSpeed + tacticianSpeedBonus + kineticSpeedBonus + mercurialSpeedBonus + airSpeedBonus + fireSpeedBonus + waterSpeedBonus + aeronautSpeedBonus + brawlerSpeedBonus + spectreSpeedBonus + avenochSpeedBonus + ammocoderSpeedBonus + pistoleerSpeedBonus;
+  const totalSpeed = baseSpeed + tacticianSpeedBonus + kineticSpeedBonus + mercurialSpeedBonus + airSpeedBonus + fireSpeedBonus + waterSpeedBonus + aeronautSpeedBonus + brawlerSpeedBonus + spectreSpeedBonus + avenochSpeedBonus + falcadorSpeedBonus + ammocoderSpeedBonus + pistoleerSpeedBonus;
   const speed = totalSpeed > 0 ? `${totalSpeed}` : "0";
   
   // Calculate jump speed and jump amount for Kinetic subclass
@@ -1002,11 +1010,10 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
     </span>
   );
 
-  const avenochFeatureJSX = (
-    <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#2b5f59' }}>First in Flight.</i></b> You have a <b><i style={{ color: '#38761d' }}>Flight Speed</i></b>. Additionally, you can <b><i style={{ color: '#38761d' }}>Move</i></b> <b>[2]</b>hx whenever you Crit on an <b><i><span style={{ color: '#990000' }}>Attack</span></i></b>.
-    </span>
-  );
+  const avenochFeatureJSX = generateFirstInFlightJSX({
+    move: 2 + ((sheet?.speciesCardDots?.[0] || []).filter(Boolean).length * 2),
+    moveWhenHit: (sheet?.speciesCardDots?.[1] || []).filter(Boolean).length
+  });
 
   const cerebronychFeatureJSX = (
     <span style={{ color: '#000', fontWeight:  400 }}>
@@ -1068,13 +1075,18 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
 
   const corvidFeatureJSX = (
     <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#75904e' }}>Crow's Cunning.</i></b> You are <i>Immune</i> to the <b><i>Confuse</i></b> and <b><i>Mesmerize</i></b> conditions.
+      {generateCrowsCunningJSX({ 
+        hasDemoralizeImmunity: sheet?.subspeciesCardDots?.[0]?.[0] || false 
+      })}
     </span>
   );
 
   const falcadorFeatureJSX = (
     <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#6d7156' }}>Rending Talons.</i></b> When you roll for <b><i>Spike</i></b> damage on <b><i style={{ color: '#351c75' }}>Strikes</i></b>, the <b><i>Spike</i></b> effect triggers on a roll of <b>[5]</b>+.
+      {generateRendingTalonsJSX({
+        includesAttacks: sheet?.subspeciesCardDots?.[0]?.[0] ?? false,
+        spike4Plus: sheet?.subspeciesCardDots?.[1]?.[0] ?? false
+      })}
     </span>
   );
 
@@ -2009,6 +2021,10 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                   // Species boosters
                   if (sheet?.species === "Avenoch" && skillName === "Awareness") sources.push({ type: 'species', color: "rgba(43,95,89,0.5)" });
                   
+                  // Subspecies boosters
+                  if (subspecies === "Corvid" && skillName === "Thievery") sources.push({ type: 'subspecies', color: "rgba(117,144,78,0.5)" });
+                  if (subspecies === "Falcador" && skillName === "Intimidation") sources.push({ type: 'subspecies', color: "rgba(109,113,86,0.5)" });
+                  
                   return sources;
                 };
                 
@@ -2496,17 +2512,19 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                 <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{hostMimicFeatureJSX}</span>
                 {subspecies === "Avenoch Host" && (
                   <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32, marginTop: 8, color: '#000', fontWeight: 400 }}>
-                    <b><i style={{ color: '#2b5f59' }}>First in Flight.</i></b> You have a <b><i style={{ color: '#38761d' }}>Flight Speed</i></b>. Additionally, you can <b><i style={{ color: '#38761d' }}>Move</i></b> <b>[2]</b>hx whenever you Crit on an <b><i><span style={{ color: '#990000' }}>Attack</span></i></b>.
+                    {generateFirstInFlightJSX()}
                   </span>
                 )}
                 {subspecies === "Corvid Avenoch Host" && (
                   <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32, marginTop: 8, color: '#000', fontWeight: 400 }}>
-                    <b><i style={{ color: '#75904e' }}>Crow's Cunning.</i></b> You are <i>Immune</i> to the <b><i>Confuse</i></b> and <b><i>Mesmerize</i></b> conditions.
+                    {generateCrowsCunningJSX({ 
+                      hasDemoralizeImmunity: sheet?.subspeciesCardDots?.[0]?.[0] || false 
+                    })}
                   </span>
                 )}
                 {subspecies === "Falcador Avenoch Host" && (
                   <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32, marginTop: 8, color: '#000', fontWeight: 400 }}>
-                    <b><i style={{ color: '#6d7156' }}>Rending Talons.</i></b> When you roll for <b><i>Spike</i></b> damage on <b><i style={{ color: '#351c75' }}>Strikes</i></b>, the <b><i>Spike</i></b> effect triggers on a roll of 5+.
+                    {generateRendingTalonsJSX()}
                   </span>
                 )}
                 {subspecies === "Nocturne Avenoch Host" && (
@@ -3008,6 +3026,12 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                     ? <span style={{ color: '#000', fontWeight: 'normal' }}><b><i>Mesmerize</i></b></span>
                   : (subclass === 'Beguiler' && sheet?.subclassProgressionDots?.beguilerStrikeMesmerizeDots?.[0])
                     ? <span style={{ color: '#000', fontWeight: 'normal' }}><b><i>Mesmerize</i></b></span>
+                  : (subspecies === 'Corvid' && sheet?.subspeciesCardDots?.[4]?.[0])
+                    ? <span style={{ color: '#000', fontWeight: 'normal' }}><b><i>Blind</i></b></span>
+                  : (subspecies === 'Falcador')
+                    ? <span style={{ color: '#000', fontWeight: 'normal' }}><b><i>Spike</i></b> <b>(</b><b><u style={{ color: '#808080', display: 'inline-flex', alignItems: 'center' }}>
+      Slashing<img src="/Slashing.png" alt="Slashing" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} />
+      </u></b><b>)</b></span>
                   : (subclass === 'Galvanic' && ((sheet?.subclassProgressionDots as any)?.galvanicStrikeAoEDots?.filter(Boolean).length || 0) > 0)
                     ? <span style={{ color: '#000', fontWeight: 'normal' }}><i>AoE</i> <b>[{((sheet?.subclassProgressionDots as any)?.galvanicStrikeAoEDots?.filter(Boolean).length || 0)}]</b>hx-Radius</span>
                   : (subclass === 'Tyrant' && (sheet?.subclassProgressionDots as any)?.tyrantStrikeDemorizeDots?.[0])
@@ -3183,6 +3207,21 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                 </span>
               </>
             )}
+            {subspecies === 'Corvid' && (
+              <>
+                <span style={{ marginLeft: 8, color: '#000', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                  <i>Confuse</i>
+                </span>
+                <span style={{ marginLeft: 8, color: '#000', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                  <i>Mesmerize</i>
+                </span>
+                {sheet?.subspeciesCardDots?.[0]?.[0] && (
+                  <span style={{ marginLeft: 8, color: '#000', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                    <i>Demoralize</i>
+                  </span>
+                )}
+              </>
+            )}
             {subclass === 'Air' && (sheet?.subclassProgressionDots as any)?.airFeatureForceImmunityDots?.[0] && !(sheet?.subclassProgressionDots as any)?.airFeatureForceAbsorptionDots?.[0] && (
               <span style={{ marginLeft: 8, display: 'inline-flex', alignItems: 'center', color: '#516fff', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                 <u>Force</u> <img src="/Force.png" alt="Force" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
@@ -3319,6 +3358,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
         sheet={sheet}
         charClass={charClass}
         subclass={subclass}
+        subspecies={subspecies}
       />
 
       {/* Portrait card */}
