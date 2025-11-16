@@ -32,6 +32,7 @@ import { generateUnreasonableAccuracyJSX } from "../utils/vectorialFeature";
 import { generateCrowsCunningJSX } from "../utils/corvidFeature";
 import { generateRendingTalonsJSX } from "../utils/falcadorFeature";
 import { generateEyesOfTheNightJSX } from "../utils/nocturneFeature";
+import { generateCarrionGorgeJSX } from "../utils/vulturineFeature";
 import { generateFirstInFlightJSX } from "../utils/avenochFeature";
 import { generateVectorialStrikeDamageJSX, generateVectorialStrikeRangeJSX } from "../utils/vectorialStrike";
 
@@ -1102,7 +1103,9 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
 
   const vulturineFeatureJSX = (
     <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#a96d8c' }}>Carrion Gorge.</i></b> When you destroy an enemy using a <b><i style={{ color: '#351c75' }}>Strike</i></b>, you immediately gain <b>[2]</b>d6 <b><i style={{ color: '#990000' }}>Hit Points</i></b>.
+      {generateCarrionGorgeJSX({
+        healingBonus: sheet?.subspeciesCardDots?.[0]?.filter(Boolean).length ?? 0
+      })}
     </span>
   );
 
@@ -2029,6 +2032,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                   if (subspecies === "Corvid" && skillName === "Thievery") sources.push({ type: 'subspecies', color: "rgba(117,144,78,0.5)" });
                   if (subspecies === "Falcador" && skillName === "Intimidation") sources.push({ type: 'subspecies', color: "rgba(109,113,86,0.5)" });
                   if (subspecies === "Nocturne" && skillName === "Investigation") sources.push({ type: 'subspecies', color: "rgba(51,69,146,0.5)" });
+                  if (subspecies === "Vulturine" && skillName === "Survival") sources.push({ type: 'subspecies', color: "rgba(169,109,140,0.5)" });
                   
                   return sources;
                 };
@@ -2539,7 +2543,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                 )}
                 {subspecies === "Vulturine Avenoch Host" && (
                   <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32, marginTop: 8, color: '#000', fontWeight: 400 }}>
-                    <b><i style={{ color: '#a96d8c' }}>Carrion Gorge.</i></b> When you destroy an enemy using a <b><i style={{ color: '#351c75' }}>Strike</i></b>, you immediately gain 2d6 <b><i style={{ color: '#990000' }}>Hit Points</i></b>.
+                    {generateCarrionGorgeJSX()}
                   </span>
                 )}
                 {subspecies === "Chloroptid Host" && (
@@ -3039,6 +3043,10 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
       </u></b><b>)</b></span>
                   : (subspecies === 'Nocturne' && sheet?.subspeciesCardDots?.[4]?.[0])
                     ? <span style={{ color: '#000', fontWeight: 'normal' }}><b><i>Mesmerize</i></b></span>
+                  : (subspecies === 'Vulturine' && sheet?.subspeciesCardDots?.[3]?.[0])
+                    ? <span style={{ color: '#000', fontWeight: 'normal' }}><b><i>Spike</i></b> <b>(</b><b><u style={{ color: '#38761d', display: 'inline-flex', alignItems: 'center' }}>
+      Toxic<img src="/Toxic.png" alt="Toxic" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} />
+      </u></b><b>)</b></span>
                   : (subclass === 'Galvanic' && ((sheet?.subclassProgressionDots as any)?.galvanicStrikeAoEDots?.filter(Boolean).length || 0) > 0)
                     ? <span style={{ color: '#000', fontWeight: 'normal' }}><i>AoE</i> <b>[{((sheet?.subclassProgressionDots as any)?.galvanicStrikeAoEDots?.filter(Boolean).length || 0)}]</b>hx-Radius</span>
                   : (subclass === 'Tyrant' && (sheet?.subclassProgressionDots as any)?.tyrantStrikeDemorizeDots?.[0])

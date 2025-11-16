@@ -391,6 +391,13 @@ const CharacterSheetPerks: React.FC<CharacterSheetPerksProps> = ({
             </span>
           </div>
           )}
+          {subspecies === 'Vulturine' && sheet?.subspeciesCardDots?.[4]?.[0] && (
+          <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <span>
+              <b><i style={{ color: '#a96d8c' }}>Cold Opportunist.</i></b> <span style={{ color: '#000' }}>You have no qualms about making the best of bad moments and taking opportunity when others are either in a vulnerable state or otherwise absent. Gain an advantage on skill related to capitalizing on tragedy in various forms.</span>
+            </span>
+          </div>
+          )}
         </div>
       </div>
   );

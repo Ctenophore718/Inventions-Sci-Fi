@@ -27,6 +27,7 @@ import { generateAvianGazeCardJSX, calculateAvianGazeData } from "../utils/aveno
 import { generateDarkenedDisplacerCardJSX } from "../utils/corvidTechnique";
 import { generateFalconDiveCardJSX } from "../utils/falcadorTechnique";
 import { generateDarknessDescendingCardJSX } from "../utils/nocturneTechnique";
+import { generateFleshEaterCardJSX } from "../utils/vulturineTechnique";
 import React from "react";
 import type { CharacterSheet } from "../types/CharacterSheet";
 import { loadSheetById, saveCharacterSheet } from "../utils/storage";
@@ -1297,7 +1298,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                     ? '#6d7156'
                     : localSheet?.subspecies === 'Nocturne'
                       ? '#334592'
-                      : 'black',
+                      : localSheet?.subspecies === 'Vulturine'
+                        ? '#a96d8c'
+                        : 'black',
                 lineHeight: 1,
                 textAlign: 'left', 
                 whiteSpace: 'nowrap',
@@ -1312,7 +1315,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                     ? 'Falcon Dive'
                     : localSheet?.subspecies === 'Nocturne'
                       ? 'Darkness Descending'
-                      : 'Subspecies Card Name'}
+                      : localSheet?.subspecies === 'Vulturine'
+                        ? 'Flesh Eater'
+                        : 'Subspecies Card Name'}
               </span>
               <span style={{
                 fontFamily: 'Arial, Helvetica, sans-serif',
@@ -1324,7 +1329,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                     ? '#6d7156'
                     : localSheet?.subspecies === 'Nocturne'
                       ? '#334592'
-                      : 'black',
+                      : localSheet?.subspecies === 'Vulturine'
+                        ? '#a96d8c'
+                        : 'black',
                 lineHeight: 1,
                 whiteSpace: 'normal',
                 wordBreak: 'keep-all',
@@ -1338,7 +1345,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                     ? 'Falcador'
                     : localSheet?.subspecies === 'Nocturne'
                       ? 'Nocturne'
-                      : 'Subspecies'}</span>
+                      : localSheet?.subspecies === 'Vulturine'
+                        ? 'Vulturine'
+                        : 'Subspecies'}</span>
             </div>
             <img 
               src={localSheet?.subspecies === 'Corvid' 
@@ -1347,14 +1356,18 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                   ? "/Falcon Dive.png"
                   : localSheet?.subspecies === 'Nocturne'
                     ? "/Darkness Descending.png"
-                    : "/Blank Card.png"}
+                    : localSheet?.subspecies === 'Vulturine'
+                      ? "/Flesh Eater.png"
+                      : "/Blank Card.png"}
               alt={localSheet?.subspecies === 'Corvid' 
                 ? "Darkened Displacer" 
                 : localSheet?.subspecies === 'Falcador'
                   ? "Falcon Dive"
                   : localSheet?.subspecies === 'Nocturne'
                     ? "Darkness Descending"
-                    : "Blank Card"}
+                    : localSheet?.subspecies === 'Vulturine'
+                      ? "Flesh Eater"
+                      : "Blank Card"}
               style={{
                 position: 'absolute',
                 top: 35,
@@ -1389,7 +1402,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                       ? `[${3 - (localSheet?.subspeciesCardDots?.[3]?.filter(Boolean).length ?? 0)}]`
                       : localSheet?.subspecies === 'Nocturne'
                         ? `[${4 - (localSheet?.subspeciesCardDots?.[3]?.filter(Boolean).length ?? 0)}]`
-                        : '[#]'}
+                        : localSheet?.subspecies === 'Vulturine'
+                          ? `[${4 - (localSheet?.subspeciesCardDots?.[2]?.filter(Boolean).length ?? 0)}]`
+                          : '[#]'}
                 </span>
               </span>
             </div>
@@ -1432,7 +1447,12 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                           rangeBonus: (localSheet?.subspeciesCardDots?.[2]?.filter(Boolean).length ?? 0) * 2,
                           cooldown: 4 - (localSheet?.subspeciesCardDots?.[3]?.filter(Boolean).length ?? 0)
                         })
-                      : 'Card stats.'}
+                      : localSheet?.subspecies === 'Vulturine'
+                        ? generateFleshEaterCardJSX({
+                            rangeBonus: localSheet?.subspeciesCardDots?.[1]?.filter(Boolean).length ?? 0,
+                            cooldown: 4 - (localSheet?.subspeciesCardDots?.[2]?.filter(Boolean).length ?? 0)
+                          })
+                        : 'Card stats.'}
               </div>
             </div>
             <div style={{
@@ -1455,7 +1475,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                   ? 'A bullet through the air, the Falcador has the capability of flying faster than any other creature on the battlefield.'
                   : localSheet?.subspecies === 'Nocturne'
                     ? '"I am a creature of the night, one that can induce the supernatural night itself into the eyes of my prey." --Wisp, Nocturne Contemplative'
-                    : 'Flavor text.'}
+                    : localSheet?.subspecies === 'Vulturine'
+                      ? '"Death is an acquired taste… but once you\'ve acquired it, nothing can beat it." --Trogon Ornio, Vulturine Mercenary'
+                      : 'Flavor text.'}
             </div>
         </div>
         
