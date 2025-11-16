@@ -20,7 +20,7 @@ const CharacterSheetPerks: React.FC<CharacterSheetPerksProps> = ({
       <h3 style={{ marginTop: 0, textDecoration: 'underline', fontFamily: 'Arial, sans-serif' }}>Languages & Perks</h3>
         <div className={styles.cardContent}>
           <div style={{ fontWeight: 'bold', marginBottom: 6, fontFamily: 'Arial, sans-serif', display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span>Languages</span>
+            <span><u>Languages</u></span>
             {sheet?.species === 'Avenoch' && (
               <span style={{ fontWeight: 'normal', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', color: '#000' }}>
                 Avenoch
@@ -374,6 +374,20 @@ const CharacterSheetPerks: React.FC<CharacterSheetPerksProps> = ({
           <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
             <span>
               <b><i style={{ color: '#75904e' }}>Skill Mimicry.</i></b> <span style={{ color: '#000' }}>You are innately capable of copying others in what they're good at. While adjacent to an ally, you can use their skill bonuses in place of your own when you make a skill roll.</span>
+            </span>
+          </div>
+          )}
+          {subspecies === 'Falcador' && sheet?.subspeciesCardDots?.[5]?.[0] && (
+          <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <span>
+              <b><i style={{ color: '#6d7156' }}>Imposing Aura.</i></b> <span style={{ color: '#000' }}>You are a proud predator and have no qualms about asserting your self-assumed authority in practically any situation. Others around you are often quick to recognize this as well. Gain an advantage on related skill rolls.</span>
+            </span>
+          </div>
+          )}
+          {subspecies === 'Nocturne' && sheet?.subspeciesCardDots?.[5]?.[0] && (
+          <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <span>
+              <b><i style={{ color: '#334592' }}>Hypnotic Gaze.</i></b> <span style={{ color: '#000' }}>You can manipulate your appearance to enchant, distract or confuse other people, and they have a hard time focusing on tasks when you have your gaze fixed on them. Gain an advantage on related skill rolls.</span>
             </span>
           </div>
           )}

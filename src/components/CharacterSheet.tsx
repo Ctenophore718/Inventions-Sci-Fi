@@ -31,6 +31,7 @@ import { generateMercurialStrikeDamageJSX, generateMercurialStrikeEffectsJSX } f
 import { generateUnreasonableAccuracyJSX } from "../utils/vectorialFeature";
 import { generateCrowsCunningJSX } from "../utils/corvidFeature";
 import { generateRendingTalonsJSX } from "../utils/falcadorFeature";
+import { generateEyesOfTheNightJSX } from "../utils/nocturneFeature";
 import { generateFirstInFlightJSX } from "../utils/avenochFeature";
 import { generateVectorialStrikeDamageJSX, generateVectorialStrikeRangeJSX } from "../utils/vectorialStrike";
 
@@ -1092,7 +1093,10 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
 
   const nocturneFeatureJSX = (
     <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#334592' }}>Eyes of the Night.</i></b> You are <i>Immune</i> to the <b><i>Blind</i></b> condition and don't have a <i>Rear Arc</i>. Additionally, whenever you Crit on an <b><i><span style={{ color: '#990000' }}>Attack</span></i></b>, you inflict the <b><i>Mesmerize</i></b> condition.
+      {generateEyesOfTheNightJSX({
+        critBonus: sheet?.subspeciesCardDots?.[0]?.filter(Boolean).length ?? 0,
+        rangeBonus: sheet?.subspeciesCardDots?.[1]?.filter(Boolean).length ?? 0
+      })}
     </span>
   );
 
@@ -2024,6 +2028,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                   // Subspecies boosters
                   if (subspecies === "Corvid" && skillName === "Thievery") sources.push({ type: 'subspecies', color: "rgba(117,144,78,0.5)" });
                   if (subspecies === "Falcador" && skillName === "Intimidation") sources.push({ type: 'subspecies', color: "rgba(109,113,86,0.5)" });
+                  if (subspecies === "Nocturne" && skillName === "Investigation") sources.push({ type: 'subspecies', color: "rgba(51,69,146,0.5)" });
                   
                   return sources;
                 };
@@ -2529,7 +2534,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                 )}
                 {subspecies === "Nocturne Avenoch Host" && (
                   <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32, marginTop: 8, color: '#000', fontWeight: 400 }}>
-                    <b><i style={{ color: '#334592' }}>Eyes of the Night.</i></b> You are <i>Immune</i> to the <b><i>Blind</i></b> condition and don't have a <i>Rear Arc</i>. Additionally, whenever you Crit on an <b><i><span style={{ color: '#990000' }}>Attack</span></i></b>, you inflict the <b><i>Mesmerize</i></b> condition.
+                    {generateEyesOfTheNightJSX()}
                   </span>
                 )}
                 {subspecies === "Vulturine Avenoch Host" && (
@@ -2752,9 +2757,9 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
       <div className={styles.movementStrikeCard}>
   <h3 style={{ fontFamily: 'Arial, sans-serif' }}>Movement</h3>
         <div className={styles.cardContent}>
-          <div className={styles.horizontalLabel} style={{ color: '#38761d', fontWeight: 'bold' }}>Speed {speed}{speed !== "0hx" ? "hx" : ""}</div>
+          <div className={styles.horizontalLabel} style={{ color: '#38761d', fontWeight: 'bold' }}><u>Speed</u> {speed}{speed !== "0hx" ? "hx" : ""}</div>
           <div className={styles.horizontalLabel} style={{ color: '#38761d', fontWeight: 'bold' }}>
-            Speed Types {movement}Ground
+            <u>Speed Types</u> {movement}Ground
             {sheet?.subclass === 'Air' && (sheet?.subclassProgressionDots as any)?.airMovementFlySpeedDots?.[0] ? ', Fly' : ''}
             {sheet?.subclass === 'Water' && (sheet?.subclassProgressionDots as any)?.waterMovementSwimSpeedDots?.[0] ? ', Swim' : ''}
             {sheet?.subclass === 'Aeronaut' ? ', Fly' : ''}
@@ -2762,10 +2767,10 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
             {sheet?.subclass === 'Nanoboticist' && (sheet?.subclassProgressionDots as any)?.nanoboticistMovementFlightDot?.[0] ? ', Fly' : ''}
             {sheet?.species === 'Avenoch' ? ', Fly' : ''}
           </div>
-          <div className={styles.horizontalLabel} style={{ color: '#38761d', fontWeight: 'bold' }}>Jump Speed {(kineticJumpSpeedBonus > 0 ? kineticJumpSpeedBonus : mercurialJumpSpeedBonus > 0 ? mercurialJumpSpeedBonus : "") + (kineticJumpSpeedBonus > 0 || mercurialJumpSpeedBonus > 0 ? "hx" : "0hx")}</div>
-          <div className={styles.horizontalLabel} style={{ color: '#38761d', fontWeight: 'bold' }}>Jump Amount {kineticJumpAmountBonus > 0 ? kineticJumpAmountBonus : mercurialJumpAmountBonus > 0 ? mercurialJumpAmountBonus : "0"}</div>
+          <div className={styles.horizontalLabel} style={{ color: '#38761d', fontWeight: 'bold' }}><u>Jump Speed</u> {(kineticJumpSpeedBonus > 0 ? kineticJumpSpeedBonus : mercurialJumpSpeedBonus > 0 ? mercurialJumpSpeedBonus : "") + (kineticJumpSpeedBonus > 0 || mercurialJumpSpeedBonus > 0 ? "hx" : "0hx")}</div>
+          <div className={styles.horizontalLabel} style={{ color: '#38761d', fontWeight: 'bold' }}><u>Jump Amount</u> {kineticJumpAmountBonus > 0 ? kineticJumpAmountBonus : mercurialJumpAmountBonus > 0 ? mercurialJumpAmountBonus : "0"}</div>
           <div className={styles.horizontalLabel} style={{ color: '#38761d', fontWeight: 'bold' }}>
-            Speed Effects {
+            <u>Speed Effects</u> {
               subclass === 'Tactician'
                 ? <span style={{ fontWeight: 'normal', color: '#000' }}>Ignore <i>Rough Terrain</i></span>
                 : subclass === 'Chaos' 
@@ -2817,7 +2822,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
   <h3 style={{ fontFamily: 'Arial, sans-serif' }}>Strike</h3>
         <div className={styles.cardContent}>
           <div className={styles.horizontalLabel} style={{ color: '#351c75', fontWeight: 'bold', display: 'flex', alignItems: 'center' }}>
-            <span style={{ fontWeight: 'bold', fontFamily: 'inherit', color: '#351c75', marginRight: 4 }}>Strike Damage</span>
+            <span style={{ fontWeight: 'bold', fontFamily: 'inherit', color: '#351c75', marginRight: 4 }}><u>Strike Damage</u></span>
             {charClass === 'Technician' ? (
               (() => {
                 const strikeDots = sheet?.classCardDots?.[11] || [];
@@ -2983,7 +2988,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
               </span>
             ) : <span style={{ fontWeight: 'bold', fontFamily: 'inherit', color: '#000', marginLeft: 4 }}>{strikeDamage}</span>}
           </div>
-          <div className={styles.horizontalLabel} style={{ color: '#351c75', fontWeight: 'bold' }}>Multi Strike <span style={{ color: '#000' }}>{
+          <div className={styles.horizontalLabel} style={{ color: '#351c75', fontWeight: 'bold' }}><u>Multi Strike</u> <span style={{ color: '#000' }}>{
             charClass === 'Contemplative'
               ? (2 + (sheet?.classCardDots?.[1]?.[0] ? 1 : 0) + ((sheet?.subclassProgressionDots as any)?.kineticStrikeMultiStrikeDots?.[0] ? 1 : 0) + ((sheet?.subclassProgressionDots as any)?.mercurialStrikeMultiStrikeDots?.[0] ? 1 : 0) + ((sheet?.subclassProgressionDots as any)?.vectorialStrikeMultiStrikeDots?.[0] ? 1 : 0))
               : (subclass === 'Beguiler' && sheet?.subclassProgressionDots?.beguilerStrikeStrikeDots?.[0])
@@ -3009,7 +3014,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                                   : (multiStrike > 0 ? multiStrike : <span style={{ visibility: 'hidden' }}>0</span>)
           }</span></div>
           <div className={styles.horizontalLabel} style={{ color: '#351c75', fontWeight: 'bold' }}>
-              Strike Effects {
+              <u>Strike Effects</u> {
                 charClass === 'Contemplative' && sheet?.classCardDots?.[2]?.[0]
                   ? <span style={{ color: '#000', fontWeight: 'normal' }}>Can <span style={{ color: '#351c75' }}><b><i>Strike</i></b></span> a single target multiple times</span>
                   : (subclass === 'Naturalist' && sheet?.subclassProgressionDots?.naturalistStrikeDrainDots?.[0])
@@ -3032,6 +3037,8 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                     ? <span style={{ color: '#000', fontWeight: 'normal' }}><b><i>Spike</i></b> <b>(</b><b><u style={{ color: '#808080', display: 'inline-flex', alignItems: 'center' }}>
       Slashing<img src="/Slashing.png" alt="Slashing" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} />
       </u></b><b>)</b></span>
+                  : (subspecies === 'Nocturne' && sheet?.subspeciesCardDots?.[4]?.[0])
+                    ? <span style={{ color: '#000', fontWeight: 'normal' }}><b><i>Mesmerize</i></b></span>
                   : (subclass === 'Galvanic' && ((sheet?.subclassProgressionDots as any)?.galvanicStrikeAoEDots?.filter(Boolean).length || 0) > 0)
                     ? <span style={{ color: '#000', fontWeight: 'normal' }}><i>AoE</i> <b>[{((sheet?.subclassProgressionDots as any)?.galvanicStrikeAoEDots?.filter(Boolean).length || 0)}]</b>hx-Radius</span>
                   : (subclass === 'Tyrant' && (sheet?.subclassProgressionDots as any)?.tyrantStrikeDemorizeDots?.[0])
@@ -3071,7 +3078,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
   <h3 style={{ fontFamily: 'Arial, sans-serif' }}>Damage Interactions</h3>
         <div className={styles.cardContent}>
             <div style={{ fontWeight: 'bold', marginBottom: 6, fontFamily: 'Arial, sans-serif', color: '#666666', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
-              Resistances
+              <u>Resistances</u>
               {charClass === 'Exospecialist' && (
                 <span style={{ marginLeft: 8, display: 'inline-flex', gap: 8, flexWrap: 'wrap' }}>
                   <span style={{ display: 'inline-flex', alignItems: 'center', color: '#915927', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
@@ -3166,7 +3173,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                 </span>
               )}
             </div>
-          <div style={{ fontWeight: 'bold', marginBottom: 2, fontFamily: 'Arial, sans-serif', color: '#666666', wordBreak: 'break-word', overflowWrap: 'break-word' }}>Immunities
+          <div style={{ fontWeight: 'bold', marginBottom: 2, fontFamily: 'Arial, sans-serif', color: '#666666', wordBreak: 'break-word', overflowWrap: 'break-word' }}><u>Immunities</u>
             {subclass === 'Poisoner' && sheet?.subclassProgressionDots?.poisonerToxicImmunityDots?.[0] && (
               <span style={{ marginLeft: 8, display: 'inline-flex', alignItems: 'center', color: '#02b900', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                 <u>Toxic</u> <img src="/Toxic.png" alt="Toxic" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
@@ -3303,7 +3310,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
               </span>
             )}
           </div>
-          <div style={{ fontWeight: 'bold', marginBottom: 2, fontFamily: 'Arial, sans-serif', color: '#666666', wordBreak: 'break-word', overflowWrap: 'break-word' }}>Absorptions
+          <div style={{ fontWeight: 'bold', marginBottom: 2, fontFamily: 'Arial, sans-serif', color: '#666666', wordBreak: 'break-word', overflowWrap: 'break-word' }}><u>Absorptions</u>
             {subclass === 'Air' && (sheet?.subclassProgressionDots as any)?.airFeatureForceAbsorptionDots?.[0] && (
               <span style={{ marginLeft: 8, display: 'inline-flex', alignItems: 'center', color: '#516fff', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                 <u>Force</u> <img src="/Force.png" alt="Force" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />

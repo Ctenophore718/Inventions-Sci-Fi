@@ -39,7 +39,7 @@ export const generateDiveBombCardJSX = (sheet: CharacterSheet | null): React.JSX
   // For the card version, we don't include the cooldown text
   return (
     <>
-      The next time you <b><i>Strike</i></b> this turn, you gain an additional Damage die for each hx you've Moved this turn. Additionally, you inflict <b>[</b>{bounceText}<b>]</b>, <b>[</b>{spikeText}<b>]</b> and the <b><i>Strike</i></b> has an <i>AoE</i> <b>[{aoeRadius}]</b>hx-Radius.
+      The next time you <b><i style={{ color: '#351c75' }}>Strike</i></b> this turn, you gain an additional Damage die for each hx you've <b><i style={{ color: '#38761d' }}>Moved</i></b> this turn. Additionally, you inflict <b>[</b>{bounceText}<b>]</b>, <b>[</b>{spikeText}<b>]</b> and the <b><i style={{ color: '#351c75' }}>Strike</i></b> has an <i>AoE</i> <b>[{aoeRadius}]</b>hx-Radius.
     </>
   );
 };
