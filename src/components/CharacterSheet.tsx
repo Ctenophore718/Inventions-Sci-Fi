@@ -101,11 +101,13 @@ type Props = {
   setSpecies: (sp: string) => void;
   subspecies: string;
   setSubspecies: (ss: string) => void;
+  hostSpecies?: string;
+  setHostSpecies?: (hs: string) => void;
   isNewCharacter?: boolean;
 };
 
 
-const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, onAutoSave, charClass, setCharClass, subclass, setSubclass, species, setSpecies, subspecies, setSubspecies }) => {
+const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, onAutoSave, charClass, setCharClass, subclass, setSubclass, species, setSpecies, subspecies, setSubspecies, hostSpecies, setHostSpecies }) => {
   
   console.log('CharacterSheet render started, sheet:', sheet ? `ID: ${sheet.id}` : 'NULL');
   
@@ -528,6 +530,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
           if (updatedSheet.subclass !== subclass) setSubclass(updatedSheet.subclass || "");
           if (updatedSheet.species !== species) setSpecies(updatedSheet.species || "");
           if (updatedSheet.subspecies !== subspecies) setSubspecies(updatedSheet.subspecies || "");
+          if (updatedSheet.hostSpecies !== hostSpecies && setHostSpecies) setHostSpecies(updatedSheet.hostSpecies || "");
         }
       }
     };
@@ -562,6 +565,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
         if (updatedSheet.subclass !== subclass) setSubclass(updatedSheet.subclass || "");
         if (updatedSheet.species !== species) setSpecies(updatedSheet.species || "");
         if (updatedSheet.subspecies !== subspecies) setSubspecies(updatedSheet.subspecies || "");
+        if (updatedSheet.hostSpecies !== hostSpecies && setHostSpecies) setHostSpecies(updatedSheet.hostSpecies || "");
       }
     };
 
@@ -574,7 +578,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
       window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('character-updated', handleCharacterUpdate as EventListener);
     };
-  }, [sheet?.id, charClass, subclass, species, subspecies, credits, chemTokens, maxHitPoints]);
+  }, [sheet?.id, charClass, subclass, species, subspecies, hostSpecies, credits, chemTokens, maxHitPoints]);
 
   const classOptions = [
     { label: "Chemist", value: "Chemist", color: "#721131" },
@@ -2328,9 +2332,17 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
               <span style={{ fontFamily: 'Arial, sans-serif' }}>Subspecies</span>
               <div className={styles.selectWrapper}>
                 <select 
-                  value={subspecies} 
+                  value={species === "Cerebronych" ? (hostSpecies || "") : subspecies} 
                   onChange={e => {
                     const val = e.target.value;
+                    
+                    // If Cerebronych, save to hostSpecies instead of subspecies
+                    if (species === "Cerebronych") {
+                      if (setHostSpecies) setHostSpecies(val);
+                      handleAutoSave({ hostSpecies: val });
+                      return;
+                    }
+                    
                     setSubspecies(val);
                     // Special case: Nocturne and Vulturine should always set species to Avenoch
                     if (val === "Nocturne" || val === "Vulturine") {

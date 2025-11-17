@@ -7,6 +7,7 @@ export type CharacterSheet = {
   subclass: string;
   species: string;
   subspecies: string;
+  hostSpecies?: string; // For Cerebronych species - the host they mimic
   background: string;
 
 

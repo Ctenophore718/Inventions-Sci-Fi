@@ -22,6 +22,7 @@ import LevelUpSubclassesExospecialist from "./LevelUpSubclassesExospecialist";
 import LevelUpSubclassesGunslinger from "./LevelUpSubclassesGunslinger";
 import LevelUpSubclassesTechnician from "./LevelUpSubclassesTechnician";
 import LevelUpSpeciesAvenoch from "./LevelUpSpeciesAvenoch";
+import LevelUpSpeciesCerebronych from "./LevelUpSpeciesCerebronych";
 import { calculateChemistFeatureData } from "../utils/chemistFeature";
 
 
@@ -544,7 +545,11 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
   const handleSpeciesChange = (newSpecies: string) => {
     if (!newSpecies || newSpecies === species) {
       setSpecies(newSpecies);
-      if (newSpecies !== species) setSubspecies(""); // Reset subspecies when species changes
+      if (newSpecies !== species) {
+        // Auto-set Cerebronych (Cont.) when Cerebronych is selected
+        const newSubspecies = newSpecies === "Cerebronych" ? "Cerebronych (Cont.)" : "";
+        setSubspecies(newSubspecies);
+      }
       return;
     }
 
@@ -565,7 +570,9 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
     if (hasExpenditures) {
       const resetSheet = resetAllExpenditures();
       if (resetSheet) {
-        const updatedSheet = { ...resetSheet, species: newSpecies, subspecies: "" }; // Reset subspecies too
+        // Auto-set Cerebronych (Cont.) when Cerebronych is selected
+        const newSubspecies = newSpecies === "Cerebronych" ? "Cerebronych (Cont.)" : "";
+        const updatedSheet = { ...resetSheet, species: newSpecies, subspecies: newSubspecies };
         saveCharacterSheet(updatedSheet);
         
         // Update local state
@@ -573,16 +580,22 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
         setSpSpent(0);
         setClassCardDots(Array(10).fill(false));
         setSkillDots(resetSheet.skillDots);
-        setSubspecies("");
+        // Auto-set Cerebronych (Cont.) when Cerebronych is selected
+        const finalSubspecies = newSpecies === "Cerebronych" ? "Cerebronych (Cont.)" : "";
+        setSubspecies(finalSubspecies);
       }
     } else {
       // No expenditures, just update the species and reset subspecies
-      setSubspecies(""); // Reset subspecies when species changes
-      handleAutoSave({ species: newSpecies, subspecies: "" });
+      // Auto-set Cerebronych (Cont.) when Cerebronych is selected
+      const newSubspecies = newSpecies === "Cerebronych" ? "Cerebronych (Cont.)" : "";
+      setSubspecies(newSubspecies);
+      handleAutoSave({ species: newSpecies, subspecies: newSubspecies });
     }
     
     setSpecies(newSpecies);
-    setSubspecies("");
+    // Auto-set Cerebronych (Cont.) when Cerebronych is selected
+    const finalSubspecies = newSpecies === "Cerebronych" ? "Cerebronych (Cont.)" : "";
+    setSubspecies(finalSubspecies);
   };
 
   const handleSubspeciesChange = (newSubspecies: string) => {
@@ -1125,7 +1138,9 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
       { label: "Nocturne", value: "Nocturne", color: "#334592", species: "" },
       { label: "Vulturine", value: "Vulturine", color: "#a96d8c", species: "" },
     ],
-    Cerebronych: [],
+    Cerebronych: [
+      { label: "Cerebronych (Cont.)", value: "Cerebronych (Cont.)", color: "#5f5e2b", species: "Cerebronych" },
+    ],
     Chloroptid: [
       { label: "Barkskin", value: "Barkskin", color: "#5f2d2b", species: "Chloroptid" },
       { label: "Carnivorous", value: "Carnivorous", color: "#2b2d5f", species: "Chloroptid" },
@@ -1200,9 +1215,8 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
     { label: "Mustelid Praedari Host", value: "Mustelid Praedari Host", color: "#699239" },
     { label: "Ursid Praedari Host", value: "Ursid Praedari Host", color: "#9026b1" },
   ];
-  const subspeciesOptions = species === "Cerebronych"
-    ? hostOptions
-    : subspeciesOptionsMap[species] || [];
+  const subspeciesOptions = subspeciesOptionsMap[species] || [];
+
 
   return (
     <div style={{ padding: "1rem" }}>
@@ -1749,64 +1763,101 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                 setNotice={setNotice}
               />
             )}
+
+            {/* Cerebronych Species Content */}
+            {species === "Cerebronych" && (
+              <LevelUpSpeciesCerebronych
+                sheet={sheet}
+                species={species}
+                subspecies={subspecies}
+                contentType="species"
+                onAutoSave={handleAutoSave}
+                xpTotal={xpTotal}
+                spTotal={spTotal}
+                xpSpent={xpSpent}
+                spSpent={spSpent}
+                setXpSpent={setXpSpent}
+                setSpSpent={setSpSpent}
+                setNotice={setNotice}
+              />
+            )}
         </div>
         {/* Subspecies Card */}
         <div style={{ background: '#fff', border: '2px solid #333', borderRadius: 8, boxShadow: '0 2px 4px rgba(0,0,0,0.1)', minHeight: 80, padding: '1.2rem', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <div style={{ fontWeight: 'bold', color: 'black', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1.1em', marginBottom: 6 }}>Subspecies</div>
-            <div className={styles.selectWrapper} style={{ width: '100%' }}>
-              <select
-                value={subspecies}
-                onChange={e => {
-                  const val = e.target.value;
-                  handleSubspeciesChange(val);
-                  if (!species && val) {
-                    const found = allSubspeciesOptions.find(opt => opt.value === val);
-                    if (found) {
-                      handleSpeciesChange(found.species);
-                      handleAutoSave({ subspecies: val, species: found.species });
-                    } else {
-                      handleAutoSave({ subspecies: val });
-                    }
-                  } else {
-                    handleAutoSave({ subspecies: val });
-                  }
-                }}
-                className={styles.colorSelect + ' ' + styles.selectedSubspeciesColor}
-                style={{
-                  '--selected-subspecies-color': (subspeciesOptions.find(opt => opt.value === subspecies) || allSubspeciesOptions.find(opt => opt.value === subspecies))?.color || '#000',
+            
+            {/* Cerebronych shows static text instead of dropdown */}
+            {species === "Cerebronych" ? (
+              <div className={styles.selectWrapper} style={{ width: '100%' }}>
+                <div style={{
                   fontWeight: 'bold',
                   padding: '4px 8px',
                   borderRadius: '4px',
                   border: '1px solid #ccc',
                   textAlign: 'center',
-                  color: `${(subspeciesOptions.find(opt => opt.value === subspecies) || allSubspeciesOptions.find(opt => opt.value === subspecies))?.color || '#000'} !important`,
+                  color: '#5f5e2b',
                   minWidth: '120px',
                   background: 'white',
                   width: '100%',
-                  fontSize: '1.3em'
-                } as React.CSSProperties}
-              >
-                <option value="" style={{ color: 'black', backgroundColor: 'white' }}>
-                  {species === "Cerebronych" ? "Select Host" : "Select Subspecies"}
-                </option>
-                {(species === "Cerebronych"
-                  ? hostOptions
-                  : (species ? subspeciesOptions : allSubspeciesOptions)
-                ).map(opt => (
-                  <option
-                    key={opt.value}
-                    value={opt.value}
-                    style={{
-                      color: opt.color,
-                      backgroundColor: 'white',
-                      fontWeight: 'bold'
-                    }}
-                  >
-                    {opt.label}
+                  fontSize: '1.3em',
+                  fontFamily: 'Arial, Helvetica, sans-serif'
+                }}>
+                  Cerebronych (Cont.)
+                </div>
+              </div>
+            ) : (
+              <div className={styles.selectWrapper} style={{ width: '100%' }}>
+                <select
+                  value={subspecies}
+                  onChange={e => {
+                    const val = e.target.value;
+                    handleSubspeciesChange(val);
+                    if (!species && val) {
+                      const found = allSubspeciesOptions.find(opt => opt.value === val);
+                      if (found) {
+                        handleSpeciesChange(found.species);
+                        handleAutoSave({ subspecies: val, species: found.species });
+                      } else {
+                        handleAutoSave({ subspecies: val });
+                      }
+                    } else {
+                      handleAutoSave({ subspecies: val });
+                    }
+                  }}
+                  className={styles.colorSelect + ' ' + styles.selectedSubspeciesColor}
+                  style={{
+                    '--selected-subspecies-color': (subspeciesOptions.find(opt => opt.value === subspecies) || allSubspeciesOptions.find(opt => opt.value === subspecies))?.color || '#000',
+                    fontWeight: 'bold',
+                    padding: '4px 8px',
+                    borderRadius: '4px',
+                    border: '1px solid #ccc',
+                    textAlign: 'center',
+                    color: `${(subspeciesOptions.find(opt => opt.value === subspecies) || allSubspeciesOptions.find(opt => opt.value === subspecies))?.color || '#000'} !important`,
+                    minWidth: '120px',
+                    background: 'white',
+                    width: '100%',
+                    fontSize: '1.3em'
+                  } as React.CSSProperties}
+                >
+                  <option value="" style={{ color: 'black', backgroundColor: 'white' }}>
+                    Select Subspecies
                   </option>
-                ))}
-              </select>
-            </div>
+                  {(species ? subspeciesOptions : allSubspeciesOptions).map(opt => (
+                    <option
+                      key={opt.value}
+                      value={opt.value}
+                      style={{
+                        color: opt.color,
+                        backgroundColor: 'white',
+                        fontWeight: 'bold'
+                      }}
+                    >
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
             
             {/* Corvid Subspecies Content */}
             {subspecies === "Corvid" && (
@@ -1865,6 +1916,24 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
             {/* Vulturine Subspecies Content */}
             {subspecies === "Vulturine" && (
               <LevelUpSpeciesAvenoch
+                sheet={sheet}
+                species={species}
+                subspecies={subspecies}
+                contentType="subspecies"
+                onAutoSave={handleAutoSave}
+                xpTotal={xpTotal}
+                spTotal={spTotal}
+                xpSpent={xpSpent}
+                spSpent={spSpent}
+                setXpSpent={setXpSpent}
+                setSpSpent={setSpSpent}
+                setNotice={setNotice}
+              />
+            )}
+            
+            {/* Cerebronych (Cont.) Subspecies Content */}
+            {subspecies === "Cerebronych (Cont.)" && (
+              <LevelUpSpeciesCerebronych
                 sheet={sheet}
                 species={species}
                 subspecies={subspecies}

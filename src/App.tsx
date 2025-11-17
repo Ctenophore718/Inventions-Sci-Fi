@@ -18,6 +18,7 @@ const App = () => {
   const [subclass, setSubclass] = useState<string>(currentSheet?.subclass || "");
   const [species, setSpecies] = useState<string>(currentSheet?.species || "");
   const [subspecies, setSubspecies] = useState<string>(currentSheet?.subspecies || "");
+  const [hostSpecies, setHostSpecies] = useState<string>(currentSheet?.hostSpecies || "");
 
   // Auto-save debounce timeout
   const autoSaveTimeoutRef = React.useRef<number | null>(null);
@@ -152,6 +153,7 @@ const App = () => {
       setSubclass(newSheet.subclass || "");
       setSpecies(newSheet.species || "");
       setSubspecies(newSheet.subspecies || "");
+      setHostSpecies(newSheet.hostSpecies || "");
       
       performAutoSave(newSheet);
       return;
@@ -169,13 +171,14 @@ const App = () => {
       if (updates.subclass !== undefined) setSubclass(updates.subclass);
       if (updates.species !== undefined) setSpecies(updates.species);
       if (updates.subspecies !== undefined) setSubspecies(updates.subspecies);
+      if (updates.hostSpecies !== undefined) setHostSpecies(updates.hostSpecies);
       
       // Now trigger the debounced save
       void performAutoSave(updatedSheet);
     } else {
       console.log('Error: Unexpected state - no current sheet available');
     }
-  }, [currentSheet, performAutoSave, newCharacterCreated, charClass, subclass, species, subspecies]);
+  }, [currentSheet, performAutoSave, newCharacterCreated, charClass, subclass, species, subspecies, hostSpecies]);
 
   // Cross-window synchronization
   React.useEffect(() => {
@@ -189,6 +192,7 @@ const App = () => {
           setSubclass(updatedSheet.subclass || "");
           setSpecies(updatedSheet.species || "");
           setSubspecies(updatedSheet.subspecies || "");
+          setHostSpecies(updatedSheet.hostSpecies || "");
         }
       }
     };
@@ -200,6 +204,7 @@ const App = () => {
         setSubclass(e.detail.sheet.subclass || "");
         setSpecies(e.detail.sheet.species || "");
         setSubspecies(e.detail.sheet.subspecies || "");
+        setHostSpecies(e.detail.sheet.hostSpecies || "");
       }
     };
 
@@ -230,6 +235,7 @@ const App = () => {
     setSubclass(sheet.subclass || "");
     setSpecies(sheet.species || "");
     setSubspecies(sheet.subspecies || "");
+    setHostSpecies(sheet.hostSpecies || "");
     setNewCharacterCreated(false); // Reset the flag when loading existing character
     console.log('handleEdit - setting view to editor');
     setView("editor");
@@ -241,6 +247,7 @@ const App = () => {
     setSubclass("");
     setSpecies("");
     setSubspecies("");
+    setHostSpecies("");
     setNewCharacterCreated(true);
     
     // Create and immediately save a new character
@@ -259,7 +266,8 @@ const App = () => {
       currentSheet.charClass !== charClass ||
       currentSheet.subclass !== subclass ||
       currentSheet.species !== species ||
-      currentSheet.subspecies !== subspecies
+      currentSheet.subspecies !== subspecies ||
+      currentSheet.hostSpecies !== hostSpecies
     );
 
     if (hasChanges) {
@@ -377,6 +385,8 @@ const App = () => {
             setSpecies={setSpecies}
             subspecies={subspecies}
             setSubspecies={setSubspecies}
+            hostSpecies={hostSpecies}
+            setHostSpecies={setHostSpecies}
             isNewCharacter={newCharacterCreated}
           />
         </div>
