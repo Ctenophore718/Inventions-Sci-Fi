@@ -31,6 +31,9 @@ const LevelUpSpeciesCerebronych: React.FC<LevelUpSpeciesCerebronychProps> = ({
   setNotice
 }) => {
   
+  // State for custom dropdown
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
   // Cerebronych species card dots default structure
   const defaultCerebronychDots = [ 
     [false],               // Parasitic Composure: Mesmerize immunity (5xp)
@@ -164,6 +167,49 @@ const LevelUpSpeciesCerebronych: React.FC<LevelUpSpeciesCerebronychProps> = ({
     }
   };
 
+  // Helper function to render colored host text
+  const renderColoredHostText = (hostValue: string): React.JSX.Element => {
+    const colorMap: { [key: string]: React.JSX.Element } = {
+      "": <span style={{ fontWeight: 'bold' }}>Select Host</span>,
+      "Avenoch Host": <><span style={{ color: '#2b5f59', fontWeight: 'bold' }}>Avenoch</span> <span style={{ color: '#5f5e2b', fontWeight: 'bold' }}>Host</span></>,
+      "Corvid Avenoch Host": <><span style={{ color: '#75904e', fontWeight: 'bold' }}>Corvid</span> <span style={{ color: '#2b5f59', fontWeight: 'bold' }}>Avenoch</span> <span style={{ color: '#5f5e2b', fontWeight: 'bold' }}>Host</span></>,
+      "Falcador Avenoch Host": <><span style={{ color: '#6d7156', fontWeight: 'bold' }}>Falcador</span> <span style={{ color: '#2b5f59', fontWeight: 'bold' }}>Avenoch</span> <span style={{ color: '#5f5e2b', fontWeight: 'bold' }}>Host</span></>,
+      "Nocturne Avenoch Host": <><span style={{ color: '#334592', fontWeight: 'bold' }}>Nocturne</span> <span style={{ color: '#2b5f59', fontWeight: 'bold' }}>Avenoch</span> <span style={{ color: '#5f5e2b', fontWeight: 'bold' }}>Host</span></>,
+      "Vulturine Avenoch Host": <><span style={{ color: '#a96d8c', fontWeight: 'bold' }}>Vulturine</span> <span style={{ color: '#2b5f59', fontWeight: 'bold' }}>Avenoch</span> <span style={{ color: '#5f5e2b', fontWeight: 'bold' }}>Host</span></>,
+      "Chloroptid Host": <><span style={{ color: '#315f2b', fontWeight: 'bold' }}>Chloroptid</span> <span style={{ color: '#5f5e2b', fontWeight: 'bold' }}>Host</span></>,
+      "Barkskin Chloroptid Host": <><span style={{ color: '#5f2d2b', fontWeight: 'bold' }}>Barkskin</span> <span style={{ color: '#315f2b', fontWeight: 'bold' }}>Chloroptid</span> <span style={{ color: '#5f5e2b', fontWeight: 'bold' }}>Host</span></>,
+      "Carnivorous Chloroptid Host": <><span style={{ color: '#2b2d5f', fontWeight: 'bold' }}>Carnivorous</span> <span style={{ color: '#315f2b', fontWeight: 'bold' }}>Chloroptid</span> <span style={{ color: '#5f5e2b', fontWeight: 'bold' }}>Host</span></>,
+      "Drifting Chloroptid Host": <><span style={{ color: '#5f8a5f', fontWeight: 'bold' }}>Drifting</span> <span style={{ color: '#315f2b', fontWeight: 'bold' }}>Chloroptid</span> <span style={{ color: '#5f5e2b', fontWeight: 'bold' }}>Host</span></>,
+      "Viny Chloroptid Host": <><span style={{ color: '#5f5f2b', fontWeight: 'bold' }}>Viny</span> <span style={{ color: '#315f2b', fontWeight: 'bold' }}>Chloroptid</span> <span style={{ color: '#5f5e2b', fontWeight: 'bold' }}>Host</span></>,
+      "Cognizant Host": <><span style={{ color: '#2b3b5f', fontWeight: 'bold' }}>Cognizant</span> <span style={{ color: '#5f5e2b', fontWeight: 'bold' }}>Host</span></>,
+      "Android Cognizant Host": <><span style={{ color: '#581fbd', fontWeight: 'bold' }}>Android</span> <span style={{ color: '#2b3b5f', fontWeight: 'bold' }}>Cognizant</span> <span style={{ color: '#5f5e2b', fontWeight: 'bold' }}>Host</span></>,
+      "Utility Droid Cognizant Host": <><span style={{ color: '#bd891f', fontWeight: 'bold' }}>Utility Droid</span> <span style={{ color: '#2b3b5f', fontWeight: 'bold' }}>Cognizant</span> <span style={{ color: '#5f5e2b', fontWeight: 'bold' }}>Host</span></>,
+      "Emberfolk Host": <><span style={{ color: '#5f2b2b', fontWeight: 'bold' }}>Emberfolk</span> <span style={{ color: '#5f5e2b', fontWeight: 'bold' }}>Host</span></>,
+      "Petran Emberfolk Host": <><span style={{ color: '#735311', fontWeight: 'bold' }}>Petran</span> <span style={{ color: '#5f2b2b', fontWeight: 'bold' }}>Emberfolk</span> <span style={{ color: '#5f5e2b', fontWeight: 'bold' }}>Host</span></>,
+      "Pyran Emberfolk Host": <><span style={{ color: '#b31111', fontWeight: 'bold' }}>Pyran</span> <span style={{ color: '#5f2b2b', fontWeight: 'bold' }}>Emberfolk</span> <span style={{ color: '#5f5e2b', fontWeight: 'bold' }}>Host</span></>,
+      "Entomos Host": <><span style={{ color: '#5f422b', fontWeight: 'bold' }}>Entomos</span> <span style={{ color: '#5f5e2b', fontWeight: 'bold' }}>Host</span></>,
+      "Apocritan Entomos Host": <><span style={{ color: '#6d7156', fontWeight: 'bold' }}>Apocritan</span> <span style={{ color: '#5f422b', fontWeight: 'bold' }}>Entomos</span> <span style={{ color: '#5f5e2b', fontWeight: 'bold' }}>Host</span></>,
+      "Dynastes Entomos Host": <><span style={{ color: '#334592', fontWeight: 'bold' }}>Dynastes</span> <span style={{ color: '#5f422b', fontWeight: 'bold' }}>Entomos</span> <span style={{ color: '#5f5e2b', fontWeight: 'bold' }}>Host</span></>,
+      "Mantid Entomos Host": <><span style={{ color: '#75904e', fontWeight: 'bold' }}>Mantid</span> <span style={{ color: '#5f422b', fontWeight: 'bold' }}>Entomos</span> <span style={{ color: '#5f5e2b', fontWeight: 'bold' }}>Host</span></>,
+      "Human Host": <><span style={{ color: '#2b315f', fontWeight: 'bold' }}>Human</span> <span style={{ color: '#5f5e2b', fontWeight: 'bold' }}>Host</span></>,
+      "Diminutive Human Host": <><span style={{ color: '#c3735f', fontWeight: 'bold' }}>Diminutive</span> <span style={{ color: '#2b315f', fontWeight: 'bold' }}>Human</span> <span style={{ color: '#5f5e2b', fontWeight: 'bold' }}>Host</span></>,
+      "Lithe Human Host": <><span style={{ color: '#2b5f5f', fontWeight: 'bold' }}>Lithe</span> <span style={{ color: '#2b315f', fontWeight: 'bold' }}>Human</span> <span style={{ color: '#5f5e2b', fontWeight: 'bold' }}>Host</span></>,
+      "Massive Human Host": <><span style={{ color: '#2b175f', fontWeight: 'bold' }}>Massive</span> <span style={{ color: '#2b315f', fontWeight: 'bold' }}>Human</span> <span style={{ color: '#5f5e2b', fontWeight: 'bold' }}>Host</span></>,
+      "Stout Human Host": <><span style={{ color: '#5f2b2b', fontWeight: 'bold' }}>Stout</span> <span style={{ color: '#2b315f', fontWeight: 'bold' }}>Human</span> <span style={{ color: '#5f5e2b', fontWeight: 'bold' }}>Host</span></>,
+      "Lumenaren Host": <><span style={{ color: '#515f2b', fontWeight: 'bold' }}>Lumenaren</span> <span style={{ color: '#5f5e2b', fontWeight: 'bold' }}>Host</span></>,
+      "Infrared Lumenaren Host": <><span style={{ color: '#b17fbe', fontWeight: 'bold' }}>Infrared</span> <span style={{ color: '#515f2b', fontWeight: 'bold' }}>Lumenaren</span> <span style={{ color: '#5f5e2b', fontWeight: 'bold' }}>Host</span></>,
+      "Radiofrequent Lumenaren Host": <><span style={{ color: '#bea97f', fontWeight: 'bold' }}>Radiofrequent</span> <span style={{ color: '#515f2b', fontWeight: 'bold' }}>Lumenaren</span> <span style={{ color: '#5f5e2b', fontWeight: 'bold' }}>Host</span></>,
+      "X-Ray Lumenaren Host": <><span style={{ color: '#7f8abe', fontWeight: 'bold' }}>X-Ray</span> <span style={{ color: '#515f2b', fontWeight: 'bold' }}>Lumenaren</span> <span style={{ color: '#5f5e2b', fontWeight: 'bold' }}>Host</span></>,
+      "Praedari Host": <><span style={{ color: '#5f2b5c', fontWeight: 'bold' }}>Praedari</span> <span style={{ color: '#5f5e2b', fontWeight: 'bold' }}>Host</span></>,
+      "Canid Praedari Host": <><span style={{ color: '#2f8da6', fontWeight: 'bold' }}>Canid</span> <span style={{ color: '#5f2b5c', fontWeight: 'bold' }}>Praedari</span> <span style={{ color: '#5f5e2b', fontWeight: 'bold' }}>Host</span></>,
+      "Felid Praedari Host": <><span style={{ color: '#b16326', fontWeight: 'bold' }}>Felid</span> <span style={{ color: '#5f2b5c', fontWeight: 'bold' }}>Praedari</span> <span style={{ color: '#5f5e2b', fontWeight: 'bold' }}>Host</span></>,
+      "Mustelid Praedari Host": <><span style={{ color: '#699239', fontWeight: 'bold' }}>Mustelid</span> <span style={{ color: '#5f2b5c', fontWeight: 'bold' }}>Praedari</span> <span style={{ color: '#5f5e2b', fontWeight: 'bold' }}>Host</span></>,
+      "Ursid Praedari Host": <><span style={{ color: '#9026b1', fontWeight: 'bold' }}>Ursid</span> <span style={{ color: '#5f2b5c', fontWeight: 'bold' }}>Praedari</span> <span style={{ color: '#5f5e2b', fontWeight: 'bold' }}>Host</span></>,
+    };
+
+    return colorMap[hostValue] || <span style={{ fontWeight: 'bold' }}>Select Host</span>;
+  };
+
   // Helper function to get the host feature JSX based on selected host
   const getHostFeatureJSX = (hostValue: string): React.JSX.Element | null => {
     if (!hostValue) return null;
@@ -224,70 +270,131 @@ const LevelUpSpeciesCerebronych: React.FC<LevelUpSpeciesCerebronychProps> = ({
             </div>
           </div>
 
-          {/* Select Host Dropdown */}
-          <div style={{ marginTop: '8px', marginBottom: '12px' }}>
-            <select
-              value={sheet?.hostSpecies || ""}
-              onChange={(e) => {
-                const val = e.target.value;
-                if (onAutoSave) {
-                  onAutoSave({ hostSpecies: val });
+          {/* Select Host Custom Dropdown */}
+          <div style={{ marginTop: '8px', marginBottom: '12px', position: 'relative', display: 'inline-block' }}>
+            {/* Backdrop to close dropdown when clicking outside */}
+            {isDropdownOpen && (
+              <div
+                onClick={() => setIsDropdownOpen(false)}
+                style={{
+                  position: 'fixed',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  zIndex: 999
+                }}
+              />
+            )}
+
+            {/* Custom dropdown trigger */}
+            <div
+              ref={(el) => {
+                if (el && isDropdownOpen) {
+                  // Calculate if dropdown should open upward or downward
+                  const rect = el.getBoundingClientRect();
+                  const spaceBelow = window.innerHeight - rect.bottom;
+                  const spaceAbove = rect.top;
+                  const dropdownHeight = 300; // maxHeight of dropdown
+
+                  // Store which direction to open
+                  el.setAttribute('data-open-upward', spaceBelow < dropdownHeight && spaceAbove > spaceBelow ? 'true' : 'false');
                 }
               }}
-              style={{ 
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsDropdownOpen(!isDropdownOpen);
+              }}
+              style={{
                 fontSize: '1em',
-                padding: '2px 8px', 
-                borderRadius: '6px', 
-                border: '1px solid #ccc', 
-                background: '#fff', 
-                color: '#222',
-                fontWeight: 'bold',
-                marginBottom: '4px',
+                padding: '2px 8px',
+                borderRadius: '6px',
+                border: '1px solid #ccc',
+                background: '#fff',
                 textAlign: 'left',
-                minWidth: '180px',
-                fontFamily: 'Arial, Helvetica, sans-serif'
+                minWidth: '200px',
+                width: 'fit-content',
+                fontFamily: 'Arial, Helvetica, sans-serif',
+                cursor: 'pointer',
+                userSelect: 'none',
+                position: 'relative',
+                zIndex: 1001
               }}
             >
-              <option value="" style={{ fontWeight: 'bold', color: 'black' }}>Select Host</option>
-              <option value="Avenoch Host" style={{ fontWeight: 'bold', color: '#2b5f59' }}>Avenoch Host</option>
-              <option value="Corvid Avenoch Host" style={{ fontWeight: 'bold', color: '#75904e' }}>Corvid Avenoch Host</option>
-              <option value="Falcador Avenoch Host" style={{ fontWeight: 'bold', color: '#6d7156' }}>Falcador Avenoch Host</option>
-              <option value="Nocturne Avenoch Host" style={{ fontWeight: 'bold', color: '#334592' }}>Nocturne Avenoch Host</option>
-              <option value="Vulturine Avenoch Host" style={{ fontWeight: 'bold', color: '#a96d8c' }}>Vulturine Avenoch Host</option>
-              <option value="Chloroptid Host" style={{ fontWeight: 'bold', color: '#315f2b' }}>Chloroptid Host</option>
-              <option value="Barkskin Chloroptid Host" style={{ fontWeight: 'bold', color: '#5f2d2b' }}>Barkskin Chloroptid Host</option>
-              <option value="Carnivorous Chloroptid Host" style={{ fontWeight: 'bold', color: '#2b2d5f' }}>Carnivorous Chloroptid Host</option>
-              <option value="Drifting Chloroptid Host" style={{ fontWeight: 'bold', color: '#5f8a5f' }}>Drifting Chloroptid Host</option>
-              <option value="Viny Chloroptid Host" style={{ fontWeight: 'bold', color: '#5f5f2b' }}>Viny Chloroptid Host</option>
-              <option value="Cognizant Host" style={{ fontWeight: 'bold', color: '#2b3b5f' }}>Cognizant Host</option>
-              <option value="Android Cognizant Host" style={{ fontWeight: 'bold', color: '#581fbd' }}>Android Cognizant Host</option>
-              <option value="Utility Droid Cognizant Host" style={{ fontWeight: 'bold', color: '#bd891f' }}>Utility Droid Cognizant Host</option>
-              <option value="Emberfolk Host" style={{ fontWeight: 'bold', color: '#5f2b2b' }}>Emberfolk Host</option>
-              <option value="Petran Emberfolk Host" style={{ fontWeight: 'bold', color: '#735311' }}>Petran Emberfolk Host</option>
-              <option value="Pyran Emberfolk Host" style={{ fontWeight: 'bold', color: '#b31111' }}>Pyran Emberfolk Host</option>
-              <option value="Entomos Host" style={{ fontWeight: 'bold', color: '#5f422b' }}>Entomos Host</option>
-              <option value="Apocritan Entomos Host" style={{ fontWeight: 'bold', color: '#6d7156' }}>Apocritan Entomos Host</option>
-              <option value="Dynastes Entomos Host" style={{ fontWeight: 'bold', color: '#334592' }}>Dynastes Entomos Host</option>
-              <option value="Mantid Entomos Host" style={{ fontWeight: 'bold', color: '#75904e' }}>Mantid Entomos Host</option>
-              <option value="Human Host" style={{ fontWeight: 'bold', color: '#2b315f' }}>Human Host</option>
-              <option value="Diminutive Human Host" style={{ fontWeight: 'bold', color: '#c3735f' }}>Diminutive Human Host</option>
-              <option value="Lithe Human Host" style={{ fontWeight: 'bold', color: '#2b5f5f' }}>Lithe Human Host</option>
-              <option value="Massive Human Host" style={{ fontWeight: 'bold', color: '#2b175f' }}>Massive Human Host</option>
-              <option value="Stout Human Host" style={{ fontWeight: 'bold', color: '#5f2b2b' }}>Stout Human Host</option>
-              <option value="Lumenaren Host" style={{ fontWeight: 'bold', color: '#515f2b' }}>Lumenaren Host</option>
-              <option value="Infrared Lumenaren Host" style={{ fontWeight: 'bold', color: '#b17fbe' }}>Infrared Lumenaren Host</option>
-              <option value="Radiofrequent Lumenaren Host" style={{ fontWeight: 'bold', color: '#bea97f' }}>Radiofrequent Lumenaren Host</option>
-              <option value="X-Ray Lumenaren Host" style={{ fontWeight: 'bold', color: '#7f8abe' }}>X-Ray Lumenaren Host</option>
-              <option value="Praedari Host" style={{ fontWeight: 'bold', color: '#5f2b5c' }}>Praedari Host</option>
-              <option value="Canid Praedari Host" style={{ fontWeight: 'bold', color: '#2f8da6' }}>Canid Praedari Host</option>
-              <option value="Felid Praedari Host" style={{ fontWeight: 'bold', color: '#b16326' }}>Felid Praedari Host</option>
-              <option value="Mustelid Praedari Host" style={{ fontWeight: 'bold', color: '#699239' }}>Mustelid Praedari Host</option>
-              <option value="Ursid Praedari Host" style={{ fontWeight: 'bold', color: '#9026b1' }}>Ursid Praedari Host</option>
-            </select>
+              {renderColoredHostText(sheet?.hostSpecies || "")}
+            </div>
+
+            {/* Custom dropdown menu */}
+            {isDropdownOpen && (() => {
+              const triggerElement = document.querySelector('[data-open-upward]') as HTMLElement;
+              const openUpward = triggerElement?.getAttribute('data-open-upward') === 'true';
+
+              return (
+                <div
+                  onClick={(e) => e.stopPropagation()}
+                  style={{
+                    position: 'absolute',
+                    ...(openUpward ? { bottom: '100%', marginBottom: '0px' } : { top: '100%', marginTop: '0px' }),
+                    left: 0,
+                    zIndex: 1000,
+                    background: '#fff',
+                    border: '1px solid #ccc',
+                    borderRadius: '6px',
+                    minWidth: '200px',
+                    width: 'fit-content',
+                    maxHeight: '300px',
+                    overflowY: 'auto',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                    fontFamily: 'Arial, Helvetica, sans-serif',
+                    fontSize: '1em'
+                  }}
+                >
+                  {/* Dropdown options */}
+                  {["", "Avenoch Host", "Corvid Avenoch Host", "Falcador Avenoch Host", "Nocturne Avenoch Host", "Vulturine Avenoch Host",
+                    "Chloroptid Host", "Barkskin Chloroptid Host", "Carnivorous Chloroptid Host", "Drifting Chloroptid Host", "Viny Chloroptid Host",
+                    "Cognizant Host", "Android Cognizant Host", "Utility Droid Cognizant Host",
+                    "Emberfolk Host", "Petran Emberfolk Host", "Pyran Emberfolk Host",
+                    "Entomos Host", "Apocritan Entomos Host", "Dynastes Entomos Host", "Mantid Entomos Host",
+                    "Human Host", "Diminutive Human Host", "Lithe Human Host", "Massive Human Host", "Stout Human Host",
+                    "Lumenaren Host", "Infrared Lumenaren Host", "Radiofrequent Lumenaren Host", "X-Ray Lumenaren Host",
+                    "Praedari Host", "Canid Praedari Host", "Felid Praedari Host", "Mustelid Praedari Host", "Ursid Praedari Host"
+                  ].map((hostOption) => (
+                    <div
+                      key={hostOption}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (onAutoSave) {
+                          onAutoSave({ hostSpecies: hostOption });
+                        }
+                        setIsDropdownOpen(false);
+                      }}
+                      style={{
+                        padding: '4px 8px',
+                        cursor: 'pointer',
+                        background: sheet?.hostSpecies === hostOption ? '#e6f2ff' : '#fff',
+                        borderBottom: '1px solid #f0f0f0'
+                      }}
+                      onMouseEnter={(e) => {
+                        if (sheet?.hostSpecies !== hostOption) {
+                          e.currentTarget.style.background = '#f5f5f5';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (sheet?.hostSpecies !== hostOption) {
+                          e.currentTarget.style.background = '#fff';
+                        }
+                      }}
+                    >
+                      {renderColoredHostText(hostOption)}
+                    </div>
+                  ))}
+                </div>
+              );
+            })()}
 
             {/* Display selected host feature */}
             {sheet?.hostSpecies && getHostFeatureJSX(sheet.hostSpecies) && (
-              <div style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '11pt', marginTop: '12px' }}>
+              <div style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginTop: '12px' }}>
                 {getHostFeatureJSX(sheet.hostSpecies)}
               </div>
             )}
@@ -947,8 +1054,8 @@ const LevelUpSpeciesCerebronych: React.FC<LevelUpSpeciesCerebronychProps> = ({
         </div>
       )}
 
-      {/* Cerebronych (Cont.) Subspecies Content */}
-      {contentType === 'subspecies' && subspecies === "Cerebronych (Cont.)" && (
+      {/* Cerebronych (cont.) Subspecies Content */}
+      {contentType === 'subspecies' && (
         <div style={{ width: '100%', marginTop: '1rem', textAlign: 'left', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
           
           {/* Strike Section */}
@@ -1134,134 +1241,118 @@ const LevelUpSpeciesCerebronych: React.FC<LevelUpSpeciesCerebronychProps> = ({
           </div>
 
           {/* Perks Section */}
-          <div style={{ color: '#cc0000', fontWeight: 'bold', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '16px', marginTop: '24px' }}>
-            <div style={{ fontWeight: 'bold', color: '#cc0000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Perks</u></div>
+          <div style={{ color: '#000', fontWeight: 'bold', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '12px', marginTop: '20px' }}>
+            <div style={{ fontWeight: 'bold', color: '#000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Perks</u></div>
+          </div>
+
+          {/* Skills */}
+          <div style={{ fontSize: '1em', color: '#000', marginBottom: '6px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <i><b>Skills.</b> Deception</i> +2, <i>Intimidation</i> +2
+          </div>
+
+          {/* Languages */}
+          <div style={{ fontSize: '1em', color: '#000', marginBottom: '6px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <i><b>Languages.</b> Cerebronych, Choose</i> 1
+          </div>
+
+          {/* Perks SP progression table */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 24px',
+            gridTemplateRows: 'auto auto auto auto',
+            columnGap: '6px',
+            rowGap: '2px',
+            alignItems: 'start',
+            marginTop: '-12px',
+            marginBottom: '2px',
+            width: '100%',
+            paddingLeft: '4px'
+          }}>
+            {/* Row 1: SP header for Many Masks */}
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>10sp</span>
             
-            {/* Skills */}
-            <div style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '8px' }}>
-              <span style={{ fontWeight: 'bold' }}>Skills.</span> Deception +2, Intimidation +2
-            </div>
+            {/* Row 2: Many Masks */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>
+              <b>Many Masks.</b> Years of embodying different hosts has developed your keen ability to mimic voices, mannerisms and personalities of many people from many walks of life. Gain an advantage on related skill rolls.
+            </span>
+            {(() => {
+              const arr = safeGetSubspeciesDotsArray(3);
+              const canCheck = !arr[0];
+              const canUncheck = arr[0];
+              return (
+                <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
+                  <span
+                    onClick={() => {
+                      if (canCheck) {
+                        const newDots = safeCloneSubspeciesCardDots();
+                        newDots[3][0] = true;
+                        persistSubspeciesCardDots(newDots, 10, 0);
+                      } else if (canUncheck) {
+                        const newDots = safeCloneSubspeciesCardDots();
+                        newDots[3][0] = false;
+                        persistSubspeciesCardDots(newDots, -10, 0);
+                      }
+                    }}
+                    style={{
+                      width: '15px',
+                      height: '15px',
+                      border: '2px solid #000',
+                      borderRadius: '50%',
+                      display: 'block',
+                      background: arr[0] ? '#000' : '#fff',
+                      cursor: canCheck || canUncheck ? 'pointer' : 'not-allowed',
+                      transition: 'background 0.2s'
+                    }}
+                  ></span>
+                </span>
+              );
+            })()}
 
-            {/* Languages */}
-            <div style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '12px' }}>
-              <span style={{ fontWeight: 'bold' }}>Languages.</span> Cerebronych, Choose 1
-            </div>
+            {/* Row 3: Spacer */}
+            <span></span>
+            <span></span>
 
-            {/* Many Masks Perk */}
-            <div style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '4px' }}>
-              <span style={{ fontWeight: 'bold' }}>Many Masks.</span> Years of embodying different hosts has developed your keen ability to mimic voices, mannerisms and personalities of many people from many walks of life. Gain an advantage on related skill rolls.
-            </div>
-          </div>
+            {/* Row 4: SP header for Play Dead */}
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>7sp</span>
 
-          {/* Many Masks Perk Table */}
-          <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '8px', marginBottom: '16px' }}>
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: '1fr 24px',
-              gridTemplateRows: 'auto auto',
-              columnGap: '6px',
-              rowGap: '2px',
-              alignItems: 'start',
-              width: '100%',
-              paddingLeft: '4px'
-            }}>
-              {/* Row 1: SP header */}
-              <span></span>
-              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>10sp</span>
-              
-              {/* Row 2: Many Masks dot */}
-              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}></span>
-              {(() => {
-                const arr = safeGetSubspeciesDotsArray(3);
-                const canCheck = !arr[0];
-                const canUncheck = arr[0];
-                return (
-                  <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
-                    <span
-                      onClick={() => {
-                        if (canCheck) {
-                          const newDots = safeCloneSubspeciesCardDots();
-                          newDots[3][0] = true;
-                          persistSubspeciesCardDots(newDots, 10, 0);
-                        } else if (canUncheck) {
-                          const newDots = safeCloneSubspeciesCardDots();
-                          newDots[3][0] = false;
-                          persistSubspeciesCardDots(newDots, -10, 0);
-                        }
-                      }}
-                      style={{
-                        width: '15px',
-                        height: '15px',
-                        border: '2px solid #000',
-                        borderRadius: '50%',
-                        display: 'block',
-                        background: arr[0] ? '#000' : '#fff',
-                        cursor: canCheck || canUncheck ? 'pointer' : 'not-allowed',
-                        transition: 'background 0.2s'
-                      }}
-                    ></span>
-                  </span>
-                );
-              })()}
-            </div>
-          </div>
-
-          {/* Play Dead Perk */}
-          <div style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '4px', marginTop: '12px' }}>
-            <span style={{ fontWeight: 'bold' }}>Play Dead.</span> The fact that you effectively inhabit a corpse is not lost on you. Gain an advantage on skills related to either pretending you're dead or otherwise pretending you're an undead creature risen from the grave.
-          </div>
-
-          {/* Play Dead Perk Table */}
-          <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '8px', marginBottom: '16px' }}>
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: '1fr 24px',
-              gridTemplateRows: 'auto auto',
-              columnGap: '6px',
-              rowGap: '2px',
-              alignItems: 'start',
-              width: '100%',
-              paddingLeft: '4px'
-            }}>
-              {/* Row 1: SP header */}
-              <span></span>
-              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>7sp</span>
-              
-              {/* Row 2: Play Dead dot */}
-              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}></span>
-              {(() => {
-                const arr = safeGetSubspeciesDotsArray(4);
-                const canCheck = !arr[0];
-                const canUncheck = arr[0];
-                return (
-                  <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
-                    <span
-                      onClick={() => {
-                        if (canCheck) {
-                          const newDots = safeCloneSubspeciesCardDots();
-                          newDots[4][0] = true;
-                          persistSubspeciesCardDots(newDots, 7, 0);
-                        } else if (canUncheck) {
-                          const newDots = safeCloneSubspeciesCardDots();
-                          newDots[4][0] = false;
-                          persistSubspeciesCardDots(newDots, -7, 0);
-                        }
-                      }}
-                      style={{
-                        width: '15px',
-                        height: '15px',
-                        border: '2px solid #000',
-                        borderRadius: '50%',
-                        display: 'block',
-                        background: arr[0] ? '#000' : '#fff',
-                        cursor: canCheck || canUncheck ? 'pointer' : 'not-allowed',
-                        transition: 'background 0.2s'
-                      }}
-                    ></span>
-                  </span>
-                );
-              })()}
-            </div>
+            {/* Row 5: Play Dead */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>
+              <b>Play Dead.</b> The fact that you effectively inhabit a corpse is not lost on you. Gain an advantage on skills related to either pretending you're dead or otherwise pretending you're an undead creature risen from the grave.
+            </span>
+            {(() => {
+              const arr = safeGetSubspeciesDotsArray(4);
+              const canCheck = !arr[0];
+              const canUncheck = arr[0];
+              return (
+                <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
+                  <span
+                    onClick={() => {
+                      if (canCheck) {
+                        const newDots = safeCloneSubspeciesCardDots();
+                        newDots[4][0] = true;
+                        persistSubspeciesCardDots(newDots, 7, 0);
+                      } else if (canUncheck) {
+                        const newDots = safeCloneSubspeciesCardDots();
+                        newDots[4][0] = false;
+                        persistSubspeciesCardDots(newDots, -7, 0);
+                      }
+                    }}
+                    style={{
+                      width: '15px',
+                      height: '15px',
+                      border: '2px solid #000',
+                      borderRadius: '50%',
+                      display: 'block',
+                      background: arr[0] ? '#000' : '#fff',
+                      cursor: canCheck || canUncheck ? 'pointer' : 'not-allowed',
+                      transition: 'background 0.2s'
+                    }}
+                  ></span>
+                </span>
+              );
+            })()}
           </div>
 
         </div>
