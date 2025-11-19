@@ -302,6 +302,47 @@ const SheetManager: React.FC<SheetManagerProps> = ({ onLoad, onNew, onClear }) =
             if (type === 'subspecies' && parent) return (subspeciesOptionsMap[parent as keyof typeof subspeciesOptionsMap] || []).find((opt: { value: string }) => opt.value === value)?.color;
             return undefined;
           };
+
+          // Helper function to render colored host text for Cerebronych
+          const renderColoredHostText = (hostValue: string): React.JSX.Element => {
+            const hostColorMap: { [key: string]: React.JSX.Element } = {
+              "Avenoch Host": <><span style={{ color: '#2b5f59', fontWeight: 'bold' }}>Avenoch</span> <span style={{ color: '#5f5e2b', fontWeight: 'bold' }}>Host</span></>,
+              "Corvid Avenoch Host": <><span style={{ color: '#75904e', fontWeight: 'bold' }}>Corvid</span> <span style={{ color: '#2b5f59', fontWeight: 'bold' }}>Avenoch</span> <span style={{ color: '#5f5e2b', fontWeight: 'bold' }}>Host</span></>,
+              "Falcador Avenoch Host": <><span style={{ color: '#6d7156', fontWeight: 'bold' }}>Falcador</span> <span style={{ color: '#2b5f59', fontWeight: 'bold' }}>Avenoch</span> <span style={{ color: '#5f5e2b', fontWeight: 'bold' }}>Host</span></>,
+              "Nocturne Avenoch Host": <><span style={{ color: '#334592', fontWeight: 'bold' }}>Nocturne</span> <span style={{ color: '#2b5f59', fontWeight: 'bold' }}>Avenoch</span> <span style={{ color: '#5f5e2b', fontWeight: 'bold' }}>Host</span></>,
+              "Vulturine Avenoch Host": <><span style={{ color: '#a96d8c', fontWeight: 'bold' }}>Vulturine</span> <span style={{ color: '#2b5f59', fontWeight: 'bold' }}>Avenoch</span> <span style={{ color: '#5f5e2b', fontWeight: 'bold' }}>Host</span></>,
+              "Chloroptid Host": <><span style={{ color: '#315f2b', fontWeight: 'bold' }}>Chloroptid</span> <span style={{ color: '#5f5e2b', fontWeight: 'bold' }}>Host</span></>,
+              "Barkskin Chloroptid Host": <><span style={{ color: '#5f2d2b', fontWeight: 'bold' }}>Barkskin</span> <span style={{ color: '#315f2b', fontWeight: 'bold' }}>Chloroptid</span> <span style={{ color: '#5f5e2b', fontWeight: 'bold' }}>Host</span></>,
+              "Carnivorous Chloroptid Host": <><span style={{ color: '#2b2d5f', fontWeight: 'bold' }}>Carnivorous</span> <span style={{ color: '#315f2b', fontWeight: 'bold' }}>Chloroptid</span> <span style={{ color: '#5f5e2b', fontWeight: 'bold' }}>Host</span></>,
+              "Drifting Chloroptid Host": <><span style={{ color: '#5f8a5f', fontWeight: 'bold' }}>Drifting</span> <span style={{ color: '#315f2b', fontWeight: 'bold' }}>Chloroptid</span> <span style={{ color: '#5f5e2b', fontWeight: 'bold' }}>Host</span></>,
+              "Viny Chloroptid Host": <><span style={{ color: '#5f5f2b', fontWeight: 'bold' }}>Viny</span> <span style={{ color: '#315f2b', fontWeight: 'bold' }}>Chloroptid</span> <span style={{ color: '#5f5e2b', fontWeight: 'bold' }}>Host</span></>,
+              "Cognizant Host": <><span style={{ color: '#2b3b5f', fontWeight: 'bold' }}>Cognizant</span> <span style={{ color: '#5f5e2b', fontWeight: 'bold' }}>Host</span></>,
+              "Android Cognizant Host": <><span style={{ color: '#581fbd', fontWeight: 'bold' }}>Android</span> <span style={{ color: '#2b3b5f', fontWeight: 'bold' }}>Cognizant</span> <span style={{ color: '#5f5e2b', fontWeight: 'bold' }}>Host</span></>,
+              "Utility Droid Cognizant Host": <><span style={{ color: '#bd891f', fontWeight: 'bold' }}>Utility Droid</span> <span style={{ color: '#2b3b5f', fontWeight: 'bold' }}>Cognizant</span> <span style={{ color: '#5f5e2b', fontWeight: 'bold' }}>Host</span></>,
+              "Emberfolk Host": <><span style={{ color: '#5f2b2b', fontWeight: 'bold' }}>Emberfolk</span> <span style={{ color: '#5f5e2b', fontWeight: 'bold' }}>Host</span></>,
+              "Petran Emberfolk Host": <><span style={{ color: '#735311', fontWeight: 'bold' }}>Petran</span> <span style={{ color: '#5f2b2b', fontWeight: 'bold' }}>Emberfolk</span> <span style={{ color: '#5f5e2b', fontWeight: 'bold' }}>Host</span></>,
+              "Pyran Emberfolk Host": <><span style={{ color: '#b31111', fontWeight: 'bold' }}>Pyran</span> <span style={{ color: '#5f2b2b', fontWeight: 'bold' }}>Emberfolk</span> <span style={{ color: '#5f5e2b', fontWeight: 'bold' }}>Host</span></>,
+              "Entomos Host": <><span style={{ color: '#5f422b', fontWeight: 'bold' }}>Entomos</span> <span style={{ color: '#5f5e2b', fontWeight: 'bold' }}>Host</span></>,
+              "Apocritan Entomos Host": <><span style={{ color: '#6d7156', fontWeight: 'bold' }}>Apocritan</span> <span style={{ color: '#5f422b', fontWeight: 'bold' }}>Entomos</span> <span style={{ color: '#5f5e2b', fontWeight: 'bold' }}>Host</span></>,
+              "Dynastes Entomos Host": <><span style={{ color: '#334592', fontWeight: 'bold' }}>Dynastes</span> <span style={{ color: '#5f422b', fontWeight: 'bold' }}>Entomos</span> <span style={{ color: '#5f5e2b', fontWeight: 'bold' }}>Host</span></>,
+              "Mantid Entomos Host": <><span style={{ color: '#75904e', fontWeight: 'bold' }}>Mantid</span> <span style={{ color: '#5f422b', fontWeight: 'bold' }}>Entomos</span> <span style={{ color: '#5f5e2b', fontWeight: 'bold' }}>Host</span></>,
+              "Human Host": <><span style={{ color: '#2b315f', fontWeight: 'bold' }}>Human</span> <span style={{ color: '#5f5e2b', fontWeight: 'bold' }}>Host</span></>,
+              "Diminutive Human Host": <><span style={{ color: '#c3735f', fontWeight: 'bold' }}>Diminutive</span> <span style={{ color: '#2b315f', fontWeight: 'bold' }}>Human</span> <span style={{ color: '#5f5e2b', fontWeight: 'bold' }}>Host</span></>,
+              "Lithe Human Host": <><span style={{ color: '#2b5f5f', fontWeight: 'bold' }}>Lithe</span> <span style={{ color: '#2b315f', fontWeight: 'bold' }}>Human</span> <span style={{ color: '#5f5e2b', fontWeight: 'bold' }}>Host</span></>,
+              "Massive Human Host": <><span style={{ color: '#2b175f', fontWeight: 'bold' }}>Massive</span> <span style={{ color: '#2b315f', fontWeight: 'bold' }}>Human</span> <span style={{ color: '#5f5e2b', fontWeight: 'bold' }}>Host</span></>,
+              "Stout Human Host": <><span style={{ color: '#5f2b2b', fontWeight: 'bold' }}>Stout</span> <span style={{ color: '#2b315f', fontWeight: 'bold' }}>Human</span> <span style={{ color: '#5f5e2b', fontWeight: 'bold' }}>Host</span></>,
+              "Lumenaren Host": <><span style={{ color: '#515f2b', fontWeight: 'bold' }}>Lumenaren</span> <span style={{ color: '#5f5e2b', fontWeight: 'bold' }}>Host</span></>,
+              "Infrared Lumenaren Host": <><span style={{ color: '#b17fbe', fontWeight: 'bold' }}>Infrared</span> <span style={{ color: '#515f2b', fontWeight: 'bold' }}>Lumenaren</span> <span style={{ color: '#5f5e2b', fontWeight: 'bold' }}>Host</span></>,
+              "Radiofrequent Lumenaren Host": <><span style={{ color: '#bea97f', fontWeight: 'bold' }}>Radiofrequent</span> <span style={{ color: '#515f2b', fontWeight: 'bold' }}>Lumenaren</span> <span style={{ color: '#5f5e2b', fontWeight: 'bold' }}>Host</span></>,
+              "X-Ray Lumenaren Host": <><span style={{ color: '#7f8abe', fontWeight: 'bold' }}>X-Ray</span> <span style={{ color: '#515f2b', fontWeight: 'bold' }}>Lumenaren</span> <span style={{ color: '#5f5e2b', fontWeight: 'bold' }}>Host</span></>,
+              "Praedari Host": <><span style={{ color: '#5f2b5c', fontWeight: 'bold' }}>Praedari</span> <span style={{ color: '#5f5e2b', fontWeight: 'bold' }}>Host</span></>,
+              "Canid Praedari Host": <><span style={{ color: '#2f8da6', fontWeight: 'bold' }}>Canid</span> <span style={{ color: '#5f2b5c', fontWeight: 'bold' }}>Praedari</span> <span style={{ color: '#5f5e2b', fontWeight: 'bold' }}>Host</span></>,
+              "Felid Praedari Host": <><span style={{ color: '#b16326', fontWeight: 'bold' }}>Felid</span> <span style={{ color: '#5f2b5c', fontWeight: 'bold' }}>Praedari</span> <span style={{ color: '#5f5e2b', fontWeight: 'bold' }}>Host</span></>,
+              "Mustelid Praedari Host": <><span style={{ color: '#699239', fontWeight: 'bold' }}>Mustelid</span> <span style={{ color: '#5f2b5c', fontWeight: 'bold' }}>Praedari</span> <span style={{ color: '#5f5e2b', fontWeight: 'bold' }}>Host</span></>,
+              "Ursid Praedari Host": <><span style={{ color: '#9026b1', fontWeight: 'bold' }}>Ursid</span> <span style={{ color: '#5f2b5c', fontWeight: 'bold' }}>Praedari</span> <span style={{ color: '#5f5e2b', fontWeight: 'bold' }}>Host</span></>,
+            };
+            return hostColorMap[hostValue] || <span>{hostValue}</span>;
+          };
           return (
             <li key={sheet.id} style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
               {/* Portrait thumbnail */}
@@ -349,17 +390,32 @@ const SheetManager: React.FC<SheetManagerProps> = ({ onLoad, onNew, onClear }) =
               >
                 {sheet.playerName ? `(${sheet.playerName}) ` : ""}
                 {sheet.name ? `${sheet.name}, ` : ""}
-                {sheet.subspecies && (
-                  <span style={{ color: getColor('subspecies', sheet.subspecies, sheet.species) }}>{sheet.subspecies} </span>
-                )}
-                {sheet.species && (
-                  <span style={{ color: getColor('species', sheet.species, undefined) }}>{sheet.species} </span>
-                )}
-                {sheet.subclass && sheet.charClass && (
-                  <span style={{ color: getColor('subclass', sheet.subclass, sheet.charClass) }}>{sheet.subclass} </span>
-                )}
-                {sheet.charClass && (
-                  <span style={{ color: getColor('class', sheet.charClass, undefined) }}>{sheet.charClass} </span>
+                {sheet.species === "Cerebronych" ? (
+                  <>
+                    <span style={{ color: getColor('species', sheet.species, undefined) }}>{sheet.species} </span>
+                    {sheet.hostSpecies && <>({renderColoredHostText(sheet.hostSpecies)}) </>}
+                    {sheet.subclass && sheet.charClass && (
+                      <span style={{ color: getColor('subclass', sheet.subclass, sheet.charClass) }}>{sheet.subclass} </span>
+                    )}
+                    {sheet.charClass && (
+                      <span style={{ color: getColor('class', sheet.charClass, undefined) }}>{sheet.charClass} </span>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    {sheet.subspecies && (
+                      <span style={{ color: getColor('subspecies', sheet.subspecies, sheet.species) }}>{sheet.subspecies} </span>
+                    )}
+                    {sheet.species && (
+                      <span style={{ color: getColor('species', sheet.species, undefined) }}>{sheet.species} </span>
+                    )}
+                    {sheet.subclass && sheet.charClass && (
+                      <span style={{ color: getColor('subclass', sheet.subclass, sheet.charClass) }}>{sheet.subclass} </span>
+                    )}
+                    {sheet.charClass && (
+                      <span style={{ color: getColor('class', sheet.charClass, undefined) }}>{sheet.charClass} </span>
+                    )}
+                  </>
                 )}
                 ({sheet.xpTotal ?? 0}xp, {sheet.spTotal ?? 0}sp)
               </button>

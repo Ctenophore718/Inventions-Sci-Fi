@@ -1936,7 +1936,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
             )}
             
             {/* Cerebronych (cont.) Subspecies Content */}
-            {subspecies === "Cerebronych (cont.)" && (
+            {species === "Cerebronych" && (
               <LevelUpSpeciesCerebronych
                 sheet={sheet}
                 species={species}

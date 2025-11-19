@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import type { CharacterSheet } from "../types/CharacterSheet";
+import { generateParasiticComposureJSX } from "../utils/cerebronychFeature";
 
 type LevelUpSpeciesCerebronychProps = {
   sheet: CharacterSheet | null;
@@ -31,8 +32,46 @@ const LevelUpSpeciesCerebronych: React.FC<LevelUpSpeciesCerebronychProps> = ({
   setNotice
 }) => {
   
-  // State for custom dropdown
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  // Host options with colors for Cerebronych
+  const hostOptions = [
+    { label: "Avenoch Host", value: "Avenoch Host", color: "#2b5f59" },
+    { label: "Corvid Avenoch Host", value: "Corvid Avenoch Host", color: "#75904e" },
+    { label: "Falcador Avenoch Host", value: "Falcador Avenoch Host", color: "#6d7156" },
+    { label: "Nocturne Avenoch Host", value: "Nocturne Avenoch Host", color: "#334592" },
+    { label: "Vulturine Avenoch Host", value: "Vulturine Avenoch Host", color: "#a96d8c" },
+    { label: "Chloroptid Host", value: "Chloroptid Host", color: "#315f2b" },
+    { label: "Barkskin Chloroptid Host", value: "Barkskin Chloroptid Host", color: "#5f2d2b" },
+    { label: "Carnivorous Chloroptid Host", value: "Carnivorous Chloroptid Host", color: "#2b2d5f" },
+    { label: "Drifting Chloroptid Host", value: "Drifting Chloroptid Host", color: "#5f8a5f" },
+    { label: "Viny Chloroptid Host", value: "Viny Chloroptid Host", color: "#5f5f2b" },
+    { label: "Cognizant Host", value: "Cognizant Host", color: "#2b3b5f" },
+    { label: "Android Cognizant Host", value: "Android Cognizant Host", color: "#581fbd" },
+    { label: "Utility Droid Cognizant Host", value: "Utility Droid Cognizant Host", color: "#bd891f" },
+    { label: "Emberfolk Host", value: "Emberfolk Host", color: "#5f2b2b" },
+    { label: "Petran Emberfolk Host", value: "Petran Emberfolk Host", color: "#735311" },
+    { label: "Pyran Emberfolk Host", value: "Pyran Emberfolk Host", color: "#b31111" },
+    { label: "Entomos Host", value: "Entomos Host", color: "#5f422b" },
+    { label: "Apocritan Entomos Host", value: "Apocritan Entomos Host", color: "#6d7156" },
+    { label: "Dynastes Entomos Host", value: "Dynastes Entomos Host", color: "#334592" },
+    { label: "Mantid Entomos Host", value: "Mantid Entomos Host", color: "#75904e" },
+    { label: "Human Host", value: "Human Host", color: "#2b315f" },
+    { label: "Diminutive Human Host", value: "Diminutive Human Host", color: "#c3735f" },
+    { label: "Lithe Human Host", value: "Lithe Human Host", color: "#2b5f5f" },
+    { label: "Massive Human Host", value: "Massive Human Host", color: "#2b175f" },
+    { label: "Stout Human Host", value: "Stout Human Host", color: "#5f2b2b" },
+    { label: "Lumenaren Host", value: "Lumenaren Host", color: "#515f2b" },
+    { label: "Infrared Lumenaren Host", value: "Infrared Lumenaren Host", color: "#b17fbe" },
+    { label: "Radiofrequent Lumenaren Host", value: "Radiofrequent Lumenaren Host", color: "#bea97f" },
+    { label: "X-Ray Lumenaren Host", value: "X-Ray Lumenaren Host", color: "#7f8abe" },
+    { label: "Praedari Host", value: "Praedari Host", color: "#5f2b5c" },
+    { label: "Canid Praedari Host", value: "Canid Praedari Host", color: "#2f8da6" },
+    { label: "Felid Praedari Host", value: "Felid Praedari Host", color: "#b16326" },
+    { label: "Mustelid Praedari Host", value: "Mustelid Praedari Host", color: "#699239" },
+    { label: "Ursid Praedari Host", value: "Ursid Praedari Host", color: "#9026b1" },
+  ];
+
+  // Get the current host color
+  const currentHostColor = sheet?.hostSpecies ? (hostOptions.find(opt => opt.value === sheet.hostSpecies)?.color || '#000') : '#000';
 
   // Cerebronych species card dots default structure
   const defaultCerebronychDots = [ 
@@ -264,152 +303,16 @@ const LevelUpSpeciesCerebronych: React.FC<LevelUpSpeciesCerebronychProps> = ({
           <div style={{ color: '#0b5394', fontWeight: 'bold', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '16px' }}>
             <div style={{ fontWeight: 'bold', color: '#0b5394', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Features</u></div>
             
-            {/* Host Mimic Feature */}
-            <div style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '12px' }}>
-              <span style={{ fontWeight: 'bold' }}>Host Mimic.</span> Choose a starting <b><i style={{ color: '#0b5394' }}>Feature</i></b> available to any other Species or Subspecies. You cannot upgrade this <b><i style={{ color: '#0b5394' }}>Feature</i></b>.
-            </div>
-          </div>
-
-          {/* Select Host Custom Dropdown */}
-          <div style={{ marginTop: '8px', marginBottom: '12px', position: 'relative', display: 'inline-block' }}>
-            {/* Backdrop to close dropdown when clicking outside */}
-            {isDropdownOpen && (
-              <div
-                onClick={() => setIsDropdownOpen(false)}
-                style={{
-                  position: 'fixed',
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  zIndex: 999
-                }}
-              />
-            )}
-
-            {/* Custom dropdown trigger */}
-            <div
-              ref={(el) => {
-                if (el && isDropdownOpen) {
-                  // Calculate if dropdown should open upward or downward
-                  const rect = el.getBoundingClientRect();
-                  const spaceBelow = window.innerHeight - rect.bottom;
-                  const spaceAbove = rect.top;
-                  const dropdownHeight = 300; // maxHeight of dropdown
-
-                  // Store which direction to open
-                  el.setAttribute('data-open-upward', spaceBelow < dropdownHeight && spaceAbove > spaceBelow ? 'true' : 'false');
-                }
-              }}
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsDropdownOpen(!isDropdownOpen);
-              }}
-              style={{
-                fontSize: '1em',
-                padding: '2px 8px',
-                borderRadius: '6px',
-                border: '1px solid #ccc',
-                background: '#fff',
-                textAlign: 'left',
-                minWidth: '200px',
-                width: 'fit-content',
-                fontFamily: 'Arial, Helvetica, sans-serif',
-                cursor: 'pointer',
-                userSelect: 'none',
-                position: 'relative',
-                zIndex: 1001
-              }}
-            >
-              {renderColoredHostText(sheet?.hostSpecies || "")}
-            </div>
-
-            {/* Custom dropdown menu */}
-            {isDropdownOpen && (() => {
-              const triggerElement = document.querySelector('[data-open-upward]') as HTMLElement;
-              const openUpward = triggerElement?.getAttribute('data-open-upward') === 'true';
-
-              return (
-                <div
-                  onClick={(e) => e.stopPropagation()}
-                  style={{
-                    position: 'absolute',
-                    ...(openUpward ? { bottom: '100%', marginBottom: '0px' } : { top: '100%', marginTop: '0px' }),
-                    left: 0,
-                    zIndex: 1000,
-                    background: '#fff',
-                    border: '1px solid #ccc',
-                    borderRadius: '6px',
-                    minWidth: '200px',
-                    width: 'fit-content',
-                    maxHeight: '300px',
-                    overflowY: 'auto',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-                    fontFamily: 'Arial, Helvetica, sans-serif',
-                    fontSize: '1em'
-                  }}
-                >
-                  {/* Dropdown options */}
-                  {["", "Avenoch Host", "Corvid Avenoch Host", "Falcador Avenoch Host", "Nocturne Avenoch Host", "Vulturine Avenoch Host",
-                    "Chloroptid Host", "Barkskin Chloroptid Host", "Carnivorous Chloroptid Host", "Drifting Chloroptid Host", "Viny Chloroptid Host",
-                    "Cognizant Host", "Android Cognizant Host", "Utility Droid Cognizant Host",
-                    "Emberfolk Host", "Petran Emberfolk Host", "Pyran Emberfolk Host",
-                    "Entomos Host", "Apocritan Entomos Host", "Dynastes Entomos Host", "Mantid Entomos Host",
-                    "Human Host", "Diminutive Human Host", "Lithe Human Host", "Massive Human Host", "Stout Human Host",
-                    "Lumenaren Host", "Infrared Lumenaren Host", "Radiofrequent Lumenaren Host", "X-Ray Lumenaren Host",
-                    "Praedari Host", "Canid Praedari Host", "Felid Praedari Host", "Mustelid Praedari Host", "Ursid Praedari Host"
-                  ].map((hostOption) => (
-                    <div
-                      key={hostOption}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (onAutoSave) {
-                          onAutoSave({ hostSpecies: hostOption });
-                        }
-                        setIsDropdownOpen(false);
-                      }}
-                      style={{
-                        padding: '4px 8px',
-                        cursor: 'pointer',
-                        background: sheet?.hostSpecies === hostOption ? '#e6f2ff' : '#fff',
-                        borderBottom: '1px solid #f0f0f0'
-                      }}
-                      onMouseEnter={(e) => {
-                        if (sheet?.hostSpecies !== hostOption) {
-                          e.currentTarget.style.background = '#f5f5f5';
-                        }
-                      }}
-                      onMouseLeave={(e) => {
-                        if (sheet?.hostSpecies !== hostOption) {
-                          e.currentTarget.style.background = '#fff';
-                        }
-                      }}
-                    >
-                      {renderColoredHostText(hostOption)}
-                    </div>
-                  ))}
-                </div>
-              );
-            })()}
-
-            {/* Display selected host feature */}
-            {sheet?.hostSpecies && getHostFeatureJSX(sheet.hostSpecies) && (
-              <div style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginTop: '12px' }}>
-                {getHostFeatureJSX(sheet.hostSpecies)}
-              </div>
-            )}
-          </div>
-
           {/* Parasitic Composure Feature */}
           <div style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '12px' }}>
-            <span style={{ fontWeight: 'bold' }}>Parasitic Composure.</span> You are immune to the <b><i style={{ color: '#bf9000' }}>Confuse</i></b> condition and have <b><i style={{ color: '#bf9000' }}>Chemical</i></b> and <b><i style={{ color: '#38761d' }}>Toxic</i></b> resistance.
+            {generateParasiticComposureJSX(sheet?.speciesCardDots)}
           </div>
 
           {/* Parasitic Composure Immunities Table */}
           <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px', marginBottom: '16px' }}>
             <div style={{
               display: 'grid',
-              gridTemplateColumns: '1fr 24px',
+              gridTemplateColumns: '1fr 24px 24px 24px',
               gridTemplateRows: 'repeat(6, auto)',
               columnGap: '6px',
               rowGap: '2px',
@@ -420,8 +323,9 @@ const LevelUpSpeciesCerebronych: React.FC<LevelUpSpeciesCerebronychProps> = ({
               {/* Row 1: Mesmerize immunity */}
               <span></span>
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>5xp</span>
-              
-              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}><b><i style={{ color: '#bf9000' }}>Mesmerize</i></b> immunity</span>
+              <span></span>
+              <span></span>
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}><i>Mesmerize</i> <i>Immunity</i></span>
               {(() => {
                 const arr = safeGetDotsArray(0);
                 const canCheck = !arr[0];
@@ -462,8 +366,10 @@ const LevelUpSpeciesCerebronych: React.FC<LevelUpSpeciesCerebronychProps> = ({
               {/* Row 3: Toxic immunity */}
               <span></span>
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>5xp</span>
-              
-              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}><b><i style={{ color: '#38761d' }}>Toxic</i></b> immunity</span>
+              <span></span>
+              <span></span>
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}><u style={{ color: '#02b900', display: 'inline-flex', alignItems: 'center' }}>
+            Toxic<img src="/Toxic.png" alt="Toxic" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u> <i>Immunity</i></span>
               {(() => {
                 const arr = safeGetDotsArray(1);
                 const canCheck = !arr[0];
@@ -504,8 +410,10 @@ const LevelUpSpeciesCerebronych: React.FC<LevelUpSpeciesCerebronychProps> = ({
               {/* Row 5: Chemical immunity */}
               <span></span>
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>5xp</span>
-              
-              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}><b><i style={{ color: '#bf9000' }}>Chemical</i></b> immunity</span>
+              <span></span>
+              <span></span>
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}><u style={{ color: '#de7204', display: 'inline-flex', alignItems: 'center' }}>
+            Chemical<img src="/Chemical.png" alt="Chemical" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u> <i>Immunity</i></span>
               {(() => {
                 const arr = safeGetDotsArray(2);
                 const canCheck = !arr[0];
@@ -540,6 +448,88 @@ const LevelUpSpeciesCerebronych: React.FC<LevelUpSpeciesCerebronychProps> = ({
               })()}
             </div>
           </div>
+
+            
+            {/* Host Mimic Feature */}
+            <div style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '12px' }}>
+              <i style={{ fontWeight: 'bold', color: '#5f5e2b' }}>Host Mimic.</i> You inhabit a host body from a different <i>Species</i> or <i>Subspecies</i>. Choose a starting <b><i style={{ color: '#0b5394' }}>Feature</i></b> available to any other <i>Species</i> or <i>Subspecies</i>. You cannot upgrade this <b><i style={{ color: '#0b5394' }}>Feature</i></b>.
+            </div>
+          </div>
+
+          {/* Select Host Standard Dropdown */}
+          <div style={{ marginTop: '8px', marginBottom: '12px' }}>
+            <style>
+              {`.cerebronych-host-select { color: ${currentHostColor} !important; }`}
+            </style>
+            <select
+              value={sheet?.hostSpecies || ""}
+              onChange={(e) => {
+                const val = e.target.value;
+                if (onAutoSave) {
+                  onAutoSave({ hostSpecies: val });
+                }
+              }}
+              className="cerebronych-host-select"
+              style={{
+                fontSize: '1em',
+                padding: '2px 8px',
+                borderRadius: '6px',
+                border: '1px solid #ccc',
+                background: '#fff',
+                textAlign: 'left',
+                minWidth: '200px',
+                fontFamily: 'Arial, Helvetica, sans-serif',
+                fontWeight: 'bold'
+              }}
+            >
+              <option value="" style={{ color: 'black', backgroundColor: 'white' }}>
+                Select Host
+              </option>
+              <option value="Avenoch Host" style={{ color: '#2b5f59', backgroundColor: 'white', fontWeight: 'bold' }}>Avenoch Host</option>
+              <option value="Corvid Avenoch Host" style={{ color: '#75904e', backgroundColor: 'white', fontWeight: 'bold' }}>Corvid Avenoch Host</option>
+              <option value="Falcador Avenoch Host" style={{ color: '#6d7156', backgroundColor: 'white', fontWeight: 'bold' }}>Falcador Avenoch Host</option>
+              <option value="Nocturne Avenoch Host" style={{ color: '#334592', backgroundColor: 'white', fontWeight: 'bold' }}>Nocturne Avenoch Host</option>
+              <option value="Vulturine Avenoch Host" style={{ color: '#a96d8c', backgroundColor: 'white', fontWeight: 'bold' }}>Vulturine Avenoch Host</option>
+              <option value="Chloroptid Host" style={{ color: '#315f2b', backgroundColor: 'white', fontWeight: 'bold' }}>Chloroptid Host</option>
+              <option value="Barkskin Chloroptid Host" style={{ color: '#5f2d2b', backgroundColor: 'white', fontWeight: 'bold' }}>Barkskin Chloroptid Host</option>
+              <option value="Carnivorous Chloroptid Host" style={{ color: '#2b2d5f', backgroundColor: 'white', fontWeight: 'bold' }}>Carnivorous Chloroptid Host</option>
+              <option value="Drifting Chloroptid Host" style={{ color: '#5f8a5f', backgroundColor: 'white', fontWeight: 'bold' }}>Drifting Chloroptid Host</option>
+              <option value="Viny Chloroptid Host" style={{ color: '#5f5f2b', backgroundColor: 'white', fontWeight: 'bold' }}>Viny Chloroptid Host</option>
+              <option value="Cognizant Host" style={{ color: '#2b3b5f', backgroundColor: 'white', fontWeight: 'bold' }}>Cognizant Host</option>
+              <option value="Android Cognizant Host" style={{ color: '#581fbd', backgroundColor: 'white', fontWeight: 'bold' }}>Android Cognizant Host</option>
+              <option value="Utility Droid Cognizant Host" style={{ color: '#bd891f', backgroundColor: 'white', fontWeight: 'bold' }}>Utility Droid Cognizant Host</option>
+              <option value="Emberfolk Host" style={{ color: '#5f2b2b', backgroundColor: 'white', fontWeight: 'bold' }}>Emberfolk Host</option>
+              <option value="Petran Emberfolk Host" style={{ color: '#735311', backgroundColor: 'white', fontWeight: 'bold' }}>Petran Emberfolk Host</option>
+              <option value="Pyran Emberfolk Host" style={{ color: '#b31111', backgroundColor: 'white', fontWeight: 'bold' }}>Pyran Emberfolk Host</option>
+              <option value="Entomos Host" style={{ color: '#5f422b', backgroundColor: 'white', fontWeight: 'bold' }}>Entomos Host</option>
+              <option value="Apocritan Entomos Host" style={{ color: '#6d7156', backgroundColor: 'white', fontWeight: 'bold' }}>Apocritan Entomos Host</option>
+              <option value="Dynastes Entomos Host" style={{ color: '#334592', backgroundColor: 'white', fontWeight: 'bold' }}>Dynastes Entomos Host</option>
+              <option value="Mantid Entomos Host" style={{ color: '#75904e', backgroundColor: 'white', fontWeight: 'bold' }}>Mantid Entomos Host</option>
+              <option value="Human Host" style={{ color: '#2b315f', backgroundColor: 'white', fontWeight: 'bold' }}>Human Host</option>
+              <option value="Diminutive Human Host" style={{ color: '#c3735f', backgroundColor: 'white', fontWeight: 'bold' }}>Diminutive Human Host</option>
+              <option value="Lithe Human Host" style={{ color: '#2b5f5f', backgroundColor: 'white', fontWeight: 'bold' }}>Lithe Human Host</option>
+              <option value="Massive Human Host" style={{ color: '#2b175f', backgroundColor: 'white', fontWeight: 'bold' }}>Massive Human Host</option>
+              <option value="Stout Human Host" style={{ color: '#5f2b2b', backgroundColor: 'white', fontWeight: 'bold' }}>Stout Human Host</option>
+              <option value="Lumenaren Host" style={{ color: '#515f2b', backgroundColor: 'white', fontWeight: 'bold' }}>Lumenaren Host</option>
+              <option value="Infrared Lumenaren Host" style={{ color: '#b17fbe', backgroundColor: 'white', fontWeight: 'bold' }}>Infrared Lumenaren Host</option>
+              <option value="Radiofrequent Lumenaren Host" style={{ color: '#bea97f', backgroundColor: 'white', fontWeight: 'bold' }}>Radiofrequent Lumenaren Host</option>
+              <option value="X-Ray Lumenaren Host" style={{ color: '#7f8abe', backgroundColor: 'white', fontWeight: 'bold' }}>X-Ray Lumenaren Host</option>
+              <option value="Praedari Host" style={{ color: '#5f2b5c', backgroundColor: 'white', fontWeight: 'bold' }}>Praedari Host</option>
+              <option value="Canid Praedari Host" style={{ color: '#2f8da6', backgroundColor: 'white', fontWeight: 'bold' }}>Canid Praedari Host</option>
+              <option value="Felid Praedari Host" style={{ color: '#b16326', backgroundColor: 'white', fontWeight: 'bold' }}>Felid Praedari Host</option>
+              <option value="Mustelid Praedari Host" style={{ color: '#699239', backgroundColor: 'white', fontWeight: 'bold' }}>Mustelid Praedari Host</option>
+              <option value="Ursid Praedari Host" style={{ color: '#9026b1', backgroundColor: 'white', fontWeight: 'bold' }}>Ursid Praedari Host</option>
+            </select>
+
+            {/* Display selected host feature with indentation */}
+            {sheet?.hostSpecies && getHostFeatureJSX(sheet.hostSpecies) && (
+              <div style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginTop: '12px', marginLeft: '24px' }}>
+                {getHostFeatureJSX(sheet.hostSpecies)}
+              </div>
+            )}
+          </div>
+
+
 
           {/* Techniques Section */}
           <div style={{ color: '#cc0000', fontWeight: 'bold', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '16px', marginTop: '24px' }}>
@@ -884,8 +874,15 @@ const LevelUpSpeciesCerebronych: React.FC<LevelUpSpeciesCerebronychProps> = ({
             </div>
           </div>
 
+        </div>
+      )}
+
+      {/* Cerebronych (cont.) Subspecies Content */}
+      {contentType === 'subspecies' && (
+        <div style={{ width: '100%', marginTop: '1rem', textAlign: 'left', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
+          
           {/* Hit Points Section */}
-          <div style={{ color: '#e69138', fontWeight: 'bold', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '16px', marginTop: '24px' }}>
+          <div style={{ color: '#e69138', fontWeight: 'bold', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '16px' }}>
             <div style={{ fontWeight: 'bold', color: '#e69138', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Hit Points</u></div>
             
             {/* Starting Hit Points */}
@@ -1051,20 +1048,13 @@ const LevelUpSpeciesCerebronych: React.FC<LevelUpSpeciesCerebronychProps> = ({
             </div>
           </div>
 
-        </div>
-      )}
-
-      {/* Cerebronych (cont.) Subspecies Content */}
-      {contentType === 'subspecies' && (
-        <div style={{ width: '100%', marginTop: '1rem', textAlign: 'left', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
-          
           {/* Strike Section */}
           <div style={{ color: '#351c75', fontWeight: 'bold', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '16px' }}>
             <div style={{ fontWeight: 'bold', color: '#351c75', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Strike</u></div>
             
             {/* Enhanced Strike Effects */}
             <div style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
-              <span style={{ fontWeight: 'bold' }}>Enhanced Strike Effects.</span>
+              <span style={{ fontWeight: 'bold' }}>Enhanced Strike Effects.</span> You can upgrade the effects of your <b><i style={{ color: '#351c75' }}>Strike</i></b>.
             </div>
           </div>
 

@@ -4,6 +4,7 @@ import styles from './CharacterSheet.module.css';
 import type { CharacterSheet } from "../types/CharacterSheet";
 import { saveCharacterSheet, loadSheetById } from "../utils/storage";
 import { generateChemicalReactionJSX, calculateChemistFeatureData } from "../utils/chemistFeature";
+import { generateParasiticComposureJSX, calculateCerebronychFeatureData } from "../utils/cerebronychFeature";
 import { generateChemistStrikeJSX } from "../utils/chemistStrike";
 import { generateCommanderStrikeJSX } from "../utils/commanderStrike";
 import { generateGalvanicStrikeJSX } from "../utils/galvanicStrike";
@@ -126,7 +127,6 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
   const [isCreditsMenuExpanded, setIsCreditsMenuExpanded] = useState(false);
   const [isChemTokensMenuExpanded, setIsChemTokensMenuExpanded] = useState(false);
   const [isSummonHpMenuExpanded, setIsSummonHpMenuExpanded] = useState(false);
-  const [isHostDropdownOpen, setIsHostDropdownOpen] = useState(false);
   const menuRef = React.useRef<HTMLDivElement>(null);
   const waffleRef = React.useRef<HTMLButtonElement>(null);
   const xpSpMenuRef = React.useRef<HTMLDivElement>(null);
@@ -1109,14 +1109,8 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
     return featureMap[hostValue] || null;
   };
 
-  const cerebronychFeatureJSX = (
-    <span style={{ color: '#000', fontWeight:  400 }}>
-      <b><i style={{ color: '#5f5e2b' }}>Parasitic Composure.</i></b> You are <i>Immune</i> to the <b><i>Confuse</i></b> condition and have <b><u style={{ color: '#de7204', display: 'inline-flex', alignItems: 'center' }}>Chemical<img src="/Chemical.png" alt="Chemical" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> and <b><u style={{ color: '#02b900', display: 'inline-flex', alignItems: 'center' }}>
-        Toxic
-        <img src="/Toxic.png" alt="Toxic" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
-      </u></b> <i>Resistance</i>.
-    </span>
-  );
+  // Generate Cerebronych feature with dynamic values
+  const cerebronychFeatureJSX = generateParasiticComposureJSX(sheet?.speciesCardDots);
 
   const chloroptidFeatureJSX = (
     <span style={{ color: '#000', fontWeight: 400 }}>
@@ -2417,134 +2411,48 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
               </div>
             </label>
             <label>
-              <span style={{ fontFamily: 'Arial, sans-serif' }}>Subspecies</span>
+              <span style={{ fontFamily: 'Arial, sans-serif' }}>
+                {species === "Cerebronych" ? "Host" : "Subspecies"}
+              </span>
               <div className={styles.selectWrapper}>
                 {species === "Cerebronych" ? (
-                  // Custom dropdown for Cerebronych
-                  <div style={{ position: 'relative', display: 'inline-block', width: '100%' }}>
-                    {/* Backdrop to close dropdown when clicking outside */}
-                    {isHostDropdownOpen && (
-                      <div
-                        onClick={() => setIsHostDropdownOpen(false)}
-                        style={{
-                          position: 'fixed',
-                          top: 0,
-                          left: 0,
-                          right: 0,
-                          bottom: 0,
-                          zIndex: 999
+                  // Standard dropdown for Cerebronych Host
+                  <select 
+                    value={hostSpecies || ""} 
+                    onChange={e => {
+                      const val = e.target.value;
+                      if (setHostSpecies) setHostSpecies(val);
+                      handleAutoSave({ hostSpecies: val });
+                    }}
+                    className={`${styles.colorSelect} ${styles.selectedHostColor}`}
+                    style={{ 
+                      fontWeight: 'bold',
+                      padding: '4px 8px',
+                      borderRadius: '4px',
+                      border: '1px solid #ccc',
+                      textAlign: 'center',
+                      ['--selected-host-color' as any]: hostSpecies ? (hostOptions.find(opt => opt.value === hostSpecies)?.color || '#000') : '#000',
+                      minWidth: '120px',
+                      background: 'white'
+                    } as React.CSSProperties}
+                  >
+                    <option value="" style={{ color: 'black', backgroundColor: 'white' }}>
+                      Select Host
+                    </option>
+                    {hostOptions.map(opt => (
+                      <option 
+                        key={opt.value} 
+                        value={opt.value} 
+                        style={{ 
+                          color: opt.color,
+                          backgroundColor: 'white',
+                          fontWeight: 'bold'
                         }}
-                      />
-                    )}
-
-                    {/* Custom dropdown trigger */}
-                    <div
-                      ref={(el) => {
-                        if (el && isHostDropdownOpen) {
-                          // Calculate if dropdown should open upward or downward
-                          const rect = el.getBoundingClientRect();
-                          const spaceBelow = window.innerHeight - rect.bottom;
-                          const spaceAbove = rect.top;
-                          const dropdownHeight = 300; // maxHeight of dropdown
-
-                          // Store which direction to open
-                          el.setAttribute('data-open-upward', spaceBelow < dropdownHeight && spaceAbove > spaceBelow ? 'true' : 'false');
-                        }
-                      }}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setIsHostDropdownOpen(!isHostDropdownOpen);
-                      }}
-                      style={{
-                        fontSize: '1em',
-                        padding: '4px 8px',
-                        borderRadius: '4px',
-                        border: '1px solid #ccc',
-                        background: '#fff',
-                        textAlign: 'center',
-                        width: '100%',
-                        minWidth: '120px',
-                        fontFamily: 'Arial, Helvetica, sans-serif',
-                        cursor: 'pointer',
-                        userSelect: 'none',
-                        position: 'relative',
-                        zIndex: 1001,
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        minHeight: '30px'
-                      }}
-                    >
-                      {renderColoredHostText(hostSpecies || "")}
-                    </div>
-
-                    {/* Custom dropdown menu */}
-                    {isHostDropdownOpen && (() => {
-                      const triggerElement = document.querySelector('[data-open-upward]') as HTMLElement;
-                      const openUpward = triggerElement?.getAttribute('data-open-upward') === 'true';
-
-                      return (
-                        <div
-                          onClick={(e) => e.stopPropagation()}
-                          style={{
-                            position: 'absolute',
-                            ...(openUpward ? { bottom: '100%', marginBottom: '0px' } : { top: '100%', marginTop: '0px' }),
-                            left: 0,
-                            right: 0,
-                            zIndex: 1000,
-                            background: '#fff',
-                            border: '1px solid #ccc',
-                            borderRadius: '6px',
-                            maxHeight: '300px',
-                            overflowY: 'auto',
-                            boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-                            fontFamily: 'Arial, Helvetica, sans-serif',
-                            fontSize: '1em'
-                          }}
-                        >
-                          {/* Dropdown options */}
-                          {["", "Avenoch Host", "Corvid Avenoch Host", "Falcador Avenoch Host", "Nocturne Avenoch Host", "Vulturine Avenoch Host",
-                            "Chloroptid Host", "Barkskin Chloroptid Host", "Carnivorous Chloroptid Host", "Drifting Chloroptid Host", "Viny Chloroptid Host",
-                            "Cognizant Host", "Android Cognizant Host", "Utility Droid Cognizant Host",
-                            "Emberfolk Host", "Petran Emberfolk Host", "Pyran Emberfolk Host",
-                            "Entomos Host", "Apocritan Entomos Host", "Dynastes Entomos Host", "Mantid Entomos Host",
-                            "Human Host", "Diminutive Human Host", "Lithe Human Host", "Massive Human Host", "Stout Human Host",
-                            "Lumenaren Host", "Infrared Lumenaren Host", "Radiofrequent Lumenaren Host", "X-Ray Lumenaren Host",
-                            "Praedari Host", "Canid Praedari Host", "Felid Praedari Host", "Mustelid Praedari Host", "Ursid Praedari Host"
-                          ].map((hostOption) => (
-                            <div
-                              key={hostOption}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                if (setHostSpecies) setHostSpecies(hostOption);
-                                handleAutoSave({ hostSpecies: hostOption });
-                                setIsHostDropdownOpen(false);
-                              }}
-                              style={{
-                                padding: '4px 8px',
-                                cursor: 'pointer',
-                                background: hostSpecies === hostOption ? '#e6f2ff' : '#fff',
-                                borderBottom: '1px solid #f0f0f0',
-                                textAlign: 'center'
-                              }}
-                              onMouseEnter={(e) => {
-                                if (hostSpecies !== hostOption) {
-                                  e.currentTarget.style.background = '#f5f5f5';
-                                }
-                              }}
-                              onMouseLeave={(e) => {
-                                if (hostSpecies !== hostOption) {
-                                  e.currentTarget.style.background = '#fff';
-                                }
-                              }}
-                            >
-                              {renderColoredHostText(hostOption)}
-                            </div>
-                          ))}
-                        </div>
-                      );
-                    })()}
-                  </div>
+                      >
+                        {opt.label}
+                      </option>
+                    ))}
+                  </select>
                 ) : (
                   // Standard dropdown for other species
                   <select 
@@ -2738,7 +2646,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
             ? <>
                 <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32 }}>{hostMimicFeatureJSX}</span>
                 {hostSpecies && getHostFeatureJSX(hostSpecies) && (
-                  <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32, marginTop: 8, color: '#000', fontWeight: 400 }}>
+                  <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32, marginTop: 8, marginLeft: '24px', color: '#000', fontWeight: 400 }}>
                     {getHostFeatureJSX(hostSpecies)}
                   </span>
                 )}
@@ -3403,8 +3311,44 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                   )}
                 </span>
               )}
+              {species === 'Cerebronych' && (
+                <span style={{ marginLeft: 8, display: 'inline-flex', gap: 8, flexWrap: 'wrap' }}>
+                  {!sheet?.speciesCardDots?.[2]?.[0] && (
+                    <span style={{ display: 'inline-flex', alignItems: 'center', color: '#de7204', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                      <u>Chemical</u> <img src="/Chemical.png" alt="Chemical" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+                    </span>
+                  )}
+                  {!sheet?.speciesCardDots?.[1]?.[0] && (
+                    <span style={{ display: 'inline-flex', alignItems: 'center', color: '#02b900', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                      <u>Toxic</u> <img src="/Toxic.png" alt="Toxic" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+                    </span>
+                  )}
+                </span>
+              )}
             </div>
           <div style={{ fontWeight: 'bold', marginBottom: 2, fontFamily: 'Arial, sans-serif', color: '#666666', wordBreak: 'break-word', overflowWrap: 'break-word' }}><u>Immunities</u>
+            {species === 'Cerebronych' && (
+              <>
+                <span style={{ marginLeft: 8, color: '#000', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                  <i>Confuse</i>
+                </span>
+                {sheet?.speciesCardDots?.[0]?.[0] && (
+                  <span style={{ marginLeft: 8, color: '#000', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                    <i>Mesmerize</i>
+                  </span>
+                )}
+                {sheet?.speciesCardDots?.[2]?.[0] && (
+                  <span style={{ marginLeft: 8, display: 'inline-flex', alignItems: 'center', color: '#de7204', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                    <u>Chemical</u> <img src="/Chemical.png" alt="Chemical" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+                  </span>
+                )}
+                {sheet?.speciesCardDots?.[1]?.[0] && (
+                  <span style={{ marginLeft: 8, display: 'inline-flex', alignItems: 'center', color: '#02b900', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                    <u>Toxic</u> <img src="/Toxic.png" alt="Toxic" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+                  </span>
+                )}
+              </>
+            )}
             {subclass === 'Poisoner' && sheet?.subclassProgressionDots?.poisonerToxicImmunityDots?.[0] && (
               <span style={{ marginLeft: 8, display: 'inline-flex', alignItems: 'center', color: '#02b900', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                 <u>Toxic</u> <img src="/Toxic.png" alt="Toxic" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />

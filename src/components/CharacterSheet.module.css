@@ -561,6 +561,10 @@
   color: var(--selected-subspecies-color) !important;
 }
 
+.selectedHostColor {
+  color: var(--selected-host-color) !important;
+}
+
 /* Features Card - Row 2, spans 2 columns */
 .featuresCard {
   grid-column: 1 / span 2;
