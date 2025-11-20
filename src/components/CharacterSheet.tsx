@@ -1090,7 +1090,45 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
       "Apocritan Entomos Host": <span style={{ color: '#000', fontWeight: 400 }}><b><i style={{ color: '#6d7156' }}>Swarm Tactics.</i></b> When you are 1hx away from an enemy, allies who <b><i style={{ color: '#351c75' }}>Strike</i></b> that enemy can choose to inflict the <b><i>Spike</i></b>, <b><i>Confuse</i></b> or <b><i>Restrain</i></b> condition on it. The <b><i>Spike</i></b> Damage type is the same as the ally's <b><i style={{ color: '#351c75' }}>Strike</i></b> Damage type.</span>,
       "Dynastes Entomos Host": <span style={{ color: '#000', fontWeight: 400 }}><b><i style={{ color: '#334592' }}>Herculean.</i></b> Your size is 3hx. You are also <i>Immune</i> to the <b><i>Slam</i></b> and <b><i>Bounce</i></b> conditions. Additionally, when you inflict the <b><i>Slam</i></b> or <b><i>Bounce</i></b> condition, increase the forced <b><i style={{ color: '#38761d' }}>Movement</i></b> by 2hx.</span>,
       "Mantid Entomos Host": <span style={{ color: '#000', fontWeight: 400 }}><b><i style={{ color: '#75904e' }}>Raptorial Claws.</i></b> You can <b><i style={{ color: '#351c75' }}>Strike</i></b> enemies in an adjacent hx during your <b><i style={{ color: '#38761d' }}>Move</i></b> instead of having to <b><i style={{ color: '#38761d' }}>Move</i></b> through them.</span>,
-      "Human Host": <span style={{ color: '#000', fontWeight: 400 }}><b><i style={{ color: '#2b315f' }}>Adaptable Physique.</i></b> You <i>Resist</i> <b>[2]</b> of the following damage types: <b><u style={{ color: '#de7204', display: 'inline-flex', alignItems: 'center' }}>Chemical<img src="/Chemical.png" alt="Chemical" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>, <b><u style={{ color: '#3ebbff', display: 'inline-flex', alignItems: 'center' }}>Cold<img src="/Cold.png" alt="Cold" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>, <b><u style={{ color: '#ffe700', display: 'inline-flex', alignItems: 'center' }}>Electric<img src="/Electric.png" alt="Electric" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>, <b><u style={{ color: '#f90102', display: 'inline-flex', alignItems: 'center' }}>Fire<img src="/Fire.png" alt="Fire" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>, <b><u style={{ color: '#516fff', display: 'inline-flex', alignItems: 'center' }}>Force<img src="/Force.png" alt="Force" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>, <b><u style={{ color: '#a929ff', display: 'inline-flex', alignItems: 'center' }}>Neural<img src="/Neural.png" alt="Neural" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>, <b><u style={{ color: '#02b900', display: 'inline-flex', alignItems: 'center' }}>Toxic<img src="/Toxic.png" alt="Toxic" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b></span>,
+      "Human Host": (
+        <span style={{ color: '#000', fontWeight: 400 }}>
+          <b><i style={{ color: '#2b315f' }}>Adaptable Physique.</i></b> You <i>Resist</i> two of the following Damage types: <b><u style={{ color: '#de7204', display: 'inline-flex', alignItems: 'center' }}>Chemical<img src="/Chemical.png" alt="Chemical" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>, <b><u style={{ color: '#3ebbff', display: 'inline-flex', alignItems: 'center' }}>Cold<img src="/Cold.png" alt="Cold" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>, <b><u style={{ color: '#d5d52a', display: 'inline-flex', alignItems: 'center' }}>Electric<img src="/Electric.png" alt="Electric" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>, <b><u style={{ color: '#f90102', display: 'inline-flex', alignItems: 'center' }}>Fire<img src="/Fire.png" alt="Fire" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>, <b><u style={{ color: '#514fff', display: 'inline-flex', alignItems: 'center' }}>Force<img src="/Force.png" alt="Force" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>, <b><u style={{ color: '#a929ff', display: 'inline-flex', alignItems: 'center' }}>Neural<img src="/Neural.png" alt="Neural" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>, <b><u style={{ color: '#02b900', display: 'inline-flex', alignItems: 'center' }}>Toxic<img src="/Toxic.png" alt="Toxic" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>.
+          <br />
+          <span><i>Resistances</i>: </span>
+          {sheet?.humanHostDamageTypes && sheet.humanHostDamageTypes.length > 0 ? (
+            sheet.humanHostDamageTypes.map((type, index) => {
+              const damageTypeColors: { [key: string]: string } = {
+                'Chemical': '#de7204',
+                'Cold': '#3ebbff',
+                'Electric': '#d5d52a',
+                'Fire': '#e20e0e',
+                'Force': '#516fff',
+                'Neural': '#a929ff',
+                'Toxic': '#02b900'
+              };
+              const damageTypeIcons: { [key: string]: string } = {
+                'Chemical': '/Chemical.png',
+                'Cold': '/Cold.png',
+                'Electric': '/Electric.png',
+                'Fire': '/Fire.png',
+                'Force': '/Force.png',
+                'Neural': '/Neural.png',
+                'Toxic': '/Toxic.png'
+              };
+              return (
+                <span key={index}>
+                  {index > 0 && ', '}
+                  <b><u style={{ color: damageTypeColors[type], display: 'inline-flex', alignItems: 'center' }}>
+                    {type}<img src={damageTypeIcons[type]} alt={type} style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} />
+                  </u></b>
+                </span>
+              );
+            })
+          ) : (
+            <span style={{ fontStyle: 'italic' }}>None selected</span>
+          )}
+        </span>
+      ),
       "Diminutive Human Host": <span style={{ color: '#000', fontWeight: 400 }}><b><i style={{ color: '#c3735f' }}>Out of Sight.</i></b> When you are <b><i><span style={{ color: '#990000' }}>Attacked</span></i></b> and have any Cover, you roll <b>[1]</b> additional Cover die and discard the lowest roll.</span>,
       "Lithe Human Host": <span style={{ color: '#000', fontWeight: 400 }}><b><i style={{ color: '#2b5f5f' }}>Fleet of Foot.</i></b> You ignore <i>Rough Terrain</i> and <i>Dangerous Terrain</i> and you gain a <b><i style={{ color: '#38761d' }}>Climb Speed</i></b>.</span>,
       "Massive Human Host": <span style={{ color: '#000', fontWeight: 400 }}><b><i style={{ color: '#2b175f' }}>I'LL SEE YOU IN HELL!</i></b> Whenever you reach 0 <b><i style={{ color: '#990000' }}>Hit Points</i></b> in a battle, you can immediately make a <b><i><span style={{ color: '#000' }}>Primary</span> <span style={{ color: '#990000' }}>Attack</span></i></b>. Additionally, your size is 3hx.</span>,
@@ -3370,6 +3408,35 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                 <span style={{ marginLeft: 8, display: 'inline-flex', alignItems: 'center', color: '#915927', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                   <u>Bludgeoning</u> <img src="/Bludgeoning.png" alt="Bludgeoning" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
                 </span>
+              )}
+              {hostSpecies === 'Human Host' && sheet?.humanHostDamageTypes && sheet.humanHostDamageTypes.length > 0 && (
+                <>
+                  {sheet.humanHostDamageTypes.map((type, index) => {
+                    const damageTypeColors: { [key: string]: string } = {
+                      'Chemical': '#de7204',
+                      'Cold': '#3ebbff',
+                      'Electric': '#d5d52a',
+                      'Fire': '#e20e0e',
+                      'Force': '#516fff',
+                      'Neural': '#a929ff',
+                      'Toxic': '#02b900'
+                    };
+                    const damageTypeIcons: { [key: string]: string } = {
+                      'Chemical': '/Chemical.png',
+                      'Cold': '/Cold.png',
+                      'Electric': '/Electric.png',
+                      'Fire': '/Fire.png',
+                      'Force': '/Force.png',
+                      'Neural': '/Neural.png',
+                      'Toxic': '/Toxic.png'
+                    };
+                    return (
+                      <span key={index} style={{ marginLeft: 8, display: 'inline-flex', alignItems: 'center', color: damageTypeColors[type], wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                        <u>{type}</u> <img src={damageTypeIcons[type]} alt={type} style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+                      </span>
+                    );
+                  })}
+                </>
               )}
             </div>
           <div style={{ fontWeight: 'bold', marginBottom: 2, fontFamily: 'Arial, sans-serif', color: '#666666', wordBreak: 'break-word', overflowWrap: 'break-word' }}><u>Immunities</u>

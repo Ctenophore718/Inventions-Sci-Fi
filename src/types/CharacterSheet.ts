@@ -8,6 +8,7 @@ export type CharacterSheet = {
   species: string;
   subspecies: string;
   hostSpecies?: string; // For Cerebronych species - the host they mimic
+  humanHostDamageTypes?: string[]; // For Human Host - selected damage types (max 2)
   background: string;
 
 

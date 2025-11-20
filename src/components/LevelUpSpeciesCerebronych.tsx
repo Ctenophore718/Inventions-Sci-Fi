@@ -274,7 +274,7 @@ const LevelUpSpeciesCerebronych: React.FC<LevelUpSpeciesCerebronychProps> = ({
       "Apocritan Entomos Host": <span style={{ color: '#000', fontWeight: 400 }}><b><i style={{ color: '#6d7156' }}>Swarm Tactics.</i></b> When you are 1hx away from an enemy, allies who <b><i style={{ color: '#351c75' }}>Strike</i></b> that enemy can choose to inflict the <b><i>Spike</i></b>, <b><i>Confuse</i></b> or <b><i>Restrain</i></b> condition on it. The <b><i>Spike</i></b> Damage type is the same as the ally's <b><i style={{ color: '#351c75' }}>Strike</i></b> Damage type.</span>,
       "Dynastes Entomos Host": <span style={{ color: '#000', fontWeight: 400 }}><b><i style={{ color: '#334592' }}>Herculean.</i></b> Your size is 3hx. You are also <i>Immune</i> to the <b><i>Slam</i></b> and <b><i>Bounce</i></b> conditions. Additionally, when you inflict the <b><i>Slam</i></b> or <b><i>Bounce</i></b> condition, increase the forced <b><i style={{ color: '#38761d' }}>Movement</i></b> by 2hx.</span>,
       "Mantid Entomos Host": <span style={{ color: '#000', fontWeight: 400 }}><b><i style={{ color: '#75904e' }}>Raptorial Claws.</i></b> You can <b><i style={{ color: '#351c75' }}>Strike</i></b> enemies in an adjacent hx during your <b><i style={{ color: '#38761d' }}>Move</i></b> instead of having to <b><i style={{ color: '#38761d' }}>Move</i></b> through them.</span>,
-      "Human Host": <span style={{ color: '#000', fontWeight: 400 }}><b><i style={{ color: '#2b315f' }}>Adaptable Physique.</i></b> You <i>Resist</i> <b>[2]</b> of the following damage types: <b><u style={{ color: '#de7204' }}>Chemical</u></b>, <b><u style={{ color: '#3ebbff' }}>Cold</u></b>, <b><u style={{ color: '#ffe700' }}>Electric</u></b>, <b><u style={{ color: '#f90102' }}>Fire</u></b>, <b><u style={{ color: '#516fff' }}>Force</u></b>, <b><u style={{ color: '#a929ff' }}>Neural</u></b>, <b><u style={{ color: '#02b900' }}>Toxic</u></b></span>,
+      "Human Host": <span style={{ color: '#000', fontWeight: 400 }}><b><i style={{ color: '#2b315f' }}>Adaptable Physique.</i></b> You <i>Resist</i> two of the following Damage types: <b><u style={{ color: '#de7204', display: 'inline-flex', alignItems: 'center' }}>Chemical<img src="/Chemical.png" alt="Chemical" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>, <b><u style={{ color: '#3ebbff', display: 'inline-flex', alignItems: 'center' }}>Cold<img src="/Cold.png" alt="Cold" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>, <b><u style={{ color: '#d5d52a', display: 'inline-flex', alignItems: 'center' }}>Electric<img src="/Electric.png" alt="Electric" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>, <b><u style={{ color: '#f90102', display: 'inline-flex', alignItems: 'center' }}>Fire<img src="/Fire.png" alt="Fire" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>, <b><u style={{ color: '#516fff', display: 'inline-flex', alignItems: 'center' }}>Force<img src="/Force.png" alt="Force" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>, <b><u style={{ color: '#a929ff', display: 'inline-flex', alignItems: 'center' }}>Neural<img src="/Neural.png" alt="Neural" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>, <b><u style={{ color: '#02b900', display: 'inline-flex', alignItems: 'center' }}>Toxic<img src="/Toxic.png" alt="Toxic" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>.</span>,
       "Diminutive Human Host": <span style={{ color: '#000', fontWeight: 400 }}><b><i style={{ color: '#c3735f' }}>Out of Sight.</i></b> When you are <b><i><span style={{ color: '#990000' }}>Attacked</span></i></b> and have any Cover, you roll <b>[1]</b> additional Cover die and discard the lowest roll.</span>,
       "Lithe Human Host": <span style={{ color: '#000', fontWeight: 400 }}><b><i style={{ color: '#2b5f5f' }}>Fleet of Foot.</i></b> You ignore <i>Rough Terrain</i> and <i>Dangerous Terrain</i> and you gain a <b><i style={{ color: '#38761d' }}>Climb Speed</i></b>.</span>,
       "Massive Human Host": <span style={{ color: '#000', fontWeight: 400 }}><b><i style={{ color: '#2b175f' }}>I'LL SEE YOU IN HELL!</i></b> Whenever you reach 0 <b><i style={{ color: '#990000' }}>Hit Points</i></b> in a battle, you can immediately make a <b><i><span style={{ color: '#000' }}>Primary</span> <span style={{ color: '#990000' }}>Attack</span></i></b>. Additionally, your size is 3hx.</span>,
@@ -527,6 +527,116 @@ const LevelUpSpeciesCerebronych: React.FC<LevelUpSpeciesCerebronychProps> = ({
             {sheet?.hostSpecies && getHostFeatureJSX(sheet.hostSpecies) && (
               <div style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginTop: '12px', marginLeft: '24px' }}>
                 {getHostFeatureJSX(sheet.hostSpecies)}
+              </div>
+            )}
+
+            {/* Damage Types Dropdown for Human Host */}
+            {sheet?.hostSpecies === 'Human Host' && (
+              <div style={{ marginTop: '8px', marginLeft: '24px' }}>
+                {/* Damage Types Dropdown */}
+                <select
+                  value=""
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    if (val && onAutoSave) {
+                      const currentTypes = sheet?.humanHostDamageTypes || [];
+                      // Only add if not already included AND less than 2 types selected
+                      if (!currentTypes.includes(val) && currentTypes.length < 2) {
+                        onAutoSave({ humanHostDamageTypes: [...currentTypes, val] });
+                      }
+                    }
+                  }}
+                  style={{
+                    fontSize: '1em',
+                    padding: '2px 8px',
+                    borderRadius: '6px',
+                    border: '1px solid #ccc',
+                    background: '#fff',
+                    textAlign: 'left',
+                    minWidth: '200px',
+                    fontFamily: 'Arial, Helvetica, sans-serif',
+                    fontWeight: 'bold',
+                    color: '#000'
+                  }}
+                >
+                  <option value="" style={{ color: 'black', backgroundColor: 'white' }}>
+                    Damage Types
+                  </option>
+                  {((sheet?.humanHostDamageTypes?.length || 0) < 2) && !sheet?.humanHostDamageTypes?.includes('Chemical') && (
+                    <option value="Chemical" style={{ color: '#de7204', backgroundColor: 'white', fontWeight: 'bold' }}>Chemical</option>
+                  )}
+                  {((sheet?.humanHostDamageTypes?.length || 0) < 2) && !sheet?.humanHostDamageTypes?.includes('Cold') && (
+                    <option value="Cold" style={{ color: '#3ebbff', backgroundColor: 'white', fontWeight: 'bold' }}>Cold</option>
+                  )}
+                  {((sheet?.humanHostDamageTypes?.length || 0) < 2) && !sheet?.humanHostDamageTypes?.includes('Electric') && (
+                    <option value="Electric" style={{ color: '#d5d52a', backgroundColor: 'white', fontWeight: 'bold' }}>Electric</option>
+                  )}
+                  {((sheet?.humanHostDamageTypes?.length || 0) < 2) && !sheet?.humanHostDamageTypes?.includes('Fire') && (
+                    <option value="Fire" style={{ color: '#e20e0e', backgroundColor: 'white', fontWeight: 'bold' }}>Fire</option>
+                  )}
+                  {((sheet?.humanHostDamageTypes?.length || 0) < 2) && !sheet?.humanHostDamageTypes?.includes('Force') && (
+                    <option value="Force" style={{ color: '#516fff', backgroundColor: 'white', fontWeight: 'bold' }}>Force</option>
+                  )}
+                  {((sheet?.humanHostDamageTypes?.length || 0) < 2) && !sheet?.humanHostDamageTypes?.includes('Neural') && (
+                    <option value="Neural" style={{ color: '#a929ff', backgroundColor: 'white', fontWeight: 'bold' }}>Neural</option>
+                  )}
+                  {((sheet?.humanHostDamageTypes?.length || 0) < 2) && !sheet?.humanHostDamageTypes?.includes('Toxic') && (
+                    <option value="Toxic" style={{ color: '#02b900', backgroundColor: 'white', fontWeight: 'bold' }}>Toxic</option>
+                  )}
+                </select>
+
+                {/* Display selected damage types */}
+                {sheet?.humanHostDamageTypes && sheet.humanHostDamageTypes.length > 0 && (
+                  <div style={{ marginTop: '4px', display: 'flex', flexDirection: 'column', gap: '0px' }}>
+                    {sheet.humanHostDamageTypes.map((type, index) => {
+                      const damageTypeColors: { [key: string]: string } = {
+                        'Chemical': '#de7204',
+                        'Cold': '#3ebbff',
+                        'Electric': '#d5d52a',
+                        'Fire': '#e20e0e',
+                        'Force': '#516fff',
+                        'Neural': '#a929ff',
+                        'Toxic': '#02b900'
+                      };
+                      const damageTypeIcons: { [key: string]: string } = {
+                        'Chemical': '/Chemical.png',
+                        'Cold': '/Cold.png',
+                        'Electric': '/Electric.png',
+                        'Fire': '/Fire.png',
+                        'Force': '/Force.png',
+                        'Neural': '/Neural.png',
+                        'Toxic': '/Toxic.png'
+                      };
+                      return (
+                        <div key={index} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <span style={{ display: 'inline-flex', alignItems: 'center', color: damageTypeColors[type], fontWeight: 'bold' }}>
+                            <u>{type}</u>
+                            <img src={damageTypeIcons[type]} alt={type} style={{ width: 16, height: 16, marginLeft: 4, verticalAlign: 'middle' }} />
+                          </span>
+                          <button
+                            onClick={() => {
+                              if (onAutoSave) {
+                                const newTypes = sheet.humanHostDamageTypes?.filter((_, i) => i !== index) || [];
+                                onAutoSave({ humanHostDamageTypes: newTypes });
+                              }
+                            }}
+                            style={{
+                              background: 'none',
+                              border: 'none',
+                              color: '#cc0000',
+                              fontSize: '1.2em',
+                              cursor: 'pointer',
+                              padding: '0 4px',
+                              fontWeight: 'bold'
+                            }}
+                          >
+                            ×
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             )}
           </div>
