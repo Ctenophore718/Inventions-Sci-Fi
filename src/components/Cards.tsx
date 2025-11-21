@@ -24,6 +24,7 @@ import { generateDetonateCardJSX } from "../utils/junkerTechnique";
 import { generateVersatileSwarmCardJSX } from "../utils/nanoboticistTechnique";
 import { generateBulletMagnetCardJSX } from "../utils/tankerTechnique";
 import { generateAvianGazeCardJSX, calculateAvianGazeData } from "../utils/avenochTechnique";
+import { generateMemoryManifestCardJSX, generateLimitPushCardJSX, calculateMemoryManifestData, calculateLimitPushData } from "../utils/cerebronychTechnique";
 import { generateDarkenedDisplacerCardJSX } from "../utils/corvidTechnique";
 import { generateFalconDiveCardJSX } from "../utils/falcadorTechnique";
 import { generateDarknessDescendingCardJSX } from "../utils/nocturneTechnique";
@@ -317,6 +318,20 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
   const calculateEffectiveMaxHP = (): number => {
     const baseHP = localSheet?.maxHitPoints ?? 0;
     let effectiveHP = baseHP;
+    
+    // Add Cerebronych species bonus
+    if (localSheet?.species === 'Cerebronych') {
+      const speciesDots = localSheet?.speciesCardDots || [];
+      const hp5Dots = speciesDots[9] || [];
+      const hp10Dots = speciesDots[10] || [];
+      const hp15Dots = speciesDots[11] || [];
+      
+      const hp5Bonus = hp5Dots.filter(Boolean).length * 5;
+      const hp10Bonus = hp10Dots.filter(Boolean).length * 10;
+      const hp15Bonus = (hp15Dots[0] ? 15 : 0);
+      
+      effectiveHP += 30 + hp5Bonus + hp10Bonus + hp15Bonus;
+    }
     
     // Add Avenoch species bonus
     if (localSheet?.species === 'Avenoch') {
@@ -1141,7 +1156,7 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                 fontFamily: 'Arial, Helvetica, sans-serif',
                 fontWeight: 'bold',
                 fontSize: 'clamp(0.8em, 4vw, 1.25em)',
-                color: localSheet?.species === 'Avenoch' ? '#2b5f59' : 'black',
+                color: localSheet?.species === 'Avenoch' ? '#2b5f59' : localSheet?.species === 'Cerebronych' ? '#5f5e2b' : 'black',
                 lineHeight: 1,
                 textAlign: 'left',
                 whiteSpace: 'nowrap',
@@ -1150,13 +1165,13 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                 flexShrink: 1,
                 marginRight: '5px'
               }}>
-                {localSheet?.species === 'Avenoch' ? 'Avian Gaze' : 'Species Card Name'}
+                {localSheet?.species === 'Avenoch' ? 'Avian Gaze' : localSheet?.species === 'Cerebronych' ? 'Memory Manifest' : 'Species Card Name'}
               </span>
               <span style={{
                 fontFamily: 'Arial, Helvetica, sans-serif',
                 fontStyle: 'italic',
                 fontSize: '0.75em',
-                color: localSheet?.species === 'Avenoch' ? '#2b5f59' : 'black',
+                color: localSheet?.species === 'Avenoch' ? '#2b5f59' : localSheet?.species === 'Cerebronych' ? '#5f5e2b' : 'black',
                 lineHeight: 1,
                 whiteSpace: 'normal',
                 wordBreak: 'keep-all',
@@ -1164,11 +1179,11 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                 maxWidth: '72px',
                 display: 'inline-block',
                 textAlign: 'right'
-              }}>{localSheet?.species === 'Avenoch' ? 'Avenoch' : 'Species'}</span>
+              }}>{localSheet?.species === 'Avenoch' ? 'Avenoch' : localSheet?.species === 'Cerebronych' ? 'Cerebronych' : 'Species'}</span>
             </div>
             <img 
-              src={localSheet?.species === 'Avenoch' ? "/Avian Gaze.png" : "/Blank Card.png"}
-              alt={localSheet?.species === 'Avenoch' ? "Avian Gaze" : "Blank Card"}
+              src={localSheet?.species === 'Avenoch' ? "/Avian Gaze.png" : localSheet?.species === 'Cerebronych' ? "/Memory Manifest.png" : "/Blank Card.png"}
+              alt={localSheet?.species === 'Avenoch' ? "Avian Gaze" : localSheet?.species === 'Cerebronych' ? "Memory Manifest" : "Blank Card"}
               style={{
                 position: 'absolute',
                 top: 35,
@@ -1198,6 +1213,10 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
               {localSheet?.species === 'Avenoch' ? (
                 <span style={{ color: '#bf9000', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '0.875em', fontStyle: 'italic', marginRight: 22, whiteSpace: 'nowrap', maxWidth: 'calc(100% - 120px)', overflow: 'hidden', textOverflow: 'ellipsis', textAlign: 'right' }}>
                   Cooldown <span style={{ fontWeight: 'bold', fontStyle: 'normal' }}>[{calculateAvianGazeData(localSheet?.speciesCardDots).cooldown}]</span>
+                </span>
+              ) : localSheet?.species === 'Cerebronych' ? (
+                <span style={{ color: '#bf9000', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '0.875em', fontStyle: 'italic', marginRight: 22, whiteSpace: 'nowrap', maxWidth: 'calc(100% - 120px)', overflow: 'hidden', textOverflow: 'ellipsis', textAlign: 'right' }}>
+                  Cooldown <span style={{ fontWeight: 'bold', fontStyle: 'normal' }}>[{calculateMemoryManifestData(localSheet?.speciesCardDots).cooldown}]</span>
                 </span>
               ) : localSheet?.subclass === 'Air' ? (
                 <span style={{ color: '#bf9000', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '0.875em', fontStyle: 'italic', marginRight: 22, whiteSpace: 'nowrap', maxWidth: 'calc(100% - 120px)', overflow: 'hidden', textOverflow: 'ellipsis', textAlign: 'right' }}>
@@ -1237,7 +1256,7 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                 maxHeight: '100%',
                 overflow: 'hidden'
               }}>
-                {localSheet?.species === 'Avenoch' ? generateAvianGazeCardJSX(localSheet?.speciesCardDots) : 'Card stats.'}
+                {localSheet?.species === 'Avenoch' ? generateAvianGazeCardJSX(localSheet?.speciesCardDots) : localSheet?.species === 'Cerebronych' ? generateMemoryManifestCardJSX(localSheet?.speciesCardDots) : 'Card stats.'}
               </div>
             </div>
             <div style={{
@@ -1256,7 +1275,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
             }}>
               {localSheet?.species === 'Avenoch' 
                 ? 'Avenochs were designed from the get-go for their accuracy and range in combat. Their eyesight is unparalleled in the creations of Dr. Hans Cripioma.' 
-                : 'Flavor text.'}
+                : localSheet?.species === 'Cerebronych'
+                  ? '"There\'s much more to mind than meets matter." --Cerebronych saying'
+                  : 'Flavor text.'}
             </div>
         </div>
         
@@ -1292,7 +1313,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                 fontFamily: 'Arial, Helvetica, sans-serif',
                 fontWeight: 'bold',
                 fontSize: localSheet?.subspecies === 'Nocturne' ? '1.2em' : 'clamp(0.8em, 4vw, 1.25em)',
-                color: localSheet?.subspecies === 'Corvid' 
+                color: localSheet?.species === 'Cerebronych'
+                  ? '#5f5e2b'
+                  : localSheet?.subspecies === 'Corvid' 
                   ? '#75904e'
                   : localSheet?.subspecies === 'Falcador'
                     ? '#6d7156'
@@ -1309,7 +1332,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                 flexShrink: 1,
                 marginRight: '5px'
               }}>
-                {localSheet?.subspecies === 'Corvid' 
+                {localSheet?.species === 'Cerebronych'
+                  ? 'Limit Push'
+                  : localSheet?.subspecies === 'Corvid' 
                   ? 'Darkened Displacer' 
                   : localSheet?.subspecies === 'Falcador'
                     ? 'Falcon Dive'
@@ -1323,7 +1348,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                 fontFamily: 'Arial, Helvetica, sans-serif',
                 fontStyle: 'italic',
                 fontSize: '0.75em',
-                color: localSheet?.subspecies === 'Corvid' 
+                color: localSheet?.species === 'Cerebronych'
+                  ? '#5f5e2b'
+                  : localSheet?.subspecies === 'Corvid' 
                   ? '#75904e'
                   : localSheet?.subspecies === 'Falcador'
                     ? '#6d7156'
@@ -1339,7 +1366,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                 maxWidth: '72px',
                 display: 'inline-block',
                 textAlign: 'right'
-              }}>{localSheet?.subspecies === 'Corvid' 
+              }}>{localSheet?.species === 'Cerebronych'
+                  ? 'Cerebronych'
+                  : localSheet?.subspecies === 'Corvid' 
                   ? 'Corvid' 
                   : localSheet?.subspecies === 'Falcador'
                     ? 'Falcador'
@@ -1350,7 +1379,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                         : 'Subspecies'}</span>
             </div>
             <img 
-              src={localSheet?.subspecies === 'Corvid' 
+              src={localSheet?.species === 'Cerebronych'
+                ? "/Limit Push.png"
+                : localSheet?.subspecies === 'Corvid' 
                 ? "/Darkened Displacer.png" 
                 : localSheet?.subspecies === 'Falcador'
                   ? "/Falcon Dive.png"
@@ -1359,7 +1390,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                     : localSheet?.subspecies === 'Vulturine'
                       ? "/Flesh Eater.png"
                       : "/Blank Card.png"}
-              alt={localSheet?.subspecies === 'Corvid' 
+              alt={localSheet?.species === 'Cerebronych'
+                ? "Limit Push"
+                : localSheet?.subspecies === 'Corvid' 
                 ? "Darkened Displacer" 
                 : localSheet?.subspecies === 'Falcador'
                   ? "Falcon Dive"
@@ -1396,7 +1429,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
               <span style={{ color: '#bf9000', fontFamily: 'Arial, Helvetica, sans-serif', fontWeight: 'bold', fontSize: '1.1em', textAlign: 'left' }}>Technique</span>
               <span style={{ color: '#bf9000', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '0.875em', fontStyle: 'italic', marginRight: 22, whiteSpace: 'nowrap', maxWidth: 'calc(100% - 120px)', overflow: 'hidden', textOverflow: 'ellipsis', textAlign: 'right' }}>
                 Cooldown <span style={{ fontWeight: 'bold', fontStyle: 'normal' }}>
-                  {localSheet?.subspecies === 'Corvid' 
+                  {localSheet?.species === 'Cerebronych'
+                    ? `[${calculateLimitPushData(localSheet?.speciesCardDots).cooldown}]`
+                    : localSheet?.subspecies === 'Corvid' 
                     ? `[${4 - (localSheet?.subspeciesCardDots?.[3]?.filter(Boolean).length ?? 0)}]`
                     : localSheet?.subspecies === 'Falcador'
                       ? `[${3 - (localSheet?.subspeciesCardDots?.[3]?.filter(Boolean).length ?? 0)}]`
@@ -1432,7 +1467,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                 maxHeight: '100%',
                 overflow: 'hidden'
               }}>
-                {localSheet?.subspecies === 'Corvid' 
+                {localSheet?.species === 'Cerebronych'
+                  ? generateLimitPushCardJSX(localSheet?.speciesCardDots)
+                  : localSheet?.subspecies === 'Corvid' 
                   ? generateDarkenedDisplacerCardJSX({ 
                       range: 6 + (localSheet?.subspeciesCardDots?.[1]?.filter(Boolean).length ?? 0) * 2,
                       inflictDemoralize: localSheet?.subspeciesCardDots?.[2]?.[0] ?? false
@@ -1469,7 +1506,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
               zIndex: 3,
               textAlign: 'left'
             }}>
-              {localSheet?.subspecies === 'Corvid' 
+              {localSheet?.species === 'Cerebronych'
+                ? 'Each Cerebronych contains within it the ability to imbue nearby allies with the unearthly will to fight beyond their limits.'
+                : localSheet?.subspecies === 'Corvid' 
                 ? '"You can hear their caws echo elsewhere, and in a flurry of black feathers, they\'re gone. And suddenly some other bloke is at your throat!" --Anonymous'
                 : localSheet?.subspecies === 'Falcador'
                   ? 'A bullet through the air, the Falcador has the capability of flying faster than any other creature on the battlefield.'

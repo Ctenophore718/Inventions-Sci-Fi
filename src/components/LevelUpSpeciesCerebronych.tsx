@@ -255,10 +255,10 @@ const LevelUpSpeciesCerebronych: React.FC<LevelUpSpeciesCerebronychProps> = ({
 
     const featureMap: { [key: string]: React.JSX.Element } = {
       "Avenoch Host": <span style={{ color: '#000', fontWeight: 400 }}><b><i style={{ color: '#2b5f59' }}>First in Flight.</i></b> You have a <b><i style={{ color: '#38761d' }}>Fly Speed</i></b>. Additionally, you can <b><i style={{ color: '#38761d' }}>Move</i></b> 2hx whenever you Crit on an <b><i style={{ color: '#990000' }}>Attack</i></b>.</span>,
-      "Corvid Avenoch Host": <span style={{ color: '#000', fontWeight: 400 }}><b><i style={{ color: '#75904e' }}>Crow's Cunning.</i></b> You are <i>Immune</i> to the <b><i>Confuse</i></b> and <b><i>Mesmerize</i></b> conditions.</span>,
-      "Falcador Avenoch Host": <span style={{ color: '#000', fontWeight: 400 }}><b><i style={{ color: '#6d7156' }}>Rending Talons.</i></b> When you roll for <b><i>Spike</i></b> Damage on <b><i style={{ color: '#351c75' }}>Strikes</i></b>, the <b><i>Spike</i></b> effect triggers on a roll of 5+.</span>,
-      "Nocturne Avenoch Host": <span style={{ color: '#000', fontWeight: 400 }}><b><i style={{ color: '#334592' }}>Eyes of the Night.</i></b> You are <i>Immune</i> to the <b><i>Blind</i></b> condition and don't have a <i>Rear Arc</i>. Additionally, whenever you Crit on an <b><i style={{ color: '#990000' }}>Attack</i></b>, you inflict the <b><i>Mesmerize</i></b> condition.</span>,
-      "Vulturine Avenoch Host": <span style={{ color: '#000', fontWeight: 400 }}><b><i style={{ color: '#a96d8c' }}>Carrion Gorge.</i></b> When you destroy an enemy using a <b><i style={{ color: '#351c75' }}>Strike</i></b>, you immediately gain 2d6 <b><i style={{ color: '#990000' }}>Hit Points</i></b>.</span>,
+      "Corvid Avenoch Host": <span style={{ color: '#000', fontWeight: 400 }}><b><i style={{ color: '#75904e' }}>Crow's Cunning.</i></b> You have a <b><i style={{ color: '#38761d' }}>Fly Speed</i></b>. Additionally, you are <i>Immune</i> to the <b><i>Confuse</i></b> and <b><i>Mesmerize</i></b> conditions.</span>,
+      "Falcador Avenoch Host": <span style={{ color: '#000', fontWeight: 400 }}><b><i style={{ color: '#6d7156' }}>Rending Talons.</i></b> You have a <b><i style={{ color: '#38761d' }}>Fly Speed</i></b>. Additionally, when you roll for <b><i>Spike</i></b> Damage on <b><i style={{ color: '#351c75' }}>Strikes</i></b>, the <b><i>Spike</i></b> effect triggers on a roll of 5+.</span>,
+      "Nocturne Avenoch Host": <span style={{ color: '#000', fontWeight: 400 }}><b><i style={{ color: '#334592' }}>Eyes of the Night.</i></b> You have a <b><i style={{ color: '#38761d' }}>Fly Speed</i></b>. Additionally, you are <i>Immune</i> to the <b><i>Blind</i></b> condition and don't have a <i>Rear Arc</i>. Additionally, whenever you Crit on an <b><i style={{ color: '#990000' }}>Attack</i></b>, you inflict the <b><i>Mesmerize</i></b> condition.</span>,
+      "Vulturine Avenoch Host": <span style={{ color: '#000', fontWeight: 400 }}><b><i style={{ color: '#a96d8c' }}>Carrion Gorge.</i></b> You have a <b><i style={{ color: '#38761d' }}>Fly Speed</i></b>. Additionally, when you destroy an enemy using a <b><i style={{ color: '#351c75' }}>Strike</i></b>, you immediately gain 2d6 <b><i style={{ color: '#990000' }}>Hit Points</i></b>.</span>,
       "Chloroptid Host": <span style={{ color: '#000', fontWeight: 400 }}><b><i style={{ color: '#315f2b' }}>Rapid Regeneration.</i></b> You gain 1d4 <b><i style={{ color: '#990000' }}>Hit Points</i></b> at the start of your turn. Additionally, your size is 1hx, 2hx, or 3hx, depending on the size of your host.</span>,
       "Barkskin Chloroptid Host": <span style={{ color: '#000', fontWeight: 400 }}><b><i style={{ color: '#5f2d2b' }}>Deep Roots.</i></b> You are <i>Immune</i> to the <b><i>Slam</i></b> and <b><i>Bounce</i></b> conditions.</span>,
       "Carnivorous Chloroptid Host": <span style={{ color: '#000', fontWeight: 400 }}><b><i style={{ color: '#2b2d5f' }}>Sap Sucker.</i></b> Whenever you heal as a result of the <b><i>Drain</i></b> condition, you heal all of the amount of Damage done instead of half.</span>,
@@ -275,19 +275,19 @@ const LevelUpSpeciesCerebronych: React.FC<LevelUpSpeciesCerebronychProps> = ({
       "Dynastes Entomos Host": <span style={{ color: '#000', fontWeight: 400 }}><b><i style={{ color: '#334592' }}>Herculean.</i></b> Your size is 3hx. You are also <i>Immune</i> to the <b><i>Slam</i></b> and <b><i>Bounce</i></b> conditions. Additionally, when you inflict the <b><i>Slam</i></b> or <b><i>Bounce</i></b> condition, increase the forced <b><i style={{ color: '#38761d' }}>Movement</i></b> by 2hx.</span>,
       "Mantid Entomos Host": <span style={{ color: '#000', fontWeight: 400 }}><b><i style={{ color: '#75904e' }}>Raptorial Claws.</i></b> You can <b><i style={{ color: '#351c75' }}>Strike</i></b> enemies in an adjacent hx during your <b><i style={{ color: '#38761d' }}>Move</i></b> instead of having to <b><i style={{ color: '#38761d' }}>Move</i></b> through them.</span>,
       "Human Host": <span style={{ color: '#000', fontWeight: 400 }}><b><i style={{ color: '#2b315f' }}>Adaptable Physique.</i></b> You <i>Resist</i> two of the following Damage types: <b><u style={{ color: '#de7204', display: 'inline-flex', alignItems: 'center' }}>Chemical<img src="/Chemical.png" alt="Chemical" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>, <b><u style={{ color: '#3ebbff', display: 'inline-flex', alignItems: 'center' }}>Cold<img src="/Cold.png" alt="Cold" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>, <b><u style={{ color: '#d5d52a', display: 'inline-flex', alignItems: 'center' }}>Electric<img src="/Electric.png" alt="Electric" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>, <b><u style={{ color: '#f90102', display: 'inline-flex', alignItems: 'center' }}>Fire<img src="/Fire.png" alt="Fire" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>, <b><u style={{ color: '#516fff', display: 'inline-flex', alignItems: 'center' }}>Force<img src="/Force.png" alt="Force" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>, <b><u style={{ color: '#a929ff', display: 'inline-flex', alignItems: 'center' }}>Neural<img src="/Neural.png" alt="Neural" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>, <b><u style={{ color: '#02b900', display: 'inline-flex', alignItems: 'center' }}>Toxic<img src="/Toxic.png" alt="Toxic" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>.</span>,
-      "Diminutive Human Host": <span style={{ color: '#000', fontWeight: 400 }}><b><i style={{ color: '#c3735f' }}>Out of Sight.</i></b> When you are <b><i><span style={{ color: '#990000' }}>Attacked</span></i></b> and have any Cover, you roll <b>[1]</b> additional Cover die and discard the lowest roll.</span>,
+      "Diminutive Human Host": <span style={{ color: '#000', fontWeight: 400 }}><b><i style={{ color: '#c3735f' }}>Out of Sight.</i></b> When you are <b><i><span style={{ color: '#990000' }}>Attacked</span></i></b> and have any Cover, you roll one additional Cover die and discard the lowest roll.</span>,
       "Lithe Human Host": <span style={{ color: '#000', fontWeight: 400 }}><b><i style={{ color: '#2b5f5f' }}>Fleet of Foot.</i></b> You ignore <i>Rough Terrain</i> and <i>Dangerous Terrain</i> and you gain a <b><i style={{ color: '#38761d' }}>Climb Speed</i></b>.</span>,
       "Massive Human Host": <span style={{ color: '#000', fontWeight: 400 }}><b><i style={{ color: '#2b175f' }}>I'LL SEE YOU IN HELL!</i></b> Whenever you reach 0 <b><i style={{ color: '#990000' }}>Hit Points</i></b> in a battle, you can immediately make a <b><i><span style={{ color: '#000' }}>Primary</span> <span style={{ color: '#990000' }}>Attack</span></i></b>. Additionally, your size is 3hx.</span>,
       "Stout Human Host": <span style={{ color: '#000', fontWeight: 400 }}><b><i style={{ color: '#5f2b2b' }}>Die Hard.</i></b> The first time you reach 0 <b><i style={{ color: '#990000' }}>Hit Points</i></b> in a battle, you immediately gain 1 <b><i style={{ color: '#990000' }}>Hit Point</i></b> and are not dying.</span>,
-      "Lumenaren Host": <span style={{ color: '#000', fontWeight: 400 }}><b><i style={{ color: '#515f2b' }}>Immutable Energy Reserves.</i></b> You are <i>Immune</i> to the <b><i>Sleep</i></b> condition, <i>Resist</i> <b><u style={{ color: '#ffe700' }}>Electric</u></b> and <b><u style={{ color: '#516fff' }}>Force</u></b> and can naturally survive in the vacuum of space.</span>,
+      "Lumenaren Host": <span style={{ color: '#000', fontWeight: 400 }}><b><i style={{ color: '#515f2b' }}>Immutable Energy Reserves.</i></b> You are <i>Immune</i> to the <b><i>Sleep</i></b> condition, <i>Resist</i> <b><u style={{ color: '#d5d52a', display: 'inline-flex', alignItems: 'center' }}>Electric<img src="/Electric.png" alt="Electric" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> and <b><u style={{ color: '#516fff', display: 'inline-flex', alignItems: 'center' }}>Force<img src="/Force.png" alt="Force" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> and can naturally survive in the vacuum of space.</span>,
       "Infrared Lumenaren Host": <span style={{ color: '#000', fontWeight: 400 }}><b><i style={{ color: '#b17fbe' }}>Infrared Tracking.</i></b> All <b><i><span style={{ color: '#990000' }}>Attacks</span></i></b> you make automatically have the Arcing keyword.</span>,
       "Radiofrequent Lumenaren Host": <span style={{ color: '#000', fontWeight: 400 }}><b><i style={{ color: '#bea97f' }}>Misleading Signals.</i></b> Enemies <b><i><span style={{ color: '#990000' }}>Attacking</span></i></b> you roll an additional Crit die and discard the highest rolled.</span>,
-      "X-Ray Lumenaren Host": <span style={{ color: '#000', fontWeight: 400 }}><b><i style={{ color: '#7f8abe' }}>Irradiate.</i></b> Enemies starting their turn within <b>[3]</b>hx of you suffer <b>[2]</b> instances of the <b><i>Spike</i></b> (<b><u style={{ color: '#de7204' }}>Chemical</u></b>) condition.</span>,
-      "Praedari Host": <span style={{ color: '#000', fontWeight: 400 }}><b><i style={{ color: '#5f2b5c' }}>Predator.</i></b> Whenever you <b><i><span style={{ color: '#990000' }}>Attack</span></i></b> or <b><i style={{ color: '#351c75' }}>Strike</i></b> a creature who is not at full <b><i style={{ color: '#990000' }}>Hit Points</i></b>, you gain +<b>[2]</b> Crit and +<b>[1]</b>d6 Damage, the Damage type is the same as the <b><i><span style={{ color: '#990000' }}>Attack</span></i></b> or <b><i style={{ color: '#351c75' }}>Strike</i></b> Damage type.</span>,
+      "X-Ray Lumenaren Host": <span style={{ color: '#000', fontWeight: 400 }}><b><i style={{ color: '#7f8abe' }}>Irradiate.</i></b> Enemies starting their turn within 3hx of you suffer two instances of the <b><i>Spike</i></b> <b>(</b><b><u style={{ color: '#de7204', display: 'inline-flex', alignItems: 'center' }}>Chemical<img src="/Chemical.png" alt="Chemical" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b><b>)</b> condition.</span>,
+      "Praedari Host": <span style={{ color: '#000', fontWeight: 400 }}><b><i style={{ color: '#5f2b5c' }}>Predator.</i></b> Whenever you <b><i><span style={{ color: '#990000' }}>Attack</span></i></b> or <b><i style={{ color: '#351c75' }}>Strike</i></b> a creature who is not at full <b><i style={{ color: '#990000' }}>Hit Points</i></b>, you gain +2 Crit and +1d6 Damage. The Damage type is the same as the <b><i><span style={{ color: '#990000' }}>Attack</span></i></b> or <b><i style={{ color: '#351c75' }}>Strike</i></b> Damage type.</span>,
       "Canid Praedari Host": <span style={{ color: '#000', fontWeight: 400 }}><b><i style={{ color: '#2f8da6' }}>Inspired Hunter.</i></b> When you reduce a creature to 0 <b><i style={{ color: '#990000' }}>Hit Points</i></b>, you immediately gain 1 <i>Action</i>. You can only benefit from this once per turn.</span>,
       "Felid Praedari Host": <span style={{ color: '#000', fontWeight: 400 }}><b><i style={{ color: '#b16326' }}>Cat's Grace.</i></b> You gain a <b><i style={{ color: '#38761d' }}>Climb Speed</i></b> and cannot take damage from falling as long as you are conscious. Additionally, you can use the <i>Acrobatics</i> skill once per turn without using an <i>Action</i>.</span>,
       "Mustelid Praedari Host": <span style={{ color: '#000', fontWeight: 400 }}><b><i style={{ color: '#699239' }}>Weasel.</i></b> You gain a <b><i style={{ color: '#38761d' }}>Burrow Speed</i></b> and are <i>Immune</i> to the <b><i>Restrain</i></b> condition. Additionally you can use the <i>Thievery</i> skill once per turn without using an <i>Action</i>.</span>,
-      "Ursid Praedari Host": <span style={{ color: '#000', fontWeight: 400 }}><b><i style={{ color: '#9026b1' }}>Natural Insulation.</i></b> You <i>Resist</i> <b><u style={{ color: '#3ebbff' }}>Cold</u></b> and <b><u style={{ color: '#915927' }}>Bludgeoning</u></b> and are <i>Immune</i> to the <b><i>Restrain</i></b> condition. Your size is 3hx.</span>,
+      "Ursid Praedari Host": <span style={{ color: '#000', fontWeight: 400 }}><b><i style={{ color: '#9026b1' }}>Natural Insulation.</i></b> You <i>Resist</i> <b><u style={{ color: '#3ebbff', display: 'inline-flex', alignItems: 'center' }}>Cold<img src="/Cold.png" alt="Cold" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> and <b><u style={{ color: '#915927', display: 'inline-flex', alignItems: 'center' }}>Bludgeoning<img src="/Bludgeoning.png" alt="Bludgeoning" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> and are <i>Immune</i> to the <b><i>Restrain</i></b> condition. Your size is 3hx.</span>,
     };
 
     return featureMap[hostValue] || null;
@@ -454,7 +454,7 @@ const LevelUpSpeciesCerebronych: React.FC<LevelUpSpeciesCerebronychProps> = ({
             
             {/* Host Mimic Feature */}
             <div style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '12px' }}>
-              <i style={{ fontWeight: 'bold', color: '#5f5e2b' }}>Host Mimic.</i> You inhabit a host body from a different <i>Species</i> or <i>Subspecies</i>. Choose a starting <b><i style={{ color: '#0b5394' }}>Feature</i></b> available to any other <i>Species</i> or <i>Subspecies</i>. You cannot upgrade this <b><i style={{ color: '#0b5394' }}>Feature</i></b>.
+              <i style={{ fontWeight: 'bold', color: '#5f5e2b' }}>Host Mimic.</i> You inhabit a host body from a different <i>Species</i> or <i>Subspecies</i>. Choose a Host <i>Species</i> or <i>Subspecies</i>, which provides a modified <b><i style={{ color: '#0b5394' }}>Feature</i></b> that cannot be upgraded. Throughout your <i style={{ color: '#5f5e2b' }}>Cerebronych's</i> life, you may change host bodies depending on your desires and opportunities.
             </div>
           </div>
 
@@ -644,12 +644,12 @@ const LevelUpSpeciesCerebronych: React.FC<LevelUpSpeciesCerebronychProps> = ({
 
 
           {/* Techniques Section */}
-          <div style={{ color: '#cc0000', fontWeight: 'bold', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '16px', marginTop: '24px' }}>
-            <div style={{ fontWeight: 'bold', color: '#cc0000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Techniques</u></div>
+          <div style={{ color: '#bf9000', fontWeight: 'bold', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '16px', marginTop: '24px' }}>
+            <div style={{ fontWeight: 'bold', color: '#bf9000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Techniques</u></div>
             
             {/* Memory Manifest Technique */}
             <div style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '4px' }}>
-              <span style={{ fontWeight: 'bold' }}>Memory Manifest</span> (Cooldown {4 - safeGetDotsArray(5).filter(Boolean).length}). You can use any <b><i style={{ color: '#cc0000' }}>Active Technique</i></b> from an ally within {3 + safeGetDotsArray(3).filter(Boolean).length}hx of you.
+              <b><i style={{ color: '#5f5e2b', fontSize: '1em' }}>Memory Manifest</i></b> <i style={{ color: '#5f5e2b', fontSize: '1em' }}>(Cooldown <b style={{ color: '#000', fontStyle: 'normal' }}>[{4 - safeGetDotsArray(5).filter(Boolean).length}]</b>).</i> You can use any <i>Active</i> or <b>{safeGetDotsArray(4)[0] ? '[Inactive]' : '[ - ]'}</b> <b><i style={{ color: '#bf9000' }}>Technique</i></b> from an ally within <b>[{3 + safeGetDotsArray(3).filter(Boolean).length}]</b>hx of you.
             </div>
           </div>
 
@@ -725,7 +725,7 @@ const LevelUpSpeciesCerebronych: React.FC<LevelUpSpeciesCerebronychProps> = ({
               <span></span>
               
               {/* Row 5: Includes Inactive Techniques dot */}
-              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>Includes <b><i style={{ color: '#cc0000' }}>Inactive Techniques</i></b></span>
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>Includes <i>Inactive</i> <b><i style={{ color: '#bf9000' }}>Techniques</i></b></span>
               {(() => {
                 const arr = safeGetDotsArray(4);
                 const canCheck = !arr[0];
@@ -774,7 +774,7 @@ const LevelUpSpeciesCerebronych: React.FC<LevelUpSpeciesCerebronychProps> = ({
               <span></span>
               
               {/* Row 8: -1 Cooldown dots */}
-              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>-1 Cooldown</span>
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>-1 <i>Cooldown</i></span>
               {[0,1].map(idx => {
                 const arr = safeGetDotsArray(5);
                 const canCheck = idx === 0 || arr.slice(0, idx).every(Boolean);
@@ -819,7 +819,7 @@ const LevelUpSpeciesCerebronych: React.FC<LevelUpSpeciesCerebronychProps> = ({
 
           {/* Limit Push Technique */}
           <div style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '4px', marginTop: '16px' }}>
-            <span style={{ fontWeight: 'bold' }}>Limit Push</span> (Cooldown {4 - safeGetDotsArray(8).filter(Boolean).length}). You and allies within {3 + safeGetDotsArray(6).filter(Boolean).length}hx of you can remove {safeGetDotsArray(7)[0] ? 'two' : 'one'} Cooldown Token{safeGetDotsArray(7)[0] ? 's' : ''} from any <b><i style={{ color: '#cc0000' }}>Inactive Attack</i></b> or <b><i style={{ color: '#cc0000' }}>Technique</i></b>.
+            <b><i style={{ color: '#5f5e2b', fontSize: '1em' }}>Limit Push </i></b> <i style={{ color: '#5f5e2b', fontSize: '1em' }}>(Cooldown <b style={{ color: '#000', fontStyle: 'normal' }}>[{4 - safeGetDotsArray(8).filter(Boolean).length}]</b>).</i> You and allies within <b>[{3 + safeGetDotsArray(6).filter(Boolean).length}]</b>hx of you can remove <b>[{safeGetDotsArray(7)[0] ? '2' : '1'}]</b> Cooldown Token(s) from any <i>Inactive</i> <b><i style={{ color: '#990000' }}>Attack</i></b> or <b><i style={{ color: '#bf9000' }}>Technique</i></b>.
           </div>
 
           {/* Limit Push Table */}
@@ -894,7 +894,7 @@ const LevelUpSpeciesCerebronych: React.FC<LevelUpSpeciesCerebronychProps> = ({
               <span></span>
               
               {/* Row 5: +1 Cooldown Token dot */}
-              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1 Cooldown Token</span>
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1 <i>Cooldown Token</i></span>
               {(() => {
                 const arr = safeGetDotsArray(7);
                 const canCheck = !arr[0];
@@ -943,7 +943,7 @@ const LevelUpSpeciesCerebronych: React.FC<LevelUpSpeciesCerebronychProps> = ({
               <span></span>
               
               {/* Row 8: -1 Cooldown dots */}
-              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>-1 Cooldown</span>
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>-1 <i>Cooldown</i></span>
               {[0,1].map(idx => {
                 const arr = safeGetDotsArray(8);
                 const canCheck = idx === 0 || arr.slice(0, idx).every(Boolean);
@@ -994,12 +994,20 @@ const LevelUpSpeciesCerebronych: React.FC<LevelUpSpeciesCerebronychProps> = ({
         <div style={{ width: '100%', marginTop: '1rem', textAlign: 'left', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
           
           {/* Hit Points Section */}
-          <div style={{ color: '#e69138', fontWeight: 'bold', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '16px' }}>
-            <div style={{ fontWeight: 'bold', color: '#e69138', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Hit Points</u></div>
+          <div style={{ color: '#990000', fontWeight: 'bold', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '16px' }}>
+            <div style={{ fontWeight: 'bold', color: '#990000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Hit Points</u></div>
             
             {/* Starting Hit Points */}
             <div style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
-              <span style={{ fontWeight: 'bold' }}>Starting Hit Points.</span> 30
+              <b><i>Starting</i></b> <b><i style={{ color: '#990000' }}>Hit Points</i></b>. 30 +<b>[{(() => {
+                const hp5Dots = safeGetDotsArray(9);
+                const hp10Dots = safeGetDotsArray(10);
+                const hp15Dots = safeGetDotsArray(11);
+                const hp5Bonus = hp5Dots.filter(Boolean).length * 5;
+                const hp10Bonus = hp10Dots.filter(Boolean).length * 10;
+                const hp15Bonus = (hp15Dots[0] ? 15 : 0);
+                return hp5Bonus + hp10Bonus + hp15Bonus;
+              })()}]</b> <b><i style={{ color: '#990000' }}>Hit Points</i></b>.
             </div>
           </div>
 
@@ -1007,7 +1015,7 @@ const LevelUpSpeciesCerebronych: React.FC<LevelUpSpeciesCerebronychProps> = ({
           <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px', marginBottom: '16px' }}>
             <div style={{
               display: 'grid',
-              gridTemplateColumns: '1fr 24px 24px',
+              gridTemplateColumns: '1fr 24px 24px 24px',
               gridTemplateRows: 'repeat(9, auto)',
               columnGap: '6px',
               rowGap: '2px',
@@ -1019,9 +1027,10 @@ const LevelUpSpeciesCerebronych: React.FC<LevelUpSpeciesCerebronychProps> = ({
               <span></span>
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>3xp</span>
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>4xp</span>
+              <span></span>
               
               {/* Row 2: +5 Hit Points dots */}
-              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+5 <b><i style={{ color: '#e69138' }}>Hit Points</i></b></span>
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+5 <b><i style={{ color: '#990000' }}>Hit Points</i></b></span>
               {[0,1].map(idx => {
                 const arr = safeGetDotsArray(9);
                 const canCheck = idx === 0 || arr.slice(0, idx).every(Boolean);
@@ -1065,14 +1074,17 @@ const LevelUpSpeciesCerebronych: React.FC<LevelUpSpeciesCerebronychProps> = ({
               <span></span>
               <span></span>
               <span></span>
+              
 
               {/* Row 4: XP header for +10 HP */}
               <span></span>
+              <span></span>
+              <span></span>
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>7xp</span>
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>10xp</span>
-              
+              <span></span>
               {/* Row 5: +10 Hit Points dots */}
-              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+10 <b><i style={{ color: '#e69138' }}>Hit Points</i></b></span>
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+10 <b><i style={{ color: '#990000' }}>Hit Points</i></b></span>
               {[0,1].map(idx => {
                 const arr = safeGetDotsArray(10);
                 const canCheck = idx === 0 || arr.slice(0, idx).every(Boolean);
@@ -1119,11 +1131,13 @@ const LevelUpSpeciesCerebronych: React.FC<LevelUpSpeciesCerebronychProps> = ({
 
               {/* Row 7: XP header for +15 HP */}
               <span></span>
+              <span></span>
+              <span></span>
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>14xp</span>
               <span></span>
-              
+              <span></span>
               {/* Row 8: +15 Hit Points dot */}
-              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+15 <b><i style={{ color: '#e69138' }}>Hit Points</i></b></span>
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+15 <b><i style={{ color: '#990000' }}>Hit Points</i></b></span>
               {(() => {
                 const arr = safeGetDotsArray(11);
                 const canCheck = !arr[0];

@@ -165,6 +165,20 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
   const calculateEffectiveMaxHP = (baseHP: number, charClass: string): number => {
     let effectiveHP = baseHP;
     
+    // Add Cerebronych species bonus
+    if (sheet?.species === 'Cerebronych') {
+      const speciesDots = sheet?.speciesCardDots || [];
+      const hp5Dots = speciesDots[9] || [];
+      const hp10Dots = speciesDots[10] || [];
+      const hp15Dots = speciesDots[11] || [];
+      
+      const hp5Bonus = hp5Dots.filter(Boolean).length * 5;
+      const hp10Bonus = hp10Dots.filter(Boolean).length * 10;
+      const hp15Bonus = (hp15Dots[0] ? 15 : 0);
+      
+      effectiveHP += 30 + hp5Bonus + hp10Bonus + hp15Bonus;
+    }
+    
     // Add Avenoch species bonus
     if (sheet?.species === 'Avenoch') {
       const speciesDots = sheet?.speciesCardDots || [];
