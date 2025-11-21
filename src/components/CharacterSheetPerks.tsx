@@ -26,6 +26,16 @@ const CharacterSheetPerks: React.FC<CharacterSheetPerksProps> = ({
                 Avenoch
               </span>
             )}
+            {sheet?.species === 'Cerebronych' && (
+              <span style={{ fontWeight: 'normal', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', color: '#000' }}>
+                Cerebronych
+              </span>
+            )}
+            {sheet?.cerebronychLanguage && (
+              <span style={{ fontWeight: 'normal', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', color: '#000' }}>
+                {sheet.cerebronychLanguage}
+              </span>
+            )}
             {charClass === 'Coder' && (
               <span style={{ fontWeight: 'normal', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', color: '#000' }}>
                 Oikovox
@@ -112,6 +122,13 @@ const CharacterSheetPerks: React.FC<CharacterSheetPerksProps> = ({
             <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
               <span>
                 <b><i style={{ color: '#2b5f59' }}>Keen Eyes.</i></b> <span style={{ color: '#000' }}>You are naturally adept at being aware of your visual surroundings, picking up on subtle patterns in the tapestry of the situation, or otherwise being highly observant. Gain an advantage on related skill rolls using your sight.</span>
+              </span>
+            </div>
+          )}
+          {sheet?.species === 'Cerebronych' && sheet?.subspeciesCardDots?.[3]?.[0] && (
+            <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <span>
+                <b><i style={{ color: '#5f5e2b' }}>Many Masks.</i></b> <span style={{ color: '#000' }}>Years of embodying different hosts has developed your keen ability to mimic voices, mannerisms and personalities of many people from many walks of life. Gain an advantage on related skill rolls.</span>
               </span>
             </div>
           )}
@@ -395,6 +412,13 @@ const CharacterSheetPerks: React.FC<CharacterSheetPerksProps> = ({
           <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
             <span>
               <b><i style={{ color: '#a96d8c' }}>Cold Opportunist.</i></b> <span style={{ color: '#000' }}>You have no qualms about making the best of bad moments and taking opportunity when others are either in a vulnerable state or otherwise absent. Gain an advantage on skill related to capitalizing on tragedy in various forms.</span>
+            </span>
+          </div>
+          )}
+          {sheet?.species === 'Cerebronych' && sheet?.subspeciesCardDots?.[4]?.[0] && (
+          <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <span>
+              <b><i style={{ color: '#5f5e2b' }}>Play Dead.</i></b> <span style={{ color: '#000' }}>The fact that you effectively inhabit a corpse is not lost on you. Gain an advantage on skills related to either pretending you're dead or otherwise pretending you're an undead creature risen from the grave.</span>
             </span>
           </div>
           )}

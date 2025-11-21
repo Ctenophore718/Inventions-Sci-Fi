@@ -85,7 +85,7 @@ export function generateLimitPushJSX(speciesCardDots?: boolean[][]): React.React
 
   return (
     <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#5f5e2b', fontSize: '1em' }}>Limit Push </i></b> <i style={{ color: '#5f5e2b', fontSize: '1em' }}>(Cooldown <b style={{ color: '#000', fontStyle: 'normal' }}>[{cooldown}]</b>).</i> You and allies within <b>[{totalRange}]</b>hx of you can remove <b>[{cooldownTokens}]</b> Cooldown Token(s) from any <i>Inactive</i> <b><i style={{ color: '#990000' }}>Attack</i></b> or <b><i style={{ color: '#bf9000' }}>Technique</i></b>.
+      <b><i style={{ color: '#5f5e2b', fontSize: '1em' }}>Limit Push </i></b> <i style={{ color: '#5f5e2b', fontSize: '1em' }}>(Cooldown <b style={{ color: '#000', fontStyle: 'normal' }}>[{cooldown}]</b>).</i> You and allies within <b>[{totalRange}]</b>hx of you can remove <b>[{cooldownTokens}]</b> <i>Cooldown Token(s)</i> from any <i>Inactive</i> <b><i style={{ color: '#990000' }}>Attack</i></b> or <b><i style={{ color: '#bf9000' }}>Technique</i></b>.
     </span>
   );
 }
@@ -99,7 +99,7 @@ export function generateLimitPushCardJSX(speciesCardDots?: boolean[][]): React.R
 
   return (
     <span style={{ color: '#000', fontWeight: 400 }}>
-      You and allies within <b>[{totalRange}]</b>hx of you can remove <b>[{cooldownTokens}]</b> Cooldown Token(s) from any <i>Inactive</i> <b><i style={{ color: '#990000' }}>Attack</i></b> or <b><i style={{ color: '#bf9000' }}>Technique</i></b>.
+      You and allies within <b>[{totalRange}]</b>hx of you can remove <b>[{cooldownTokens}]</b> <i>Cooldown Token(s)</i> from any <i>Inactive</i> <b><i style={{ color: '#990000' }}>Attack</i></b> or <b><i style={{ color: '#bf9000' }}>Technique</i></b>.
     </span>
   );
 }

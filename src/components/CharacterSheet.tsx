@@ -392,7 +392,17 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
   const pistoleerSpeedBonus = sheet?.subclass === 'Pistoleer'
     ? ((sheet?.subclassProgressionDots as any)?.pistoleerMovementSpeedDots?.filter(Boolean).length || 0)
     : 0;
-  const totalSpeed = baseSpeed + tacticianSpeedBonus + kineticSpeedBonus + mercurialSpeedBonus + airSpeedBonus + fireSpeedBonus + waterSpeedBonus + aeronautSpeedBonus + brawlerSpeedBonus + spectreSpeedBonus + avenochSpeedBonus + falcadorSpeedBonus + ammocoderSpeedBonus + pistoleerSpeedBonus;
+  
+  // Calculate Cerebronych species speed bonus (6 base + dots)
+  const cerebronychSpeedBonus = sheet?.species === 'Cerebronych'
+    ? (() => {
+        const subspeciesDots = sheet?.subspeciesCardDots || [];
+        const speedDots = subspeciesDots[2] || [];
+        return 6 + speedDots.filter(Boolean).length;
+      })()
+    : 0;
+  
+  const totalSpeed = baseSpeed + tacticianSpeedBonus + kineticSpeedBonus + mercurialSpeedBonus + airSpeedBonus + fireSpeedBonus + waterSpeedBonus + aeronautSpeedBonus + brawlerSpeedBonus + spectreSpeedBonus + avenochSpeedBonus + falcadorSpeedBonus + ammocoderSpeedBonus + pistoleerSpeedBonus + cerebronychSpeedBonus;
   const speed = totalSpeed > 0 ? `${totalSpeed}` : "0";
   
   // Calculate jump speed and jump amount for Kinetic subclass
@@ -2167,6 +2177,8 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                   
                   // Species boosters
                   if (sheet?.species === "Avenoch" && skillName === "Awareness") sources.push({ type: 'species', color: "rgba(43,95,89,0.5)" });
+                  if (sheet?.species === "Cerebronych" && skillName === "Deception") sources.push({ type: 'species', color: "rgba(95,94,43,0.5)" });
+                  if (sheet?.species === "Cerebronych" && skillName === "Intimidation") sources.push({ type: 'species', color: "rgba(95,94,43,0.5)" });
                   
                   // Subspecies boosters
                   if (subspecies === "Corvid" && skillName === "Thievery") sources.push({ type: 'subspecies', color: "rgba(117,144,78,0.5)" });
@@ -3201,8 +3213,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
             ) : <span style={{ fontWeight: 'bold', fontFamily: 'inherit', color: '#000', marginLeft: 4 }}>{strikeDamage}</span>}
             {species === 'Cerebronych' && sheet?.subspeciesCardDots?.[0]?.[0] && (
               <span style={{ fontWeight: 'normal', fontFamily: 'inherit', color: '#000', marginLeft: 4, display: 'flex', alignItems: 'center' }}>
-                (optional <b><u style={{ color: '#02b900', display: 'inline-flex', alignItems: 'center' }}>Toxic<img src="/Toxic.png" alt="Toxic" style={{ width: 16, height: 16, verticalAlign: 'middle', marginLeft: 2 }} />
-                </u></b>)
+                or&nbsp;<b><u style={{ color: '#02b900', display: 'inline-flex', alignItems: 'center' }}>Toxic<img src="/Toxic.png" alt="Toxic" style={{ width: 16, height: 16, verticalAlign: 'middle', marginLeft: 2 }} /></u></b>
               </span>
             )}
           </div>

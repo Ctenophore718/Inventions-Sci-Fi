@@ -2186,6 +2186,8 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                         
                         // Species boosters
                         if (species === "Avenoch" && skillName === "Awareness") sources.push({ type: 'species', color: "rgba(43,95,89,0.5)" });
+                        if (species === "Cerebronych" && skillName === "Deception") sources.push({ type: 'species', color: "rgba(95,94,43,0.5)" });
+                        if (species === "Cerebronych" && skillName === "Intimidation") sources.push({ type: 'species', color: "rgba(95,94,43,0.5)" });
                         
                         // Subspecies boosters
                         if (subspecies === "Corvid" && skillName === "Thievery") sources.push({ type: 'subspecies', color: "rgba(117,144,78,0.5)" });

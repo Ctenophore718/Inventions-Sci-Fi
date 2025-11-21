@@ -819,7 +819,7 @@ const LevelUpSpeciesCerebronych: React.FC<LevelUpSpeciesCerebronychProps> = ({
 
           {/* Limit Push Technique */}
           <div style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '4px', marginTop: '16px' }}>
-            <b><i style={{ color: '#5f5e2b', fontSize: '1em' }}>Limit Push </i></b> <i style={{ color: '#5f5e2b', fontSize: '1em' }}>(Cooldown <b style={{ color: '#000', fontStyle: 'normal' }}>[{4 - safeGetDotsArray(8).filter(Boolean).length}]</b>).</i> You and allies within <b>[{3 + safeGetDotsArray(6).filter(Boolean).length}]</b>hx of you can remove <b>[{safeGetDotsArray(7)[0] ? '2' : '1'}]</b> Cooldown Token(s) from any <i>Inactive</i> <b><i style={{ color: '#990000' }}>Attack</i></b> or <b><i style={{ color: '#bf9000' }}>Technique</i></b>.
+            <b><i style={{ color: '#5f5e2b', fontSize: '1em' }}>Limit Push </i></b> <i style={{ color: '#5f5e2b', fontSize: '1em' }}>(Cooldown <b style={{ color: '#000', fontStyle: 'normal' }}>[{4 - safeGetDotsArray(8).filter(Boolean).length}]</b>).</i> You and allies within <b>[{3 + safeGetDotsArray(6).filter(Boolean).length}]</b>hx of you can remove <b>[{safeGetDotsArray(7)[0] ? '2' : '1'}]</b> <i>Cooldown Token(s)</i> from any <i>Inactive</i> <b><i style={{ color: '#990000' }}>Attack</i></b> or <b><i style={{ color: '#bf9000' }}>Technique</i></b>.
           </div>
 
           {/* Limit Push Table */}
@@ -1294,7 +1294,7 @@ const LevelUpSpeciesCerebronych: React.FC<LevelUpSpeciesCerebronychProps> = ({
             
             {/* Starting Speed */}
             <div style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
-              <span style={{ fontWeight: 'bold' }}>Starting Speed.</span> 6hx.
+              <b><i>Starting</i></b> <b><i style={{ color: '#38761d' }}>Speed</i></b>. 6hx +<b>[{safeGetSubspeciesDotsArray(2).filter(Boolean).length}]</b>hx.
             </div>
           </div>
 
@@ -1317,7 +1317,7 @@ const LevelUpSpeciesCerebronych: React.FC<LevelUpSpeciesCerebronychProps> = ({
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>13xp</span>
               
               {/* Row 2: +1 Speed dots */}
-              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1 Speed</span>
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1hx <b><i style={{ color: '#38761d' }}>Speed</i></b></span>
               {[0,1,2].map(idx => {
                 const arr = safeGetSubspeciesDotsArray(2);
                 const canCheck = idx === 0 || arr.slice(0, idx).every(Boolean);
@@ -1372,6 +1372,104 @@ const LevelUpSpeciesCerebronych: React.FC<LevelUpSpeciesCerebronychProps> = ({
           {/* Languages */}
           <div style={{ fontSize: '1em', color: '#000', marginBottom: '6px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
             <i><b>Languages.</b> Cerebronych, Choose</i> 1
+            
+            {/* Language Dropdown */}
+            <div style={{ marginTop: '8px', marginLeft: '24px' }}>
+              <select
+                value=""
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (val && onAutoSave) {
+                    onAutoSave({ cerebronychLanguage: val });
+                  }
+                }}
+                style={{
+                  fontSize: '1em',
+                  padding: '2px 8px',
+                  borderRadius: '6px',
+                  border: '1px solid #ccc',
+                  background: '#fff',
+                  textAlign: 'left',
+                  minWidth: '200px',
+                  fontFamily: 'Arial, Helvetica, sans-serif',
+                  fontWeight: 'bold',
+                  color: '#000'
+                }}
+              >
+                <option value="" style={{ color: 'black', backgroundColor: 'white' }}>
+                  Languages
+                </option>
+                {!['Avenoch', sheet?.species].includes('Avenoch') && sheet?.cerebronychLanguage !== 'Avenoch' && (
+                  <option value="Avenoch" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Avenoch</option>
+                )}
+                {sheet?.charClass !== 'Coder' && sheet?.cerebronychLanguage !== 'Binary' && (
+                  <option value="Binary" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Binary</option>
+                )}
+                {sheet?.cerebronychLanguage !== 'Body Language' && (
+                  <option value="Body Language" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Body Language</option>
+                )}
+                {sheet?.cerebronychLanguage !== 'Chloroptid' && (
+                  <option value="Chloroptid" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Chloroptid</option>
+                )}
+                {sheet?.cerebronychLanguage !== 'Defteran' && (
+                  <option value="Defteran" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Defteran</option>
+                )}
+                {sheet?.cerebronychLanguage !== 'Dentomos' && (
+                  <option value="Dentomos" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Dentomos</option>
+                )}
+                {sheet?.cerebronychLanguage !== 'Hycryptice' && (
+                  <option value="Hycryptice" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Hycryptice</option>
+                )}
+                {sheet?.cerebronychLanguage !== 'Galactapol Jargon' && (
+                  <option value="Galactapol Jargon" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Galactapol Jargon</option>
+                )}
+                {sheet?.cerebronychLanguage !== 'Lumenaren' && (
+                  <option value="Lumenaren" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Lumenaren</option>
+                )}
+                {sheet?.cerebronychLanguage !== 'Lux' && (
+                  <option value="Lux" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Lux</option>
+                )}
+                {sheet?.charClass !== 'Coder' && sheet?.cerebronychLanguage !== 'Oikovox' && (
+                  <option value="Oikovox" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Oikovox</option>
+                )}
+                {sheet?.cerebronychLanguage !== 'Praedari' && (
+                  <option value="Praedari" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Praedari</option>
+                )}
+                {sheet?.charClass !== 'Elementalist' && sheet?.cerebronychLanguage !== 'Xenoelemental' && (
+                  <option value="Xenoelemental" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Xenoelemental</option>
+                )}
+                {sheet?.charClass !== 'Devout' && sheet?.cerebronychLanguage !== 'Xenovox' && (
+                  <option value="Xenovox" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Xenovox</option>
+                )}
+              </select>
+
+              {/* Display selected language */}
+              {sheet?.cerebronychLanguage && (
+                <div style={{ marginTop: '4px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ color: '#000', fontWeight: 'bold' }}>
+                    {sheet.cerebronychLanguage}
+                  </span>
+                  <button
+                    onClick={() => {
+                      if (onAutoSave) {
+                        onAutoSave({ cerebronychLanguage: undefined });
+                      }
+                    }}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: '#cc0000',
+                      fontSize: '1.2em',
+                      cursor: 'pointer',
+                      padding: '0 4px',
+                      fontWeight: 'bold'
+                    }}
+                  >
+                    ×
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Perks SP progression table */}
@@ -1392,8 +1490,8 @@ const LevelUpSpeciesCerebronych: React.FC<LevelUpSpeciesCerebronychProps> = ({
             <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>10sp</span>
             
             {/* Row 2: Many Masks */}
-            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>
-              <b>Many Masks.</b> Years of embodying different hosts has developed your keen ability to mimic voices, mannerisms and personalities of many people from many walks of life. Gain an advantage on related skill rolls.
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'left', paddingRight: '8px' }}>
+              <b><i style={{ color: '#5f5e2b' }}>Many Masks.</i></b> Years of embodying different hosts has developed your keen ability to mimic voices, mannerisms and personalities of many people from many walks of life. Gain an advantage on related skill rolls.
             </span>
             {(() => {
               const arr = safeGetSubspeciesDotsArray(3);
@@ -1437,8 +1535,8 @@ const LevelUpSpeciesCerebronych: React.FC<LevelUpSpeciesCerebronychProps> = ({
             <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>7sp</span>
 
             {/* Row 5: Play Dead */}
-            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>
-              <b>Play Dead.</b> The fact that you effectively inhabit a corpse is not lost on you. Gain an advantage on skills related to either pretending you're dead or otherwise pretending you're an undead creature risen from the grave.
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'left', paddingRight: '8px' }}>
+              <b><i style={{ color: '#5f5e2b' }}>Play Dead.</i></b> The fact that you effectively inhabit a corpse is not lost on you. Gain an advantage on skills related to either pretending you're dead or otherwise pretending you're an undead creature risen from the grave.
             </span>
             {(() => {
               const arr = safeGetSubspeciesDotsArray(4);
