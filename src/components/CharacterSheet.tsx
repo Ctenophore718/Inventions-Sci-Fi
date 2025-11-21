@@ -3199,6 +3199,12 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                 {generateSniperStrikeDamageJSX(sheet)}
               </span>
             ) : <span style={{ fontWeight: 'bold', fontFamily: 'inherit', color: '#000', marginLeft: 4 }}>{strikeDamage}</span>}
+            {species === 'Cerebronych' && sheet?.subspeciesCardDots?.[0]?.[0] && (
+              <span style={{ fontWeight: 'normal', fontFamily: 'inherit', color: '#000', marginLeft: 4, display: 'flex', alignItems: 'center' }}>
+                (optional <b><u style={{ color: '#02b900', display: 'inline-flex', alignItems: 'center' }}>Toxic<img src="/Toxic.png" alt="Toxic" style={{ width: 16, height: 16, verticalAlign: 'middle', marginLeft: 2 }} />
+                </u></b>)
+              </span>
+            )}
           </div>
           <div className={styles.horizontalLabel} style={{ color: '#351c75', fontWeight: 'bold' }}><u>Multi Strike</u> <span style={{ color: '#000' }}>{
             charClass === 'Contemplative'
@@ -3297,6 +3303,12 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                     ? generateBrawlerStrikeEffectsJSX(sheet) || strikeEffects
                   : (subclass === 'Hacker' && (sheet?.subclassProgressionDots as any)?.hackerStrikeForcedTeleportationDots?.[0])
                     ? <span style={{ color: '#000', fontWeight: 'normal' }}>Forced <b><i style={{ color: '#38761d' }}>Teleportation</i></b> to hx adjacent to <i>Drone</i> against 3hx or smaller enemy</span>
+                  : (species === 'Cerebronych' && sheet?.subspeciesCardDots?.[1]?.[0])
+                    ? <span style={{ color: '#000', fontWeight: 'normal' }}>
+                        <b><i style={{ color: '#5f5e2b' }}>Infest.</i></b> When you destroy a creature with a <b><i style={{ color: '#351c75' }}>Strike</i></b> using <b><u style={{ color: '#02b900', display: 'inline-flex', alignItems: 'center' }}>
+                          Toxic<img src="/Toxic.png" alt="Toxic" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} />
+                        </u></b> Damage, the creature instead stays at 1 <b><i style={{ color: '#990000' }}>Hit Point</i></b> and is under your complete control until the end of the encounter. If the creature dies, you lose control. After the battle, you can choose to inhabit the creature and abandon your current host, as long as that creature is a playable species. If you choose not to take on the new host, the creature you infest dies. Consult your DM for more information.
+                      </span>
                     : strikeEffects
               }
           </div>

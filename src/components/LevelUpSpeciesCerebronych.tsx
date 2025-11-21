@@ -305,9 +305,9 @@ const LevelUpSpeciesCerebronych: React.FC<LevelUpSpeciesCerebronychProps> = ({
             
           {/* Parasitic Composure Feature */}
           <div style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '12px' }}>
-            <i style={{ fontWeight: 'bold', color: '#5f5e2b' }}>Parasitic Composure.</i> You are <i>Immune</i> to the <b><i>Confuse</i></b> and <b>[ - ]</b> condition(s) and have <b><u style={{ color: '#de7204', display: 'inline-flex', alignItems: 'center' }}>
-            Chemical<img src="/Chemical.png" alt="Chemical" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> <b>[</b><i>Resistance</i><b>]</b> and <b><u style={{ color: '#02b900', display: 'inline-flex', alignItems: 'center' }}>
-            Toxic<img src="/Toxic.png" alt="Toxic" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> <b>[</b><i>Resistance</i><b>]</b>.
+            <i style={{ fontWeight: 'bold', color: '#5f5e2b' }}>Parasitic Composure.</i> You are <i>Immune</i> to the <b><i>Confuse</i></b> and <b>{safeGetDotsArray(0)[0] ? '[Mesmerize]' : '[ - ]'}</b> condition(s) and have <b><u style={{ color: '#de7204', display: 'inline-flex', alignItems: 'center' }}>
+            Chemical<img src="/Chemical.png" alt="Chemical" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> <b>[</b><i>{safeGetDotsArray(2)[0] ? 'Immunity' : 'Resistance'}</i><b>]</b> and <b><u style={{ color: '#02b900', display: 'inline-flex', alignItems: 'center' }}>
+            Toxic<img src="/Toxic.png" alt="Toxic" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> <b>[</b><i>{safeGetDotsArray(1)[0] ? 'Immunity' : 'Resistance'}</i><b>]</b>.
           </div>
 
           {/* Parasitic Composure Immunities Table */}
@@ -1180,7 +1180,7 @@ const LevelUpSpeciesCerebronych: React.FC<LevelUpSpeciesCerebronychProps> = ({
             
             {/* Enhanced Strike Effects */}
             <div style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
-              <span style={{ fontWeight: 'bold' }}>Enhanced Strike Effects.</span> You can upgrade the effects of your <b><i style={{ color: '#351c75' }}>Strike</i></b>.
+              <i><b>Enhanced</b></i> <i><b style={{ color: '#351c75' }}>Strike</b></i> <i><b>Effects.</b></i> {safeGetSubspeciesDotsArray(0)[0] && 'Can Strike using Toxic instead. '}{safeGetSubspeciesDotsArray(1)[0] && 'Infest (see below).'}
             </div>
           </div>
 
@@ -1188,7 +1188,7 @@ const LevelUpSpeciesCerebronych: React.FC<LevelUpSpeciesCerebronychProps> = ({
           <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px', marginBottom: '16px' }}>
             <div style={{
               display: 'grid',
-              gridTemplateColumns: '1fr 24px',
+              gridTemplateColumns: '1fr 24px 24px',
               gridTemplateRows: 'repeat(4, auto)',
               columnGap: '6px',
               rowGap: '2px',
@@ -1199,9 +1199,9 @@ const LevelUpSpeciesCerebronych: React.FC<LevelUpSpeciesCerebronychProps> = ({
               {/* Row 1: XP header for Toxic Strike */}
               <span></span>
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>4xp</span>
-              
+              <span></span>
               {/* Row 2: Can Strike using Toxic instead */}
-              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>Can <b><i style={{ color: '#351c75' }}>Strike</i></b> using <b><i style={{ color: '#38761d' }}>Toxic</i></b> instead</span>
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>Can <b><i style={{ color: '#351c75' }}>Strike</i></b> using <b><u style={{ color: '#02b900', display: 'inline-flex', alignItems: 'center' }}>Toxic<img src="/Toxic.png" alt="Toxic" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> instead</span>
               {(() => {
                 const arr = safeGetSubspeciesDotsArray(0);
                 const canCheck = !arr[0];
@@ -1244,10 +1244,12 @@ const LevelUpSpeciesCerebronych: React.FC<LevelUpSpeciesCerebronychProps> = ({
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>22xp</span>
 
               {/* Row 5: Infest */}
-              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>⤷ <b><i>Infest</i></b> (see below)</span>
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}><b><i style={{ color: '#5f5e2b' }}>Infest</i></b> (see below)</span>
+            <span style={{ textAlign: 'center', fontSize: '1.2em', fontWeight: 'bold', color: '#666' }}>⤷</span>
               {(() => {
                 const arr = safeGetSubspeciesDotsArray(1);
-                const canCheck = !arr[0];
+                const toxicStrikeSelected = safeGetSubspeciesDotsArray(0)[0];
+                const canCheck = !arr[0] && toxicStrikeSelected;
                 const canUncheck = arr[0];
                 return (
                   <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
@@ -1282,7 +1284,8 @@ const LevelUpSpeciesCerebronych: React.FC<LevelUpSpeciesCerebronychProps> = ({
 
           {/* Infest Description */}
           <div style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginTop: '12px', marginBottom: '16px' }}>
-            <span style={{ fontWeight: 'bold' }}>Infest.</span> When you destroy a creature with a <b><i style={{ color: '#351c75' }}>Strike</i></b> using <b><i style={{ color: '#38761d' }}>Toxic</i></b> damage, the creature instead stays at 1 <b><i style={{ color: '#e69138' }}>Hit Point</i></b> and is under your complete control until the end of the encounter. If the creature dies, you lose control. After the battle, you can choose to inhabit the creature and abandon your current host, as long as that creature is a playable species. If you choose not to take on the new host, the creature you infest dies. Consult your DM for more information.
+            <b><i style={{ color: '#5f5e2b' }}>Infest.</i></b> When you destroy a creature with a <b><i style={{ color: '#351c75' }}>Strike</i></b> using <b><u style={{ color: '#02b900', display: 'inline-flex', alignItems: 'center' }}>
+            Toxic<img src="/Toxic.png" alt="Toxic" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> Damage, the creature instead stays at 1 <b><i style={{ color: '#990000' }}>Hit Point</i></b> and is under your complete control until the end of the encounter. If the creature dies, you lose control. After the battle, you can choose to inhabit the creature and abandon your current host, as long as that creature is a playable species. If you choose not to take on the new host, the creature you infest dies. Consult your DM for more information.
           </div>
 
           {/* Movement Section */}
