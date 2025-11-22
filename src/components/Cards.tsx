@@ -25,10 +25,12 @@ import { generateVersatileSwarmCardJSX } from "../utils/nanoboticistTechnique";
 import { generateBulletMagnetCardJSX } from "../utils/tankerTechnique";
 import { generateAvianGazeCardJSX, calculateAvianGazeData } from "../utils/avenochTechnique";
 import { generateMemoryManifestCardJSX, generateLimitPushCardJSX, calculateMemoryManifestData, calculateLimitPushData } from "../utils/cerebronychTechnique";
+import { generateUnusualGrowthCardJSX, calculateUnusualGrowthData } from "../utils/chloroptidTechnique";
 import { generateDarkenedDisplacerCardJSX } from "../utils/corvidTechnique";
 import { generateFalconDiveCardJSX } from "../utils/falcadorTechnique";
 import { generateDarknessDescendingCardJSX } from "../utils/nocturneTechnique";
 import { generateFleshEaterCardJSX } from "../utils/vulturineTechnique";
+import { generateOakenshieldCardJSX, calculateOakenshieldData } from "../utils/barkskinTechnique";
 import React from "react";
 import type { CharacterSheet } from "../types/CharacterSheet";
 import { loadSheetById, saveCharacterSheet } from "../utils/storage";
@@ -345,6 +347,20 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
       const hp15Bonus = (hp15Dots[0] ? 15 : 0);
       
       effectiveHP += 35 + hp5Bonus + hp10Bonus + hp15Bonus;
+    }
+    
+    // Add Chloroptid species bonus
+    if (localSheet?.species === 'Chloroptid') {
+      const speciesDots = localSheet?.speciesCardDots || [];
+      const hp5Dots = speciesDots[4] || [];
+      const hp10Dots = speciesDots[5] || [];
+      const hp15Dots = speciesDots[6] || [];
+      
+      const hp5Bonus = hp5Dots.filter(Boolean).length * 5;
+      const hp10Bonus = hp10Dots.filter(Boolean).length * 10;
+      const hp15Bonus = (hp15Dots[0] ? 15 : 0);
+      
+      effectiveHP += 40 + hp5Bonus + hp10Bonus + hp15Bonus;
     }
     
     // Add class-specific bonuses
@@ -1156,7 +1172,7 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                 fontFamily: 'Arial, Helvetica, sans-serif',
                 fontWeight: 'bold',
                 fontSize: 'clamp(0.8em, 4vw, 1.25em)',
-                color: localSheet?.species === 'Avenoch' ? '#2b5f59' : localSheet?.species === 'Cerebronych' ? '#5f5e2b' : 'black',
+                color: localSheet?.species === 'Avenoch' ? '#2b5f59' : localSheet?.species === 'Cerebronych' ? '#5f5e2b' : localSheet?.species === 'Chloroptid' ? '#315f2b' : 'black',
                 lineHeight: 1,
                 textAlign: 'left',
                 whiteSpace: 'nowrap',
@@ -1165,13 +1181,13 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                 flexShrink: 1,
                 marginRight: '5px'
               }}>
-                {localSheet?.species === 'Avenoch' ? 'Avian Gaze' : localSheet?.species === 'Cerebronych' ? 'Memory Manifest' : 'Species Card Name'}
+                {localSheet?.species === 'Avenoch' ? 'Avian Gaze' : localSheet?.species === 'Cerebronych' ? 'Memory Manifest' : localSheet?.species === 'Chloroptid' ? 'Unusual Growth' : 'Species Card Name'}
               </span>
               <span style={{
                 fontFamily: 'Arial, Helvetica, sans-serif',
                 fontStyle: 'italic',
                 fontSize: '0.75em',
-                color: localSheet?.species === 'Avenoch' ? '#2b5f59' : localSheet?.species === 'Cerebronych' ? '#5f5e2b' : 'black',
+                color: localSheet?.species === 'Avenoch' ? '#2b5f59' : localSheet?.species === 'Cerebronych' ? '#5f5e2b' : localSheet?.species === 'Chloroptid' ? '#315f2b' : 'black',
                 lineHeight: 1,
                 whiteSpace: 'normal',
                 wordBreak: 'keep-all',
@@ -1179,11 +1195,11 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                 maxWidth: '72px',
                 display: 'inline-block',
                 textAlign: 'right'
-              }}>{localSheet?.species === 'Avenoch' ? 'Avenoch' : localSheet?.species === 'Cerebronych' ? 'Cerebronych' : 'Species'}</span>
+              }}>{localSheet?.species === 'Avenoch' ? 'Avenoch' : localSheet?.species === 'Cerebronych' ? 'Cerebronych' : localSheet?.species === 'Chloroptid' ? 'Chloroptid' : 'Species'}</span>
             </div>
             <img 
-              src={localSheet?.species === 'Avenoch' ? "/Avian Gaze.png" : localSheet?.species === 'Cerebronych' ? "/Memory Manifest.png" : "/Blank Card.png"}
-              alt={localSheet?.species === 'Avenoch' ? "Avian Gaze" : localSheet?.species === 'Cerebronych' ? "Memory Manifest" : "Blank Card"}
+              src={localSheet?.species === 'Avenoch' ? "/Avian Gaze.png" : localSheet?.species === 'Cerebronych' ? "/Memory Manifest.png" : localSheet?.species === 'Chloroptid' ? "/Unusual Growth.png" : "/Blank Card.png"}
+              alt={localSheet?.species === 'Avenoch' ? "Avian Gaze" : localSheet?.species === 'Cerebronych' ? "Memory Manifest" : localSheet?.species === 'Chloroptid' ? "Unusual Growth" : "Blank Card"}
               style={{
                 position: 'absolute',
                 top: 35,
@@ -1217,6 +1233,10 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
               ) : localSheet?.species === 'Cerebronych' ? (
                 <span style={{ color: '#bf9000', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '0.875em', fontStyle: 'italic', marginRight: 22, whiteSpace: 'nowrap', maxWidth: 'calc(100% - 120px)', overflow: 'hidden', textOverflow: 'ellipsis', textAlign: 'right' }}>
                   Cooldown <span style={{ fontWeight: 'bold', fontStyle: 'normal' }}>[{calculateMemoryManifestData(localSheet?.speciesCardDots).cooldown}]</span>
+                </span>
+              ) : localSheet?.species === 'Chloroptid' ? (
+                <span style={{ color: '#bf9000', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '0.875em', fontStyle: 'italic', marginRight: 22, whiteSpace: 'nowrap', maxWidth: 'calc(100% - 120px)', overflow: 'hidden', textOverflow: 'ellipsis', textAlign: 'right' }}>
+                  Cooldown <span style={{ fontWeight: 'bold', fontStyle: 'normal' }}>[{calculateUnusualGrowthData(localSheet?.speciesCardDots).cooldown}]</span>
                 </span>
               ) : localSheet?.subclass === 'Air' ? (
                 <span style={{ color: '#bf9000', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '0.875em', fontStyle: 'italic', marginRight: 22, whiteSpace: 'nowrap', maxWidth: 'calc(100% - 120px)', overflow: 'hidden', textOverflow: 'ellipsis', textAlign: 'right' }}>
@@ -1256,7 +1276,7 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                 maxHeight: '100%',
                 overflow: 'hidden'
               }}>
-                {localSheet?.species === 'Avenoch' ? generateAvianGazeCardJSX(localSheet?.speciesCardDots) : localSheet?.species === 'Cerebronych' ? generateMemoryManifestCardJSX(localSheet?.speciesCardDots) : 'Card stats.'}
+                {localSheet?.species === 'Avenoch' ? generateAvianGazeCardJSX(localSheet?.speciesCardDots) : localSheet?.species === 'Cerebronych' ? generateMemoryManifestCardJSX(localSheet?.speciesCardDots) : localSheet?.species === 'Chloroptid' ? generateUnusualGrowthCardJSX(localSheet?.speciesCardDots) : 'Card stats.'}
               </div>
             </div>
             <div style={{
@@ -1277,7 +1297,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                 ? 'Avenochs were designed from the get-go for their accuracy and range in combat. Their eyesight is unparalleled in the creations of Dr. Hans Cripioma.' 
                 : localSheet?.species === 'Cerebronych'
                   ? '"There\'s much more to mind than meets matter." --Cerebronych saying'
-                  : 'Flavor text.'}
+                  : localSheet?.species === 'Chloroptid'
+                    ? 'Vines, branches, leaves and other foliage suddenly sprout out from the ground, creating nearby obstacles and landmarks.'
+                    : 'Flavor text.'}
             </div>
         </div>
         
@@ -1342,7 +1364,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                       ? 'Darkness Descending'
                       : localSheet?.subspecies === 'Vulturine'
                         ? 'Flesh Eater'
-                        : 'Subspecies Card Name'}
+                        : localSheet?.subspecies === 'Barkskin'
+                          ? 'Oakenshield'
+                          : 'Subspecies Card Name'}
               </span>
               <span style={{
                 fontFamily: 'Arial, Helvetica, sans-serif',
@@ -1358,7 +1382,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                       ? '#334592'
                       : localSheet?.subspecies === 'Vulturine'
                         ? '#a96d8c'
-                        : 'black',
+                        : localSheet?.subspecies === 'Barkskin'
+                          ? '#5f2d2b'
+                          : 'black',
                 lineHeight: 1,
                 whiteSpace: 'normal',
                 wordBreak: 'keep-all',
@@ -1376,7 +1402,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                       ? 'Nocturne'
                       : localSheet?.subspecies === 'Vulturine'
                         ? 'Vulturine'
-                        : 'Subspecies'}</span>
+                        : localSheet?.subspecies === 'Barkskin'
+                          ? 'Barkskin'
+                          : 'Subspecies'}</span>
             </div>
             <img 
               src={localSheet?.species === 'Cerebronych'
@@ -1389,7 +1417,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                     ? "/Darkness Descending.png"
                     : localSheet?.subspecies === 'Vulturine'
                       ? "/Flesh Eater.png"
-                      : "/Blank Card.png"}
+                      : localSheet?.subspecies === 'Barkskin'
+                        ? "/Oakenshield.png"
+                        : "/Blank Card.png"}
               alt={localSheet?.species === 'Cerebronych'
                 ? "Limit Push"
                 : localSheet?.subspecies === 'Corvid' 
@@ -1400,7 +1430,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                     ? "Darkness Descending"
                     : localSheet?.subspecies === 'Vulturine'
                       ? "Flesh Eater"
-                      : "Blank Card"}
+                      : localSheet?.subspecies === 'Barkskin'
+                        ? "Oakenshield"
+                        : "Blank Card"}
               style={{
                 position: 'absolute',
                 top: 35,
@@ -1439,7 +1471,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                         ? `[${4 - (localSheet?.subspeciesCardDots?.[3]?.filter(Boolean).length ?? 0)}]`
                         : localSheet?.subspecies === 'Vulturine'
                           ? `[${4 - (localSheet?.subspeciesCardDots?.[2]?.filter(Boolean).length ?? 0)}]`
-                          : '[#]'}
+                          : localSheet?.subspecies === 'Barkskin'
+                            ? `[${calculateOakenshieldData(localSheet?.subspeciesCardDots).cooldown}]`
+                            : '[#]'}
                 </span>
               </span>
             </div>
@@ -1489,7 +1523,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                             rangeBonus: localSheet?.subspeciesCardDots?.[1]?.filter(Boolean).length ?? 0,
                             cooldown: 4 - (localSheet?.subspeciesCardDots?.[2]?.filter(Boolean).length ?? 0)
                           })
-                        : 'Card stats.'}
+                        : localSheet?.subspecies === 'Barkskin'
+                          ? generateOakenshieldCardJSX(calculateOakenshieldData(localSheet?.subspeciesCardDots))
+                          : 'Card stats.'}
               </div>
             </div>
             <div style={{
@@ -1516,7 +1552,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                     ? '"I am a creature of the night, one that can induce the supernatural night itself into the eyes of my prey." --Wisp, Nocturne Contemplative'
                     : localSheet?.subspecies === 'Vulturine'
                       ? '"Death is an acquired taste… but once you\'ve acquired it, nothing can beat it." --Trogon Ornio, Vulturine Mercenary'
-                      : 'Flavor text.'}
+                      : localSheet?.subspecies === 'Barkskin'
+                        ? '"The spirit of Mother Nature emanates from my very being. You shall be protected as I am protected." --Doug Fir, Barkskin Chloroptid'
+                        : 'Flavor text.'}
             </div>
         </div>
         

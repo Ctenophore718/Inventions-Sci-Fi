@@ -36,6 +36,11 @@ const CharacterSheetPerks: React.FC<CharacterSheetPerksProps> = ({
                 {sheet.cerebronychLanguage}
               </span>
             )}
+            {sheet?.species === 'Chloroptid' && (
+              <span style={{ fontWeight: 'normal', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', color: '#000' }}>
+                Chloroptid
+              </span>
+            )}
             {charClass === 'Coder' && (
               <span style={{ fontWeight: 'normal', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', color: '#000' }}>
                 Oikovox
@@ -129,6 +134,13 @@ const CharacterSheetPerks: React.FC<CharacterSheetPerksProps> = ({
             <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
               <span>
                 <b><i style={{ color: '#5f5e2b' }}>Many Masks.</i></b> <span style={{ color: '#000' }}>Years of embodying different hosts has developed your keen ability to mimic voices, mannerisms and personalities of many people from many walks of life. Gain an advantage on related skill rolls.</span>
+              </span>
+            </div>
+          )}
+          {sheet?.species === 'Chloroptid' && sheet?.speciesCardDots?.[8]?.[0] && (
+            <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <span>
+                <b><i style={{ color: '#315f2b' }}>Natural Camouflage.</i></b> <span style={{ color: '#000' }}>You resemble normal plants, shrubbery, vines, and/or trees so closely that others can hardly tell you apart from the foliage while you remain still. Gain an advantage on related skill rolls.</span>
               </span>
             </div>
           )}

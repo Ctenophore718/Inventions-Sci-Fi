@@ -23,6 +23,7 @@ import LevelUpSubclassesGunslinger from "./LevelUpSubclassesGunslinger";
 import LevelUpSubclassesTechnician from "./LevelUpSubclassesTechnician";
 import LevelUpSpeciesAvenoch from "./LevelUpSpeciesAvenoch";
 import LevelUpSpeciesCerebronych from "./LevelUpSpeciesCerebronych";
+import LevelUpSpeciesChloroptid from "./LevelUpSpeciesChloroptid";
 import { calculateChemistFeatureData } from "../utils/chemistFeature";
 
 
@@ -191,6 +192,20 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
       const hp15Bonus = (hp15Dots[0] ? 15 : 0);
       
       effectiveHP += 35 + hp5Bonus + hp10Bonus + hp15Bonus;
+    }
+    
+    // Add Chloroptid species bonus
+    if (sheet?.species === 'Chloroptid') {
+      const speciesDots = sheet?.speciesCardDots || [];
+      const hp5Dots = speciesDots[4] || [];
+      const hp10Dots = speciesDots[5] || [];
+      const hp15Dots = speciesDots[6] || [];
+      
+      const hp5Bonus = hp5Dots.filter(Boolean).length * 5;
+      const hp10Bonus = hp10Dots.filter(Boolean).length * 10;
+      const hp15Bonus = (hp15Dots[0] ? 15 : 0);
+      
+      effectiveHP += 40 + hp5Bonus + hp10Bonus + hp15Bonus;
     }
     
     // Exospecialist gets +20 Max Hit Points
@@ -1795,6 +1810,22 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                 setNotice={setNotice}
               />
             )}
+
+            {/* Chloroptid Species Content */}
+            {species === "Chloroptid" && (
+              <LevelUpSpeciesChloroptid
+                sheet={sheet}
+                species={species}
+                onAutoSave={handleAutoSave}
+                xpTotal={xpTotal}
+                spTotal={spTotal}
+                xpSpent={xpSpent}
+                spSpent={spSpent}
+                setXpSpent={setXpSpent}
+                setSpSpent={setSpSpent}
+                setNotice={setNotice}
+              />
+            )}
         </div>
         {/* Subspecies Card */}
         <div style={{ background: '#fff', border: '2px solid #333', borderRadius: 8, boxShadow: '0 2px 4px rgba(0,0,0,0.1)', minHeight: 80, padding: '1.2rem', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -1934,6 +1965,24 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
             {/* Vulturine Subspecies Content */}
             {subspecies === "Vulturine" && (
               <LevelUpSpeciesAvenoch
+                sheet={sheet}
+                species={species}
+                subspecies={subspecies}
+                contentType="subspecies"
+                onAutoSave={handleAutoSave}
+                xpTotal={xpTotal}
+                spTotal={spTotal}
+                xpSpent={xpSpent}
+                spSpent={spSpent}
+                setXpSpent={setXpSpent}
+                setSpSpent={setSpSpent}
+                setNotice={setNotice}
+              />
+            )}
+            
+            {/* Barkskin Subspecies Content */}
+            {subspecies === "Barkskin" && (
+              <LevelUpSpeciesChloroptid
                 sheet={sheet}
                 species={species}
                 subspecies={subspecies}
@@ -2188,6 +2237,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                         if (species === "Avenoch" && skillName === "Awareness") sources.push({ type: 'species', color: "rgba(43,95,89,0.5)" });
                         if (species === "Cerebronych" && skillName === "Deception") sources.push({ type: 'species', color: "rgba(95,94,43,0.5)" });
                         if (species === "Cerebronych" && skillName === "Intimidation") sources.push({ type: 'species', color: "rgba(95,94,43,0.5)" });
+                        if (species === "Chloroptid" && skillName === "Awareness") sources.push({ type: 'species', color: "rgba(49,95,43,0.5)" });
                         
                         // Subspecies boosters
                         if (subspecies === "Corvid" && skillName === "Thievery") sources.push({ type: 'subspecies', color: "rgba(117,144,78,0.5)" });
@@ -2403,8 +2453,11 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                           // Avenoch Awareness booster always goes at position 2, same as class boosters
                           const isAvenochAwareness = species === "Avenoch" && skill === "Awareness" && i === 2;
 
+                          // Check for Chloroptid Awareness species booster dot
+                          // Chloroptid Awareness booster always goes at position 2, same as class boosters
+                          const isChloroptidAwareness = species === "Chloroptid" && skill === "Awareness" && i === 2;
 
-                          if (isChemistInvestigation || isCoderOikomagic || isCommanderDiplomacy || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine || isGrenadierIntimidation || isNecroSurvival || isPoisonerThievery || isCoerciveDeception || isBeguilerDeception || isDivinistInvestigation || isNaturalistSurvival || isTechnologistTechnology || isGalvanicAthletics || isTacticianAwareness || isTyrantIntimidation || isInertialDiplomacy || isKineticAthletics || isMercurialAcrobatics || isVectorialPiloting || isAstralMedicine || isChaosIntimidation || isOrderCulture || isVoidStealth || isAirAcrobatics || isEarthSurvival || isFireIntimidation || isWaterMedicine || isAeronautPiloting || isBrawlerSurvival || isDreadnaughtIntimidation || isSpectreStealth || isAmmoCoderOikomagic || isOrdnancerAthletics || isPistoleerThievery || isSniperStealth || isHackerComputers || isJunkerThievery || isNanoboticistAcrobatics || isTankerPiloting || isAvenochAwareness) {
+                          if (isChemistInvestigation || isCoderOikomagic || isCommanderDiplomacy || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine || isGrenadierIntimidation || isNecroSurvival || isPoisonerThievery || isCoerciveDeception || isBeguilerDeception || isDivinistInvestigation || isNaturalistSurvival || isTechnologistTechnology || isGalvanicAthletics || isTacticianAwareness || isTyrantIntimidation || isInertialDiplomacy || isKineticAthletics || isMercurialAcrobatics || isVectorialPiloting || isAstralMedicine || isChaosIntimidation || isOrderCulture || isVoidStealth || isAirAcrobatics || isEarthSurvival || isFireIntimidation || isWaterMedicine || isAeronautPiloting || isBrawlerSurvival || isDreadnaughtIntimidation || isSpectreStealth || isAmmoCoderOikomagic || isOrdnancerAthletics || isPistoleerThievery || isSniperStealth || isHackerComputers || isJunkerThievery || isNanoboticistAcrobatics || isTankerPiloting || isAvenochAwareness || isChloroptidAwareness) {
                             checked = true; // Force third dot to be filled for class booster dots
                           }
 
@@ -2456,6 +2509,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                             if (isNanoboticistAcrobatics) return "rgba(87,184,176,0.5)";
                             if (isTankerPiloting) return "rgba(184,87,139,0.5)";
                             if (isAvenochAwareness) return "rgba(43,95,89,0.5)";
+                            if (isChloroptidAwareness) return "rgba(49,95,43,0.5)";
                             // Add other class colors here in the future
                             return "#d0d0d0"; // fallback color
                           };
@@ -2519,7 +2573,8 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                                     (subclass === "Junker" && skill === "Thievery") ||
                                     (subclass === "Nanoboticist" && skill === "Acrobatics") ||
                                     (subclass === "Tanker" && skill === "Piloting") ||
-                                    (species === "Avenoch" && skill === "Awareness")
+                                    (species === "Avenoch" && skill === "Awareness") ||
+                                    (species === "Chloroptid" && skill === "Awareness")
                                   ))
                               )) {
                                 spCostForThisDot += [1, 1, 2, 2, 3, 4, 5, 6, 8, 10][j];
@@ -2575,7 +2630,8 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                                     (subclass === "Junker" && skill === "Thievery") ||
                                     (subclass === "Nanoboticist" && skill === "Acrobatics") ||
                                     (subclass === "Tanker" && skill === "Piloting") ||
-                                    (species === "Avenoch" && skill === "Awareness")
+                                    (species === "Avenoch" && skill === "Awareness") ||
+                                    (species === "Chloroptid" && skill === "Awareness")
                                   ))
                               )) {
                                 spCostForThisDot += [1, 1, 2, 2, 3, 4, 5, 6, 8, 10][j];

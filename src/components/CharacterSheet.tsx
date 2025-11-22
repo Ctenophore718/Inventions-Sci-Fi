@@ -36,6 +36,8 @@ import { generateEyesOfTheNightJSX } from "../utils/nocturneFeature";
 import { generateCarrionGorgeJSX } from "../utils/vulturineFeature";
 import { generateFirstInFlightJSX } from "../utils/avenochFeature";
 import { generateVectorialStrikeDamageJSX, generateVectorialStrikeRangeJSX } from "../utils/vectorialStrike";
+import { generateRapidRegenerationJSX } from "../utils/chloroptidFeature";
+import { generateDeepRootsJSX } from "../utils/barkskinFeature";
 
 import { generateBloodTradeJSX } from "../utils/devoutFeature";
 import { generateFatigueJSX } from "../utils/voidFeature";
@@ -402,7 +404,16 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
       })()
     : 0;
   
-  const totalSpeed = baseSpeed + tacticianSpeedBonus + kineticSpeedBonus + mercurialSpeedBonus + airSpeedBonus + fireSpeedBonus + waterSpeedBonus + aeronautSpeedBonus + brawlerSpeedBonus + spectreSpeedBonus + avenochSpeedBonus + falcadorSpeedBonus + ammocoderSpeedBonus + pistoleerSpeedBonus + cerebronychSpeedBonus;
+  // Calculate Chloroptid species speed bonus (6 base + dots)
+  const chloroptidSpeedBonus = sheet?.species === 'Chloroptid'
+    ? (() => {
+        const speciesDots = sheet?.speciesCardDots || [];
+        const speedDots = speciesDots[7] || [];
+        return 6 + speedDots.filter(Boolean).length;
+      })()
+    : 0;
+  
+  const totalSpeed = baseSpeed + tacticianSpeedBonus + kineticSpeedBonus + mercurialSpeedBonus + airSpeedBonus + fireSpeedBonus + waterSpeedBonus + aeronautSpeedBonus + brawlerSpeedBonus + spectreSpeedBonus + avenochSpeedBonus + falcadorSpeedBonus + ammocoderSpeedBonus + pistoleerSpeedBonus + cerebronychSpeedBonus + chloroptidSpeedBonus;
   const speed = totalSpeed > 0 ? `${totalSpeed}` : "0";
   
   // Calculate jump speed and jump amount for Kinetic subclass
@@ -475,6 +486,22 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
         const hp15Bonus = (hp15Dots[0] ? 15 : 0);
         
         return 30 + hp5Bonus + hp10Bonus + hp15Bonus;
+      })()
+    : 0;
+  
+  // Calculate Chloroptid species hit points bonus
+  const chloroptidHitPointsBonus = sheet?.species === 'Chloroptid'
+    ? (() => {
+        const speciesDots = sheet?.speciesCardDots || [];
+        const hp5Dots = speciesDots[4] || [];
+        const hp10Dots = speciesDots[5] || [];
+        const hp15Dots = speciesDots[6] || [];
+        
+        const hp5Bonus = hp5Dots.filter(Boolean).length * 5;
+        const hp10Bonus = hp10Dots.filter(Boolean).length * 10;
+        const hp15Bonus = (hp15Dots[0] ? 15 : 0);
+        
+        return 40 + hp5Bonus + hp10Bonus + hp15Bonus;
       })()
     : 0;
   
@@ -1102,7 +1129,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
       "Nocturne Avenoch Host": <span style={{ color: '#000', fontWeight: 400 }}><b><i style={{ color: '#334592' }}>Eyes of the Night.</i></b> You have a <b><i style={{ color: '#38761d' }}>Fly Speed</i></b>. Additionally, you are <i>Immune</i> to the <b><i>Blind</i></b> condition and don't have a <i>Rear Arc</i>. Additionally, whenever you Crit on an <b><i style={{ color: '#990000' }}>Attack</i></b>, you inflict the <b><i>Mesmerize</i></b> condition.</span>,
       "Vulturine Avenoch Host": <span style={{ color: '#000', fontWeight: 400 }}><b><i style={{ color: '#a96d8c' }}>Carrion Gorge.</i></b> You have a <b><i style={{ color: '#38761d' }}>Fly Speed</i></b>. Additionally, when you destroy an enemy using a <b><i style={{ color: '#351c75' }}>Strike</i></b>, you immediately gain 2d6 <b><i style={{ color: '#990000' }}>Hit Points</i></b>.</span>,
       "Chloroptid Host": <span style={{ color: '#000', fontWeight: 400 }}><b><i style={{ color: '#315f2b' }}>Rapid Regeneration.</i></b> You gain 1d4 <b><i style={{ color: '#990000' }}>Hit Points</i></b> at the start of your turn. Additionally, your size is 1hx, 2hx, or 3hx, depending on the size of your host.</span>,
-      "Barkskin Chloroptid Host": <span style={{ color: '#000', fontWeight: 400 }}><b><i style={{ color: '#5f2d2b' }}>Deep Roots.</i></b> You are <i>Immune</i> to the <b><i>Slam</i></b> and <b><i>Bounce</i></b> conditions.</span>,
+      "Barkskin Chloroptid Host": <span style={{ color: '#000', fontWeight: 400 }}>{generateDeepRootsJSX()}</span>,
       "Carnivorous Chloroptid Host": <span style={{ color: '#000', fontWeight: 400 }}><b><i style={{ color: '#2b2d5f' }}>Sap Sucker.</i></b> Whenever you heal as a result of the <b><i>Drain</i></b> condition, you heal all of the amount of Damage done instead of half.</span>,
       "Drifting Chloroptid Host": <span style={{ color: '#000', fontWeight: 400 }}><b><i style={{ color: '#5f8a5f' }}>Leaf on the Wind.</i></b> You have a <b><i style={{ color: '#38761d' }}>Fly Speed</i></b>. Additionally, you can <b><i style={{ color: '#38761d' }}>Move</i></b> 1hx after you take any Damage.</span>,
       "Viny Chloroptid Host": <span style={{ color: '#000', fontWeight: 400 }}><b><i style={{ color: '#5f5f2b' }}>Climbing Creeper.</i></b> You gain a <b><i style={{ color: '#38761d' }}>Climb Speed</i></b> and <i>Resist</i> <b><u style={{ color: '#a6965f', display: 'inline-flex', alignItems: 'center' }}>Piercing<img src="/Piercing.png" alt="Piercing" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>.</span>,
@@ -1176,11 +1203,9 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
   // Generate Cerebronych feature with dynamic values
   const cerebronychFeatureJSX = generateParasiticComposureJSX(sheet?.speciesCardDots);
 
-  const chloroptidFeatureJSX = (
-    <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#315f2b' }}>Rapid Regeneration.</i></b> You gain 1d4 <b><i style={{ color: '#990000' }}>Hit Points</i></b> at the start of your turn. Additionally, your size is 1hx, 2hx, or 3hx, which is chosen at character creation.
-    </span>
-  );
+  const chloroptidFeatureJSX = generateRapidRegenerationJSX({ 
+    hitPointsDice: 1 + (sheet?.speciesCardDots?.[0]?.[0] ? 1 : 0) 
+  });
 
   const cognizantFeatureJSX = (
     <span style={{ color: '#000', fontWeight: 400 }}>
@@ -1265,11 +1290,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
     </span>
   );
 
-  const barkskinFeatureJSX = (
-    <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#5f2d2b' }}>Deep Roots.</i></b> You are <i>Immune</i> to the <b><i>Slam</i></b> and <b><i>Bounce</i></b> conditions.
-    </span>
-  );
+  const barkskinFeatureJSX = generateDeepRootsJSX();
 
   const carnivorousFeatureJSX = (
     <span style={{ color: '#000', fontWeight: 400 }}>
@@ -2179,6 +2200,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                   if (sheet?.species === "Avenoch" && skillName === "Awareness") sources.push({ type: 'species', color: "rgba(43,95,89,0.5)" });
                   if (sheet?.species === "Cerebronych" && skillName === "Deception") sources.push({ type: 'species', color: "rgba(95,94,43,0.5)" });
                   if (sheet?.species === "Cerebronych" && skillName === "Intimidation") sources.push({ type: 'species', color: "rgba(95,94,43,0.5)" });
+                  if (sheet?.species === "Chloroptid" && skillName === "Awareness") sources.push({ type: 'species', color: "rgba(49,95,43,0.5)" });
                   
                   // Subspecies boosters
                   if (subspecies === "Corvid" && skillName === "Thievery") sources.push({ type: 'subspecies', color: "rgba(117,144,78,0.5)" });
@@ -2745,12 +2767,14 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                 )}
                 {subspecies === "Chloroptid Host" && (
                   <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32, marginTop: 8, color: '#000', fontWeight: 400 }}>
-                    <b><i style={{ color: '#315f2b' }}>Rapid Regeneration.</i></b> You gain 1d4 <b><i style={{ color: '#990000' }}>Hit Points</i></b> at the start of your turn. Additionally, your size is 1hx, 2hx, or 3hx, which is chosen at character creation.
+                    {generateRapidRegenerationJSX({ 
+                      hitPointsDice: 1 + (sheet?.speciesCardDots?.[0]?.[0] ? 1 : 0) 
+                    })}
                   </span>
                 )}
                 {subspecies === "Barkskin Chloroptid Host" && (
                   <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32, marginTop: 8, color: '#000', fontWeight: 400 }}>
-                    <b><i style={{ color: '#5f2d2b' }}>Deep Roots.</i></b> You are <i>Immune</i> to the <b><i>Slam</i></b> and <b><i>Bounce</i></b> conditions.
+                    {generateDeepRootsJSX()}
                   </span>
                 )}
                 {subspecies === "Carnivorous Chloroptid Host" && (
@@ -3546,6 +3570,16 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
               <span style={{ marginLeft: 8, color: '#000', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                 <i>Blind</i>
               </span>
+            )}
+            {subspecies === 'Barkskin' && (
+              <>
+                <span style={{ marginLeft: 8, color: '#000', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                  <i>Slam</i>
+                </span>
+                <span style={{ marginLeft: 8, color: '#000', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                  <i>Bounce</i>
+                </span>
+              </>
             )}
             {hostSpecies === 'Barkskin Chloroptid Host' && (
               <>
@@ -4529,8 +4563,8 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                   <span style={{ fontWeight: 'bold', fontSize: '14px' }}>Max Hit Points:</span>
                   <span style={{ minWidth: '40px', textAlign: 'center' }}>
                     {charClass === "Exospecialist" 
-                      ? maxHitPoints + 20 + aeronautHitPointsBonus + brawlerHitPointsBonus + dreadnaughtHitPointsBonus + spectreHitPointsBonus + avenochHitPointsBonus + cerebronychHitPointsBonus
-                      : maxHitPoints + avenochHitPointsBonus + cerebronychHitPointsBonus}
+                      ? maxHitPoints + 20 + aeronautHitPointsBonus + brawlerHitPointsBonus + dreadnaughtHitPointsBonus + spectreHitPointsBonus + avenochHitPointsBonus + cerebronychHitPointsBonus + chloroptidHitPointsBonus
+                      : maxHitPoints + avenochHitPointsBonus + cerebronychHitPointsBonus + chloroptidHitPointsBonus}
                   </span>
                 </div>
                 <button
@@ -4538,8 +4572,8 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                   style={{ padding: '6px 36px', fontSize: '14px', whiteSpace: 'nowrap' }}
                   onClick={() => {
                     const maxHP = charClass === "Exospecialist" 
-                      ? maxHitPoints + 20 + aeronautHitPointsBonus + brawlerHitPointsBonus + dreadnaughtHitPointsBonus + spectreHitPointsBonus + avenochHitPointsBonus + cerebronychHitPointsBonus
-                      : maxHitPoints + avenochHitPointsBonus + cerebronychHitPointsBonus;
+                      ? maxHitPoints + 20 + aeronautHitPointsBonus + brawlerHitPointsBonus + dreadnaughtHitPointsBonus + spectreHitPointsBonus + avenochHitPointsBonus + cerebronychHitPointsBonus + chloroptidHitPointsBonus
+                      : maxHitPoints + avenochHitPointsBonus + cerebronychHitPointsBonus + chloroptidHitPointsBonus;
                     setCurrentHitPoints(maxHP);
                     handleAutoSave({ currentHitPoints: maxHP });
                   }}
@@ -4629,8 +4663,8 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
           }}
         >
           hp: {currentHitPoints}/{charClass === "Exospecialist" 
-            ? maxHitPoints + 20 + aeronautHitPointsBonus + brawlerHitPointsBonus + dreadnaughtHitPointsBonus + spectreHitPointsBonus + avenochHitPointsBonus + cerebronychHitPointsBonus
-            : maxHitPoints + avenochHitPointsBonus + cerebronychHitPointsBonus}
+            ? maxHitPoints + 20 + aeronautHitPointsBonus + brawlerHitPointsBonus + dreadnaughtHitPointsBonus + spectreHitPointsBonus + avenochHitPointsBonus + cerebronychHitPointsBonus + chloroptidHitPointsBonus
+            : maxHitPoints + avenochHitPointsBonus + cerebronychHitPointsBonus + chloroptidHitPointsBonus}
         </button>
       </div>
 
