@@ -434,6 +434,13 @@ const CharacterSheetPerks: React.FC<CharacterSheetPerksProps> = ({
             </span>
           </div>
           )}
+          {subspecies === 'Barkskin' && sheet?.subspeciesCardDots?.[6]?.[0] && (
+          <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <span>
+              <b><i style={{ color: '#5f2d2b' }}>Thick Skinned.</i></b> <span style={{ color: '#000' }}>Your tree-like nature makes you capable of keeping a level head and a willingness to bend and not break in both social and emotional situations when the going gets tough. Gain an advantage on related skill rolls.</span>
+            </span>
+          </div>
+          )}
         </div>
       </div>
   );

@@ -363,6 +363,16 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
       effectiveHP += 40 + hp5Bonus + hp10Bonus + hp15Bonus;
     }
     
+    // Add Barkskin subspecies bonus
+    if (localSheet?.subspecies === 'Barkskin') {
+      const subspeciesDots = localSheet?.subspeciesCardDots || [];
+      const hp10Dots = subspeciesDots[7] || [];
+      
+      const hp10Bonus = hp10Dots.filter(Boolean).length * 10;
+      
+      effectiveHP += hp10Bonus;
+    }
+    
     // Add class-specific bonuses
     if (localSheet?.charClass === 'Exospecialist') {
       effectiveHP += 20;

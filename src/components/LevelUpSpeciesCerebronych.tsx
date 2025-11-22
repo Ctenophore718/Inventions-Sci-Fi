@@ -1245,7 +1245,7 @@ const LevelUpSpeciesCerebronych: React.FC<LevelUpSpeciesCerebronychProps> = ({
 
               {/* Row 5: Infest */}
               <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}><b><i style={{ color: '#5f5e2b' }}>Infest</i></b> (see below)</span>
-            <span style={{ textAlign: 'center', fontSize: '1.2em', fontWeight: 'bold', color: '#666' }}>⤷</span>
+            <span style={{ textAlign: 'center', fontSize: '1.2em', fontWeight: 'bold', color: '#000' }}>⤷</span>
               {(() => {
                 const arr = safeGetSubspeciesDotsArray(1);
                 const toxicStrikeSelected = safeGetSubspeciesDotsArray(0)[0];

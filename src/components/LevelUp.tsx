@@ -206,6 +206,13 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
       const hp15Bonus = (hp15Dots[0] ? 15 : 0);
       
       effectiveHP += 40 + hp5Bonus + hp10Bonus + hp15Bonus;
+      
+      // Add Barkskin subspecies HP bonus
+      if (sheet?.subspecies === 'Barkskin') {
+        const subspeciesDots = sheet?.subspeciesCardDots || [];
+        const barkskinHitPointsBonus = (subspeciesDots[7]?.filter(Boolean).length || 0) * 10;
+        effectiveHP += barkskinHitPointsBonus;
+      }
     }
     
     // Exospecialist gets +20 Max Hit Points
@@ -1816,6 +1823,8 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
               <LevelUpSpeciesChloroptid
                 sheet={sheet}
                 species={species}
+                subspecies={subspecies}
+                contentType="species"
                 onAutoSave={handleAutoSave}
                 xpTotal={xpTotal}
                 spTotal={spTotal}
@@ -2244,6 +2253,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                         if (subspecies === "Falcador" && skillName === "Intimidation") sources.push({ type: 'subspecies', color: "rgba(109,113,86,0.5)" });
                         if (subspecies === "Nocturne" && skillName === "Investigation") sources.push({ type: 'subspecies', color: "rgba(51,69,146,0.5)" });
                         if (subspecies === "Vulturine" && skillName === "Survival") sources.push({ type: 'subspecies', color: "rgba(169,109,140,0.5)" });
+                        if (subspecies === "Barkskin" && skillName === "Survival") sources.push({ type: 'subspecies', color: "rgba(95,45,43,0.5)" });
                         
                         return sources;
                       };
@@ -2457,7 +2467,11 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                           // Chloroptid Awareness booster always goes at position 2, same as class boosters
                           const isChloroptidAwareness = species === "Chloroptid" && skill === "Awareness" && i === 2;
 
-                          if (isChemistInvestigation || isCoderOikomagic || isCommanderDiplomacy || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine || isGrenadierIntimidation || isNecroSurvival || isPoisonerThievery || isCoerciveDeception || isBeguilerDeception || isDivinistInvestigation || isNaturalistSurvival || isTechnologistTechnology || isGalvanicAthletics || isTacticianAwareness || isTyrantIntimidation || isInertialDiplomacy || isKineticAthletics || isMercurialAcrobatics || isVectorialPiloting || isAstralMedicine || isChaosIntimidation || isOrderCulture || isVoidStealth || isAirAcrobatics || isEarthSurvival || isFireIntimidation || isWaterMedicine || isAeronautPiloting || isBrawlerSurvival || isDreadnaughtIntimidation || isSpectreStealth || isAmmoCoderOikomagic || isOrdnancerAthletics || isPistoleerThievery || isSniperStealth || isHackerComputers || isJunkerThievery || isNanoboticistAcrobatics || isTankerPiloting || isAvenochAwareness || isChloroptidAwareness) {
+                          // Check for Barkskin Survival subspecies booster dot
+                          // Barkskin Survival booster always goes at position 2, same as class boosters
+                          const isBarkskinSurvival = subspecies === "Barkskin" && skill === "Survival" && i === 2;
+
+                          if (isChemistInvestigation || isCoderOikomagic || isCommanderDiplomacy || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine || isGrenadierIntimidation || isNecroSurvival || isPoisonerThievery || isCoerciveDeception || isBeguilerDeception || isDivinistInvestigation || isNaturalistSurvival || isTechnologistTechnology || isGalvanicAthletics || isTacticianAwareness || isTyrantIntimidation || isInertialDiplomacy || isKineticAthletics || isMercurialAcrobatics || isVectorialPiloting || isAstralMedicine || isChaosIntimidation || isOrderCulture || isVoidStealth || isAirAcrobatics || isEarthSurvival || isFireIntimidation || isWaterMedicine || isAeronautPiloting || isBrawlerSurvival || isDreadnaughtIntimidation || isSpectreStealth || isAmmoCoderOikomagic || isOrdnancerAthletics || isPistoleerThievery || isSniperStealth || isHackerComputers || isJunkerThievery || isNanoboticistAcrobatics || isTankerPiloting || isAvenochAwareness || isChloroptidAwareness || isBarkskinSurvival) {
                             checked = true; // Force third dot to be filled for class booster dots
                           }
 
@@ -2510,6 +2524,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                             if (isTankerPiloting) return "rgba(184,87,139,0.5)";
                             if (isAvenochAwareness) return "rgba(43,95,89,0.5)";
                             if (isChloroptidAwareness) return "rgba(49,95,43,0.5)";
+                            if (isBarkskinSurvival) return "rgba(95,45,43,0.5)";
                             // Add other class colors here in the future
                             return "#d0d0d0"; // fallback color
                           };
