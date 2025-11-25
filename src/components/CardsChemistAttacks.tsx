@@ -55,10 +55,6 @@ export const CardsChemistAttacks: React.FC<CardsChemistAttacksProps> = ({ sheet 
   const grenades = sheet?.grenades || [];
   const noxiousFumes = sheet?.noxiousFumes || [];
   
-  // Debug logging for chemZombies
-
-  });
-  
   if (dartGuns.length === 0 && superSerums.length === 0 && chemZombies.length === 0 && grenades.length === 0 && noxiousFumes.length === 0) {
     return null;
   }
