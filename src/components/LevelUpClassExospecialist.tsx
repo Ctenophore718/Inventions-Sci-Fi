@@ -4,7 +4,6 @@ import { generateExosuitJSX } from "../utils/exospecialistFeature";
 import { generateTargetLockJSX } from "../utils/exospecialistTechnique";
 
 
-
 // Default dots array for Exospecialist progression (12 rows, each with appropriate number of dots)
 const defaultExospecialistDots: boolean[][] = [
   [false, false, false], // +1hx

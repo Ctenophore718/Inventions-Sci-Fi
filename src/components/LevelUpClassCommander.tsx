@@ -875,7 +875,6 @@ const LevelUpClassCommander: React.FC<LevelUpClassCommanderProps> = ({
               </div>
             )}
 
-    
 
           </div>
         

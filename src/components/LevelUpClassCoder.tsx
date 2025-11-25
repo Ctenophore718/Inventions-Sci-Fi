@@ -53,7 +53,6 @@ const LevelUpClassCoder: React.FC<LevelUpClassCoderProps> = ({
   setSpSpent,
   setNotice
 }) => {
-  
 
 
     // Local state for class card dots (Coder)
@@ -505,7 +504,6 @@ const LevelUpClassCoder: React.FC<LevelUpClassCoderProps> = ({
                   </div>
 
 
-                  
                   {/* Lenses Dropdown */}
                   <div style={{ marginBottom: '4px', textAlign: 'left' }}>
                     <select 
@@ -616,9 +614,6 @@ const LevelUpClassCoder: React.FC<LevelUpClassCoderProps> = ({
                   </div>
 
 
-
-
-
               <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
 
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
@@ -657,20 +652,9 @@ const LevelUpClassCoder: React.FC<LevelUpClassCoderProps> = ({
                   </>
                 );
               })()}
-        
-
 
 
             </div>
-
-
-
-
-
-
-
-
-
 
 
                   <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif' }}>
@@ -902,11 +886,6 @@ const LevelUpClassCoder: React.FC<LevelUpClassCoderProps> = ({
                         )}
                       </div>
                     </div>
-
-
-
-
-
 
 
               <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
@@ -1233,7 +1212,6 @@ const LevelUpClassCoder: React.FC<LevelUpClassCoderProps> = ({
               </div>
             )}
 
-    
 
           </div>
         

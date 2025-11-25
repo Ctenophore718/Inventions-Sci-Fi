@@ -1,0 +1,64 @@
+{
+  // TypeScript Performance
+  "typescript.tsserver.maxTsServerMemory": 4096,
+  "typescript.disableAutomaticTypeAcquisition": true,
+  "typescript.tsserver.experimental.enableProjectDiagnostics": false,
+  
+  // Editor Performance
+  "editor.semanticHighlighting.enabled": false,
+  "editor.quickSuggestions": {
+    "other": true,
+    "comments": false,
+    "strings": false
+  },
+  "editor.suggestOnTriggerCharacters": true,
+  "editor.acceptSuggestionOnCommitCharacter": false,
+  "editor.wordBasedSuggestions": "off",
+  "editor.parameterHints.enabled": true,
+  "editor.suggestSelection": "first",
+  "editor.fontSize": 14,
+  "editor.minimap.enabled": false,
+  "editor.renderWhitespace": "none",
+  "editor.codeLens": false,
+  
+  // File Exclusions for Performance
+  "files.exclude": {
+    "**/.git": true,
+    "**/node_modules": true,
+    "**/dist": true,
+    "**/.vercel": true,
+    "**/temp_*.txt": true
+  },
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/dist": true,
+    "**/.vercel": true,
+    "**/package-lock.json": true
+  },
+  "files.watcherExclude": {
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true,
+    "**/node_modules/**": true,
+    "**/dist/**": true,
+    "**/.vercel/**": true
+  },
+  
+  // Git Performance
+  "git.enabled": true,
+  "git.autofetch": false,
+  "git.autorefresh": false,
+  
+  // Extensions
+  "eslint.run": "onSave",
+  "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
+  
+  // AI Chat
+  "github.copilot.enable": {
+    "*": true
+  },
+  
+  // Disable resource-intensive features
+  "breadcrumbs.enabled": false,
+  "editor.hover.delay": 500,
+  "editor.lightbulb.enabled": "off"
+}

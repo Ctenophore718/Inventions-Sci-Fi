@@ -99,8 +99,6 @@ export function generateTyrantSecondaryAttackStatsJSX(
             Electric<img src="/Electric.png" alt="Electric" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u>)</b></span>
 
 
-
-
         </div>
       </div>
     );

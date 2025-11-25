@@ -454,7 +454,6 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
   return (
 
 
-    
     <div style={{ width: '100%', textAlign: 'left', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
       {/* Anatomist Subclass Content */}
       {subclass === 'Anatomist' && (
@@ -1950,10 +1949,8 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
               <b><u>Damage</u></b> <b>[{1 + necroAttackDamageDots.filter(Boolean).length}]</b>d6, Self-Destruct <br />
               <b><u>Crit Effect</u></b> <b>[{1 + necroAttackDamageDots.filter(Boolean).length}]</b>d6
               </div>
-            
-            
-            
-            
+
+
             </div>
 
             {/* Attack XP progression table */}
@@ -2554,8 +2551,6 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
               <b><u>Damage</u></b> <b>[{1 + poisonerAttackDamageDots.filter(Boolean).length}]</b>d4, <i>Dangerous Terrain</i> <i>(affects <b><span style={{ color: '#38761d' }}>Fly</span></b>)</i> <br />
               <b><u>Crit Effect</u></b> <b>[{1 + poisonerAttackDamageDots.filter(Boolean).length}]</b>d4
               </div>
-
-
 
 
             </div>

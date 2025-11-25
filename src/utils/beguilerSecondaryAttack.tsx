@@ -42,11 +42,8 @@ export function generateBeguilerSecondaryAttackJSX(
       <div style={{ marginBottom: '4px' }}>
         <b><i><span style={{ color: '#000' }}>Secondary</span> <span style={{ color: '#990000' }}>Attack</span></i></b> <i>(Cooldown</i> <b>[{cooldown}]</b><i>).</i>
       </div>
-      
-      
-      
-      
-      
+
+
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
         <span>
           <b><u>Range</u></b> 1hx

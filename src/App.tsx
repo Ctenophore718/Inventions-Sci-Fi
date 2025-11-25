@@ -25,24 +25,23 @@ const App = () => {
 
   // Enhanced auto-save function that handles any character changes
   const performAutoSave = React.useCallback(async (updatedSheet: CharacterSheet) => {
-    console.log('performAutoSave called with:', updatedSheet);
-    console.log('performAutoSave - debouncing save for:', updatedSheet.id);
-    
+
+
     // Debounce the save (don't update currentSheet here - it's already updated in updateCurrentSheet)
     if (autoSaveTimeoutRef.current) {
       clearTimeout(autoSaveTimeoutRef.current);
     }
     
     autoSaveTimeoutRef.current = window.setTimeout(async () => {
-      console.log('Actually saving to storage:', updatedSheet);
+
       await saveCharacterSheet(updatedSheet);
-      console.log('Auto-saved character:', updatedSheet.name || 'Unnamed');
+
     }, 300); // 300ms debounce for better UX
   }, []);
 
   // Add effect to track currentSheet changes
   React.useEffect(() => {
-    console.log('currentSheet changed to:', currentSheet ? `ID: ${currentSheet.id}, Name: "${currentSheet.name || 'Unnamed'}"` : 'NULL');
+
   }, [currentSheet]);
 
   // Function to update current sheet with any changes
@@ -118,15 +117,13 @@ const App = () => {
   };
 
   const updateCurrentSheet = React.useCallback((updates: Partial<CharacterSheet>) => {
-    console.log('updateCurrentSheet called with:', updates);
-    console.log('current currentSheet:', currentSheet);
-    console.log('newCharacterCreated flag:', newCharacterCreated);
-    
+
+
     if (!currentSheet && !newCharacterCreated) {
       // Create a new character sheet for the first save
-      console.log('Creating new character sheet with updates:', updates);
+
       const newSheet = createNewCharacterSheet(updates);
-      console.log('Created new sheet:', newSheet);
+
       setCurrentSheet(newSheet);
       setNewCharacterCreated(true); // Mark that we've created a character
       
@@ -143,9 +140,9 @@ const App = () => {
     if (!currentSheet && newCharacterCreated) {
       // Handle the case where we've marked a character as created but currentSheet is still null
       // This can happen during the initial creation process
-      console.log('Creating character sheet for newCharacterCreated case with updates:', updates);
+
       const newSheet = createNewCharacterSheet(updates);
-      console.log('Created new sheet for newCharacterCreated case:', newSheet);
+
       setCurrentSheet(newSheet);
       
       // Immediately sync the App-level state with the new sheet
@@ -161,8 +158,7 @@ const App = () => {
     
     if (currentSheet) {
       const updatedSheet = { ...currentSheet, ...updates };
-      console.log('Updating existing sheet:', updatedSheet);
-      
+
       // CRITICAL: Update currentSheet immediately before auto-save
       setCurrentSheet(updatedSheet);
       
@@ -176,7 +172,7 @@ const App = () => {
       // Now trigger the debounced save
       void performAutoSave(updatedSheet);
     } else {
-      console.log('Error: Unexpected state - no current sheet available');
+
     }
   }, [currentSheet, performAutoSave, newCharacterCreated, charClass, subclass, species, subspecies, hostSpecies]);
 
@@ -229,7 +225,7 @@ const App = () => {
   }, [currentSheet]);
 
   const handleEdit = (sheet: CharacterSheet) => {
-    console.log('handleEdit called with sheet:', sheet ? `ID: ${sheet.id}, Name: ${sheet.name}` : 'NULL');
+
     setCurrentSheet(sheet);
     setCharClass(sheet.charClass || "");
     setSubclass(sheet.subclass || "");
@@ -237,7 +233,7 @@ const App = () => {
     setSubspecies(sheet.subspecies || "");
     setHostSpecies(sheet.hostSpecies || "");
     setNewCharacterCreated(false); // Reset the flag when loading existing character
-    console.log('handleEdit - setting view to editor');
+
     setView("editor");
   };
 
@@ -290,7 +286,7 @@ const App = () => {
   }, [charClass, subclass, species, subspecies, currentSheet]);
 
   const handleLevelUp = async () => {
-    console.log('handleLevelUp called, currentSheet before:', currentSheet ? `ID: ${currentSheet.id}` : 'NULL');
+
     // Clear any pending auto-saves before navigation
     if (autoSaveTimeoutRef.current) {
       clearTimeout(autoSaveTimeoutRef.current);
@@ -299,12 +295,12 @@ const App = () => {
         await saveCharacterSheet(currentSheet);
       }
     }
-    console.log('handleLevelUp - setting view to levelup');
+
     setView("levelup");
   };
 
   const handleCards = async () => {
-    console.log('handleCards called, currentSheet before:', currentSheet ? `ID: ${currentSheet.id}` : 'NULL');
+
     // Clear any pending auto-saves before navigation
     if (autoSaveTimeoutRef.current) {
       clearTimeout(autoSaveTimeoutRef.current);
@@ -313,12 +309,12 @@ const App = () => {
         await saveCharacterSheet(currentSheet);
       }
     }
-    console.log('handleCards - setting view to cards');
+
     setView("cards");
   };
 
   const handleBackToEditor = async () => {
-    console.log('handleBackToEditor called, currentSheet before:', currentSheet ? `ID: ${currentSheet.id}` : 'NULL');
+
     // Clear any pending auto-saves before navigation
     if (autoSaveTimeoutRef.current) {
       clearTimeout(autoSaveTimeoutRef.current);
@@ -327,12 +323,12 @@ const App = () => {
         await saveCharacterSheet(currentSheet);
       }
     }
-    console.log('handleBackToEditor - setting view to editor');
+
     setView("editor");
   };
 
   const handleBackToHome = async () => {
-    console.log('handleBackToHome called, currentSheet before:', currentSheet ? `ID: ${currentSheet.id}` : 'NULL');
+
     // Clear any pending auto-saves before navigation
     if (autoSaveTimeoutRef.current) {
       clearTimeout(autoSaveTimeoutRef.current);
@@ -341,7 +337,7 @@ const App = () => {
         await saveCharacterSheet(currentSheet);
       }
     }
-    console.log('handleBackToHome - clearing currentSheet, setting view to manager');
+
     setCurrentSheet(null);
     setView("manager");
   };

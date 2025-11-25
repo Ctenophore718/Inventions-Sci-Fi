@@ -56,11 +56,7 @@ export const CardsChemistAttacks: React.FC<CardsChemistAttacksProps> = ({ sheet 
   const noxiousFumes = sheet?.noxiousFumes || [];
   
   // Debug logging for chemZombies
-  console.log('CardsChemistAttacks Debug:', {
-    subclass: sheet?.subclass,
-    chemZombies: sheet?.chemZombies,
-    chemZombiesLength: sheet?.chemZombies?.length,
-    isArray: Array.isArray(sheet?.chemZombies)
+
   });
   
   if (dartGuns.length === 0 && superSerums.length === 0 && chemZombies.length === 0 && grenades.length === 0 && noxiousFumes.length === 0) {

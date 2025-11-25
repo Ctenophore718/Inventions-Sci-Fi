@@ -4,7 +4,6 @@ import { generatePsychosomaticHarmonyJSX } from "../utils/contemplativeFeature";
 import { generateSwiftReactionJSX } from "../utils/contemplativeTechnique";
 
 
-
 // Default dots structure for Contemplative class
 const defaultContemplativeDots: boolean[][] = [
   [false],      // Neural Immunity (1 dot)
@@ -1234,7 +1233,6 @@ const LevelUpClassContemplative: React.FC<LevelUpClassContemplativeProps> = ({
               </div>
             )}
 
-    
 
           </div>
         

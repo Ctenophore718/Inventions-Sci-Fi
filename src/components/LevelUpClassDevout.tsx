@@ -6,7 +6,6 @@ import { generateDevoutPrimaryAttackStatsJSX, getIncantationCost } from "../util
 import { generateDevoutSecondaryAttackStatsJSX, getRelicCost } from "../utils/devoutSecondaryAttack";
 
 
-
 type LevelUpClassDevoutProps = {
   sheet: CharacterSheet | null;
   charClass: string;

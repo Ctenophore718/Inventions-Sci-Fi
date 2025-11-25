@@ -71,13 +71,10 @@ export function generateContemplativePrimaryAttackStatsJSX(
             , treat {ignoreAllCover ? <><b>[all]</b> </> : <><b>[100%]</b></>} <br />
 
 
-
                         <span style={{ display: 'block', textAlign: 'right' }}>
               Cover as {ignoreAllCover ? <><b>[no]</b> </> : <><b>[50%]</b> </>} Cover</span>
-            
-            
-              
-            
+
+
           </>
         )}
         {!isVectorial && <br />}

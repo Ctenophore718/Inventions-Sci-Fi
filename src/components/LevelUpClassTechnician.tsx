@@ -21,8 +21,6 @@ const defaultTechnicianDots: boolean[][] = [
 ];
 
 
-
-
 type LevelUpClassTechnicianProps = {
   sheet: CharacterSheet | null;
   charClass: string;

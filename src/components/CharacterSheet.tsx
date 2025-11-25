@@ -113,9 +113,7 @@ type Props = {
 
 
 const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, onAutoSave, charClass, setCharClass, subclass, setSubclass, species, setSpecies, subspecies, setSubspecies, hostSpecies, setHostSpecies }) => {
-  
-  console.log('CharacterSheet render started, sheet:', sheet ? `ID: ${sheet.id}` : 'NULL');
-  
+
   // Auto-save helper function
   const handleAutoSave = (fieldUpdates: Partial<CharacterSheet>) => {
     onAutoSave(fieldUpdates);
@@ -2994,7 +2992,6 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
       </div>
 
 
-
       <div className={styles.movementStrikeCard}>
   <h3 style={{ fontFamily: 'Arial, sans-serif' }}>Movement</h3>
         <div className={styles.cardContent}>
@@ -3850,7 +3847,6 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
           </div>
         </div>
       </div>
-
 
 
       <CharacterSheetInventory

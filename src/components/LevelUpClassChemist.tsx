@@ -66,7 +66,6 @@ const LevelUpClassChemist: React.FC<LevelUpClassChemistProps> = ({
   const [pendingDartGun, setPendingDartGun] = useState<string>("");
 
 
-  
     // Helper function to safely access classCardDots array
     const safeGetDotsArray = (index: number): boolean[] => {
       if (!classCardDots || !Array.isArray(classCardDots) || index >= classCardDots.length) {
@@ -127,7 +126,6 @@ const LevelUpClassChemist: React.FC<LevelUpClassChemistProps> = ({
     */
 
 
-    
     /* Unused helper functions - may be needed in future
     // Helper function to handle dot clicking with sequential requirement
     const _handleDotClick = (
@@ -255,14 +253,14 @@ const LevelUpClassChemist: React.FC<LevelUpClassChemistProps> = ({
                                 onClick={() => {
                                   if (!arr[idx] && canCheck) {
                                     const newDots = safeCloneClassCardDots();
-                                    console.log('About to set newDots[0][j], newDots:', newDots, 'newDots[0]:', newDots[0], 'idx:', idx);
+
                                     for (let j = 0; j <= idx; ++j) newDots[0][j] = true;
                                     let delta = 0;
                                     for (let j = 0; j <= idx; ++j) if (!arr[j]) delta += xpCosts[j];
                                     persistClassCardDots(newDots, 0, delta);
                                   } else if (arr[idx] && canUncheck) {
                                     const newDots = safeCloneClassCardDots();
-                                    console.log('About to set newDots[0][j] false, newDots:', newDots, 'newDots[0]:', newDots[0], 'idx:', idx);
+
                                     for (let j = idx; j < arr.length; ++j) newDots[0][j] = false;
                                     let delta = 0;
                                     for (let j = idx; j < arr.length; ++j) if (arr[j]) delta -= xpCosts[j];

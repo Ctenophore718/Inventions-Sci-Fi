@@ -642,7 +642,6 @@ const LevelUpSpeciesCerebronych: React.FC<LevelUpSpeciesCerebronychProps> = ({
           </div>
 
 
-
           {/* Techniques Section */}
           <div style={{ color: '#bf9000', fontWeight: 'bold', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '16px', marginTop: '24px' }}>
             <div style={{ fontWeight: 'bold', color: '#bf9000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Techniques</u></div>

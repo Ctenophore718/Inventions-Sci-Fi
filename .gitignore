@@ -23,6 +23,7 @@ backend/database.db
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
+!.vscode/settings.json
 .idea
 .DS_Store
 *.suo
@@ -32,3 +33,10 @@ backend/database.db
 *.sw?
 
 .vercel
+
+# Temporary files
+temp_*.txt
+
+# Scripts
+fix-*.ps1
+remove-console-logs.ps1

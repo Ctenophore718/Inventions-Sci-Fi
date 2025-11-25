@@ -48,20 +48,20 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
   
   // Auto-save helper function
   const handleAutoSave = (fieldUpdates: Partial<CharacterSheet>) => {
-    console.log("handleAutoSave called with:", fieldUpdates);
+
     if (onAutoSave) {
       if (sheet) {
         // Update existing sheet
         const updatedSheet = { ...sheet, ...fieldUpdates };
         onAutoSave(updatedSheet);
-        console.log("Auto-save completed for existing sheet");
+
       } else {
         // Create new sheet with updates - this handles new character creation
-        console.log("Auto-save for new character creation");
+
         onAutoSave(fieldUpdates);
       }
     } else {
-      console.log("Auto-save failed - missing onAutoSave function");
+
     }
   };
 
@@ -119,8 +119,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
     const isNewCharacter = !sheet || !sheet.hasFreeSkillStarterDots;
     
     if (isNewCharacter) {
-      console.log("Setting up new character with starter skill dots");
-      
+
       // Create skill dots with first two columns filled
       const newSkillDots = Object.fromEntries(skillList.map(skill => [skill, [true, true, false, false, false, false, false, false, false, false]]));
       
@@ -1455,58 +1454,6 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
               </>
             )}
         </div>
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
         {/* Subclass Card */}
@@ -1718,26 +1665,6 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
               />
             )}
         </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
         {/* Species Card */}
@@ -2063,42 +1990,6 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
         </div>
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         {/* Background Card */}
         <div style={{ background: '#fff', border: '2px solid #333', borderRadius: 8, boxShadow: '0 2px 4px rgba(0,0,0,0.1)', minHeight: 80, padding: '1.2rem', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <div style={{ fontWeight: 'bold', color: 'black', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1.1em', marginBottom: 6 }}>Background</div>
@@ -2145,21 +2036,6 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
               </select>
             </div>
         </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
         {/* Skills Card */}
@@ -2738,25 +2614,22 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                                   if (canCheckThisDot) {
                                     // Filling dots: calculate SP cost for new dots being filled (excluding free dots)
                                     console.log(`Attempting to fill ${skill} at index ${i} (column ${[20, 18, 16, 14, 12, 10, 8, 6, 4, 2][i]}+)`);
-                                    console.log(`Current skill dots:`, currentSkillDots);
+
                                     console.log(`Current SP spent: ${spSpent}, Total SP: ${sheet?.spTotal || 0}, Remaining: ${(sheet?.spTotal || 0) - spSpent}`);
                                     
                                     for (let j = 0; j <= i; j++) {
                                       const isFree = isFreeDot(skill, j);
                                       const isFilled = currentSkillDots[j];
-                                      console.log(`  Position ${j}: filled=${isFilled}, isFreeDot=${isFree}, cost=${spCosts[j]}`);
-                                      
+
                                       if (!currentSkillDots[j] && !isFreeDot(skill, j)) {
                                         spDelta += spCosts[j];
                                         console.log(`    Adding ${spCosts[j]}sp to spDelta (now ${spDelta})`);
                                       }
                                     }
-                                    
-                                    console.log(`Total SP delta: ${spDelta}, Would result in: ${spSpent + spDelta} spent`);
-                                    
+
                                     // Check if user has enough SP
                                     if (spSpent + spDelta > (sheet?.spTotal || 0)) {
-                                      console.log(`NOT ENOUGH SP! Need ${spSpent + spDelta} but only have ${sheet?.spTotal || 0}`);
+
                                       setNotice("Not enough sp!");
                                       return;
                                     }
@@ -2794,9 +2667,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                                     
                                     // Create the updated skill dots object
                                     const updatedSkillDots = { ...prev, [skill]: newSkillDots };
-                                    
-                                    console.log(`Skill dots updated for ${skill}:`, newSkillDots, `SP change: ${spDelta}, New SP spent: ${spSpent + spDelta}`);
-                                    
+
                                     return updatedSkillDots;
                                   });
 
@@ -2862,46 +2733,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
         </div>
 
 
-
-
-
       </div>    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     {/* XP/SP Notice */}
