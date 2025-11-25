@@ -1310,11 +1310,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
 
   const carnivorousFeatureJSX = generateSapSuckerJSX();
 
-  const driftingFeatureJSX = (
-    <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#5f8a5f' }}>Leaf on the Wind.</i></b> You have a <b><i style={{ color: '#38761d' }}>Flight Speed</i></b>. Additionally, you can <b><i style={{ color: '#38761d' }}>Move</i></b> <b>[1]</b>hx after you take any Damage.
-    </span>
-  );
+  const driftingFeatureJSX = generateLeafOnTheWindJSX(1 + (sheet?.subspeciesCardDots?.[0]?.filter(Boolean).length || 0));
 
   const vinyFeatureJSX = (
     <span style={{ color: '#000', fontWeight: 400 }}>
@@ -3010,6 +3006,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
             {hostSpecies === 'Nocturne Avenoch Host' ? ', Fly' : ''}
             {hostSpecies === 'Vulturine Avenoch Host' ? ', Fly' : ''}
             {hostSpecies === 'Drifting Chloroptid Host' ? ', Fly' : ''}
+            {subspecies === 'Drifting' ? ', Fly' : ''}
             {hostSpecies === 'Viny Chloroptid Host' ? ', Climb' : ''}
             {hostSpecies === 'Utility Droid Cognizant Host' ? ', Climb' : ''}
             {hostSpecies === 'Lithe Human Host' ? ', Climb' : ''}
@@ -3078,6 +3075,16 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                 ? <span style={{ fontWeight: 'normal', color: '#000' }}>
                     <b><i style={{ color: '#38761d' }}>Move</i></b> 1hx after you take any Damage
                   </span>
+                : subspecies === 'Drifting'
+                ? (() => {
+                    const driftingMoveDots = sheet?.subspeciesCardDots?.[0] || [];
+                    const moveDistance = 1 + driftingMoveDots.filter(Boolean).length;
+                    return (
+                      <span style={{ fontWeight: 'normal', color: '#000' }}>
+                        <b><i style={{ color: '#38761d' }}>Move</i></b> <b>[{moveDistance}]</b>hx after you take any Damage
+                      </span>
+                    );
+                  })()
                 : hostSpecies === 'Lithe Human Host'
                 ? <span style={{ fontWeight: 'normal', color: '#000' }}>
                     Ignore <i>Rough Terrain</i> and <i>Dangerous Terrain</i>
