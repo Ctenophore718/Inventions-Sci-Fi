@@ -38,6 +38,8 @@ import { generateFirstInFlightJSX } from "../utils/avenochFeature";
 import { generateVectorialStrikeDamageJSX, generateVectorialStrikeRangeJSX } from "../utils/vectorialStrike";
 import { generateRapidRegenerationJSX } from "../utils/chloroptidFeature";
 import { generateDeepRootsJSX } from "../utils/barkskinFeature";
+import { generateSapSuckerJSX } from "../utils/carnivorousFeature";
+import { generateLeafOnTheWindJSX } from "../utils/driftingFeature";
 
 import { generateBloodTradeJSX } from "../utils/devoutFeature";
 import { generateFatigueJSX } from "../utils/voidFeature";
@@ -1141,7 +1143,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
       "Nocturne Avenoch Host": <span style={{ color: '#000', fontWeight: 400 }}><b><i style={{ color: '#334592' }}>Eyes of the Night.</i></b> You have a <b><i style={{ color: '#38761d' }}>Fly Speed</i></b>. Additionally, you are <i>Immune</i> to the <b><i>Blind</i></b> condition and don't have a <i>Rear Arc</i>. Additionally, whenever you Crit on an <b><i style={{ color: '#990000' }}>Attack</i></b>, you inflict the <b><i>Mesmerize</i></b> condition.</span>,
       "Vulturine Avenoch Host": <span style={{ color: '#000', fontWeight: 400 }}><b><i style={{ color: '#a96d8c' }}>Carrion Gorge.</i></b> You have a <b><i style={{ color: '#38761d' }}>Fly Speed</i></b>. Additionally, when you destroy an enemy using a <b><i style={{ color: '#351c75' }}>Strike</i></b>, you immediately gain 2d6 <b><i style={{ color: '#990000' }}>Hit Points</i></b>.</span>,
       "Chloroptid Host": <span style={{ color: '#000', fontWeight: 400 }}><b><i style={{ color: '#315f2b' }}>Rapid Regeneration.</i></b> You gain 1d4 <b><i style={{ color: '#990000' }}>Hit Points</i></b> at the start of your turn. Additionally, your size is 1hx, 2hx, or 3hx, depending on the size of your host.</span>,
-      "Barkskin Chloroptid Host": <span style={{ color: '#000', fontWeight: 400 }}>{generateDeepRootsJSX({ mesmerizeImmunity: sheet?.subspeciesCardDots?.[0]?.[0] })}</span>,
+      "Barkskin Chloroptid Host": <span style={{ color: '#000', fontWeight: 400 }}><b><i style={{ color: '#5f2d2b' }}>Deep Roots.</i></b> You are <i>Immune</i> to the <b><i>Slam</i></b> and <b><i>Bounce</i></b> conditions.</span>,
       "Carnivorous Chloroptid Host": <span style={{ color: '#000', fontWeight: 400 }}><b><i style={{ color: '#2b2d5f' }}>Sap Sucker.</i></b> Whenever you heal as a result of the <b><i>Drain</i></b> condition, you heal all of the amount of Damage done instead of half.</span>,
       "Drifting Chloroptid Host": <span style={{ color: '#000', fontWeight: 400 }}><b><i style={{ color: '#5f8a5f' }}>Leaf on the Wind.</i></b> You have a <b><i style={{ color: '#38761d' }}>Fly Speed</i></b>. Additionally, you can <b><i style={{ color: '#38761d' }}>Move</i></b> 1hx after you take any Damage.</span>,
       "Viny Chloroptid Host": <span style={{ color: '#000', fontWeight: 400 }}><b><i style={{ color: '#5f5f2b' }}>Climbing Creeper.</i></b> You gain a <b><i style={{ color: '#38761d' }}>Climb Speed</i></b> and <i>Resist</i> <b><u style={{ color: '#a6965f', display: 'inline-flex', alignItems: 'center' }}>Piercing<img src="/Piercing.png" alt="Piercing" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>.</span>,
@@ -1308,11 +1310,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
     </span>
   );
 
-  const carnivorousFeatureJSX = (
-    <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#2b2d5f' }}>Sap Sucker.</i></b> Whenever you heal as a result of the <b><i>Drain</i></b> condition, you heal all of the amount of Damage done instead of half.
-    </span>
-  );
+  const carnivorousFeatureJSX = generateSapSuckerJSX();
 
   const driftingFeatureJSX = (
     <span style={{ color: '#000', fontWeight: 400 }}>
@@ -2224,6 +2222,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                   if (subspecies === "Nocturne" && skillName === "Investigation") sources.push({ type: 'subspecies', color: "rgba(51,69,146,0.5)" });
                   if (subspecies === "Vulturine" && skillName === "Survival") sources.push({ type: 'subspecies', color: "rgba(169,109,140,0.5)" });
                   if (subspecies === "Barkskin" && skillName === "Survival") sources.push({ type: 'subspecies', color: "rgba(95,45,43,0.5)" });
+                  if (subspecies === "Carnivorous" && skillName === "Intimidation") sources.push({ type: 'subspecies', color: "rgba(43,45,95,0.5)" });
                   
                   return sources;
                 };
@@ -2795,8 +2794,8 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                   </span>
                 )}
                 {subspecies === "Carnivorous Chloroptid Host" && (
-                  <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32, marginTop: 8, color: '#000', fontWeight: 400 }}>
-                    <b><i style={{ color: '#2b2d5f' }}>Sap Sucker.</i></b> Whenever you heal as a result of the <b><i>Drain</i></b> condition, you heal all of the amount of Damage done instead of half.
+                  <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32, marginTop: 8 }}>
+                    {generateSapSuckerJSX(sheet?.subspeciesCardDots?.[0]?.[0])}
                   </span>
                 )}
                 {subspecies === "Drifting Chloroptid Host" && (
@@ -3024,7 +3023,16 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
           <div className={styles.horizontalLabel} style={{ color: '#38761d', fontWeight: 'bold' }}><u>Jump Amount</u> {kineticJumpAmountBonus > 0 ? kineticJumpAmountBonus : mercurialJumpAmountBonus > 0 ? mercurialJumpAmountBonus : "0"}</div>
           <div className={styles.horizontalLabel} style={{ color: '#38761d', fontWeight: 'bold' }}>
             <u>Speed Effects</u> {
-              subclass === 'Tactician'
+              subclass === 'Naturalist'
+                ? (() => {
+                    const hasDangerousTerrain = (sheet?.subclassProgressionDots as any)?.naturalistFeatureDangerousDots?.[0];
+                    return (
+                      <span style={{ fontWeight: 'normal', color: '#000' }}>
+                        Ignore <i>Obstacles</i>, <i>Rough Terrain</i>{hasDangerousTerrain ? ' & ' : ''}{hasDangerousTerrain ? <i>Dangerous Terrain</i> : ''}
+                      </span>
+                    );
+                  })()
+                : subclass === 'Tactician'
                 ? <span style={{ fontWeight: 'normal', color: '#000' }}>Ignore <i>Rough Terrain</i></span>
                 : subclass === 'Chaos' 
                 ? (() => {
@@ -3313,6 +3321,15 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                     ? <span style={{ color: '#000', fontWeight: 'normal' }}><b><i>Spike</i></b> <b>(</b><b><u style={{ color: '#38761d', display: 'inline-flex', alignItems: 'center' }}>
       Toxic<img src="/Toxic.png" alt="Toxic" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} />
       </u></b><b>)</b></span>
+                  : (subspecies === 'Carnivorous')
+                    ? <span style={{ color: '#000', fontWeight: 'normal' }}>
+                        <b><i>Drain</i></b>
+                        {sheet?.subspeciesCardDots?.[3]?.[0] && (
+                          <span>, <b><i>Spike</i></b> <b>(</b><b><u style={{ color: '#02b900', display: 'inline-flex', alignItems: 'center' }}>
+                            Toxic<img src="/Toxic.png" alt="Toxic" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} />
+                          </u></b><b>)</b></span>
+                        )}
+                      </span>
                   : (hostSpecies === 'Vulturine Avenoch Host')
                     ? <span style={{ color: '#000', fontWeight: 'normal' }}>+2d6 <b><i style={{ color: '#990000' }}>Hit Points</i></b> if target is reduced to 0 <b><i style={{ color: '#990000' }}>Hit Points</i></b></span>
                   : (subspecies === 'Vulturine')

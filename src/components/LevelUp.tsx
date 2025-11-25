@@ -2007,6 +2007,42 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
               />
             )}
             
+            {/* Carnivorous Subspecies Content */}
+            {subspecies === "Carnivorous" && (
+              <LevelUpSpeciesChloroptid
+                sheet={sheet}
+                species={species}
+                subspecies={subspecies}
+                contentType="subspecies"
+                onAutoSave={handleAutoSave}
+                xpTotal={xpTotal}
+                spTotal={spTotal}
+                xpSpent={xpSpent}
+                spSpent={spSpent}
+                setXpSpent={setXpSpent}
+                setSpSpent={setSpSpent}
+                setNotice={setNotice}
+              />
+            )}
+            
+            {/* Drifting Subspecies Content */}
+            {subspecies === "Drifting" && (
+              <LevelUpSpeciesChloroptid
+                sheet={sheet}
+                species={species}
+                subspecies={subspecies}
+                contentType="subspecies"
+                onAutoSave={handleAutoSave}
+                xpTotal={xpTotal}
+                spTotal={spTotal}
+                xpSpent={xpSpent}
+                spSpent={spSpent}
+                setXpSpent={setXpSpent}
+                setSpSpent={setSpSpent}
+                setNotice={setNotice}
+              />
+            )}
+            
             {/* Cerebronych (cont.) Subspecies Content */}
             {species === "Cerebronych" && (
               <LevelUpSpeciesCerebronych
@@ -2254,6 +2290,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                         if (subspecies === "Nocturne" && skillName === "Investigation") sources.push({ type: 'subspecies', color: "rgba(51,69,146,0.5)" });
                         if (subspecies === "Vulturine" && skillName === "Survival") sources.push({ type: 'subspecies', color: "rgba(169,109,140,0.5)" });
                         if (subspecies === "Barkskin" && skillName === "Survival") sources.push({ type: 'subspecies', color: "rgba(95,45,43,0.5)" });
+                        if (subspecies === "Carnivorous" && skillName === "Intimidation") sources.push({ type: 'subspecies', color: "rgba(43,45,95,0.5)" });
                         
                         return sources;
                       };

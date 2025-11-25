@@ -434,10 +434,17 @@ const CharacterSheetPerks: React.FC<CharacterSheetPerksProps> = ({
             </span>
           </div>
           )}
-          {subspecies === 'Barkskin' && sheet?.subspeciesCardDots?.[6]?.[0] && (
+          {subspecies === 'Barkskin' && sheet?.subspeciesCardDots?.[8]?.[0] && (
           <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
             <span>
               <b><i style={{ color: '#5f2d2b' }}>Thick Skinned.</i></b> <span style={{ color: '#000' }}>Your tree-like nature makes you capable of keeping a level head and a willingness to bend and not break in both social and emotional situations when the going gets tough. Gain an advantage on related skill rolls.</span>
+            </span>
+          </div>
+          )}
+          {subspecies === 'Carnivorous' && sheet?.subspeciesCardDots?.[5]?.[0] && (
+          <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <span>
+              <b><i style={{ color: '#2b2d5f' }}>pH Sensitive.</i></b> <span style={{ color: '#000' }}>You are very sensitive to chemical levels and acidity balances and can sniff out toxins, poisons and other chemicals and substances whenever you smell, taste or touch them. Gain an advantage on related skill rolls.</span>
             </span>
           </div>
           )}

@@ -31,6 +31,7 @@ import { generateFalconDiveCardJSX } from "../utils/falcadorTechnique";
 import { generateDarknessDescendingCardJSX } from "../utils/nocturneTechnique";
 import { generateFleshEaterCardJSX } from "../utils/vulturineTechnique";
 import { generateOakenshieldCardJSX, calculateOakenshieldData } from "../utils/barkskinTechnique";
+import { generatePoisonousBarbsCardJSX, calculatePoisonousBarbsData } from "../utils/carnivorousTechnique";
 import React from "react";
 import type { CharacterSheet } from "../types/CharacterSheet";
 import { loadSheetById, saveCharacterSheet } from "../utils/storage";
@@ -1376,7 +1377,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                         ? 'Flesh Eater'
                         : localSheet?.subspecies === 'Barkskin'
                           ? 'Oakenshield'
-                          : 'Subspecies Card Name'}
+                          : localSheet?.subspecies === 'Carnivorous'
+                            ? 'Poisonous Barbs'
+                            : 'Subspecies Card Name'}
               </span>
               <span style={{
                 fontFamily: 'Arial, Helvetica, sans-serif',
@@ -1394,7 +1397,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                         ? '#a96d8c'
                         : localSheet?.subspecies === 'Barkskin'
                           ? '#5f2d2b'
-                          : 'black',
+                          : localSheet?.subspecies === 'Carnivorous'
+                            ? '#2b2d5f'
+                            : 'black',
                 lineHeight: 1,
                 whiteSpace: 'normal',
                 wordBreak: 'keep-all',
@@ -1414,7 +1419,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                         ? 'Vulturine'
                         : localSheet?.subspecies === 'Barkskin'
                           ? 'Barkskin'
-                          : 'Subspecies'}</span>
+                          : localSheet?.subspecies === 'Carnivorous'
+                            ? 'Carnivorous'
+                            : 'Subspecies'}</span>
             </div>
             <img 
               src={localSheet?.species === 'Cerebronych'
@@ -1429,7 +1436,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                       ? "/Flesh Eater.png"
                       : localSheet?.subspecies === 'Barkskin'
                         ? "/Oakenshield.png"
-                        : "/Blank Card.png"}
+                        : localSheet?.subspecies === 'Carnivorous'
+                          ? "/Poisonous Barbs.png"
+                          : "/Blank Card.png"}
               alt={localSheet?.species === 'Cerebronych'
                 ? "Limit Push"
                 : localSheet?.subspecies === 'Corvid' 
@@ -1442,7 +1451,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                       ? "Flesh Eater"
                       : localSheet?.subspecies === 'Barkskin'
                         ? "Oakenshield"
-                        : "Blank Card"}
+                        : localSheet?.subspecies === 'Carnivorous'
+                          ? "Poisonous Barbs"
+                          : "Blank Card"}
               style={{
                 position: 'absolute',
                 top: 35,
@@ -1483,7 +1494,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                           ? `[${4 - (localSheet?.subspeciesCardDots?.[2]?.filter(Boolean).length ?? 0)}]`
                           : localSheet?.subspecies === 'Barkskin'
                             ? `[${calculateOakenshieldData(localSheet?.subspeciesCardDots).cooldown}]`
-                            : '[#]'}
+                            : localSheet?.subspecies === 'Carnivorous'
+                              ? `[${calculatePoisonousBarbsData(localSheet?.subspeciesCardDots ?? []).cooldown}]`
+                              : '[#]'}
                 </span>
               </span>
             </div>
@@ -1535,7 +1548,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                           })
                         : localSheet?.subspecies === 'Barkskin'
                           ? generateOakenshieldCardJSX(calculateOakenshieldData(localSheet?.subspeciesCardDots))
-                          : 'Card stats.'}
+                          : localSheet?.subspecies === 'Carnivorous'
+                            ? generatePoisonousBarbsCardJSX(calculatePoisonousBarbsData(localSheet?.subspeciesCardDots ?? []).piercingDamage, calculatePoisonousBarbsData(localSheet?.subspeciesCardDots ?? []).includesAttacks)
+                            : 'Card stats.'}
               </div>
             </div>
             <div style={{
@@ -1564,7 +1579,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                       ? '"Death is an acquired taste… but once you\'ve acquired it, nothing can beat it." --Trogon Ornio, Vulturine Mercenary'
                       : localSheet?.subspecies === 'Barkskin'
                         ? '"The spirit of Mother Nature emanates from my very being. You shall be protected as I am protected." --Doug Fir, Barkskin Chloroptid'
-                        : 'Flavor text.'}
+                        : localSheet?.subspecies === 'Carnivorous'
+                          ? 'Barbs protrude from your plant-epidermis that are capable of sapping the energy out of anyone who touches you.'
+                          : 'Flavor text.'}
             </div>
         </div>
         
