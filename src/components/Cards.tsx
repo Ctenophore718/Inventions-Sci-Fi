@@ -32,6 +32,8 @@ import { generateDarknessDescendingCardJSX } from "../utils/nocturneTechnique";
 import { generateFleshEaterCardJSX } from "../utils/vulturineTechnique";
 import { generateOakenshieldCardJSX, calculateOakenshieldData } from "../utils/barkskinTechnique";
 import { generatePoisonousBarbsCardJSX, calculatePoisonousBarbsData } from "../utils/carnivorousTechnique";
+import { generateCottonGuardCardJSX } from "../utils/driftingTechnique";
+import { generateRootboundCardJSX } from "../utils/vinyTechnique";
 import React from "react";
 import type { CharacterSheet } from "../types/CharacterSheet";
 import { loadSheetById, saveCharacterSheet } from "../utils/storage";
@@ -1356,7 +1358,11 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                       ? '#334592'
                       : localSheet?.subspecies === 'Vulturine'
                         ? '#a96d8c'
-                        : 'black',
+                        : localSheet?.subspecies === 'Drifting'
+                          ? '#5f8a5f'
+                          : localSheet?.subspecies === 'Viny'
+                            ? '#5f5f2b'
+                            : 'black',
                 lineHeight: 1,
                 textAlign: 'left', 
                 whiteSpace: 'nowrap',
@@ -1379,7 +1385,11 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                           ? 'Oakenshield'
                           : localSheet?.subspecies === 'Carnivorous'
                             ? 'Poisonous Barbs'
-                            : 'Subspecies Card Name'}
+                            : localSheet?.subspecies === 'Drifting'
+                              ? 'Cotton Guard'
+                              : localSheet?.subspecies === 'Viny'
+                                ? 'Rootbound'
+                                : 'Subspecies Card Name'}
               </span>
               <span style={{
                 fontFamily: 'Arial, Helvetica, sans-serif',
@@ -1399,7 +1409,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                           ? '#5f2d2b'
                           : localSheet?.subspecies === 'Carnivorous'
                             ? '#2b2d5f'
-                            : 'black',
+                            : localSheet?.subspecies === 'Drifting'
+                              ? '#5f8a5f'
+                              : 'black',
                 lineHeight: 1,
                 whiteSpace: 'normal',
                 wordBreak: 'keep-all',
@@ -1421,7 +1433,11 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                           ? 'Barkskin'
                           : localSheet?.subspecies === 'Carnivorous'
                             ? 'Carnivorous'
-                            : 'Subspecies'}</span>
+                            : localSheet?.subspecies === 'Drifting'
+                              ? 'Drifting'
+                              : localSheet?.subspecies === 'Viny'
+                                ? 'Viny'
+                                : 'Subspecies'}</span>
             </div>
             <img 
               src={localSheet?.species === 'Cerebronych'
@@ -1438,7 +1454,11 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                         ? "/Oakenshield.png"
                         : localSheet?.subspecies === 'Carnivorous'
                           ? "/Poisonous Barbs.png"
-                          : "/Blank Card.png"}
+                          : localSheet?.subspecies === 'Drifting'
+                            ? "/Cotton Guard.png"
+                            : localSheet?.subspecies === 'Viny'
+                              ? "/Rootbound.png"
+                              : "/Blank Card.png"}
               alt={localSheet?.species === 'Cerebronych'
                 ? "Limit Push"
                 : localSheet?.subspecies === 'Corvid' 
@@ -1453,7 +1473,11 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                         ? "Oakenshield"
                         : localSheet?.subspecies === 'Carnivorous'
                           ? "Poisonous Barbs"
-                          : "Blank Card"}
+                          : localSheet?.subspecies === 'Drifting'
+                            ? "Cotton Guard"
+                            : localSheet?.subspecies === 'Viny'
+                              ? "Rootbound"
+                              : "Blank Card"}
               style={{
                 position: 'absolute',
                 top: 35,
@@ -1496,7 +1520,11 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                             ? `[${calculateOakenshieldData(localSheet?.subspeciesCardDots).cooldown}]`
                             : localSheet?.subspecies === 'Carnivorous'
                               ? `[${calculatePoisonousBarbsData(localSheet?.subspeciesCardDots ?? []).cooldown}]`
-                              : '[#]'}
+                              : localSheet?.subspecies === 'Drifting'
+                                ? `[${4 - (localSheet?.subspeciesCardDots?.[3]?.filter(Boolean).length ?? 0)}]`
+                                : localSheet?.subspecies === 'Viny'
+                                  ? `[${5 - (localSheet?.subspeciesCardDots?.[7]?.filter(Boolean).length ?? 0)}]`
+                                  : '[#]'}
                 </span>
               </span>
             </div>
@@ -1550,7 +1578,18 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                           ? generateOakenshieldCardJSX(calculateOakenshieldData(localSheet?.subspeciesCardDots))
                           : localSheet?.subspecies === 'Carnivorous'
                             ? generatePoisonousBarbsCardJSX(calculatePoisonousBarbsData(localSheet?.subspeciesCardDots ?? []).piercingDamage, calculatePoisonousBarbsData(localSheet?.subspeciesCardDots ?? []).includesAttacks)
-                            : 'Card stats.'}
+                            : localSheet?.subspecies === 'Drifting'
+                              ? generateCottonGuardCardJSX(
+                                  3 + (localSheet?.subspeciesCardDots?.[1]?.filter(Boolean).length ?? 0),
+                                  localSheet?.subspeciesCardDots?.[2]?.[0] ?? false
+                                )
+                              : localSheet?.subspecies === 'Viny'
+                                ? generateRootboundCardJSX(
+                                    3 + (localSheet?.subspeciesCardDots?.[2]?.filter(Boolean).length ?? 0) * 3,
+                                    localSheet?.subspeciesCardDots?.[3]?.filter(Boolean).length ?? 0,
+                                    localSheet?.subspeciesCardDots?.[6]?.[0] ?? false
+                                  )
+                                : 'Card stats.'}
               </div>
             </div>
             <div style={{
@@ -1581,7 +1620,11 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                         ? '"The spirit of Mother Nature emanates from my very being. You shall be protected as I am protected." --Doug Fir, Barkskin Chloroptid'
                         : localSheet?.subspecies === 'Carnivorous'
                           ? 'Barbs protrude from your plant-epidermis that are capable of sapping the energy out of anyone who touches you.'
-                          : 'Flavor text.'}
+                          : localSheet?.subspecies === 'Drifting'
+                            ? 'A burst of cotton-like fluff emanates from your body, concealing you and your allies within the storm of fuzz.'
+                            : localSheet?.subspecies === 'Viny'
+                              ? 'Your roots surge through the earth beneath you and spring up in vines that wrap around the ankles of your enemies, holding them still.'
+                              : 'Flavor text.'}
             </div>
         </div>
         

@@ -40,6 +40,7 @@ import { generateRapidRegenerationJSX } from "../utils/chloroptidFeature";
 import { generateDeepRootsJSX } from "../utils/barkskinFeature";
 import { generateSapSuckerJSX } from "../utils/carnivorousFeature";
 import { generateLeafOnTheWindJSX } from "../utils/driftingFeature";
+import { generateClimbingCreeperJSX } from "../utils/vinyFeature";
 
 import { generateBloodTradeJSX } from "../utils/devoutFeature";
 import { generateFatigueJSX } from "../utils/voidFeature";
@@ -413,7 +414,12 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
       })()
     : 0;
   
-  const totalSpeed = baseSpeed + tacticianSpeedBonus + kineticSpeedBonus + mercurialSpeedBonus + airSpeedBonus + fireSpeedBonus + waterSpeedBonus + aeronautSpeedBonus + brawlerSpeedBonus + spectreSpeedBonus + avenochSpeedBonus + falcadorSpeedBonus + ammocoderSpeedBonus + pistoleerSpeedBonus + cerebronychSpeedBonus + chloroptidSpeedBonus;
+  // Calculate Drifting subspecies speed bonus
+  const driftingSpeedBonus = sheet?.subspecies === 'Drifting'
+    ? (sheet?.subspeciesCardDots?.[4]?.filter(Boolean).length || 0)
+    : 0;
+  
+  const totalSpeed = baseSpeed + tacticianSpeedBonus + kineticSpeedBonus + mercurialSpeedBonus + airSpeedBonus + fireSpeedBonus + waterSpeedBonus + aeronautSpeedBonus + brawlerSpeedBonus + spectreSpeedBonus + avenochSpeedBonus + falcadorSpeedBonus + ammocoderSpeedBonus + pistoleerSpeedBonus + cerebronychSpeedBonus + chloroptidSpeedBonus + driftingSpeedBonus;
   const speed = totalSpeed > 0 ? `${totalSpeed}` : "0";
   
   // Calculate jump speed and jump amount for Kinetic subclass
@@ -1312,11 +1318,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
 
   const driftingFeatureJSX = generateLeafOnTheWindJSX(1 + (sheet?.subspeciesCardDots?.[0]?.filter(Boolean).length || 0));
 
-  const vinyFeatureJSX = (
-    <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#5f5f2b' }}>Climbing Creeper.</i></b> You gain a <b><i style={{ color: '#38761d' }}>Climb Speed</i></b> and <i>Resist</i> <b><u style={{ color: '#a6965f', display: 'inline-flex', alignItems: 'center' }}>Piercing<img src="/Piercing.png" alt="Piercing" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>.
-    </span>
-  );
+  const vinyFeatureJSX = generateClimbingCreeperJSX();
 
   const androidFeatureJSX = (
     <span style={{ color: '#000', fontWeight: 400 }}>
@@ -2217,6 +2219,8 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                   if (subspecies === "Vulturine" && skillName === "Survival") sources.push({ type: 'subspecies', color: "rgba(169,109,140,0.5)" });
                   if (subspecies === "Barkskin" && skillName === "Survival") sources.push({ type: 'subspecies', color: "rgba(95,45,43,0.5)" });
                   if (subspecies === "Carnivorous" && skillName === "Intimidation") sources.push({ type: 'subspecies', color: "rgba(43,45,95,0.5)" });
+                  if (subspecies === "Drifting" && skillName === "Piloting") sources.push({ type: 'subspecies', color: "rgba(95,138,95,0.5)" });
+                  if (subspecies === "Viny" && skillName === "Thievery") sources.push({ type: 'subspecies', color: "rgba(95,95,43,0.5)" });
                   
                   return sources;
                 };
@@ -3008,6 +3012,8 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
             {hostSpecies === 'Drifting Chloroptid Host' ? ', Fly' : ''}
             {subspecies === 'Drifting' ? ', Fly' : ''}
             {hostSpecies === 'Viny Chloroptid Host' ? ', Climb' : ''}
+            {subspecies === 'Viny' ? ', Climb' : ''}
+            {subspecies === 'Viny' && sheet?.subspeciesCardDots?.[0]?.[0] ? ', Burrow' : ''}
             {hostSpecies === 'Utility Droid Cognizant Host' ? ', Climb' : ''}
             {hostSpecies === 'Lithe Human Host' ? ', Climb' : ''}
             {hostSpecies === 'Felid Praedari Host' ? ', Climb' : ''}
@@ -3504,6 +3510,18 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
               {hostSpecies === 'Viny Chloroptid Host' && (
                 <span style={{ marginLeft: 8, display: 'inline-flex', alignItems: 'center', color: '#a6965f', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                   <u>Piercing</u> <img src="/Piercing.png" alt="Piercing" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+                </span>
+              )}
+              {subspecies === 'Viny' && (
+                <span style={{ marginLeft: 8, display: 'inline-flex', gap: 8, flexWrap: 'wrap' }}>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', color: '#a6965f', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                    <u>Piercing</u> <img src="/Piercing.png" alt="Piercing" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+                  </span>
+                  {sheet?.subspeciesCardDots?.[1]?.[0] && (
+                    <span style={{ display: 'inline-flex', alignItems: 'center', color: '#915927', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                      <u>Bludgeoning</u> <img src="/Bludgeoning.png" alt="Bludgeoning" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+                    </span>
+                  )}
                 </span>
               )}
               {hostSpecies === 'Cognizant Host' && (

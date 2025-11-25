@@ -448,6 +448,13 @@ const CharacterSheetPerks: React.FC<CharacterSheetPerksProps> = ({
             </span>
           </div>
           )}
+          {subspecies === 'Drifting' && sheet?.subspeciesCardDots?.[5]?.[0] && (
+          <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <span>
+              <b><i style={{ color: '#5f8a5f' }}>Easy Glider.</i></b> <span style={{ color: '#000' }}>You are generally very go-with-the-flow. As such, you're naturally adept at picking up signs and signals of various kinds, such as air currents, tracks in the ground or nonverbal communication. Gain an advantage on related skill rolls.</span>
+            </span>
+          </div>
+          )}
         </div>
       </div>
   );
