@@ -41,6 +41,8 @@ import { generateDeepRootsJSX } from "../utils/barkskinFeature";
 import { generateSapSuckerJSX } from "../utils/carnivorousFeature";
 import { generateLeafOnTheWindJSX } from "../utils/driftingFeature";
 import { generateClimbingCreeperJSX } from "../utils/vinyFeature";
+import { generateGearsAndCogsJSX } from "../utils/cognizantFeature";
+import { generateEncryptedCerebralCortexJSX } from "../utils/androidFeature";
 
 import { generateBloodTradeJSX } from "../utils/devoutFeature";
 import { generateFatigueJSX } from "../utils/voidFeature";
@@ -419,7 +421,16 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
     ? (sheet?.subspeciesCardDots?.[4]?.filter(Boolean).length || 0)
     : 0;
   
-  const totalSpeed = baseSpeed + tacticianSpeedBonus + kineticSpeedBonus + mercurialSpeedBonus + airSpeedBonus + fireSpeedBonus + waterSpeedBonus + aeronautSpeedBonus + brawlerSpeedBonus + spectreSpeedBonus + avenochSpeedBonus + falcadorSpeedBonus + ammocoderSpeedBonus + pistoleerSpeedBonus + cerebronychSpeedBonus + chloroptidSpeedBonus + driftingSpeedBonus;
+  // Calculate Cognizant species speed bonus (6 base + dots)
+  const cognizantSpeedBonus = sheet?.species === 'Cognizant'
+    ? (() => {
+        const speciesDots = sheet?.speciesCardDots || [];
+        const speedDots = speciesDots[8] || [];
+        return 6 + speedDots.filter(Boolean).length;
+      })()
+    : 0;
+  
+  const totalSpeed = baseSpeed + tacticianSpeedBonus + kineticSpeedBonus + mercurialSpeedBonus + airSpeedBonus + fireSpeedBonus + waterSpeedBonus + aeronautSpeedBonus + brawlerSpeedBonus + spectreSpeedBonus + avenochSpeedBonus + falcadorSpeedBonus + ammocoderSpeedBonus + pistoleerSpeedBonus + cerebronychSpeedBonus + chloroptidSpeedBonus + driftingSpeedBonus + cognizantSpeedBonus;
   const speed = totalSpeed > 0 ? `${totalSpeed}` : "0";
   
   // Calculate jump speed and jump amount for Kinetic subclass
@@ -1225,10 +1236,9 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
     hitPointsDice: 1 + (sheet?.speciesCardDots?.[0]?.[0] ? 1 : 0) 
   });
 
-  const cognizantFeatureJSX = (
-    <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#2b3b5f' }}>Gears & Cogs.</i></b> You <i>Resist</i> <b><u style={{ color: '#02b900', display: 'inline-flex', alignItems: 'center' }}>Toxic<img src="/Toxic.png" alt="Toxic" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> damage and are <i>Immune</i> to the <b><i>Drain</i></b> condition and can naturally survive in the vacuum of space.
-    </span>
+  const cognizantFeatureJSX = generateGearsAndCogsJSX(
+    sheet?.speciesCardDots?.[0]?.[0] ?? false,
+    sheet?.speciesCardDots?.[1]?.[0] ?? false
   );
 
   const emberfolkFeatureJSX = (
@@ -1318,12 +1328,15 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
 
   const driftingFeatureJSX = generateLeafOnTheWindJSX(1 + (sheet?.subspeciesCardDots?.[0]?.filter(Boolean).length || 0));
 
-  const vinyFeatureJSX = generateClimbingCreeperJSX();
+  const vinyFeatureJSX = generateClimbingCreeperJSX(
+    sheet?.subspeciesCardDots?.[0]?.[0] ?? false,
+    sheet?.subspeciesCardDots?.[1]?.[0] ?? false
+  );
 
-  const androidFeatureJSX = (
-    <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#581fbd' }}>Encrypted Cerebral Cortex.</i></b> You are <i>Immune</i> to the <b><i>Confuse</i></b> condition.
-    </span>
+  const androidFeatureJSX = generateEncryptedCerebralCortexJSX(
+    sheet?.subspeciesCardDots?.[0]?.[0] ?? false,
+    sheet?.subspeciesCardDots?.[1]?.[0] ?? false,
+    sheet?.subspeciesCardDots?.[2]?.[0] ?? false
   );
 
   const utilityDroidFeatureJSX = (
@@ -2211,6 +2224,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                   if (sheet?.species === "Cerebronych" && skillName === "Deception") sources.push({ type: 'species', color: "rgba(95,94,43,0.5)" });
                   if (sheet?.species === "Cerebronych" && skillName === "Intimidation") sources.push({ type: 'species', color: "rgba(95,94,43,0.5)" });
                   if (sheet?.species === "Chloroptid" && skillName === "Awareness") sources.push({ type: 'species', color: "rgba(49,95,43,0.5)" });
+                  if (sheet?.species === "Cognizant" && skillName === "Technology") sources.push({ type: 'species', color: "rgba(43,59,95,0.5)" });
                   
                   // Subspecies boosters
                   if (subspecies === "Corvid" && skillName === "Thievery") sources.push({ type: 'subspecies', color: "rgba(117,144,78,0.5)" });
@@ -2807,6 +2821,11 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                   </span>
                 )}
                 {subspecies === "Cognizant Host" && (
+                  <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32, marginTop: 8 }}>
+                    You are <i>Resistant</i> to <b><u style={{ color: '#02b900', display: 'inline-flex', alignItems: 'center' }}>Toxic<img src="/Toxic.png" alt="Toxic" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> and are <i>Immune</i> to the <b><i>Drain</i></b> condition and can naturally survive in the vacuum of space.
+                  </span>
+                )}
+                {subspecies === "Cognizant Host" && (
                   <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32, marginTop: 8, color: '#000', fontWeight: 400 }}>
                     <b><i style={{ color: '#2b3b5f' }}>Gears & Cogs.</i></b> You <i>Resist</i> <b><u style={{ color: '#02b900', display: 'inline-flex', alignItems: 'center' }}>Toxic<img src="/Toxic.png" alt="Toxic" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> damage and are <i>Immune</i> to the <b><i>Drain</i></b> condition and can naturally survive in the vacuum of space.
                   </span>
@@ -3340,6 +3359,17 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                           </u></b><b>)</b></span>
                         )}
                       </span>
+                  : (subspecies === 'Viny' && (sheet?.subspeciesCardDots?.[4]?.[0] || sheet?.subspeciesCardDots?.[5]?.[0]))
+                    ? <span style={{ color: '#000', fontWeight: 'normal' }}>
+                        {sheet?.subspeciesCardDots?.[4]?.[0] && (
+                          <span>Can deal <b><u style={{ color: '#02b900', display: 'inline-flex', alignItems: 'center' }}>
+                            Toxic<img src="/Toxic.png" alt="Toxic" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} />
+                          </u></b> instead</span>
+                        )}
+                        {sheet?.subspeciesCardDots?.[5]?.[0] && (
+                          <span>{sheet?.subspeciesCardDots?.[4]?.[0] ? ', ' : ''}<b><i>Sleep</i></b></span>
+                        )}
+                      </span>
                   : (hostSpecies === 'Vulturine Avenoch Host')
                     ? <span style={{ color: '#000', fontWeight: 'normal' }}>+2d6 <b><i style={{ color: '#990000' }}>Hit Points</i></b> if target is reduced to 0 <b><i style={{ color: '#990000' }}>Hit Points</i></b></span>
                   : (subspecies === 'Vulturine')
@@ -3524,6 +3554,11 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                   )}
                 </span>
               )}
+              {species === 'Cognizant' && !sheet?.speciesCardDots?.[0]?.[0] && (
+                <span style={{ marginLeft: 8, display: 'inline-flex', alignItems: 'center', color: '#02b900', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                  <u>Toxic</u> <img src="/Toxic.png" alt="Toxic" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+                </span>
+              )}
               {hostSpecies === 'Cognizant Host' && (
                 <span style={{ marginLeft: 8, display: 'inline-flex', alignItems: 'center', color: '#02b900', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                   <u>Toxic</u> <img src="/Toxic.png" alt="Toxic" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
@@ -3650,6 +3685,23 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                 <span style={{ marginLeft: 8, color: '#000', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                   <i>Bounce</i>
                 </span>
+              </>
+            )}
+            {species === 'Cognizant' && (
+              <>
+                <span style={{ marginLeft: 8, color: '#000', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                  <i>Drain</i>
+                </span>
+                {sheet?.speciesCardDots?.[0]?.[0] && (
+                  <span style={{ marginLeft: 8, display: 'inline-flex', alignItems: 'center', color: '#02b900', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                    <u>Toxic</u> <img src="/Toxic.png" alt="Toxic" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+                  </span>
+                )}
+                {sheet?.speciesCardDots?.[1]?.[0] && (
+                  <span style={{ marginLeft: 8, color: '#000', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                    <i>Sleep</i>
+                  </span>
+                )}
               </>
             )}
             {hostSpecies === 'Cognizant Host' && (

@@ -41,6 +41,16 @@ const CharacterSheetPerks: React.FC<CharacterSheetPerksProps> = ({
                 Chloroptid
               </span>
             )}
+            {sheet?.species === 'Cognizant' && (
+              <span style={{ fontWeight: 'normal', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', color: '#000' }}>
+                Binary
+              </span>
+            )}
+            {sheet?.cognizantLanguage && (
+              <span style={{ fontWeight: 'normal', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', color: '#000' }}>
+                {sheet.cognizantLanguage}
+              </span>
+            )}
             {charClass === 'Coder' && (
               <span style={{ fontWeight: 'normal', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', color: '#000' }}>
                 Oikovox
@@ -141,6 +151,13 @@ const CharacterSheetPerks: React.FC<CharacterSheetPerksProps> = ({
             <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
               <span>
                 <b><i style={{ color: '#315f2b' }}>Natural Camouflage.</i></b> <span style={{ color: '#000' }}>You resemble normal plants, shrubbery, vines, and/or trees so closely that others can hardly tell you apart from the foliage while you remain still. Gain an advantage on related skill rolls.</span>
+              </span>
+            </div>
+          )}
+          {sheet?.species === 'Cognizant' && sheet?.speciesCardDots?.[9]?.[0] && (
+            <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <span>
+                <b><i style={{ color: '#2b3b5f' }}>Machine Learning.</i></b> <span style={{ color: '#000' }}>You are capable of learning mathematical equations, grammatical combinations and other such patterns with ease. Gain an advantage on related skills after learning such a skill.</span>
               </span>
             </div>
           )}
@@ -452,6 +469,13 @@ const CharacterSheetPerks: React.FC<CharacterSheetPerksProps> = ({
           <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
             <span>
               <b><i style={{ color: '#5f8a5f' }}>Easy Glider.</i></b> <span style={{ color: '#000' }}>You are generally very go-with-the-flow. As such, you're naturally adept at picking up signs and signals of various kinds, such as air currents, tracks in the ground or nonverbal communication. Gain an advantage on related skill rolls.</span>
+            </span>
+          </div>
+          )}
+          {subspecies === 'Viny' && sheet?.subspeciesCardDots?.[8]?.[0] && (
+          <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <span>
+              <b><i style={{ color: '#5f5f2b' }}>Invasive Maneuvers.</i></b> <span style={{ color: '#000' }}>You are capable of transforming your viny body in myriad ways, including squeezing through areas as small as 1 inch in diameter or reaching with your appendages as far as 6hx in any direction.</span>
             </span>
           </div>
           )}

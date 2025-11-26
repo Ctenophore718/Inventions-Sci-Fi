@@ -1413,8 +1413,8 @@ const LevelUpSpeciesCerebronych: React.FC<LevelUpSpeciesCerebronychProps> = ({
                 {sheet?.cerebronychLanguage !== 'Defteran' && (
                   <option value="Defteran" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Defteran</option>
                 )}
-                {sheet?.cerebronychLanguage !== 'Dentomos' && (
-                  <option value="Dentomos" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Dentomos</option>
+                {sheet?.cerebronychLanguage !== 'Entomos' && (
+                  <option value="Entomos" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Entomos</option>
                 )}
                 {sheet?.cerebronychLanguage !== 'Hycryptice' && (
                   <option value="Hycryptice" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Hycryptice</option>

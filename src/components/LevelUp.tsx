@@ -24,6 +24,7 @@ import LevelUpSubclassesTechnician from "./LevelUpSubclassesTechnician";
 import LevelUpSpeciesAvenoch from "./LevelUpSpeciesAvenoch";
 import LevelUpSpeciesCerebronych from "./LevelUpSpeciesCerebronych";
 import LevelUpSpeciesChloroptid from "./LevelUpSpeciesChloroptid";
+import LevelUpSpeciesCognizant from "./LevelUpSpeciesCognizant";
 import { calculateChemistFeatureData } from "../utils/chemistFeature";
 
 
@@ -212,6 +213,20 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
         const barkskinHitPointsBonus = (subspeciesDots[7]?.filter(Boolean).length || 0) * 10;
         effectiveHP += barkskinHitPointsBonus;
       }
+    }
+    
+    // Add Cognizant species bonus
+    if (sheet?.species === 'Cognizant') {
+      const speciesDots = sheet?.speciesCardDots || [];
+      const hp5Dots = speciesDots[5] || [];
+      const hp10Dots = speciesDots[6] || [];
+      const hp15Dots = speciesDots[7] || [];
+      
+      const hp5Bonus = hp5Dots.filter(Boolean).length * 5;
+      const hp10Bonus = hp10Dots.filter(Boolean).length * 10;
+      const hp15Bonus = (hp15Dots[0] ? 15 : 0);
+      
+      effectiveHP += 40 + hp5Bonus + hp10Bonus + hp15Bonus;
     }
     
     // Exospecialist gets +20 Max Hit Points
@@ -1762,6 +1777,24 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                 setNotice={setNotice}
               />
             )}
+
+            {/* Cognizant Species Content */}
+            {species === "Cognizant" && (
+              <LevelUpSpeciesCognizant
+                sheet={sheet}
+                species={species}
+                subspecies={subspecies}
+                contentType="species"
+                onAutoSave={handleAutoSave}
+                xpTotal={xpTotal}
+                spTotal={spTotal}
+                xpSpent={xpSpent}
+                spSpent={spSpent}
+                setXpSpent={setXpSpent}
+                setSpSpent={setSpSpent}
+                setNotice={setNotice}
+              />
+            )}
         </div>
         {/* Subspecies Card */}
         <div style={{ background: '#fff', border: '2px solid #333', borderRadius: 8, boxShadow: '0 2px 4px rgba(0,0,0,0.1)', minHeight: 80, padding: '1.2rem', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -1988,6 +2021,42 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
               />
             )}
             
+            {/* Android Subspecies Content */}
+            {subspecies === "Android" && (
+              <LevelUpSpeciesCognizant
+                sheet={sheet}
+                species={species}
+                subspecies={subspecies}
+                contentType="subspecies"
+                onAutoSave={handleAutoSave}
+                xpTotal={xpTotal}
+                spTotal={spTotal}
+                xpSpent={xpSpent}
+                spSpent={spSpent}
+                setXpSpent={setXpSpent}
+                setSpSpent={setSpSpent}
+                setNotice={setNotice}
+              />
+            )}
+            
+            {/* Utility Droid Subspecies Content */}
+            {subspecies === "Utility Droid" && (
+              <LevelUpSpeciesCognizant
+                sheet={sheet}
+                species={species}
+                subspecies={subspecies}
+                contentType="subspecies"
+                onAutoSave={handleAutoSave}
+                xpTotal={xpTotal}
+                spTotal={spTotal}
+                xpSpent={xpSpent}
+                spSpent={spSpent}
+                setXpSpent={setXpSpent}
+                setSpSpent={setSpSpent}
+                setNotice={setNotice}
+              />
+            )}
+            
             {/* Cerebronych (cont.) Subspecies Content */}
             {species === "Cerebronych" && (
               <LevelUpSpeciesCerebronych
@@ -2177,6 +2246,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                         if (species === "Cerebronych" && skillName === "Deception") sources.push({ type: 'species', color: "rgba(95,94,43,0.5)" });
                         if (species === "Cerebronych" && skillName === "Intimidation") sources.push({ type: 'species', color: "rgba(95,94,43,0.5)" });
                         if (species === "Chloroptid" && skillName === "Awareness") sources.push({ type: 'species', color: "rgba(49,95,43,0.5)" });
+                        if (species === "Cognizant" && skillName === "Technology") sources.push({ type: 'species', color: "rgba(43,59,95,0.5)" });
                         
                         // Subspecies boosters
                         if (subspecies === "Corvid" && skillName === "Thievery") sources.push({ type: 'subspecies', color: "rgba(117,144,78,0.5)" });
