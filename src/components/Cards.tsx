@@ -32,6 +32,7 @@ import { generateDarknessDescendingCardJSX } from "../utils/nocturneTechnique";
 import { generateFleshEaterCardJSX } from "../utils/vulturineTechnique";
 import { generateOakenshieldCardJSX, calculateOakenshieldData } from "../utils/barkskinTechnique";
 import { generatePoisonousBarbsCardJSX, calculatePoisonousBarbsData } from "../utils/carnivorousTechnique";
+import { generateGlimpseTheMatrixCardJSX } from "../utils/androidTechnique";
 import { generateCottonGuardCardJSX } from "../utils/driftingTechnique";
 import { generateRootboundCardJSX } from "../utils/vinyTechnique";
 import { generateLocalAreaNetworkCardJSX } from "../utils/cognizantTechnique";
@@ -1396,7 +1397,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                               ? 'Cotton Guard'
                               : localSheet?.subspecies === 'Viny'
                                 ? 'Rootbound'
-                                : 'Subspecies Card Name'}
+                                : localSheet?.subspecies === 'Android'
+                                  ? 'Glimpse the Matrix'
+                                  : 'Subspecies Card Name'}
               </span>
               <span style={{
                 fontFamily: 'Arial, Helvetica, sans-serif',
@@ -1418,7 +1421,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                             ? '#2b2d5f'
                             : localSheet?.subspecies === 'Drifting'
                               ? '#5f8a5f'
-                              : 'black',
+                              : localSheet?.subspecies === 'Android'
+                                ? '#581fbd'
+                                : 'black',
                 lineHeight: 1,
                 whiteSpace: 'normal',
                 wordBreak: 'keep-all',
@@ -1444,7 +1449,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                               ? 'Drifting'
                               : localSheet?.subspecies === 'Viny'
                                 ? 'Viny'
-                                : 'Subspecies'}</span>
+                                : localSheet?.subspecies === 'Android'
+                                  ? 'Android'
+                                  : 'Subspecies'}</span>
             </div>
             <img 
               src={localSheet?.species === 'Cerebronych'
@@ -1465,7 +1472,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                             ? "/Cotton Guard.png"
                             : localSheet?.subspecies === 'Viny'
                               ? "/Rootbound.png"
-                              : "/Blank Card.png"}
+                              : localSheet?.subspecies === 'Android'
+                                ? "/Glimpse the Matrix.png"
+                                : "/Blank Card.png"}
               alt={localSheet?.species === 'Cerebronych'
                 ? "Limit Push"
                 : localSheet?.subspecies === 'Corvid' 
@@ -1484,7 +1493,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                             ? "Cotton Guard"
                             : localSheet?.subspecies === 'Viny'
                               ? "Rootbound"
-                              : "Blank Card"}
+                              : localSheet?.subspecies === 'Android'
+                                ? "Glimpse the Matrix"
+                                : "Blank Card"}
               style={{
                 position: 'absolute',
                 top: 35,
@@ -1531,7 +1542,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                                 ? `[${4 - (localSheet?.subspeciesCardDots?.[3]?.filter(Boolean).length ?? 0)}]`
                                 : localSheet?.subspecies === 'Viny'
                                   ? `[${4 - (localSheet?.subspeciesCardDots?.[7]?.filter(Boolean).length ?? 0)}]`
-                                  : '[#]'}
+                                  : localSheet?.subspecies === 'Android'
+                                    ? `[${3 - (localSheet?.subspeciesCardDots?.[4]?.filter(Boolean).length ?? 0)}]`
+                                    : '[#]'}
                 </span>
               </span>
             </div>
@@ -1596,7 +1609,12 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                                     localSheet?.subspeciesCardDots?.[3]?.filter(Boolean).length ?? 0,
                                     localSheet?.subspeciesCardDots?.[6]?.[0] ?? false
                                   )
-                                : 'Card stats.'}
+                                : localSheet?.subspecies === 'Android'
+                                  ? generateGlimpseTheMatrixCardJSX(
+                                      3 - (localSheet?.subspeciesCardDots?.[4]?.filter(Boolean).length ?? 0),
+                                      localSheet?.subspeciesCardDots?.[3]?.filter(Boolean).length ?? 0
+                                    )
+                                  : 'Card stats.'}
               </div>
             </div>
             <div style={{
@@ -1631,7 +1649,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                             ? 'A burst of cotton-like fluff emanates from your body, concealing you and your allies within the storm of fuzz.'
                             : localSheet?.subspecies === 'Viny'
                               ? 'Your roots surge through the earth beneath you and spring up in vines that wrap around the ankles of your enemies, holding them still.'
-                              : 'Flavor text.'}
+                              : localSheet?.subspecies === 'Android'
+                                ? 'You just overlay your physical interface onto any digital substrate and exponentially enhance its potential. Easy-peasy.'
+                                : 'Flavor text.'}
             </div>
         </div>
         

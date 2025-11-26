@@ -479,6 +479,13 @@ const CharacterSheetPerks: React.FC<CharacterSheetPerksProps> = ({
             </span>
           </div>
           )}
+          {subspecies === 'Android' && sheet?.subspeciesCardDots?.[5]?.[0] && (
+          <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <span>
+              <b><i style={{ color: '#581fbd' }}>Translate Bot.</i></b> <span style={{ color: '#000' }}>You can speak, read, and write any language that you spend at least 2 minutes learning.</span>
+            </span>
+          </div>
+          )}
         </div>
       </div>
   );

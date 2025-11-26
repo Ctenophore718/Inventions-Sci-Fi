@@ -836,21 +836,25 @@ const LevelUpSpeciesCognizant: React.FC<LevelUpSpeciesCognizantProps> = ({
               <span></span>
               <span></span>
               {/* Row 2: Neural resistance dot */}
-              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}><b><i>Neural</i></b> <i>Resistance</i></span>
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}><b><u style={{ color: '#a929ff', display: 'inline-flex', alignItems: 'center' }}>Neural<img src="/Neural.png" alt="Neural" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> <i>Resistance</i></span>
               {[0].map(idx => {
                 const arr = safeGetSubspeciesDotsArray(0);
+                const immunityArr = safeGetSubspeciesDotsArray(1);
                 const xpCosts = [3];
+                const hasImmunity = immunityArr[0];
                 return (
                   <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
                     <span
                       onClick={() => {
-                        const newDots = safeCloneSubspeciesCardDots();
-                        if (!arr[idx]) {
-                          newDots[0][idx] = true;
-                          persistSubspeciesCardDots(newDots, 0, xpCosts[idx]);
-                        } else {
-                          newDots[0][idx] = false;
-                          persistSubspeciesCardDots(newDots, 0, -xpCosts[idx]);
+                        if (!hasImmunity) {
+                          const newDots = safeCloneSubspeciesCardDots();
+                          if (!arr[idx]) {
+                            newDots[0][idx] = true;
+                            persistSubspeciesCardDots(newDots, 0, xpCosts[idx]);
+                          } else {
+                            newDots[0][idx] = false;
+                            persistSubspeciesCardDots(newDots, 0, -xpCosts[idx]);
+                          }
                         }
                       }}
                       style={{
@@ -860,7 +864,7 @@ const LevelUpSpeciesCognizant: React.FC<LevelUpSpeciesCognizantProps> = ({
                         borderRadius: '50%',
                         display: 'block',
                         background: arr[idx] ? '#000' : '#fff',
-                        cursor: 'pointer',
+                        cursor: hasImmunity ? 'not-allowed' : 'pointer',
                         transition: 'background 0.2s'
                       }}
                     ></span>
@@ -872,25 +876,32 @@ const LevelUpSpeciesCognizant: React.FC<LevelUpSpeciesCognizantProps> = ({
 
               {/* Row 3: XP header for Neural immunity */}
               <span></span>
-              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>7xp</span>
               <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>7xp</span>
+              
               <span></span>
               {/* Row 4: Neural immunity dot */}
-              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}><b><i>Neural</i></b> <i>Immunity</i></span>
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}><b><u style={{ color: '#a929ff', display: 'inline-flex', alignItems: 'center' }}>Neural<img src="/Neural.png" alt="Neural" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> <i>Immunity</i></span>
+              <span style={{ textAlign: 'center', fontSize: '1.2em', fontWeight: 'bold', color: '#000' }}>⤷</span>
               {[0].map(idx => {
                 const arr = safeGetSubspeciesDotsArray(1);
+                const resistanceArr = safeGetSubspeciesDotsArray(0);
                 const xpCosts = [7];
+                const hasResistance = resistanceArr[0];
+                const canSelect = hasResistance;
                 return (
                   <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
                     <span
                       onClick={() => {
-                        const newDots = safeCloneSubspeciesCardDots();
-                        if (!arr[idx]) {
-                          newDots[1][idx] = true;
-                          persistSubspeciesCardDots(newDots, 0, xpCosts[idx]);
-                        } else {
-                          newDots[1][idx] = false;
-                          persistSubspeciesCardDots(newDots, 0, -xpCosts[idx]);
+                        if (canSelect) {
+                          const newDots = safeCloneSubspeciesCardDots();
+                          if (!arr[idx]) {
+                            newDots[1][idx] = true;
+                            persistSubspeciesCardDots(newDots, 0, xpCosts[idx]);
+                          } else {
+                            newDots[1][idx] = false;
+                            persistSubspeciesCardDots(newDots, 0, -xpCosts[idx]);
+                          }
                         }
                       }}
                       style={{
@@ -900,14 +911,13 @@ const LevelUpSpeciesCognizant: React.FC<LevelUpSpeciesCognizantProps> = ({
                         borderRadius: '50%',
                         display: 'block',
                         background: arr[idx] ? '#000' : '#fff',
-                        cursor: 'pointer',
+                        cursor: canSelect ? 'pointer' : 'not-allowed',
                         transition: 'background 0.2s'
                       }}
                     ></span>
                   </span>
                 );
               })}
-              <span></span>
               <span></span>
 
               {/* Row 5: XP header for Mesmerize immunity */}
@@ -979,7 +989,7 @@ const LevelUpSpeciesCognizant: React.FC<LevelUpSpeciesCognizantProps> = ({
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>25xp</span>
               <span></span>
               {/* Row 2: +1 ally gains benefit dots */}
-              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1 <i>ally also gains this benefit</i></span>
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1 ally also gains this benefit</span>
               {[0, 1].map(idx => {
                 const arr = safeGetSubspeciesDotsArray(3);
                 const xpCosts = [12, 25];
