@@ -46,6 +46,7 @@ import { generateEncryptedCerebralCortexJSX } from "../utils/androidFeature";
 import { generateVariantUtilityJSX } from "../utils/utilitydroidFeature";
 import { generateMountainsEnduranceJSX } from "../utils/petranFeature";
 import { generateBornOfFireJSX } from "../utils/emberfolkFeature";
+import { generateIgnitionJSX } from "../utils/pyranFeature";
 
 import { generateBloodTradeJSX } from "../utils/devoutFeature";
 import { generateFatigueJSX } from "../utils/voidFeature";
@@ -1382,11 +1383,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
     sheet?.subspeciesCardDots?.[3]?.[0] ?? false
   );
 
-  const pyranFeatureJSX = (
-    <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#b31111' }}>Ignition.</i></b> You can choose to have your <b><i><span style={{ color: '#990000' }}>Attacks</span></i></b> and/or <b><i style={{ color: '#351c75' }}>Strikes</i></b> deal <b><u style={{ color: '#f90102', display: 'inline-flex', alignItems: 'center' }}>Fire<img src="/Fire.png" alt="Fire" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> Damage at-will.
-    </span>
-  );
+  const pyranFeatureJSX = generateIgnitionJSX();
 
   const apocritanFeatureJSX = (
     <span style={{ color: '#000', fontWeight: 400 }}>
@@ -2887,8 +2884,8 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                   </span>
                 )}   
                 {subspecies === "Pyran Emberfolk Host" && (
-                  <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32, marginTop: 8, color: '#000', fontWeight: 400 }}>
-                    <b><i style={{ color: '#b31111' }}>Ignition.</i></b> You can choose to have your <b><i><span style={{ color: '#990000' }}>Attacks</span></i></b> and/or <b><i style={{ color: '#351c75' }}>Strikes</i></b> deal <b><u style={{ color: '#f90102', display: 'inline-flex', alignItems: 'center' }}>Fire<img src="/Fire.png" alt="Fire" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> Damage at-will.
+                  <span style={{ display: 'inline-block', verticalAlign: 'middle', minHeight: 32, marginTop: 8 }}>
+                    {generateIgnitionJSX()}
                   </span>
                 )}     
                 {subspecies === "Entomos Host" && (
