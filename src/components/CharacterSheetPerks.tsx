@@ -66,6 +66,11 @@ const CharacterSheetPerks: React.FC<CharacterSheetPerksProps> = ({
                 Xenoelemental
               </span>
             )}
+            {sheet?.species === 'Emberfolk' && (
+              <span style={{ fontWeight: 'normal', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', color: '#000' }}>
+                Xenoelemental
+              </span>
+            )}
           </div>
           {/* Class Perk segment, visible if Class Perk dot is selected */}
           {charClass === 'Chemist' && sheet?.classCardDots?.[9]?.[0] && (
@@ -151,6 +156,13 @@ const CharacterSheetPerks: React.FC<CharacterSheetPerksProps> = ({
             <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
               <span>
                 <b><i style={{ color: '#315f2b' }}>Natural Camouflage.</i></b> <span style={{ color: '#000' }}>You resemble normal plants, shrubbery, vines, and/or trees so closely that others can hardly tell you apart from the foliage while you remain still. Gain an advantage on related skill rolls.</span>
+              </span>
+            </div>
+          )}
+          {sheet?.species === 'Emberfolk' && sheet?.speciesCardDots?.[7]?.[0] && (
+            <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <span>
+                <b><i style={{ color: '#5f2b2b' }}>Molten Fortitude.</i></b> <span style={{ color: '#000' }}>Your body is naturally hot to the touch, and when you are stressed or angry, it can become downright scalding. Gain an advantage on related skill rolls when you use your body heat to intimidate, threaten, or otherwise coerce others.</span>
               </span>
             </div>
           )}
@@ -490,6 +502,13 @@ const CharacterSheetPerks: React.FC<CharacterSheetPerksProps> = ({
           <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
             <span>
               <b><i style={{ color: '#bd891f' }}>Adaptable Utility.</i></b> <span style={{ color: '#000' }}>You always have the right tool on hand for whatever simple task you need to complete. This is limited to handheld-sized tools that would fit into a toolbox. Examples include a drill, magnifying glass, lockpicks, hammer, welder, binoculars, etc.</span>
+            </span>
+          </div>
+          )}
+          {subspecies === 'Petran' && sheet?.subspeciesCardDots?.[11]?.[0] && (
+          <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <span>
+              <b><i style={{ color: '#735311' }}>Stone Artisan.</i></b> <span style={{ color: '#000' }}>You can shape stone and earth with ease. As such, you can quickly and easily make a tool, key, or other small item from a handful of gravel or dirt. Consult the DM for more information.</span>
             </span>
           </div>
           )}

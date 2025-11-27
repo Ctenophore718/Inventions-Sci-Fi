@@ -25,6 +25,7 @@ import LevelUpSpeciesAvenoch from "./LevelUpSpeciesAvenoch";
 import LevelUpSpeciesCerebronych from "./LevelUpSpeciesCerebronych";
 import LevelUpSpeciesChloroptid from "./LevelUpSpeciesChloroptid";
 import LevelUpSpeciesCognizant from "./LevelUpSpeciesCognizant";
+import LevelUpSpeciesEmberfolk from "./LevelUpSpeciesEmberfolk";
 import { calculateChemistFeatureData } from "../utils/chemistFeature";
 
 
@@ -213,6 +214,20 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
         const barkskinHitPointsBonus = (subspeciesDots[7]?.filter(Boolean).length || 0) * 10;
         effectiveHP += barkskinHitPointsBonus;
       }
+    }
+    
+    // Add Petran subspecies bonus
+    if (sheet?.subspecies === 'Petran') {
+      const subspeciesDots = sheet?.subspeciesCardDots || [];
+      const hp5Dots = subspeciesDots[7] || [];
+      const hp10Dots = subspeciesDots[8] || [];
+      const hp15Dots = subspeciesDots[9] || [];
+      
+      const hp5Bonus = hp5Dots.filter(Boolean).length * 5;
+      const hp10Bonus = hp10Dots.filter(Boolean).length * 10;
+      const hp15Bonus = hp15Dots.filter(Boolean).length * 15;
+      
+      effectiveHP += 50 + hp5Bonus + hp10Bonus + hp15Bonus;
     }
     
     // Add Cognizant species bonus
@@ -1779,6 +1794,22 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
             )}
 
             {/* Cognizant Species Content */}
+            {species === "Emberfolk" && (
+              <LevelUpSpeciesEmberfolk
+                sheet={sheet}
+                species={species}
+                subspecies={subspecies}
+                contentType="species"
+                onAutoSave={handleAutoSave}
+                xpTotal={xpTotal}
+                spTotal={spTotal}
+                xpSpent={xpSpent}
+                spSpent={spSpent}
+                setXpSpent={setXpSpent}
+                setSpSpent={setSpSpent}
+                setNotice={setNotice}
+              />
+            )}
             {species === "Cognizant" && (
               <LevelUpSpeciesCognizant
                 sheet={sheet}
@@ -2057,6 +2088,24 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
               />
             )}
             
+            {/* Petran Subspecies Content */}
+            {subspecies === "Petran" && (
+              <LevelUpSpeciesEmberfolk
+                sheet={sheet}
+                species={species}
+                subspecies={subspecies}
+                contentType="subspecies"
+                onAutoSave={handleAutoSave}
+                xpTotal={xpTotal}
+                spTotal={spTotal}
+                xpSpent={xpSpent}
+                spSpent={spSpent}
+                setXpSpent={setXpSpent}
+                setSpSpent={setSpSpent}
+                setNotice={setNotice}
+              />
+            )}
+            
             {/* Cerebronych (cont.) Subspecies Content */}
             {species === "Cerebronych" && (
               <LevelUpSpeciesCerebronych
@@ -2247,6 +2296,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                         if (species === "Cerebronych" && skillName === "Intimidation") sources.push({ type: 'species', color: "rgba(95,94,43,0.5)" });
                         if (species === "Chloroptid" && skillName === "Awareness") sources.push({ type: 'species', color: "rgba(49,95,43,0.5)" });
                         if (species === "Cognizant" && skillName === "Technology") sources.push({ type: 'species', color: "rgba(43,59,95,0.5)" });
+                        if (species === "Emberfolk" && skillName === "Xenomagic") sources.push({ type: 'species', color: "rgba(95,43,43,0.5)" });
                         
                         // Subspecies boosters
                         if (subspecies === "Corvid" && skillName === "Thievery") sources.push({ type: 'subspecies', color: "rgba(117,144,78,0.5)" });
@@ -2259,7 +2309,8 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                         if (subspecies === "Viny" && skillName === "Thievery") sources.push({ type: 'subspecies', color: "rgba(95,95,43,0.5)" });
                         if (subspecies === "Android" && skillName === "Diplomacy") sources.push({ type: 'subspecies', color: "rgba(88,31,189,0.5)" });
                         if (subspecies === "Utility Droid" && skillName === "Computers") sources.push({ type: 'subspecies', color: "rgba(189,137,31,0.5)" });
-                        
+                        if (subspecies === "Petran" && skillName === "Survival") sources.push({ type: 'subspecies', color: "rgba(115,83,17,0.5)" });
+
                         return sources;
                       };
                       
@@ -2476,7 +2527,11 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                           // Barkskin Survival booster always goes at position 2, same as class boosters
                           const isBarkskinSurvival = subspecies === "Barkskin" && skill === "Survival" && i === 2;
 
-                          if (isChemistInvestigation || isCoderOikomagic || isCommanderDiplomacy || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine || isGrenadierIntimidation || isNecroSurvival || isPoisonerThievery || isCoerciveDeception || isBeguilerDeception || isDivinistInvestigation || isNaturalistSurvival || isTechnologistTechnology || isGalvanicAthletics || isTacticianAwareness || isTyrantIntimidation || isInertialDiplomacy || isKineticAthletics || isMercurialAcrobatics || isVectorialPiloting || isAstralMedicine || isChaosIntimidation || isOrderCulture || isVoidStealth || isAirAcrobatics || isEarthSurvival || isFireIntimidation || isWaterMedicine || isAeronautPiloting || isBrawlerSurvival || isDreadnaughtIntimidation || isSpectreStealth || isAmmoCoderOikomagic || isOrdnancerAthletics || isPistoleerThievery || isSniperStealth || isHackerComputers || isJunkerThievery || isNanoboticistAcrobatics || isTankerPiloting || isAvenochAwareness || isChloroptidAwareness || isBarkskinSurvival) {
+                          // Check for Petran Survival subspecies booster dot
+                          // Petran Survival booster always goes at position 2, same as class boosters
+                          const isPetranSurvival = subspecies === "Petran" && skill === "Survival" && i === 2;
+
+                          if (isChemistInvestigation || isCoderOikomagic || isCommanderDiplomacy || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine || isGrenadierIntimidation || isNecroSurvival || isPoisonerThievery || isCoerciveDeception || isBeguilerDeception || isDivinistInvestigation || isNaturalistSurvival || isTechnologistTechnology || isGalvanicAthletics || isTacticianAwareness || isTyrantIntimidation || isInertialDiplomacy || isKineticAthletics || isMercurialAcrobatics || isVectorialPiloting || isAstralMedicine || isChaosIntimidation || isOrderCulture || isVoidStealth || isAirAcrobatics || isEarthSurvival || isFireIntimidation || isWaterMedicine || isAeronautPiloting || isBrawlerSurvival || isDreadnaughtIntimidation || isSpectreStealth || isAmmoCoderOikomagic || isOrdnancerAthletics || isPistoleerThievery || isSniperStealth || isHackerComputers || isJunkerThievery || isNanoboticistAcrobatics || isTankerPiloting || isAvenochAwareness || isChloroptidAwareness || isBarkskinSurvival || isPetranSurvival) {
                             checked = true; // Force third dot to be filled for class booster dots
                           }
 
@@ -2530,6 +2585,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                             if (isAvenochAwareness) return "rgba(43,95,89,0.5)";
                             if (isChloroptidAwareness) return "rgba(49,95,43,0.5)";
                             if (isBarkskinSurvival) return "rgba(95,45,43,0.5)";
+                            if (isPetranSurvival) return "rgba(115,83,17,0.5)";
                             // Add other class colors here in the future
                             return "#d0d0d0"; // fallback color
                           };
