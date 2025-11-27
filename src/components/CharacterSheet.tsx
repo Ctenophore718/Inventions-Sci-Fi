@@ -43,6 +43,7 @@ import { generateLeafOnTheWindJSX } from "../utils/driftingFeature";
 import { generateClimbingCreeperJSX } from "../utils/vinyFeature";
 import { generateGearsAndCogsJSX } from "../utils/cognizantFeature";
 import { generateEncryptedCerebralCortexJSX } from "../utils/androidFeature";
+import { generateVariantUtilityJSX } from "../utils/utilitydroidFeature";
 
 import { generateBloodTradeJSX } from "../utils/devoutFeature";
 import { generateFatigueJSX } from "../utils/voidFeature";
@@ -1339,10 +1340,10 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
     sheet?.subspeciesCardDots?.[2]?.[0] ?? false
   );
 
-  const utilityDroidFeatureJSX = (
-    <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#bd891f' }}>Variant Utility.</i></b> Your size is 1hx, 2hx, or 3hx, chosen at character creation, and you gain a <b><i style={{ color: '#38761d' }}>Climb Speed</i></b>.
-    </span>
+  const utilityDroidFeatureJSX = generateVariantUtilityJSX(
+    sheet?.subspeciesCardDots?.[0]?.[0] ?? false,
+    sheet?.subspeciesCardDots?.[1]?.[0] ?? false,
+    sheet?.subspeciesCardDots?.[2]?.[0] ?? false
   );
 
   const petranFeatureJSX = (
@@ -2236,6 +2237,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                   if (subspecies === "Drifting" && skillName === "Piloting") sources.push({ type: 'subspecies', color: "rgba(95,138,95,0.5)" });
                   if (subspecies === "Viny" && skillName === "Thievery") sources.push({ type: 'subspecies', color: "rgba(95,95,43,0.5)" });
                   if (subspecies === "Android" && skillName === "Diplomacy") sources.push({ type: 'subspecies', color: "rgba(88,31,189,0.5)" });
+                  if (subspecies === "Utility Droid" && skillName === "Computers") sources.push({ type: 'subspecies', color: "rgba(189,137,31,0.5)" });
                   
                   return sources;
                 };
@@ -3035,6 +3037,10 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
             {subspecies === 'Viny' ? ', Climb' : ''}
             {subspecies === 'Viny' && sheet?.subspeciesCardDots?.[0]?.[0] ? ', Burrow' : ''}
             {hostSpecies === 'Utility Droid Cognizant Host' ? ', Climb' : ''}
+            {subspecies === 'Utility Droid' ? ', Climb' : ''}
+            {subspecies === 'Utility Droid' && sheet?.subspeciesCardDots?.[0]?.[0] ? ', Swim' : ''}
+            {subspecies === 'Utility Droid' && sheet?.subspeciesCardDots?.[1]?.[0] ? ', Burrow' : ''}
+            {subspecies === 'Utility Droid' && sheet?.subspeciesCardDots?.[2]?.[0] ? ', Fly' : ''}
             {hostSpecies === 'Lithe Human Host' ? ', Climb' : ''}
             {hostSpecies === 'Felid Praedari Host' ? ', Climb' : ''}
             {hostSpecies === 'Mustelid Praedari Host' ? ', Burrow' : ''}

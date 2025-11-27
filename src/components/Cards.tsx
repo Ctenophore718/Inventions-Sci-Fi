@@ -33,6 +33,7 @@ import { generateFleshEaterCardJSX } from "../utils/vulturineTechnique";
 import { generateOakenshieldCardJSX, calculateOakenshieldData } from "../utils/barkskinTechnique";
 import { generatePoisonousBarbsCardJSX, calculatePoisonousBarbsData } from "../utils/carnivorousTechnique";
 import { generateGlimpseTheMatrixCardJSX } from "../utils/androidTechnique";
+import { generateTechInterferenceCardJSX } from "../utils/utilitydroidTechnique";
 import { generateCottonGuardCardJSX } from "../utils/driftingTechnique";
 import { generateRootboundCardJSX } from "../utils/vinyTechnique";
 import { generateLocalAreaNetworkCardJSX } from "../utils/cognizantTechnique";
@@ -1370,6 +1371,10 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                           ? '#5f8a5f'
                           : localSheet?.subspecies === 'Viny'
                             ? '#5f5f2b'
+                            : localSheet?.subspecies === 'Android'
+                            ? '#581fbd'
+                            : localSheet?.subspecies === 'Utility Droid'
+                            ? '#bd891f'
                             : 'black',
                 lineHeight: 1,
                 textAlign: 'left', 
@@ -1399,7 +1404,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                                 ? 'Rootbound'
                                 : localSheet?.subspecies === 'Android'
                                   ? 'Glimpse the Matrix'
-                                  : 'Subspecies Card Name'}
+                                  : localSheet?.subspecies === 'Utility Droid'
+                                    ? 'Tech Interference'
+                                    : 'Subspecies Card Name'}
               </span>
               <span style={{
                 fontFamily: 'Arial, Helvetica, sans-serif',
@@ -1423,7 +1430,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                               ? '#5f8a5f'
                               : localSheet?.subspecies === 'Android'
                                 ? '#581fbd'
-                                : 'black',
+                                : localSheet?.subspecies === 'Utility Droid'
+                                  ? '#bd891f'
+                                  : 'black',
                 lineHeight: 1,
                 whiteSpace: 'normal',
                 wordBreak: 'keep-all',
@@ -1451,7 +1460,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                                 ? 'Viny'
                                 : localSheet?.subspecies === 'Android'
                                   ? 'Android'
-                                  : 'Subspecies'}</span>
+                                  : localSheet?.subspecies === 'Utility Droid'
+                                    ? (<>Utility<br/>Droid</>)
+                                    : 'Subspecies'}</span>
             </div>
             <img 
               src={localSheet?.species === 'Cerebronych'
@@ -1474,7 +1485,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                               ? "/Rootbound.png"
                               : localSheet?.subspecies === 'Android'
                                 ? "/Glimpse the Matrix.png"
-                                : "/Blank Card.png"}
+                                : localSheet?.subspecies === 'Utility Droid'
+                                  ? "/Tech Interference.png"
+                                  : "/Blank Card.png"}
               alt={localSheet?.species === 'Cerebronych'
                 ? "Limit Push"
                 : localSheet?.subspecies === 'Corvid' 
@@ -1495,7 +1508,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                               ? "Rootbound"
                               : localSheet?.subspecies === 'Android'
                                 ? "Glimpse the Matrix"
-                                : "Blank Card"}
+                                : localSheet?.subspecies === 'Utility Droid'
+                                  ? "Tech Interference"
+                                  : "Blank Card"}
               style={{
                 position: 'absolute',
                 top: 35,
@@ -1544,7 +1559,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                                   ? `[${4 - (localSheet?.subspeciesCardDots?.[7]?.filter(Boolean).length ?? 0)}]`
                                   : localSheet?.subspecies === 'Android'
                                     ? `[${3 - (localSheet?.subspeciesCardDots?.[4]?.filter(Boolean).length ?? 0)}]`
-                                    : '[#]'}
+                                    : localSheet?.subspecies === 'Utility Droid'
+                                      ? `[${4 - (localSheet?.subspeciesCardDots?.[5]?.filter(Boolean).length ?? 0)}]`
+                                      : '[#]'}
                 </span>
               </span>
             </div>
@@ -1614,7 +1631,13 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                                       3 - (localSheet?.subspeciesCardDots?.[4]?.filter(Boolean).length ?? 0),
                                       localSheet?.subspeciesCardDots?.[3]?.filter(Boolean).length ?? 0
                                     )
-                                  : 'Card stats.'}
+                                  : localSheet?.subspecies === 'Utility Droid'
+                                    ? generateTechInterferenceCardJSX(
+                                        4 - (localSheet?.subspeciesCardDots?.[5]?.filter(Boolean).length ?? 0),
+                                        (localSheet?.subspeciesCardDots?.[3]?.filter(Boolean).length ?? 0) * 2,
+                                        localSheet?.subspeciesCardDots?.[4]?.filter(Boolean).length ?? 0
+                                      )
+                                    : 'Card stats.'}
               </div>
             </div>
             <div style={{
@@ -1651,7 +1674,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                               ? 'Your roots surge through the earth beneath you and spring up in vines that wrap around the ankles of your enemies, holding them still.'
                               : localSheet?.subspecies === 'Android'
                                 ? 'You just overlay your physical interface onto any digital substrate and exponentially enhance its potential. Easy-peasy.'
-                                : 'Flavor text.'}
+                                : localSheet?.subspecies === 'Utility Droid'
+                                  ? 'Otherwise known as an electromagnetic pulse, each Utility Droid is outfitted with the ability to render equipment useless.'
+                                  : 'Flavor text.'}
             </div>
         </div>
         

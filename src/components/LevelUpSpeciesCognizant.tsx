@@ -4,6 +4,8 @@ import { generateGearsAndCogsJSX } from "../utils/cognizantFeature";
 import { generateLocalAreaNetworkJSX } from "../utils/cognizantTechnique";
 import { generateEncryptedCerebralCortexJSX } from "../utils/androidFeature";
 import { generateGlimpseTheMatrixJSX } from "../utils/androidTechnique";
+import { generateVariantUtilityJSX } from "../utils/utilitydroidFeature";
+import { generateTechInterferenceJSX } from "../utils/utilitydroidTechnique";
 
 type LevelUpSpeciesCognizantProps = {
   sheet: CharacterSheet | null;
@@ -57,6 +59,17 @@ const LevelUpSpeciesCognizant: React.FC<LevelUpSpeciesCognizantProps> = ({
     [false, false],        // Technique: +1 ally gains benefit (12xp, 25xp)
     [false, false],        // Technique: -1 Cooldown (5xp, 9xp)
     [false],               // Perk: Translate Bot (12sp)
+  ];
+
+  // Utility Droid subspecies card dots default structure
+  const defaultUtilityDroidDots = [
+    [false],               // Feature: Swim Speed (6xp)
+    [false],               // Feature: Burrow Speed (10xp)
+    [false],               // Feature: Flight Speed (13xp)
+    [false, false, false], // Technique: +2hx Range (4xp, 7xp, 10xp)
+    [false, false, false], // Technique: Inflict Spike (Electric) (4xp, 8xp, 12xp)
+    [false, false],        // Technique: -1 Cooldown (4xp, 7xp)
+    [false],               // Perk: Adaptable Utility (10sp)
   ];
 
   // Local state for species card dots
@@ -113,10 +126,13 @@ const LevelUpSpeciesCognizant: React.FC<LevelUpSpeciesCognizantProps> = ({
     }
   };
 
-  // Local state for subspecies card dots (Android)
+  // Local state for subspecies card dots (Android/Utility Droid)
   const [subspeciesCardDots, setSubspeciesCardDots] = useState<boolean[][]>(() => {
     if (sheet?.subspeciesCardDots && Array.isArray(sheet.subspeciesCardDots) && sheet.subspeciesCardDots.length > 0) {
       return sheet.subspeciesCardDots.map(row => Array.isArray(row) ? [...row] : []);
+    }
+    if (subspecies === 'Utility Droid') {
+      return defaultUtilityDroidDots.map(row => [...row]);
     }
     return defaultAndroidDots.map(row => [...row]);
   });
@@ -124,6 +140,9 @@ const LevelUpSpeciesCognizant: React.FC<LevelUpSpeciesCognizantProps> = ({
   // Helper function to safely access subspeciesCardDots array
   const safeGetSubspeciesDotsArray = (index: number): boolean[] => {
     if (!subspeciesCardDots || !Array.isArray(subspeciesCardDots) || index >= subspeciesCardDots.length) {
+      if (subspecies === 'Utility Droid') {
+        return defaultUtilityDroidDots[index] || [];
+      }
       return defaultAndroidDots[index] || [];
     }
     return subspeciesCardDots[index] || [];
@@ -132,6 +151,9 @@ const LevelUpSpeciesCognizant: React.FC<LevelUpSpeciesCognizantProps> = ({
   // Helper function to safely clone subspeciesCardDots array
   const safeCloneSubspeciesCardDots = (): boolean[][] => {
     if (!subspeciesCardDots || !Array.isArray(subspeciesCardDots) || subspeciesCardDots.length === 0) {
+      if (subspecies === 'Utility Droid') {
+        return defaultUtilityDroidDots.map(row => [...row]);
+      }
       return defaultAndroidDots.map(row => [...row]);
     }
     return subspeciesCardDots.map(row => Array.isArray(row) ? [...row] : []);
@@ -1112,6 +1134,379 @@ const LevelUpSpeciesCognizant: React.FC<LevelUpSpeciesCognizantProps> = ({
                       } else {
                         newDots[5][0] = false;
                         persistSubspeciesCardDots(newDots, -12, 0);
+                      }
+                    }}
+                    style={{
+                      width: '15px',
+                      height: '15px',
+                      border: '2px solid #000',
+                      borderRadius: '50%',
+                      display: 'block',
+                      background: arr[0] ? '#000' : '#fff',
+                      cursor: 'pointer',
+                      transition: 'background 0.2s'
+                    }}
+                  ></span>
+                </span>
+              );
+            })()}
+          </div>
+
+        </div>
+      )}
+
+      {/* Utility Droid Subspecies Content */}
+      {contentType === 'subspecies' && subspecies === "Utility Droid" && (
+        <div style={{ width: '100%', marginTop: '1rem', textAlign: 'left', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
+          
+          {/* Feature Section */}
+          <div style={{ color: '#0b5394', fontWeight: 'bold', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '16px' }}>
+            <div style={{ fontWeight: 'bold', color: '#0b5394', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Feature</u></div>
+            <span style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
+              {generateVariantUtilityJSX(
+                safeGetSubspeciesDotsArray(0)[0] ?? false,
+                safeGetSubspeciesDotsArray(1)[0] ?? false,
+                safeGetSubspeciesDotsArray(2)[0] ?? false
+              )}
+            </span>
+          </div>
+
+          {/* Feature Upgrades Table */}
+          <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px', marginBottom: '16px' }}>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 24px 24px 24px',
+              gridTemplateRows: 'repeat(6, auto)',
+              columnGap: '6px',
+              rowGap: '2px',
+              alignItems: 'start',
+              width: '100%',
+              paddingLeft: '4px'
+            }}>
+              {/* Row 1: XP header for Swim Speed */}
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>6xp</span>
+              <span></span>
+              <span></span>
+              {/* Row 2: Swim Speed dot */}
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}><b><i style={{ color: '#38761d' }}>Swim Speed</i></b></span>
+              {[0].map(idx => {
+                const arr = safeGetSubspeciesDotsArray(0);
+                const burrowArr = safeGetSubspeciesDotsArray(1);
+                const flightArr = safeGetSubspeciesDotsArray(2);
+                const xpCosts = [6];
+                const canUnselect = !burrowArr[0] && !flightArr[0];
+                return (
+                  <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
+                    <span
+                      onClick={() => {
+                        const newDots = safeCloneSubspeciesCardDots();
+                        if (!arr[idx]) {
+                          newDots[0][idx] = true;
+                          persistSubspeciesCardDots(newDots, 0, xpCosts[idx]);
+                        } else if (canUnselect) {
+                          newDots[0][idx] = false;
+                          persistSubspeciesCardDots(newDots, 0, -xpCosts[idx]);
+                        }
+                      }}
+                      style={{
+                        width: '15px',
+                        height: '15px',
+                        border: '2px solid #000',
+                        borderRadius: '50%',
+                        display: 'block',
+                        background: arr[idx] ? '#000' : '#fff',
+                        cursor: 'pointer',
+                        transition: 'background 0.2s'
+                      }}
+                    ></span>
+                  </span>
+                );
+              })}
+              <span></span>
+              <span></span>
+
+              {/* Row 3: XP header for Burrow Speed */}
+              <span></span>
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>10xp</span>
+              <span></span>
+              {/* Row 4: Burrow Speed dot */}
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}><b><i style={{ color: '#38761d' }}>Burrow Speed</i></b></span>
+              <span style={{ textAlign: 'center', fontSize: '1.2em', fontWeight: 'bold', color: '#000' }}>⤷</span>
+              {[0].map(idx => {
+                const arr = safeGetSubspeciesDotsArray(1);
+                const swimArr = safeGetSubspeciesDotsArray(0);
+                const xpCosts = [10];
+                const hasSwim = swimArr[0];
+                const canSelect = hasSwim;
+                return (
+                  <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
+                    <span
+                      onClick={() => {
+                        if (!arr[idx] && canSelect) {
+                          const newDots = safeCloneSubspeciesCardDots();
+                          newDots[1][idx] = true;
+                          persistSubspeciesCardDots(newDots, 0, xpCosts[idx]);
+                        } else if (arr[idx]) {
+                          const newDots = safeCloneSubspeciesCardDots();
+                          newDots[1][idx] = false;
+                          persistSubspeciesCardDots(newDots, 0, -xpCosts[idx]);
+                        }
+                      }}
+                      style={{
+                        width: '15px',
+                        height: '15px',
+                        border: '2px solid #000',
+                        borderRadius: '50%',
+                        display: 'block',
+                        background: arr[idx] ? '#000' : '#fff',
+                        cursor: (arr[idx] || canSelect) ? 'pointer' : 'not-allowed',
+                        transition: 'background 0.2s',
+                      }}
+                    ></span>
+                  </span>
+                );
+              })}
+              {/* Row 5: XP header for Flight Speed */}
+              <span></span>
+              <span></span>
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>13xp</span>
+              {/* Row 6: Flight Speed dot */}
+              <span></span>
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}><b><i style={{ color: '#38761d' }}>Fly Speed</i></b></span>
+              <span style={{ textAlign: 'center', fontSize: '1.2em', fontWeight: 'bold', color: '#000' }}>⤷</span>
+              {[0].map(idx => {
+                const arr = safeGetSubspeciesDotsArray(2);
+                const swimArr = safeGetSubspeciesDotsArray(0);
+                const xpCosts = [13];
+                const hasSwim = swimArr[0];
+                const canSelect = hasSwim;
+                return (
+                  <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
+                    <span
+                      onClick={() => {
+                        if (!arr[idx] && canSelect) {
+                          const newDots = safeCloneSubspeciesCardDots();
+                          newDots[2][idx] = true;
+                          persistSubspeciesCardDots(newDots, 0, xpCosts[idx]);
+                        } else if (arr[idx]) {
+                          const newDots = safeCloneSubspeciesCardDots();
+                          newDots[2][idx] = false;
+                          persistSubspeciesCardDots(newDots, 0, -xpCosts[idx]);
+                        }
+                      }}
+                      style={{
+                        width: '15px',
+                        height: '15px',
+                        border: '2px solid #000',
+                        borderRadius: '50%',
+                        display: 'block',
+                        background: arr[idx] ? '#000' : '#fff',
+                        cursor: (arr[idx] || canSelect) ? 'pointer' : 'not-allowed',
+                        transition: 'background 0.2s'
+                      }}
+                    ></span>
+                  </span>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Technique Section */}
+          <div style={{ color: '#bf9000', fontWeight: 'bold', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '12px', marginTop: '20px' }}>
+            <div style={{ fontWeight: 'bold', color: '#bf9000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Technique</u></div>
+            <span style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
+              {generateTechInterferenceJSX(
+                4 - safeGetSubspeciesDotsArray(5).filter(Boolean).length,
+                safeGetSubspeciesDotsArray(3).filter(Boolean).length * 2,
+                safeGetSubspeciesDotsArray(4).filter(Boolean).length
+              )}
+            </span>
+          </div>
+
+          {/* Technique Upgrades Table */}
+          <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px', marginBottom: '16px' }}>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 24px 24px 24px',
+              gridTemplateRows: 'repeat(6, auto)',
+              columnGap: '6px',
+              rowGap: '2px',
+              alignItems: 'start',
+              width: '100%',
+              paddingLeft: '4px'
+            }}>
+              {/* Row 1: XP header for +2hx Range */}
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>4xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>7xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>10xp</span>
+              {/* Row 2: +2hx Range dots */}
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+2hx</span>
+              {[0, 1, 2].map(idx => {
+                const arr = safeGetSubspeciesDotsArray(3);
+                const xpCosts = [4, 7, 10];
+                const canSelect = idx === 0 || arr[idx - 1];
+                const canUnselect = !arr[idx + 1];
+                return (
+                  <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
+                    <span
+                      onClick={() => {
+                        if (!arr[idx] && canSelect) {
+                          const newDots = safeCloneSubspeciesCardDots();
+                          newDots[3][idx] = true;
+                          persistSubspeciesCardDots(newDots, 0, xpCosts[idx]);
+                        } else if (arr[idx] && canUnselect) {
+                          const newDots = safeCloneSubspeciesCardDots();
+                          newDots[3][idx] = false;
+                          persistSubspeciesCardDots(newDots, 0, -xpCosts[idx]);
+                        }
+                      }}
+                      style={{
+                        width: '15px',
+                        height: '15px',
+                        border: '2px solid #000',
+                        borderRadius: '50%',
+                        display: 'block',
+                        background: arr[idx] ? '#000' : '#fff',
+                        cursor: (arr[idx] && canUnselect) || (!arr[idx] && canSelect) ? 'pointer' : 'not-allowed',
+                        transition: 'background 0.2s'
+                      }}
+                    ></span>
+                  </span>
+                );
+              })}  
+
+              {/* Row 3: XP header for Inflict Spike */}
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>4xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>8xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>12xp</span>
+              {/* Row 4: Inflict Spike dots */}
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>Inflict <b><i>Spike</i></b> <b>(</b><b><u style={{ color: '#d5d52a', display: 'inline-flex', alignItems: 'center' }}>Electric<img src="/Electric.png" alt="Electric" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b><b>)</b> in <i>AoE</i></span>
+              {[0, 1, 2].map(idx => {
+                const arr = safeGetSubspeciesDotsArray(4);
+                const xpCosts = [4, 8, 12];
+                const canSelect = idx === 0 || arr[idx - 1];
+                const canUnselect = !arr[idx + 1];
+                return (
+                  <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
+                    <span
+                      onClick={() => {
+                        if (!arr[idx] && canSelect) {
+                          const newDots = safeCloneSubspeciesCardDots();
+                          newDots[4][idx] = true;
+                          persistSubspeciesCardDots(newDots, 0, xpCosts[idx]);
+                        } else if (arr[idx] && canUnselect) {
+                          const newDots = safeCloneSubspeciesCardDots();
+                          newDots[4][idx] = false;
+                          persistSubspeciesCardDots(newDots, 0, -xpCosts[idx]);
+                        }
+                      }}
+                      style={{
+                        width: '15px',
+                        height: '15px',
+                        border: '2px solid #000',
+                        borderRadius: '50%',
+                        display: 'block',
+                        background: arr[idx] ? '#000' : '#fff',
+                        cursor: (arr[idx] && canUnselect) || (!arr[idx] && canSelect) ? 'pointer' : 'not-allowed',
+                        transition: 'background 0.2s'
+                      }}
+                    ></span>
+                  </span>
+                );
+              })}
+
+              {/* Row 5: XP header for -1 Cooldown */}
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>4xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>7xp</span>
+              <span></span>
+              {/* Row 6: -1 Cooldown dots */}
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>-1 <i>Cooldown</i></span>
+              {[0, 1].map(idx => {
+                const arr = safeGetSubspeciesDotsArray(5);
+                const xpCosts = [4, 7];
+                const canSelect = idx === 0 || arr[idx - 1];
+                const canUnselect = !arr[idx + 1];
+                return (
+                  <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
+                    <span
+                      onClick={() => {
+                        if (!arr[idx] && canSelect) {
+                          const newDots = safeCloneSubspeciesCardDots();
+                          newDots[5][idx] = true;
+                          persistSubspeciesCardDots(newDots, 0, xpCosts[idx]);
+                        } else if (arr[idx] && canUnselect) {
+                          const newDots = safeCloneSubspeciesCardDots();
+                          newDots[5][idx] = false;
+                          persistSubspeciesCardDots(newDots, 0, -xpCosts[idx]);
+                        }
+                      }}
+                      style={{
+                        width: '15px',
+                        height: '15px',
+                        border: '2px solid #000',
+                        borderRadius: '50%',
+                        display: 'block',
+                        background: arr[idx] ? '#000' : '#fff',
+                        cursor: (arr[idx] && canUnselect) || (!arr[idx] && canSelect) ? 'pointer' : 'not-allowed',
+                        transition: 'background 0.2s'
+                      }}
+                    ></span>
+                  </span>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Perks Section */}
+          <div style={{ color: '#000', fontWeight: 'bold', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '12px', marginTop: '20px' }}>
+            <div style={{ fontWeight: 'bold', color: '#000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Perks</u></div>
+          </div>
+
+          {/* Skills */}
+          <div style={{ fontSize: '1em', color: '#000', marginBottom: '6px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <i><b>Skills.</b> Computers</i> +2
+          </div>
+
+          {/* Perks SP progression table */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 24px',
+            gridTemplateRows: 'auto auto',
+            columnGap: '6px',
+            rowGap: '2px',
+            alignItems: 'start',
+            marginTop: '8px',
+            marginBottom: '2px',
+            width: '100%',
+            paddingLeft: '4px'
+          }}>
+            {/* Row 1: SP header for Adaptable Utility */}
+            <span></span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>10sp</span>
+            
+            {/* Row 2: Adaptable Utility */}
+            <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'left', paddingRight: '8px' }}>
+              <b><i style={{ color: '#bd891f' }}>Adaptable Utility.</i></b> You always have the right tool on hand for whatever simple task you need to complete. This is limited to handheld-sized tools that would fit into a toolbox. Examples include a drill, magnifying glass, lockpicks, hammer, welder, binoculars, etc.
+            </span>
+            {(() => {
+              const arr = safeGetSubspeciesDotsArray(6);
+              return (
+                <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
+                  <span
+                    onClick={() => {
+                      const newDots = safeCloneSubspeciesCardDots();
+                      if (!arr[0]) {
+                        newDots[6][0] = true;
+                        persistSubspeciesCardDots(newDots, 10, 0);
+                      } else {
+                        newDots[6][0] = false;
+                        persistSubspeciesCardDots(newDots, -10, 0);
                       }
                     }}
                     style={{

@@ -486,6 +486,13 @@ const CharacterSheetPerks: React.FC<CharacterSheetPerksProps> = ({
             </span>
           </div>
           )}
+          {subspecies === 'Utility Droid' && sheet?.subspeciesCardDots?.[6]?.[0] && (
+          <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <span>
+              <b><i style={{ color: '#bd891f' }}>Adaptable Utility.</i></b> <span style={{ color: '#000' }}>You always have the right tool on hand for whatever simple task you need to complete. This is limited to handheld-sized tools that would fit into a toolbox. Examples include a drill, magnifying glass, lockpicks, hammer, welder, binoculars, etc.</span>
+            </span>
+          </div>
+          )}
         </div>
       </div>
   );
