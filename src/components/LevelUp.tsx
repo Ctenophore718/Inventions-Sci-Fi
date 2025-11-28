@@ -230,6 +230,20 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
       effectiveHP += 50 + hp5Bonus + hp10Bonus + hp15Bonus;
     }
     
+    // Add Pyran subspecies bonus
+    if (sheet?.subspecies === 'Pyran') {
+      const subspeciesDots = sheet?.subspeciesCardDots || [];
+      const hp5Dots = subspeciesDots[5] || [];
+      const hp10Dots = subspeciesDots[6] || [];
+      const hp15Dots = subspeciesDots[7] || [];
+      
+      const hp5Bonus = hp5Dots.filter(Boolean).length * 5;
+      const hp10Bonus = hp10Dots.filter(Boolean).length * 10;
+      const hp15Bonus = hp15Dots.filter(Boolean).length * 15;
+      
+      effectiveHP += 40 + hp5Bonus + hp10Bonus + hp15Bonus;
+    }
+    
     // Add Cognizant species bonus
     if (sheet?.species === 'Cognizant') {
       const speciesDots = sheet?.speciesCardDots || [];
@@ -2328,6 +2342,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                         if (subspecies === "Android" && skillName === "Diplomacy") sources.push({ type: 'subspecies', color: "rgba(88,31,189,0.5)" });
                         if (subspecies === "Utility Droid" && skillName === "Computers") sources.push({ type: 'subspecies', color: "rgba(189,137,31,0.5)" });
                         if (subspecies === "Petran" && skillName === "Survival") sources.push({ type: 'subspecies', color: "rgba(115,83,17,0.5)" });
+                        if (subspecies === "Pyran" && skillName === "Performance") sources.push({ type: 'subspecies', color: "rgba(179,17,17,0.5)" });
 
                         return sources;
                       };
@@ -2549,7 +2564,11 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                           // Petran Survival booster always goes at position 2, same as class boosters
                           const isPetranSurvival = subspecies === "Petran" && skill === "Survival" && i === 2;
 
-                          if (isChemistInvestigation || isCoderOikomagic || isCommanderDiplomacy || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine || isGrenadierIntimidation || isNecroSurvival || isPoisonerThievery || isCoerciveDeception || isBeguilerDeception || isDivinistInvestigation || isNaturalistSurvival || isTechnologistTechnology || isGalvanicAthletics || isTacticianAwareness || isTyrantIntimidation || isInertialDiplomacy || isKineticAthletics || isMercurialAcrobatics || isVectorialPiloting || isAstralMedicine || isChaosIntimidation || isOrderCulture || isVoidStealth || isAirAcrobatics || isEarthSurvival || isFireIntimidation || isWaterMedicine || isAeronautPiloting || isBrawlerSurvival || isDreadnaughtIntimidation || isSpectreStealth || isAmmoCoderOikomagic || isOrdnancerAthletics || isPistoleerThievery || isSniperStealth || isHackerComputers || isJunkerThievery || isNanoboticistAcrobatics || isTankerPiloting || isAvenochAwareness || isChloroptidAwareness || isBarkskinSurvival || isPetranSurvival) {
+                          // Check for Pyran Performance subspecies booster dot
+                          // Pyran Performance booster always goes at position 2, same as class boosters
+                          const isPyranPerformance = subspecies === "Pyran" && skill === "Performance" && i === 2;
+
+                          if (isChemistInvestigation || isCoderOikomagic || isCommanderDiplomacy || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine || isGrenadierIntimidation || isNecroSurvival || isPoisonerThievery || isCoerciveDeception || isBeguilerDeception || isDivinistInvestigation || isNaturalistSurvival || isTechnologistTechnology || isGalvanicAthletics || isTacticianAwareness || isTyrantIntimidation || isInertialDiplomacy || isKineticAthletics || isMercurialAcrobatics || isVectorialPiloting || isAstralMedicine || isChaosIntimidation || isOrderCulture || isVoidStealth || isAirAcrobatics || isEarthSurvival || isFireIntimidation || isWaterMedicine || isAeronautPiloting || isBrawlerSurvival || isDreadnaughtIntimidation || isSpectreStealth || isAmmoCoderOikomagic || isOrdnancerAthletics || isPistoleerThievery || isSniperStealth || isHackerComputers || isJunkerThievery || isNanoboticistAcrobatics || isTankerPiloting || isAvenochAwareness || isChloroptidAwareness || isBarkskinSurvival || isPetranSurvival || isPyranPerformance) {
                             checked = true; // Force third dot to be filled for class booster dots
                           }
 
@@ -2604,6 +2623,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                             if (isChloroptidAwareness) return "rgba(49,95,43,0.5)";
                             if (isBarkskinSurvival) return "rgba(95,45,43,0.5)";
                             if (isPetranSurvival) return "rgba(115,83,17,0.5)";
+                            if (isPyranPerformance) return "rgba(179,17,17,0.5)";
                             // Add other class colors here in the future
                             return "#d0d0d0"; // fallback color
                           };
@@ -2668,7 +2688,10 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                                     (subclass === "Nanoboticist" && skill === "Acrobatics") ||
                                     (subclass === "Tanker" && skill === "Piloting") ||
                                     (species === "Avenoch" && skill === "Awareness") ||
-                                    (species === "Chloroptid" && skill === "Awareness")
+                                    (species === "Chloroptid" && skill === "Awareness") ||
+                                    (subspecies === "Barkskin" && skill === "Survival") ||
+                                    (subspecies === "Petran" && skill === "Survival") ||
+                                    (subspecies === "Pyran" && skill === "Performance")
                                   ))
                               )) {
                                 spCostForThisDot += [1, 1, 2, 2, 3, 4, 5, 6, 8, 10][j];
@@ -2725,7 +2748,10 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                                     (subclass === "Nanoboticist" && skill === "Acrobatics") ||
                                     (subclass === "Tanker" && skill === "Piloting") ||
                                     (species === "Avenoch" && skill === "Awareness") ||
-                                    (species === "Chloroptid" && skill === "Awareness")
+                                    (species === "Chloroptid" && skill === "Awareness") ||
+                                    (subspecies === "Barkskin" && skill === "Survival") ||
+                                    (subspecies === "Petran" && skill === "Survival") ||
+                                    (subspecies === "Pyran" && skill === "Performance")
                                   ))
                               )) {
                                 spCostForThisDot += [1, 1, 2, 2, 3, 4, 5, 6, 8, 10][j];

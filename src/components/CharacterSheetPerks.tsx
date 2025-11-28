@@ -512,6 +512,13 @@ const CharacterSheetPerks: React.FC<CharacterSheetPerksProps> = ({
             </span>
           </div>
           )}
+          {subspecies === 'Pyran' && sheet?.subspeciesCardDots?.[12]?.[0] && (
+          <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <span>
+              <b><i style={{ color: '#b31111' }}>Fiery Creations.</i></b> <span style={{ color: '#000' }}>Your affinity with flames and heat allow you to mold metal and burn woods with an artisanal touch. Gain an advantage on any related skill roll.</span>
+            </span>
+          </div>
+          )}
         </div>
       </div>
   );

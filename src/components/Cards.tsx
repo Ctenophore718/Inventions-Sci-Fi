@@ -39,6 +39,7 @@ import { generateRootboundCardJSX } from "../utils/vinyTechnique";
 import { generateLocalAreaNetworkCardJSX } from "../utils/cognizantTechnique";
 import { generateOppressiveHeatCardJSX } from "../utils/emberfolkTechnique";
 import { generateStonyRestorationCardJSX } from "../utils/petranTechnique";
+import { generateBlazingLeapCardJSX } from "../utils/pyranTechnique";
 import React from "react";
 import type { CharacterSheet } from "../types/CharacterSheet";
 import { loadSheetById, saveCharacterSheet } from "../utils/storage";
@@ -393,6 +394,20 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
       const hp15Bonus = hp15Dots.filter(Boolean).length * 15;
       
       effectiveHP += 50 + hp5Bonus + hp10Bonus + hp15Bonus;
+    }
+    
+    // Add Pyran subspecies bonus
+    if (localSheet?.subspecies === 'Pyran') {
+      const subspeciesDots = localSheet?.subspeciesCardDots || [];
+      const hp5Dots = subspeciesDots[5] || [];
+      const hp10Dots = subspeciesDots[6] || [];
+      const hp15Dots = subspeciesDots[7] || [];
+      
+      const hp5Bonus = hp5Dots.filter(Boolean).length * 5;
+      const hp10Bonus = hp10Dots.filter(Boolean).length * 10;
+      const hp15Bonus = hp15Dots.filter(Boolean).length * 15;
+      
+      effectiveHP += 40 + hp5Bonus + hp10Bonus + hp15Bonus;
     }
     
     // Add class-specific bonuses
@@ -1399,6 +1414,8 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                             ? '#bd891f'
                             : localSheet?.subspecies === 'Petran'
                             ? '#735311' 
+                            : localSheet?.subspecies === 'Pyran'
+                            ? '#b31111'
                             : 'black',
                 lineHeight: 1,
                 textAlign: 'left', 
@@ -1432,7 +1449,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                                     ? 'Tech Interference'
                                     : localSheet?.subspecies === 'Petran'
                                       ? 'Stony Restoration'
-                                      : 'Subspecies Card Name'}
+                                      : localSheet?.subspecies === 'Pyran'
+                                        ? 'Blazing Leap'
+                                        : 'Subspecies Card Name'}
               </span>
               <span style={{
                 fontFamily: 'Arial, Helvetica, sans-serif',
@@ -1460,7 +1479,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                                   ? '#bd891f'
                                   : localSheet?.subspecies === 'Petran'
                                     ? '#735311'
-                                    : 'black',
+                                    : localSheet?.subspecies === 'Pyran'
+                                      ? '#b31111'
+                                      : 'black',
                 lineHeight: 1,
                 whiteSpace: 'normal',
                 wordBreak: 'keep-all',
@@ -1492,7 +1513,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                                     ? (<>Utility<br/>Droid</>)
                                     : localSheet?.subspecies === 'Petran'
                                       ? 'Petran'
-                                      : 'Subspecies'}</span>
+                                      : localSheet?.subspecies === 'Pyran'
+                                        ? 'Pyran'
+                                        : 'Subspecies'}</span>
             </div>
             <img 
               src={localSheet?.species === 'Cerebronych'
@@ -1519,7 +1542,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                                   ? "/Tech Interference.png"
                                   : localSheet?.subspecies === 'Petran'
                                     ? "/Stony Restoration.png"
-                                    : "/Blank Card.png"}
+                                    : localSheet?.subspecies === 'Pyran'
+                                      ? "/Blazing Leap.png"
+                                      : "/Blank Card.png"}
               alt={localSheet?.species === 'Cerebronych'
                 ? "Limit Push"
                 : localSheet?.subspecies === 'Corvid' 
@@ -1544,7 +1569,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                                   ? "Tech Interference"
                                   : localSheet?.subspecies === 'Petran'
                                     ? "Stony Restoration"
-                                    : "Blank Card"}
+                                    : localSheet?.subspecies === 'Pyran'
+                                      ? "Blazing Leap"
+                                      : "Blank Card"}
               style={{
                 position: 'absolute',
                 top: 35,
@@ -1597,7 +1624,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                                       ? `[${4 - (localSheet?.subspeciesCardDots?.[5]?.filter(Boolean).length ?? 0)}]`
                                       : localSheet?.subspecies === 'Petran'
                                         ? '[2]'
-                                        : '[#]'}
+                                        : localSheet?.subspecies === 'Pyran'
+                                          ? `[${4 - (localSheet?.subspeciesCardDots?.[4]?.filter(Boolean).length ?? 0)}]`
+                                          : '[#]'}
                 </span>
               </span>
             </div>
@@ -1679,7 +1708,14 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                                           1 + (localSheet?.subspeciesCardDots?.[4]?.filter(Boolean).length ?? 0),
                                           (localSheet?.subspeciesCardDots?.[6]?.filter(Boolean).length ?? 0) * 2
                                         )
-                                      : 'Card stats.'}
+                                      : localSheet?.subspecies === 'Pyran'
+                                        ? generateBlazingLeapCardJSX(
+                                            4 - (localSheet?.subspeciesCardDots?.[4]?.filter(Boolean).length ?? 0),
+                                            3 + (localSheet?.subspeciesCardDots?.[1]?.filter(Boolean).length ?? 0),
+                                            1 + (localSheet?.subspeciesCardDots?.[2]?.filter(Boolean).length ?? 0),
+                                            localSheet?.subspeciesCardDots?.[3]?.filter(Boolean).length ?? 0
+                                          )
+                                        : 'Card stats.'}
               </div>
             </div>
             <div style={{
@@ -1720,7 +1756,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                                   ? 'Otherwise known as an electromagnetic pulse, each Utility Droid is outfitted with the ability to render equipment useless.'
                                   : localSheet?.subspecies === 'Petran'
                                     ? '"The will of stone is indomitable and unshakable. Breaking me will be very difficult." --Onyxia Stonegrit, Petran Independent'
-                                    : 'Flavor text.'}
+                                    : localSheet?.subspecies === 'Pyran'
+                                      ? '"I\'ve never seen a Pyran who wasn\'t capable of moving as fast as a wildfire through a dry forest." --Ziggs Freeman, Anti-Deft Secessionist'
+                                      : 'Flavor text.'}
             </div>
         </div>
         
