@@ -71,6 +71,11 @@ const CharacterSheetPerks: React.FC<CharacterSheetPerksProps> = ({
                 Xenoelemental
               </span>
             )}
+            {sheet?.species === 'Entomos' && (
+              <span style={{ fontWeight: 'normal', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', color: '#000' }}>
+                Entomos
+              </span>
+            )}
           </div>
           {/* Class Perk segment, visible if Class Perk dot is selected */}
           {charClass === 'Chemist' && sheet?.classCardDots?.[9]?.[0] && (
@@ -170,6 +175,13 @@ const CharacterSheetPerks: React.FC<CharacterSheetPerksProps> = ({
             <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
               <span>
                 <b><i style={{ color: '#2b3b5f' }}>Machine Learning.</i></b> <span style={{ color: '#000' }}>You are capable of learning mathematical equations, grammatical combinations and other such patterns with ease. Gain an advantage on related skills after learning such a skill.</span>
+              </span>
+            </div>
+          )}
+          {sheet?.species === 'Entomos' && sheet?.speciesCardDots?.[7]?.[0] && (
+            <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <span>
+                <b><i style={{ color: '#5f422b' }}>Hiveminded.</i></b> <span style={{ color: '#000' }}>You instinctively understand hive mentality and can pick up on social hierarchies and dynamics after only a glance at the way a particular organization, department, or tribe operates. Gain an advantage on related skill rolls.</span>
               </span>
             </div>
           )}
@@ -516,6 +528,13 @@ const CharacterSheetPerks: React.FC<CharacterSheetPerksProps> = ({
           <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
             <span>
               <b><i style={{ color: '#b31111' }}>Fiery Creations.</i></b> <span style={{ color: '#000' }}>Your affinity with flames and heat allow you to mold metal and burn woods with an artisanal touch. Gain an advantage on any related skill roll.</span>
+            </span>
+          </div>
+          )}
+          {subspecies === 'Apocritan' && sheet?.subspeciesCardDots?.[12]?.[0] && (
+          <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <span>
+              <b><i style={{ color: '#6d7156' }}>Colony Instinct.</i></b> <span style={{ color: '#000' }}>Your highly communal, worker upbringing has led you to work better together within a team. You gain an advantage on all skill rolls for each ally who participates in that skill with you simultaneously.</span>
             </span>
           </div>
           )}

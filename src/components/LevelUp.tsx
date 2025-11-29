@@ -26,6 +26,7 @@ import LevelUpSpeciesCerebronych from "./LevelUpSpeciesCerebronych";
 import LevelUpSpeciesChloroptid from "./LevelUpSpeciesChloroptid";
 import LevelUpSpeciesCognizant from "./LevelUpSpeciesCognizant";
 import LevelUpSpeciesEmberfolk from "./LevelUpSpeciesEmberfolk";
+import LevelUpSpeciesEntomos from "./LevelUpSpeciesEntomos";
 import { calculateChemistFeatureData } from "../utils/chemistFeature";
 
 
@@ -242,6 +243,34 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
       const hp15Bonus = hp15Dots.filter(Boolean).length * 15;
       
       effectiveHP += 40 + hp5Bonus + hp10Bonus + hp15Bonus;
+    }
+
+    // Add Apocritan subspecies bonus
+    if (sheet?.subspecies === 'Apocritan') {
+      const subspeciesDots = sheet?.subspeciesCardDots || [];
+      const hp5Dots = subspeciesDots[7] || [];
+      const hp10Dots = subspeciesDots[8] || [];
+      const hp15Dots = subspeciesDots[9] || [];
+      
+      const hp5Bonus = hp5Dots.filter(Boolean).length * 5;
+      const hp10Bonus = hp10Dots.filter(Boolean).length * 10;
+      const hp15Bonus = hp15Dots.filter(Boolean).length * 15;
+      
+      effectiveHP += 40 + hp5Bonus + hp10Bonus + hp15Bonus;
+    }
+
+    // Add Dynastes subspecies bonus
+    if (sheet?.subspecies === 'Dynastes') {
+      const subspeciesDots = sheet?.subspeciesCardDots || [];
+      const hp5Dots = subspeciesDots[6] || [];
+      const hp10Dots = subspeciesDots[7] || [];
+      const hp15Dots = subspeciesDots[8] || [];
+      
+      const hp5Bonus = hp5Dots.filter(Boolean).length * 5;
+      const hp10Bonus = hp10Dots.filter(Boolean).length * 10;
+      const hp15Bonus = hp15Dots.filter(Boolean).length * 15;
+      
+      effectiveHP += 45 + hp5Bonus + hp10Bonus + hp15Bonus;
     }
     
     // Add Cognizant species bonus
@@ -1807,7 +1836,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
               />
             )}
 
-            {/* Cognizant Species Content */}
+            {/* Emberfolk Species Content */}
             {species === "Emberfolk" && (
               <LevelUpSpeciesEmberfolk
                 sheet={sheet}
@@ -1824,6 +1853,24 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                 setNotice={setNotice}
               />
             )}
+            
+            {/* Entomos Species Content */}
+            {species === "Entomos" && (
+              <LevelUpSpeciesEntomos
+                sheet={sheet}
+                species={species}
+                onAutoSave={handleAutoSave}
+                xpTotal={xpTotal}
+                spTotal={spTotal}
+                xpSpent={xpSpent}
+                spSpent={spSpent}
+                setXpSpent={setXpSpent}
+                setSpSpent={setSpSpent}
+                setNotice={setNotice}
+              />
+            )}
+            
+            {/* Cognizant Species Content */}
             {species === "Cognizant" && (
               <LevelUpSpeciesCognizant
                 sheet={sheet}
@@ -2138,6 +2185,42 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
               />
             )}
             
+            {/* Apocritan Subspecies Content */}
+            {subspecies === "Apocritan" && (
+              <LevelUpSpeciesEntomos
+                sheet={sheet}
+                species={species}
+                subspecies={subspecies}
+                contentType="subspecies"
+                onAutoSave={handleAutoSave}
+                xpTotal={xpTotal}
+                spTotal={spTotal}
+                xpSpent={xpSpent}
+                spSpent={spSpent}
+                setXpSpent={setXpSpent}
+                setSpSpent={setSpSpent}
+                setNotice={setNotice}
+              />
+            )}
+
+            {/* Dynastes Subspecies Content */}
+            {subspecies === "Dynastes" && (
+              <LevelUpSpeciesEntomos
+                sheet={sheet}
+                species={species}
+                subspecies={subspecies}
+                contentType="subspecies"
+                onAutoSave={handleAutoSave}
+                xpTotal={xpTotal}
+                spTotal={spTotal}
+                xpSpent={xpSpent}
+                spSpent={spSpent}
+                setXpSpent={setXpSpent}
+                setSpSpent={setSpSpent}
+                setNotice={setNotice}
+              />
+            )}
+            
             {/* Cerebronych (cont.) Subspecies Content */}
             {species === "Cerebronych" && (
               <LevelUpSpeciesCerebronych
@@ -2329,6 +2412,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                         if (species === "Chloroptid" && skillName === "Awareness") sources.push({ type: 'species', color: "rgba(49,95,43,0.5)" });
                         if (species === "Cognizant" && skillName === "Technology") sources.push({ type: 'species', color: "rgba(43,59,95,0.5)" });
                         if (species === "Emberfolk" && skillName === "Xenomagic") sources.push({ type: 'species', color: "rgba(95,43,43,0.5)" });
+                        if (species === "Entomos" && skillName === "Athletics") sources.push({ type: 'species', color: "rgba(95,66,43,0.5)" });
                         
                         // Subspecies boosters
                         if (subspecies === "Corvid" && skillName === "Thievery") sources.push({ type: 'subspecies', color: "rgba(117,144,78,0.5)" });
@@ -2343,6 +2427,8 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                         if (subspecies === "Utility Droid" && skillName === "Computers") sources.push({ type: 'subspecies', color: "rgba(189,137,31,0.5)" });
                         if (subspecies === "Petran" && skillName === "Survival") sources.push({ type: 'subspecies', color: "rgba(115,83,17,0.5)" });
                         if (subspecies === "Pyran" && skillName === "Performance") sources.push({ type: 'subspecies', color: "rgba(179,17,17,0.5)" });
+                        if (subspecies === "Apocritan" && skillName === "Survival") sources.push({ type: 'subspecies', color: "rgba(109,113,86,0.5)" });
+                        if (subspecies === "Dynastes" && skillName === "Intimidation") sources.push({ type: 'subspecies', color: "rgba(139,105,20,0.5)" });
 
                         return sources;
                       };
