@@ -42,6 +42,8 @@ import { generateStonyRestorationCardJSX } from "../utils/petranTechnique";
 import { generateBlazingLeapCardJSX } from "../utils/pyranTechnique";
 import { generateIronCarapaceCardJSX } from "../utils/entomosTechnique";
 import { generateTenacityCardJSX } from "../utils/apocritanTechnique";
+import { generateStinkbugCloudCardJSX } from "../utils/dynastesTechnique";
+import { generatePinDownCardJSX } from "../utils/mantidTechnique";
 import React from "react";
 import type { CharacterSheet } from "../types/CharacterSheet";
 import { loadSheetById, saveCharacterSheet } from "../utils/storage";
@@ -438,6 +440,20 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
       const hp15Bonus = hp15Dots.filter(Boolean).length * 15;
       
       effectiveHP += 45 + hp5Bonus + hp10Bonus + hp15Bonus;
+    }
+    
+    // Add Mantid subspecies bonus
+    if (localSheet?.subspecies === 'Mantid') {
+      const subspeciesDots = localSheet?.subspeciesCardDots || [];
+      const hp5Dots = subspeciesDots[5] || [];
+      const hp10Dots = subspeciesDots[6] || [];
+      const hp15Dots = subspeciesDots[7] || [];
+      
+      const hp5Bonus = hp5Dots.filter(Boolean).length * 5;
+      const hp10Bonus = hp10Dots.filter(Boolean).length * 10;
+      const hp15Bonus = hp15Dots.filter(Boolean).length * 15;
+      
+      effectiveHP += 35 + hp5Bonus + hp10Bonus + hp15Bonus;
     }
     
     // Add class-specific bonuses
@@ -1454,6 +1470,10 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                             ? '#b31111'
                             : localSheet?.subspecies === 'Apocritan'
                             ? '#6d7156'
+                            : localSheet?.subspecies === 'Dynastes'
+                            ? '#334592'
+                            : localSheet?.subspecies === 'Mantid'
+                            ? '#75904e'
                             : 'black',
                 lineHeight: 1,
                 textAlign: 'left', 
@@ -1491,7 +1511,11 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                                         ? 'Blazing Leap'
                                         : localSheet?.subspecies === 'Apocritan'
                                           ? 'Tenacity'
-                                          : 'Subspecies Card Name'}
+                                          : localSheet?.subspecies === 'Dynastes'
+                                            ? 'Stinkbug Cloud'
+                                            : localSheet?.subspecies === 'Mantid'
+                                              ? 'Pin Down'
+                                              : 'Subspecies Card Name'}
               </span>
               <span style={{
                 fontFamily: 'Arial, Helvetica, sans-serif',
@@ -1523,7 +1547,11 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                                       ? '#b31111'
                                       : localSheet?.subspecies === 'Apocritan'
                                         ? '#6d7156'
-                                        : 'black',
+                                        : localSheet?.subspecies === 'Dynastes'
+                                          ? '#334592'
+                                          : localSheet?.subspecies === 'Mantid'
+                                            ? '#75904e'
+                                            : 'black',
                 lineHeight: 1,
                 whiteSpace: 'normal',
                 wordBreak: 'keep-all',
@@ -1559,7 +1587,11 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                                         ? 'Pyran'
                                         : localSheet?.subspecies === 'Apocritan'
                                           ? 'Apocritan'
-                                          : 'Subspecies'}</span>
+                                          : localSheet?.subspecies === 'Dynastes'
+                                            ? 'Dynastes'
+                                            : localSheet?.subspecies === 'Mantid'
+                                              ? 'Mantid'
+                                              : 'Subspecies'}</span>
             </div>
             <img 
               src={localSheet?.species === 'Cerebronych'
@@ -1590,7 +1622,11 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                                       ? "/Blazing Leap.png"
                                       : localSheet?.subspecies === 'Apocritan'
                                         ? "/Tenacity.png"
-                                        : "/Blank Card.png"}
+                                        : localSheet?.subspecies === 'Dynastes'
+                                          ? "/Stinkbug Cloud.png"
+                                          : localSheet?.subspecies === 'Mantid'
+                                            ? "/Pin Down.png"
+                                            : "/Blank Card.png"}
               alt={localSheet?.species === 'Cerebronych'
                 ? "Limit Push"
                 : localSheet?.subspecies === 'Corvid' 
@@ -1676,7 +1712,11 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                                           ? `[${4 - (localSheet?.subspeciesCardDots?.[4]?.filter(Boolean).length ?? 0)}]`
                                           : localSheet?.subspecies === 'Apocritan'
                                             ? `[${4 - (localSheet?.subspeciesCardDots?.[6]?.filter(Boolean).length ?? 0)}]`
-                                            : '[#]'}
+                                            : localSheet?.subspecies === 'Dynastes'
+                                              ? `[${4 - (localSheet?.subspeciesCardDots?.[5]?.filter(Boolean).length ?? 0)}]`
+                                              : localSheet?.subspecies === 'Mantid'
+                                                ? `[${4 - (localSheet?.subspeciesCardDots?.[4]?.filter(Boolean).length ?? 0)}]`
+                                                : '[#]'}
                 </span>
               </span>
             </div>
@@ -1774,7 +1814,20 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                                               localSheet?.subspeciesCardDots?.[4]?.[0] ? 1 : 0,
                                               localSheet?.subspeciesCardDots?.[5]?.[0] ? 1 : 0
                                             )
-                                          : 'Card stats.'}
+                                          : localSheet?.subspecies === 'Dynastes'
+                                            ? generateStinkbugCloudCardJSX(
+                                                localSheet?.subspeciesCardDots?.[1]?.filter(Boolean).length ?? 0,
+                                                localSheet?.subspeciesCardDots?.[2]?.[0] ?? false,
+                                                localSheet?.subspeciesCardDots?.[3]?.[0] ? 1 : 0,
+                                                localSheet?.subspeciesCardDots?.[4]?.[0] ?? false
+                                              )
+                                            : localSheet?.subspecies === 'Mantid'
+                                              ? generatePinDownCardJSX(
+                                                  localSheet?.subspeciesCardDots?.[1]?.filter(Boolean).length ?? 0,
+                                                  localSheet?.subspeciesCardDots?.[2]?.filter(Boolean).length ?? 0,
+                                                  localSheet?.subspeciesCardDots?.[3]?.[0] ?? false
+                                                )
+                                              : 'Card stats.'}
               </div>
             </div>
             <div style={{
@@ -1819,7 +1872,11 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                                       ? '"I\'ve never seen a Pyran who wasn\'t capable of moving as fast as a wildfire through a dry forest." --Ziggs Freeman, Anti-Deft Secessionist'
                                       : localSheet?.subspecies === 'Apocritan'
                                         ? '"Apocritans have an innate and undeniable tenacity. The question is, how can you even tell before it\'s your own head on a platter?" --Anonymous'
-                                        : 'Flavor text.'}
+                                        : localSheet?.subspecies === 'Dynastes'
+                                          ? '"I spew my noxious wrath at all who get too close. Then I take my giant hammer and smash the heads of the blind fools!" --Box, Silver Swarm Brute'
+                                          : localSheet?.subspecies === 'Mantid'
+                                            ? '"They say that my claws are fierce, but how pretty are my hypnotic eyes?" --Jesperine Kaardinen, Mantid Duchess'
+                                            : 'Flavor text.'}
             </div>
         </div>
         

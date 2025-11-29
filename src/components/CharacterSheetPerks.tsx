@@ -538,6 +538,20 @@ const CharacterSheetPerks: React.FC<CharacterSheetPerksProps> = ({
             </span>
           </div>
           )}
+          {subspecies === 'Dynastes' && sheet?.subspeciesCardDots?.[9]?.[0] && (
+          <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <span>
+              <b><i style={{ color: '#334592' }}>Colony Instinct.</i></b> <span style={{ color: '#000' }}>Your size and strength allows you to perform powerful feats. Gain an advantage on skill rolls where you can leverage your bulk and strength.</span>
+            </span>
+          </div>
+          )}
+          {subspecies === 'Mantid' && sheet?.subspeciesCardDots?.[12]?.[0] && (
+          <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <span>
+              <b><i style={{ color: '#75904e' }}>Patient Hunter.</i></b> <span style={{ color: '#000' }}>Your ability to stay still for an impressively long time has its upsides. Gain an advantage on related skills when waiting and/or being still for prolonged periods.</span>
+            </span>
+          </div>
+          )}
         </div>
       </div>
   );

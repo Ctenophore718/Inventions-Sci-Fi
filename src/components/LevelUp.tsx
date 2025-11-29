@@ -273,6 +273,20 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
       effectiveHP += 45 + hp5Bonus + hp10Bonus + hp15Bonus;
     }
     
+    // Add Mantid subspecies bonus
+    if (sheet?.subspecies === 'Mantid') {
+      const subspeciesDots = sheet?.subspeciesCardDots || [];
+      const hp5Dots = subspeciesDots[5] || [];
+      const hp10Dots = subspeciesDots[6] || [];
+      const hp15Dots = subspeciesDots[7] || [];
+      
+      const hp5Bonus = hp5Dots.filter(Boolean).length * 5;
+      const hp10Bonus = hp10Dots.filter(Boolean).length * 10;
+      const hp15Bonus = hp15Dots.filter(Boolean).length * 15;
+      
+      effectiveHP += 35 + hp5Bonus + hp10Bonus + hp15Bonus;
+    }
+    
     // Add Cognizant species bonus
     if (sheet?.species === 'Cognizant') {
       const speciesDots = sheet?.speciesCardDots || [];
@@ -2221,6 +2235,23 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
               />
             )}
             
+            {subspecies === "Mantid" && (
+              <LevelUpSpeciesEntomos
+                sheet={sheet}
+                species={species}
+                subspecies={subspecies}
+                contentType="subspecies"
+                onAutoSave={handleAutoSave}
+                xpTotal={xpTotal}
+                spTotal={spTotal}
+                xpSpent={xpSpent}
+                spSpent={spSpent}
+                setXpSpent={setXpSpent}
+                setSpSpent={setSpSpent}
+                setNotice={setNotice}
+              />
+            )}
+            
             {/* Cerebronych (cont.) Subspecies Content */}
             {species === "Cerebronych" && (
               <LevelUpSpeciesCerebronych
@@ -2428,7 +2459,8 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                         if (subspecies === "Petran" && skillName === "Survival") sources.push({ type: 'subspecies', color: "rgba(115,83,17,0.5)" });
                         if (subspecies === "Pyran" && skillName === "Performance") sources.push({ type: 'subspecies', color: "rgba(179,17,17,0.5)" });
                         if (subspecies === "Apocritan" && skillName === "Survival") sources.push({ type: 'subspecies', color: "rgba(109,113,86,0.5)" });
-                        if (subspecies === "Dynastes" && skillName === "Intimidation") sources.push({ type: 'subspecies', color: "rgba(139,105,20,0.5)" });
+                        if (subspecies === "Dynastes" && skillName === "Intimidation") sources.push({ type: 'subspecies', color: "rgba(51,69,146,0.5)" });
+                        if (subspecies === "Mantid" && skillName === "Awareness") sources.push({ type: 'subspecies', color: "rgba(117,144,78,0.5)" });
 
                         return sources;
                       };
