@@ -45,6 +45,7 @@ import { generateTenacityCardJSX } from "../utils/apocritanTechnique";
 import { generateStinkbugCloudCardJSX } from "../utils/dynastesTechnique";
 import { generatePinDownCardJSX } from "../utils/mantidTechnique";
 import { generateActionSurgeCardJSX } from "../utils/humanTechnique";
+import { generateSizeMattersCardJSX } from "../utils/diminutiveTechnique";
 import React from "react";
 import type { CharacterSheet } from "../types/CharacterSheet";
 import { loadSheetById, saveCharacterSheet } from "../utils/storage";
@@ -1481,6 +1482,8 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                             ? '#334592'
                             : localSheet?.subspecies === 'Mantid'
                             ? '#75904e'
+                            : localSheet?.subspecies === 'Diminutive Evolution'
+                            ? '#c3735f'
                             : 'black',
                 lineHeight: 1,
                 textAlign: 'left', 
@@ -1522,7 +1525,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                                             ? 'Stinkbug Cloud'
                                             : localSheet?.subspecies === 'Mantid'
                                               ? 'Pin Down'
-                                              : 'Subspecies Card Name'}
+                                              : localSheet?.subspecies === 'Diminutive Evolution'
+                                                ? 'Size Matters'
+                                                : 'Subspecies Card Name'}
               </span>
               <span style={{
                 fontFamily: 'Arial, Helvetica, sans-serif',
@@ -1558,6 +1563,8 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                                           ? '#334592'
                                           : localSheet?.subspecies === 'Mantid'
                                             ? '#75904e'
+                                            : localSheet?.subspecies === 'Diminutive Evolution'
+                                            ? '#c3735f'
                                             : 'black',
                 lineHeight: 1,
                 whiteSpace: 'normal',
@@ -1598,7 +1605,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                                             ? 'Dynastes'
                                             : localSheet?.subspecies === 'Mantid'
                                               ? 'Mantid'
-                                              : 'Subspecies'}</span>
+                                              : localSheet?.subspecies === 'Diminutive Evolution'
+                                                ? (<>Diminutive<br/>Evolution</>)
+                                                : 'Subspecies'}</span>
             </div>
             <img 
               src={localSheet?.species === 'Cerebronych'
@@ -1633,6 +1642,8 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                                           ? "/Stinkbug Cloud.png"
                                           : localSheet?.subspecies === 'Mantid'
                                             ? "/Pin Down.png"
+                                            : localSheet?.subspecies === 'Diminutive Evolution'
+                                            ? "/Size Matters.png"
                                             : "/Blank Card.png"}
               alt={localSheet?.species === 'Cerebronych'
                 ? "Limit Push"
@@ -1723,7 +1734,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                                               ? `[${4 - (localSheet?.subspeciesCardDots?.[5]?.filter(Boolean).length ?? 0)}]`
                                               : localSheet?.subspecies === 'Mantid'
                                                 ? `[${4 - (localSheet?.subspeciesCardDots?.[4]?.filter(Boolean).length ?? 0)}]`
-                                                : '[#]'}
+                                                : localSheet?.subspecies === 'Diminutive Evolution'
+                                                  ? `[${3 - (localSheet?.subspeciesCardDots?.[2]?.filter(Boolean).length ?? 0)}]`
+                                                  : '[#]'}
                 </span>
               </span>
             </div>
@@ -1834,7 +1847,11 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                                                   localSheet?.subspeciesCardDots?.[2]?.filter(Boolean).length ?? 0,
                                                   localSheet?.subspeciesCardDots?.[3]?.[0] ?? false
                                                 )
-                                              : 'Card stats.'}
+                                              : localSheet?.subspecies === 'Diminutive Evolution'
+                                                ? generateSizeMattersCardJSX(
+                                                    3 + (localSheet?.subspeciesCardDots?.[1]?.filter(Boolean).length ?? 0)
+                                                  )
+                                                : 'Card stats.'}
               </div>
             </div>
             <div style={{
@@ -1883,6 +1900,8 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                                           ? '"I spew my noxious wrath at all who get too close. Then I take my giant hammer and smash the heads of the blind fools!" --Box, Silver Swarm Brute'
                                           : localSheet?.subspecies === 'Mantid'
                                             ? '"They say that my claws are fierce, but how pretty are my hypnotic eyes?" --Jesperine Kaardinen, Mantid Duchess'
+                                            : localSheet?.subspecies === 'Diminutive Evolution'
+                                            ? '"I can slip between your feet faster than you can point that gun at me and shoot." --Fresnia Freebottom, Diminutive Human Thief'
                                             : 'Flavor text.'}
             </div>
         </div>

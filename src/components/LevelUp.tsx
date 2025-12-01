@@ -1,5 +1,5 @@
 import React from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import type { CharacterSheet } from "../types/CharacterSheet";
 import { saveCharacterSheet, loadSheetById } from "../utils/storage";
 import styles from "./CharacterSheet.module.css";
@@ -50,24 +50,39 @@ type LevelUpProps = {
 
 const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAutoSave, charClass, setCharClass, subclass, setSubclass, species, setSpecies, subspecies, setSubspecies }) => {
   
-  // Auto-save helper function
-  const handleAutoSave = (fieldUpdates: Partial<CharacterSheet>) => {
-
+  // Debounce timer for auto-save
+  const saveTimeoutRef = useRef<number | null>(null);
+  
+  // Auto-save helper function with debouncing
+  const handleAutoSave = useCallback((fieldUpdates: Partial<CharacterSheet>) => {
     if (onAutoSave) {
-      if (sheet) {
-        // Update existing sheet
-        const updatedSheet = { ...sheet, ...fieldUpdates };
-        onAutoSave(updatedSheet);
-
-      } else {
-        // Create new sheet with updates - this handles new character creation
-
-        onAutoSave(fieldUpdates);
+      // Clear any pending save
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
       }
-    } else {
-
+      
+      // Debounce the save by 150ms to batch rapid changes
+      saveTimeoutRef.current = setTimeout(() => {
+        if (sheet) {
+          // Update existing sheet
+          const updatedSheet = { ...sheet, ...fieldUpdates };
+          onAutoSave(updatedSheet);
+        } else {
+          // Create new sheet with updates - this handles new character creation
+          onAutoSave(fieldUpdates);
+        }
+      }, 150);
     }
-  };
+  }, [onAutoSave, sheet]);
+  
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+    };
+  }, []);
 
   // Handler for Credits changes without auto-save (for atomic operations)
   const handleCreditsChangeNoSave = (creditsDelta: number) => {
@@ -877,24 +892,54 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
     };
   }, [sheet?.id, charClass, subclass, species, subspecies, xpTotal, spTotal, xpSpent, spSpent, credits, chemTokens, skillDots]);
 
-  // Auto-save when XP/SP totals change
+  // Auto-save when XP/SP totals change (debounced)
+  const xpSpSaveTimeoutRef = useRef<number | null>(null);
   React.useEffect(() => {
     if (sheet && (sheet.xpTotal !== xpTotal || sheet.spTotal !== spTotal)) {
-      const updatedSheet = { ...sheet, xpTotal, spTotal };
-      saveCharacterSheet(updatedSheet);
+      // Clear any pending save
+      if (xpSpSaveTimeoutRef.current) {
+        clearTimeout(xpSpSaveTimeoutRef.current);
+      }
+      
+      // Debounce the save by 300ms for typing
+      xpSpSaveTimeoutRef.current = setTimeout(() => {
+        const updatedSheet = { ...sheet, xpTotal, spTotal };
+        saveCharacterSheet(updatedSheet);
+      }, 300);
     }
+    
+    return () => {
+      if (xpSpSaveTimeoutRef.current) {
+        clearTimeout(xpSpSaveTimeoutRef.current);
+      }
+    };
   }, [xpTotal, spTotal, sheet]);
 
-  // Auto-save skillDots when they change (but not on initial load)
+  // Auto-save skillDots when they change (but not on initial load, debounced)
+  const skillDotsSaveTimeoutRef = useRef<number | null>(null);
   React.useEffect(() => {
     if (sheet && sheet.skillDots && JSON.stringify(sheet.skillDots) !== JSON.stringify(skillDots)) {
-      const updatedSheet = {
-        ...sheet,
-        skillDots,
-        spRemaining: spTotal - spSpent
-      };
-      saveCharacterSheet(updatedSheet);
+      // Clear any pending save
+      if (skillDotsSaveTimeoutRef.current) {
+        clearTimeout(skillDotsSaveTimeoutRef.current);
+      }
+      
+      // Debounce the save by 200ms
+      skillDotsSaveTimeoutRef.current = setTimeout(() => {
+        const updatedSheet = {
+          ...sheet,
+          skillDots,
+          spRemaining: spTotal - spSpent
+        };
+        saveCharacterSheet(updatedSheet);
+      }, 200);
     }
+    
+    return () => {
+      if (skillDotsSaveTimeoutRef.current) {
+        clearTimeout(skillDotsSaveTimeoutRef.current);
+      }
+    };
   }, [skillDots, sheet, spTotal, spSpent]);
 
   // Sync classCardDots state when sheet or charClass changes
@@ -2255,6 +2300,24 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
             
             {subspecies === "Mantid" && (
               <LevelUpSpeciesEntomos
+                sheet={sheet}
+                species={species}
+                subspecies={subspecies}
+                contentType="subspecies"
+                onAutoSave={handleAutoSave}
+                xpTotal={xpTotal}
+                spTotal={spTotal}
+                xpSpent={xpSpent}
+                spSpent={spSpent}
+                setXpSpent={setXpSpent}
+                setSpSpent={setSpSpent}
+                setNotice={setNotice}
+              />
+            )}
+            
+            {/* Diminutive Evolution Subspecies Content */}
+            {subspecies === "Diminutive Evolution" && (
+              <LevelUpSpeciesHuman
                 sheet={sheet}
                 species={species}
                 subspecies={subspecies}
