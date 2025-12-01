@@ -27,6 +27,7 @@ import LevelUpSpeciesChloroptid from "./LevelUpSpeciesChloroptid";
 import LevelUpSpeciesCognizant from "./LevelUpSpeciesCognizant";
 import LevelUpSpeciesEmberfolk from "./LevelUpSpeciesEmberfolk";
 import LevelUpSpeciesEntomos from "./LevelUpSpeciesEntomos";
+import LevelUpSpeciesHuman from "./LevelUpSpeciesHuman";
 import { calculateChemistFeatureData } from "../utils/chemistFeature";
 
 
@@ -1884,6 +1885,23 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
               />
             )}
             
+            {/* Human Species Content */}
+            {species === "Human" && (
+              <LevelUpSpeciesHuman
+                sheet={sheet}
+                species={species}
+                contentType="species"
+                onAutoSave={handleAutoSave}
+                xpTotal={xpTotal}
+                spTotal={spTotal}
+                xpSpent={xpSpent}
+                spSpent={spSpent}
+                setXpSpent={setXpSpent}
+                setSpSpent={setSpSpent}
+                setNotice={setNotice}
+              />
+            )}
+            
             {/* Cognizant Species Content */}
             {species === "Cognizant" && (
               <LevelUpSpeciesCognizant
@@ -2444,6 +2462,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                         if (species === "Cognizant" && skillName === "Technology") sources.push({ type: 'species', color: "rgba(43,59,95,0.5)" });
                         if (species === "Emberfolk" && skillName === "Xenomagic") sources.push({ type: 'species', color: "rgba(95,43,43,0.5)" });
                         if (species === "Entomos" && skillName === "Athletics") sources.push({ type: 'species', color: "rgba(95,66,43,0.5)" });
+                        if (species === "Human" && skillName === "Culture") sources.push({ type: 'species', color: "rgba(43,49,95,0.5)" });
                         
                         // Subspecies boosters
                         if (subspecies === "Corvid" && skillName === "Thievery") sources.push({ type: 'subspecies', color: "rgba(117,144,78,0.5)" });
@@ -2506,6 +2525,14 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                           // Check if this position has a booster dot (handles overlaps)
                           const boosterAtThisPosition = boosterPositions.find(bp => bp.position === i);
                           if (boosterAtThisPosition) {
+                            checked = true;
+                          }
+                          
+                          // Check for Jack of All Trades (Human perk)
+                          // If selected, fills in columns 2 and 3 (16+ and 14+) for all skills not already filled by default or boosters
+                          const jackOfAllTradesDots = sheet?.species === "Human" && sheet?.speciesCardDots && sheet.speciesCardDots[4] && sheet.speciesCardDots[4][0];
+                          const isJackOfAllTrades = jackOfAllTradesDots && (i === 2 || i === 3);
+                          if (isJackOfAllTrades) {
                             checked = true;
                           }
                           
@@ -2597,6 +2624,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                           // Check for Order Culture booster dot
                           // Order Culture booster always goes at position 2, same as class boosters
                           const isOrderCulture = subclass === "Order" && skill === "Culture" && i === 2;
+                          const isHumanCulture = species === "Human" && skill === "Culture" && i === 2;
 
                           // Check for Void Stealth booster dot
                           // Void Stealth booster always goes at position 2, same as class boosters
@@ -2742,6 +2770,8 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                             if (isBarkskinSurvival) return "rgba(95,45,43,0.5)";
                             if (isPetranSurvival) return "rgba(115,83,17,0.5)";
                             if (isPyranPerformance) return "rgba(179,17,17,0.5)";
+                            if (isHumanCulture) return "rgba(43,49,95,0.5)";
+                            if (isJackOfAllTrades) return "rgba(43,49,95,0.25)"; // Jack of All Trades - Human color with 0.25 transparency
                             // Add other class colors here in the future
                             return "#d0d0d0"; // fallback color
                           };
@@ -2807,6 +2837,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                                     (subclass === "Tanker" && skill === "Piloting") ||
                                     (species === "Avenoch" && skill === "Awareness") ||
                                     (species === "Chloroptid" && skill === "Awareness") ||
+                                    (species === "Human" && skill === "Culture") ||
                                     (subspecies === "Barkskin" && skill === "Survival") ||
                                     (subspecies === "Petran" && skill === "Survival") ||
                                     (subspecies === "Pyran" && skill === "Performance")
@@ -2867,6 +2898,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                                     (subclass === "Tanker" && skill === "Piloting") ||
                                     (species === "Avenoch" && skill === "Awareness") ||
                                     (species === "Chloroptid" && skill === "Awareness") ||
+                                    (species === "Human" && skill === "Culture") ||
                                     (subspecies === "Barkskin" && skill === "Survival") ||
                                     (subspecies === "Petran" && skill === "Survival") ||
                                     (subspecies === "Pyran" && skill === "Performance")
@@ -2906,6 +2938,12 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                                   const isFreeDot = (skillName: string, position: number) => {
                                     // Positions 0 and 1 are always free starter dots for all skills
                                     if (position === 0 || position === 1) {
+                                      return true;
+                                    }
+                                    
+                                    // Positions 2 and 3 are free if Jack of All Trades is selected (Human perk)
+                                    const jackOfAllTradesDots = sheet?.species === "Human" && sheet?.speciesCardDots && sheet.speciesCardDots[4] && sheet.speciesCardDots[4][0];
+                                    if ((position === 2 || position === 3) && jackOfAllTradesDots) {
                                       return true;
                                     }
                                     
@@ -3014,13 +3052,15 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                                   width: isMobile ? 14 : 18,
                                   height: isMobile ? 14 : 18,
                                   borderRadius: '50%',
-                                  border: (boosterAtThisPosition || isLockedColumn) ? `2px solid ${boosterAtThisPosition ? boosterAtThisPosition.color : '#666'}` : '2px solid #000',
-                                  background: checked ? (boosterAtThisPosition ? boosterAtThisPosition.color : (isLockedColumn ? '#666' : '#000')) : '#fff',
-                                  cursor: (isLockedColumn || boosterAtThisPosition) ? 'not-allowed' : (canAffordCheck || canUncheck ? 'pointer' : 'not-allowed'),
-                                  opacity: (isLockedColumn || boosterAtThisPosition) ? 0.6 : (canAffordCheck || canUncheck ? 1 : 0.4),
+                                  border: (boosterAtThisPosition || isLockedColumn || isJackOfAllTrades) ? `2px solid ${boosterAtThisPosition ? boosterAtThisPosition.color : (isJackOfAllTrades ? 'rgba(43,49,95,0.25)' : '#666')}` : '2px solid #000',
+                                  background: checked ? (boosterAtThisPosition ? boosterAtThisPosition.color : (isJackOfAllTrades ? 'rgba(43,49,95,0.25)' : (isLockedColumn ? '#666' : '#000'))) : '#fff',
+                                  cursor: (isLockedColumn || boosterAtThisPosition || isJackOfAllTrades) ? 'not-allowed' : (canAffordCheck || canUncheck ? 'pointer' : 'not-allowed'),
+                                  opacity: (isLockedColumn || boosterAtThisPosition || isJackOfAllTrades) ? 1 : (canAffordCheck || canUncheck ? 1 : 0.4),
                                 }}
                                 title={
-                                  boosterAtThisPosition
+                                  isJackOfAllTrades
+                                    ? 'Jack of All Trades skill dot (cannot be changed)'
+                                    : boosterAtThisPosition
                                     ? `${boosterAtThisPosition.type.charAt(0).toUpperCase() + boosterAtThisPosition.type.slice(1)} bonus skill dot (cannot be changed)`
                                     : isLockedColumn 
                                     ? 'Starting skill dots (cannot be changed)'

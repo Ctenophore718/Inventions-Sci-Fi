@@ -9,6 +9,8 @@ export type CharacterSheet = {
   subspecies: string;
   hostSpecies?: string; // For Cerebronych species - the host they mimic
   humanHostDamageTypes?: string[]; // For Human Host - selected damage types (max 2)
+  humanDamageTypes?: string[]; // For Human species - selected damage types (varies with upgrades)
+  humanLanguages?: string[]; // For Human species - selected languages (max 2)
   cerebronychLanguage?: string; // For Cerebronych species - selected bonus language from subspecies card
   cognizantLanguage?: string; // For Cognizant species - selected bonus language from species card
   background: string;

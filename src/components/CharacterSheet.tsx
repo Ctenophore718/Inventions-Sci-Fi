@@ -24,6 +24,7 @@ import { generateInspiringPresenceJSX } from "../utils/galvanicFeature";
 import { generateTacticalOffensiveJSX } from "../utils/tacticianFeature";
 import { generateFearlessJSX } from "../utils/tyrantFeature";
 import { generatePsychosomaticHarmonyJSX } from "../utils/contemplativeFeature";
+import { generateAdaptablePhysiqueJSX } from "../utils/humanFeature";
 import { generateTelekineticShieldJSX } from "../utils/inertialFeature";
 import { generateInertialStrikeJSX, generateInertialStrikeDamageJSX, generateInertialStrikeEffectsJSX } from "../utils/inertialStrike";
 import { generateFinalFistsJSX } from "../utils/kineticFeature";
@@ -468,6 +469,15 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
       })()
     : 0;
 
+  // Calculate Human species speed bonus
+  const humanSpeedBonus = sheet?.species === 'Human'
+    ? (() => {
+        const speciesDots = sheet?.speciesCardDots || [];
+        const speedDots = speciesDots[3] || [];
+        return 6 + speedDots.filter(Boolean).length;
+      })()
+    : 0;
+
   // Calculate Apocritan subspecies speed bonus
   const apocritanSpeedBonus = sheet?.subspecies === 'Apocritan'
     ? (sheet?.subspeciesCardDots?.[10]?.[0] ? 1 : 0)
@@ -477,7 +487,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
     ? (sheet?.subspeciesCardDots?.[8]?.filter(Boolean).length || 0)
     : 0;
   
-  const totalSpeed = baseSpeed + tacticianSpeedBonus + kineticSpeedBonus + mercurialSpeedBonus + airSpeedBonus + fireSpeedBonus + waterSpeedBonus + aeronautSpeedBonus + brawlerSpeedBonus + spectreSpeedBonus + avenochSpeedBonus + falcadorSpeedBonus + ammocoderSpeedBonus + pistoleerSpeedBonus + cerebronychSpeedBonus + chloroptidSpeedBonus + driftingSpeedBonus + cognizantSpeedBonus + emberfolkSpeedBonus + petranSpeedBonus + pyranSpeedBonus + entomosSpeedBonus + apocritanSpeedBonus + mantidSpeedBonus;
+  const totalSpeed = baseSpeed + tacticianSpeedBonus + kineticSpeedBonus + mercurialSpeedBonus + airSpeedBonus + fireSpeedBonus + waterSpeedBonus + aeronautSpeedBonus + brawlerSpeedBonus + spectreSpeedBonus + avenochSpeedBonus + falcadorSpeedBonus + ammocoderSpeedBonus + pistoleerSpeedBonus + cerebronychSpeedBonus + chloroptidSpeedBonus + driftingSpeedBonus + cognizantSpeedBonus + emberfolkSpeedBonus + petranSpeedBonus + pyranSpeedBonus + entomosSpeedBonus + humanSpeedBonus + apocritanSpeedBonus + mantidSpeedBonus;
   const speed = totalSpeed > 0 ? `${totalSpeed}` : "0";
   
   // Calculate jump speed and jump amount for Kinetic subclass
@@ -1317,7 +1327,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
       "Mantid Entomos Host": <span style={{ color: '#000', fontWeight: 400 }}><b><i style={{ color: '#75904e' }}>Raptorial Claws.</i></b> You can <b><i style={{ color: '#351c75' }}>Strike</i></b> enemies in an adjacent hx during your <b><i style={{ color: '#38761d' }}>Move</i></b> instead of having to <b><i style={{ color: '#38761d' }}>Move</i></b> through them.</span>,
       "Human Host": (
         <span style={{ color: '#000', fontWeight: 400 }}>
-          <b><i style={{ color: '#2b315f' }}>Adaptable Physique.</i></b> You <i>Resist</i> two of the following Damage types: <b><u style={{ color: '#de7204', display: 'inline-flex', alignItems: 'center' }}>Chemical<img src="/Chemical.png" alt="Chemical" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>, <b><u style={{ color: '#3ebbff', display: 'inline-flex', alignItems: 'center' }}>Cold<img src="/Cold.png" alt="Cold" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>, <b><u style={{ color: '#d5d52a', display: 'inline-flex', alignItems: 'center' }}>Electric<img src="/Electric.png" alt="Electric" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>, <b><u style={{ color: '#f90102', display: 'inline-flex', alignItems: 'center' }}>Fire<img src="/Fire.png" alt="Fire" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>, <b><u style={{ color: '#514fff', display: 'inline-flex', alignItems: 'center' }}>Force<img src="/Force.png" alt="Force" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>, <b><u style={{ color: '#a929ff', display: 'inline-flex', alignItems: 'center' }}>Neural<img src="/Neural.png" alt="Neural" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>, <b><u style={{ color: '#02b900', display: 'inline-flex', alignItems: 'center' }}>Toxic<img src="/Toxic.png" alt="Toxic" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>.
+          {generateAdaptablePhysiqueJSX(2)}
           <br />
           <span><i>Resistances</i>: </span>
           {sheet?.humanHostDamageTypes && sheet.humanHostDamageTypes.length > 0 ? (
@@ -1396,14 +1406,41 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
 
   const humanFeatureJSX = (
     <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#2b315f' }}>Adaptable Physique.</i></b> You <i>Resist</i> <b>[2]</b> of the following damage types:<br/>
-    <b><u style={{ color: '#de7204', display: 'inline-flex', alignItems: 'center' }}>Chemical<img src="/Chemical.png" alt="Chemical" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>,&nbsp;
-    <b><u style={{ color: '#3ebbff', display: 'inline-flex', alignItems: 'center' }}>Cold<img src="/Cold.png" alt="Cold" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>,&nbsp;
-    <b><u style={{ color: '#ffe700', display: 'inline-flex', alignItems: 'center' }}>Electric<img src="/Electric.png" alt="Electric" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>,&nbsp;
-    <b><u style={{ color: '#f90102', display: 'inline-flex', alignItems: 'center' }}>Fire<img src="/Fire.png" alt="Fire" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>,&nbsp;
-    <b><u style={{ color: '#516fff', display: 'inline-flex', alignItems: 'center' }}>Force<img src="/Force.png" alt="Force" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>,&nbsp;
-    <b><u style={{ color: '#a929ff', display: 'inline-flex', alignItems: 'center' }}>Neural<img src="/Neural.png" alt="Neural" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>,&nbsp;
-    <b><u style={{ color: '#02b900', display: 'inline-flex', alignItems: 'center' }}>Toxic<img src="/Toxic.png" alt="Toxic" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>
+      {generateAdaptablePhysiqueJSX(2 + (sheet?.speciesCardDots?.[0]?.filter(Boolean).length || 0))}
+      <br />
+      <span><i>Resistances</i>: </span>
+      {sheet?.humanDamageTypes && sheet.humanDamageTypes.length > 0 ? (
+        sheet.humanDamageTypes.map((type, index) => {
+          const damageTypeColors: { [key: string]: string } = {
+            'Chemical': '#de7204',
+            'Cold': '#3ebbff',
+            'Electric': '#d5d52a',
+            'Fire': '#e20e0e',
+            'Force': '#516fff',
+            'Neural': '#a929ff',
+            'Toxic': '#02b900'
+          };
+          const damageTypeIcons: { [key: string]: string } = {
+            'Chemical': '/Chemical.png',
+            'Cold': '/Cold.png',
+            'Electric': '/Electric.png',
+            'Fire': '/Fire.png',
+            'Force': '/Force.png',
+            'Neural': '/Neural.png',
+            'Toxic': '/Toxic.png'
+          };
+          return (
+            <span key={index}>
+              {index > 0 && ', '}
+              <b><u style={{ color: damageTypeColors[type], display: 'inline-flex', alignItems: 'center' }}>
+                {type}<img src={damageTypeIcons[type]} alt={type} style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} />
+              </u></b>
+            </span>
+          );
+        })
+      ) : (
+        <span style={{ fontStyle: 'italic' }}>None selected</span>
+      )}
     </span>
   );
 
@@ -2361,6 +2398,8 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                   if (sheet?.species === "Cognizant" && skillName === "Technology") sources.push({ type: 'species', color: "rgba(43,59,95,0.5)" });
                   if (sheet?.species === "Emberfolk" && skillName === "Xenomagic") sources.push({ type: 'species', color: "rgba(95,43,43,0.5)" });
                   if (sheet?.species === "Entomos" && skillName === "Athletics") sources.push({ type: 'species', color: "rgba(95,66,43,0.5)" });
+                  if (species === "Human" && skillName === "Culture") sources.push({ type: 'species', color: "rgba(43,49,95,0.5)" });
+
                   
                   // Subspecies boosters
                   if (subspecies === "Corvid" && skillName === "Thievery") sources.push({ type: 'subspecies', color: "rgba(117,144,78,0.5)" });
@@ -2400,12 +2439,21 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                   const dots = sheet?.skillDots?.[skill] || [];
                   const boosterPositions = getBoosterPositions(skill);
                   
+                  // Check for Jack of All Trades (Human perk)
+                  const jackOfAllTradesDots = sheet?.species === "Human" && sheet?.speciesCardDots && sheet.speciesCardDots[4] && sheet.speciesCardDots[4][0];
+                  
                   let value;
                   let displayDots = [];
                   
                   if (isNewCharacter) {
                     // New characters default to first two dots, plus any booster dots
                     displayDots = [true, true];
+                    
+                    // Add Jack of All Trades dots at positions 2 and 3 if selected
+                    if (jackOfAllTradesDots) {
+                      displayDots[2] = true;
+                      displayDots[3] = true;
+                    }
                     
                     // Add booster dots at their appropriate positions
                     boosterPositions.forEach(bp => {
@@ -2430,6 +2478,15 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                     displayDots[0] = true;
                     displayDots[1] = true;
                     
+                    // Add Jack of All Trades dots at positions 2 and 3 if selected
+                    if (jackOfAllTradesDots) {
+                      while (displayDots.length <= 3) {
+                        displayDots.push(false);
+                      }
+                      displayDots[2] = true;
+                      displayDots[3] = true;
+                    }
+                    
                     // Ensure all booster dots are shown at their proper positions
                     boosterPositions.forEach(bp => {
                       while (displayDots.length <= bp.position) {
@@ -2448,7 +2505,9 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                     
                     // Check if this is a booster dot
                     const boosterAtPosition = boosterPositions.find(bp => bp.position === dotIndex);
-                    const dotColor = boosterAtPosition ? boosterAtPosition.color : '#666';
+                    // Check if this is a Jack of All Trades dot
+                    const isJackOfAllTradesDot = jackOfAllTradesDots && (dotIndex === 2 || dotIndex === 3);
+                    const dotColor = boosterAtPosition ? boosterAtPosition.color : (isJackOfAllTradesDot ? 'rgba(43,49,95,0.25)' : '#666');
                     
                     return (
                       <span
@@ -3187,8 +3246,6 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
             {hostSpecies === 'Mustelid Praedari Host' ? ', Burrow' : ''}
             {sheet?.species === 'Entomos' && sheet?.speciesCardDots?.[6]?.[0] ? ', Fly' : ''}
           </div>
-          <div className={styles.horizontalLabel} style={{ color: '#38761d', fontWeight: 'bold' }}><u>Jump Speed</u> {(kineticJumpSpeedBonus > 0 ? kineticJumpSpeedBonus : mercurialJumpSpeedBonus > 0 ? mercurialJumpSpeedBonus : pyranJumpSpeedBonus > 0 ? pyranJumpSpeedBonus : mantidJumpSpeedBonus > 0 ? mantidJumpSpeedBonus : "") + (kineticJumpSpeedBonus > 0 || mercurialJumpSpeedBonus > 0 || pyranJumpSpeedBonus > 0 || mantidJumpSpeedBonus > 0 ? "hx" : "0hx")}</div>
-          <div className={styles.horizontalLabel} style={{ color: '#38761d', fontWeight: 'bold' }}><u>Jump Amount</u> {kineticJumpAmountBonus > 0 ? kineticJumpAmountBonus : mercurialJumpAmountBonus > 0 ? mercurialJumpAmountBonus : pyranJumpAmountBonus > 0 ? pyranJumpAmountBonus : mantidJumpAmountBonus > 0 ? mantidJumpAmountBonus : "0"}</div>
           <div className={styles.horizontalLabel} style={{ color: '#38761d', fontWeight: 'bold' }}>
             <u>Speed Effects</u> {
               subclass === 'Naturalist'
@@ -3266,6 +3323,8 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                 : resistances
             }
           </div>
+          <div className={styles.horizontalLabel} style={{ color: '#38761d', fontWeight: 'bold' }}><u>Jump Amount</u> {kineticJumpAmountBonus > 0 ? kineticJumpAmountBonus : mercurialJumpAmountBonus > 0 ? mercurialJumpAmountBonus : pyranJumpAmountBonus > 0 ? pyranJumpAmountBonus : mantidJumpAmountBonus > 0 ? mantidJumpAmountBonus : "0"}</div>
+          <div className={styles.horizontalLabel} style={{ color: '#38761d', fontWeight: 'bold' }}><u>Jump Speed</u> {(kineticJumpSpeedBonus > 0 ? kineticJumpSpeedBonus : mercurialJumpSpeedBonus > 0 ? mercurialJumpSpeedBonus : pyranJumpSpeedBonus > 0 ? pyranJumpSpeedBonus : mantidJumpSpeedBonus > 0 ? mantidJumpSpeedBonus : "") + (kineticJumpSpeedBonus > 0 || mercurialJumpSpeedBonus > 0 || pyranJumpSpeedBonus > 0 || mantidJumpSpeedBonus > 0 ? "hx" : "0hx")}</div>
         </div>
       </div>
 
@@ -3445,29 +3504,77 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
             )}
           </div>
           <div className={styles.horizontalLabel} style={{ color: '#351c75', fontWeight: 'bold' }}><u>Multi Strike</u> <span style={{ color: '#000' }}>{
-            charClass === 'Contemplative'
-              ? (2 + (sheet?.classCardDots?.[1]?.[0] ? 1 : 0) + ((sheet?.subclassProgressionDots as any)?.kineticStrikeMultiStrikeDots?.[0] ? 1 : 0) + ((sheet?.subclassProgressionDots as any)?.mercurialStrikeMultiStrikeDots?.[0] ? 1 : 0) + ((sheet?.subclassProgressionDots as any)?.vectorialStrikeMultiStrikeDots?.[0] ? 1 : 0))
-              : (subclass === 'Beguiler' && sheet?.subclassProgressionDots?.beguilerStrikeStrikeDots?.[0])
-                ? 2
-                : (subclass === 'Galvanic' && (sheet?.subclassProgressionDots as any)?.galvanicStrikeStrikeDots?.[0])
-                  ? 2
-                  : (subclass === 'Tactician' && (sheet?.subclassProgressionDots as any)?.tacticianStrikeStrikeDots?.[0])
-                    ? 2
-                    : (subclass === 'Chaos' && (sheet?.subclassProgressionDots as any)?.chaosStrikeMultiStrikeDots?.[0])
-                      ? 2
-                      : (subclass === 'Air' && ((sheet?.subclassProgressionDots as any)?.airStrikeMultiStrikeDots?.filter(Boolean).length || 0) > 0)
-                        ? (1 + ((sheet?.subclassProgressionDots as any)?.airStrikeMultiStrikeDots?.filter(Boolean).length || 0))
-                        : (subclass === 'Fire' && ((sheet?.subclassProgressionDots as any)?.fireStrikeExtraStrikeDots?.filter(Boolean).length || 0) > 0)
-                          ? (1 + ((sheet?.subclassProgressionDots as any)?.fireStrikeExtraStrikeDots?.filter(Boolean).length || 0))
-                          : (subclass === 'Aeronaut' && (sheet?.subclassProgressionDots as any)?.aeronautStrikeExtraDots?.[0])
-                            ? 2
-                            : (subclass === 'Brawler' && (sheet?.subclassProgressionDots as any)?.brawlerStrikeExtraDots?.[0])
-                              ? 2
-                              : (subclass === 'Spectre' && (sheet?.subclassProgressionDots as any)?.spectreStrikeExtraDots?.[0])
-                                ? 2
-                                : (subclass === 'Pistoleer' && ((sheet?.subclassProgressionDots as any)?.pistoleerStrikeDots?.filter(Boolean).length || 0) > 0)
-                                  ? (1 + ((sheet?.subclassProgressionDots as any)?.pistoleerStrikeDots?.filter(Boolean).length || 0))
-                                  : (multiStrike > 0 ? multiStrike : <span style={{ visibility: 'hidden' }}>0</span>)
+            (() => {
+              // Calculate base multiStrike (default is 1, not shown)
+              let calculatedMultiStrike = 1;
+              
+              // Add Mantid +1 Strike bonus
+              if (subspecies === 'Mantid' && sheet?.subspeciesCardDots?.[0]?.[0]) {
+                calculatedMultiStrike += 1;
+              }
+              
+              // Check for class/subclass bonuses that override or add
+              if (charClass === 'Contemplative') {
+                calculatedMultiStrike = 2 + (sheet?.classCardDots?.[1]?.[0] ? 1 : 0) + ((sheet?.subclassProgressionDots as any)?.kineticStrikeMultiStrikeDots?.[0] ? 1 : 0) + ((sheet?.subclassProgressionDots as any)?.mercurialStrikeMultiStrikeDots?.[0] ? 1 : 0) + ((sheet?.subclassProgressionDots as any)?.vectorialStrikeMultiStrikeDots?.[0] ? 1 : 0);
+                // Add Mantid bonus to Contemplative
+                if (subspecies === 'Mantid' && sheet?.subspeciesCardDots?.[0]?.[0]) {
+                  calculatedMultiStrike += 1;
+                }
+              } else if (subclass === 'Beguiler' && sheet?.subclassProgressionDots?.beguilerStrikeStrikeDots?.[0]) {
+                calculatedMultiStrike = 2;
+                if (subspecies === 'Mantid' && sheet?.subspeciesCardDots?.[0]?.[0]) {
+                  calculatedMultiStrike += 1;
+                }
+              } else if (subclass === 'Galvanic' && (sheet?.subclassProgressionDots as any)?.galvanicStrikeStrikeDots?.[0]) {
+                calculatedMultiStrike = 2;
+                if (subspecies === 'Mantid' && sheet?.subspeciesCardDots?.[0]?.[0]) {
+                  calculatedMultiStrike += 1;
+                }
+              } else if (subclass === 'Tactician' && (sheet?.subclassProgressionDots as any)?.tacticianStrikeStrikeDots?.[0]) {
+                calculatedMultiStrike = 2;
+                if (subspecies === 'Mantid' && sheet?.subspeciesCardDots?.[0]?.[0]) {
+                  calculatedMultiStrike += 1;
+                }
+              } else if (subclass === 'Chaos' && (sheet?.subclassProgressionDots as any)?.chaosStrikeMultiStrikeDots?.[0]) {
+                calculatedMultiStrike = 2;
+                if (subspecies === 'Mantid' && sheet?.subspeciesCardDots?.[0]?.[0]) {
+                  calculatedMultiStrike += 1;
+                }
+              } else if (subclass === 'Air' && ((sheet?.subclassProgressionDots as any)?.airStrikeMultiStrikeDots?.filter(Boolean).length || 0) > 0) {
+                calculatedMultiStrike = 1 + ((sheet?.subclassProgressionDots as any)?.airStrikeMultiStrikeDots?.filter(Boolean).length || 0);
+                if (subspecies === 'Mantid' && sheet?.subspeciesCardDots?.[0]?.[0]) {
+                  calculatedMultiStrike += 1;
+                }
+              } else if (subclass === 'Fire' && ((sheet?.subclassProgressionDots as any)?.fireStrikeExtraStrikeDots?.filter(Boolean).length || 0) > 0) {
+                calculatedMultiStrike = 1 + ((sheet?.subclassProgressionDots as any)?.fireStrikeExtraStrikeDots?.filter(Boolean).length || 0);
+                if (subspecies === 'Mantid' && sheet?.subspeciesCardDots?.[0]?.[0]) {
+                  calculatedMultiStrike += 1;
+                }
+              } else if (subclass === 'Aeronaut' && (sheet?.subclassProgressionDots as any)?.aeronautStrikeExtraDots?.[0]) {
+                calculatedMultiStrike = 2;
+                if (subspecies === 'Mantid' && sheet?.subspeciesCardDots?.[0]?.[0]) {
+                  calculatedMultiStrike += 1;
+                }
+              } else if (subclass === 'Brawler' && (sheet?.subclassProgressionDots as any)?.brawlerStrikeExtraDots?.[0]) {
+                calculatedMultiStrike = 2;
+                if (subspecies === 'Mantid' && sheet?.subspeciesCardDots?.[0]?.[0]) {
+                  calculatedMultiStrike += 1;
+                }
+              } else if (subclass === 'Spectre' && (sheet?.subclassProgressionDots as any)?.spectreStrikeExtraDots?.[0]) {
+                calculatedMultiStrike = 2;
+                if (subspecies === 'Mantid' && sheet?.subspeciesCardDots?.[0]?.[0]) {
+                  calculatedMultiStrike += 1;
+                }
+              } else if (subclass === 'Pistoleer' && ((sheet?.subclassProgressionDots as any)?.pistoleerStrikeDots?.filter(Boolean).length || 0) > 0) {
+                calculatedMultiStrike = 1 + ((sheet?.subclassProgressionDots as any)?.pistoleerStrikeDots?.filter(Boolean).length || 0);
+                if (subspecies === 'Mantid' && sheet?.subspeciesCardDots?.[0]?.[0]) {
+                  calculatedMultiStrike += 1;
+                }
+              }
+              
+              // Only show if >= 2
+              return calculatedMultiStrike >= 2 ? calculatedMultiStrike : <span style={{ visibility: 'hidden' }}>0</span>;
+            })()
           }</span></div>
           <div className={styles.horizontalLabel} style={{ color: '#351c75', fontWeight: 'bold' }}>
               <u>Strike Effects</u> {
@@ -3764,6 +3871,35 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
               {hostSpecies === 'Human Host' && sheet?.humanHostDamageTypes && sheet.humanHostDamageTypes.length > 0 && (
                 <>
                   {sheet.humanHostDamageTypes.map((type, index) => {
+                    const damageTypeColors: { [key: string]: string } = {
+                      'Chemical': '#de7204',
+                      'Cold': '#3ebbff',
+                      'Electric': '#d5d52a',
+                      'Fire': '#f90102',
+                      'Force': '#516fff',
+                      'Neural': '#a929ff',
+                      'Toxic': '#02b900'
+                    };
+                    const damageTypeIcons: { [key: string]: string } = {
+                      'Chemical': '/Chemical.png',
+                      'Cold': '/Cold.png',
+                      'Electric': '/Electric.png',
+                      'Fire': '/Fire.png',
+                      'Force': '/Force.png',
+                      'Neural': '/Neural.png',
+                      'Toxic': '/Toxic.png'
+                    };
+                    return (
+                      <span key={index} style={{ marginLeft: 8, display: 'inline-flex', alignItems: 'center', color: damageTypeColors[type], wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                        <u>{type}</u> <img src={damageTypeIcons[type]} alt={type} style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+                      </span>
+                    );
+                  })}
+                </>
+              )}
+              {species === 'Human' && sheet?.humanDamageTypes && sheet.humanDamageTypes.length > 0 && (
+                <>
+                  {sheet.humanDamageTypes.map((type, index) => {
                     const damageTypeColors: { [key: string]: string } = {
                       'Chemical': '#de7204',
                       'Cold': '#3ebbff',

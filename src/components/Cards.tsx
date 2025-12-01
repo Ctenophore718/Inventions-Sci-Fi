@@ -44,6 +44,7 @@ import { generateIronCarapaceCardJSX } from "../utils/entomosTechnique";
 import { generateTenacityCardJSX } from "../utils/apocritanTechnique";
 import { generateStinkbugCloudCardJSX } from "../utils/dynastesTechnique";
 import { generatePinDownCardJSX } from "../utils/mantidTechnique";
+import { generateActionSurgeCardJSX } from "../utils/humanTechnique";
 import React from "react";
 import type { CharacterSheet } from "../types/CharacterSheet";
 import { loadSheetById, saveCharacterSheet } from "../utils/storage";
@@ -1265,7 +1266,7 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                 fontFamily: 'Arial, Helvetica, sans-serif',
                 fontWeight: 'bold',
                 fontSize: 'clamp(0.8em, 4vw, 1.25em)',
-                color: localSheet?.species === 'Avenoch' ? '#2b5f59' : localSheet?.species === 'Cerebronych' ? '#5f5e2b' : localSheet?.species === 'Chloroptid' ? '#315f2b' : localSheet?.species === 'Cognizant' ? '#2b3b5f' : localSheet?.species === 'Emberfolk' ? '#5f2b2b' : localSheet?.species === 'Entomos' ? '#5f422b' : 'black',
+                color: localSheet?.species === 'Avenoch' ? '#2b5f59' : localSheet?.species === 'Cerebronych' ? '#5f5e2b' : localSheet?.species === 'Chloroptid' ? '#315f2b' : localSheet?.species === 'Cognizant' ? '#2b3b5f' : localSheet?.species === 'Emberfolk' ? '#5f2b2b' : localSheet?.species === 'Entomos' ? '#5f422b' : localSheet?.species === 'Human' ? '#2b315f' : 'black',
                 lineHeight: 1,
                 textAlign: 'left',
                 whiteSpace: 'nowrap',
@@ -1274,13 +1275,13 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                 flexShrink: 1,
                 marginRight: '5px'
               }}>
-                {localSheet?.species === 'Avenoch' ? 'Avian Gaze' : localSheet?.species === 'Cerebronych' ? 'Memory Manifest' : localSheet?.species === 'Chloroptid' ? 'Unusual Growth' : localSheet?.species === 'Cognizant' ? 'Local Area Network' : localSheet?.species === 'Emberfolk' ? 'Oppressive Heat' : localSheet?.species === 'Entomos' ? 'Iron Carapace' : 'Species Card Name'}
+                {localSheet?.species === 'Avenoch' ? 'Avian Gaze' : localSheet?.species === 'Cerebronych' ? 'Memory Manifest' : localSheet?.species === 'Chloroptid' ? 'Unusual Growth' : localSheet?.species === 'Cognizant' ? 'Local Area Network' : localSheet?.species === 'Emberfolk' ? 'Oppressive Heat' : localSheet?.species === 'Entomos' ? 'Iron Carapace' : localSheet?.species === 'Human' ? 'Action Surge' : 'Species Card Name'}
               </span>
               <span style={{
                 fontFamily: 'Arial, Helvetica, sans-serif',
                 fontStyle: 'italic',
                 fontSize: '0.75em',
-                color: localSheet?.species === 'Avenoch' ? '#2b5f59' : localSheet?.species === 'Cerebronych' ? '#5f5e2b' : localSheet?.species === 'Chloroptid' ? '#315f2b' : localSheet?.species === 'Cognizant' ? '#2b3b5f' : localSheet?.species === 'Emberfolk' ? '#5f2b2b' : localSheet?.species === 'Entomos' ? '#5f422b' : 'black',
+                color: localSheet?.species === 'Avenoch' ? '#2b5f59' : localSheet?.species === 'Cerebronych' ? '#5f5e2b' : localSheet?.species === 'Chloroptid' ? '#315f2b' : localSheet?.species === 'Cognizant' ? '#2b3b5f' : localSheet?.species === 'Emberfolk' ? '#5f2b2b' : localSheet?.species === 'Entomos' ? '#5f422b' : localSheet?.species === 'Human' ? '#2b315f' : 'black',
                 lineHeight: 1,
                 whiteSpace: 'normal',
                 wordBreak: 'keep-all',
@@ -1288,11 +1289,11 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                 maxWidth: '72px',
                 display: 'inline-block',
                 textAlign: 'right'
-              }}>{localSheet?.species === 'Avenoch' ? 'Avenoch' : localSheet?.species === 'Cerebronych' ? 'Cerebronych' : localSheet?.species === 'Chloroptid' ? 'Chloroptid' : localSheet?.species === 'Cognizant' ? 'Cognizant' : localSheet?.species === 'Emberfolk' ? 'Emberfolk' : localSheet?.species === 'Entomos' ? 'Entomos' : 'Species'}</span>
+              }}>{localSheet?.species === 'Avenoch' ? 'Avenoch' : localSheet?.species === 'Cerebronych' ? 'Cerebronych' : localSheet?.species === 'Chloroptid' ? 'Chloroptid' : localSheet?.species === 'Cognizant' ? 'Cognizant' : localSheet?.species === 'Emberfolk' ? 'Emberfolk' : localSheet?.species === 'Entomos' ? 'Entomos' : localSheet?.species === 'Human' ? 'Human' : 'Species'}</span>
             </div>
             <img 
-              src={localSheet?.species === 'Avenoch' ? "/Avian Gaze.png" : localSheet?.species === 'Cerebronych' ? "/Memory Manifest.png" : localSheet?.species === 'Chloroptid' ? "/Unusual Growth.png" : localSheet?.species === 'Cognizant' ? "/Local Area Network.png" : localSheet?.species === 'Emberfolk' ? "/Oppressive Heat.png" : localSheet?.species === 'Entomos' ? "/Iron Carapace.png" : "/Blank Card.png"}
-              alt={localSheet?.species === 'Avenoch' ? "Avian Gaze" : localSheet?.species === 'Cerebronych' ? "Memory Manifest" : localSheet?.species === 'Chloroptid' ? "Unusual Growth" : localSheet?.species === 'Cognizant' ? "Local Area Network" : localSheet?.species === 'Emberfolk' ? "Oppressive Heat" : localSheet?.species === 'Entomos' ? "Iron Carapace" : "Blank Card"}
+              src={localSheet?.species === 'Avenoch' ? "/Avian Gaze.png" : localSheet?.species === 'Cerebronych' ? "/Memory Manifest.png" : localSheet?.species === 'Chloroptid' ? "/Unusual Growth.png" : localSheet?.species === 'Cognizant' ? "/Local Area Network.png" : localSheet?.species === 'Emberfolk' ? "/Oppressive Heat.png" : localSheet?.species === 'Entomos' ? "/Iron Carapace.png" : localSheet?.species === 'Human' ? "/Action Surge.png" : "/Blank Card.png"}
+              alt={localSheet?.species === 'Avenoch' ? "Avian Gaze" : localSheet?.species === 'Cerebronych' ? "Memory Manifest" : localSheet?.species === 'Chloroptid' ? "Unusual Growth" : localSheet?.species === 'Cognizant' ? "Local Area Network" : localSheet?.species === 'Emberfolk' ? "Oppressive Heat" : localSheet?.species === 'Entomos' ? "Iron Carapace" : localSheet?.species === 'Human' ? "Action Surge" : "Blank Card"}
               style={{
                 position: 'absolute',
                 top: 35,
@@ -1343,6 +1344,10 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                 <span style={{ color: '#bf9000', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '0.875em', fontStyle: 'italic', marginRight: 22, whiteSpace: 'nowrap', maxWidth: 'calc(100% - 120px)', overflow: 'hidden', textOverflow: 'ellipsis', textAlign: 'right' }}>
                   Cooldown <span style={{ fontWeight: 'bold', fontStyle: 'normal' }}>[{3 - (localSheet?.speciesCardDots?.[4]?.filter(Boolean).length || 0)}]</span>
                 </span>
+              ) : localSheet?.species === 'Human' ? (
+                <span style={{ color: '#bf9000', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '0.875em', fontStyle: 'italic', marginRight: 22, whiteSpace: 'nowrap', maxWidth: 'calc(100% - 120px)', overflow: 'hidden', textOverflow: 'ellipsis', textAlign: 'right' }}>
+                  Cooldown <span style={{ fontWeight: 'bold', fontStyle: 'normal' }}>[{5 - (localSheet?.speciesCardDots?.[2]?.filter(Boolean).length || 0)}]</span>
+                </span>
               ) : localSheet?.subclass === 'Air' ? (
                 <span style={{ color: '#bf9000', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '0.875em', fontStyle: 'italic', marginRight: 22, whiteSpace: 'nowrap', maxWidth: 'calc(100% - 120px)', overflow: 'hidden', textOverflow: 'ellipsis', textAlign: 'right' }}>
                   Cooldown <span style={{ fontWeight: 'bold', fontStyle: 'normal' }}>[{4 - ((localSheet?.subclassProgressionDots as any)?.airTechniqueCooldownDots?.filter(Boolean).length || 0)}]</span>
@@ -1381,7 +1386,7 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                 maxHeight: '100%',
                 overflow: 'hidden'
               }}>
-                {localSheet?.species === 'Avenoch' ? generateAvianGazeCardJSX(localSheet?.speciesCardDots) : localSheet?.species === 'Cerebronych' ? generateMemoryManifestCardJSX(localSheet?.speciesCardDots) : localSheet?.species === 'Chloroptid' ? generateUnusualGrowthCardJSX(localSheet?.speciesCardDots) : localSheet?.species === 'Cognizant' ? generateLocalAreaNetworkCardJSX(3 - (localSheet?.speciesCardDots?.[4]?.filter(Boolean).length || 0), 3 + (localSheet?.speciesCardDots?.[2]?.filter(Boolean).length || 0), localSheet?.speciesCardDots?.[3]?.[0] ? 1 : 0) : localSheet?.species === 'Emberfolk' ? generateOppressiveHeatCardJSX(4 - (localSheet?.speciesCardDots?.[5]?.filter(Boolean).length || 0), 3 + (localSheet?.speciesCardDots?.[2]?.filter(Boolean).length || 0), 1 + (localSheet?.speciesCardDots?.[3]?.filter(Boolean).length || 0), localSheet?.speciesCardDots?.[4]?.[0] ?? false) : localSheet?.species === 'Entomos' ? generateIronCarapaceCardJSX(3 - (localSheet?.speciesCardDots?.[4]?.filter(Boolean).length || 0), 2 + (localSheet?.speciesCardDots?.[2]?.filter(Boolean).length || 0), localSheet?.speciesCardDots?.[3]?.[0] ?? false) : 'Card stats.'}
+                {localSheet?.species === 'Avenoch' ? generateAvianGazeCardJSX(localSheet?.speciesCardDots) : localSheet?.species === 'Cerebronych' ? generateMemoryManifestCardJSX(localSheet?.speciesCardDots) : localSheet?.species === 'Chloroptid' ? generateUnusualGrowthCardJSX(localSheet?.speciesCardDots) : localSheet?.species === 'Cognizant' ? generateLocalAreaNetworkCardJSX(3 - (localSheet?.speciesCardDots?.[4]?.filter(Boolean).length || 0), 3 + (localSheet?.speciesCardDots?.[2]?.filter(Boolean).length || 0), localSheet?.speciesCardDots?.[3]?.[0] ? 1 : 0) : localSheet?.species === 'Emberfolk' ? generateOppressiveHeatCardJSX(4 - (localSheet?.speciesCardDots?.[5]?.filter(Boolean).length || 0), 3 + (localSheet?.speciesCardDots?.[2]?.filter(Boolean).length || 0), 1 + (localSheet?.speciesCardDots?.[3]?.filter(Boolean).length || 0), localSheet?.speciesCardDots?.[4]?.[0] ?? false) : localSheet?.species === 'Entomos' ? generateIronCarapaceCardJSX(3 - (localSheet?.speciesCardDots?.[4]?.filter(Boolean).length || 0), 2 + (localSheet?.speciesCardDots?.[2]?.filter(Boolean).length || 0), localSheet?.speciesCardDots?.[3]?.[0] ?? false) : localSheet?.species === 'Human' ? generateActionSurgeCardJSX(3 + (localSheet?.speciesCardDots?.[1]?.filter(Boolean).length || 0)) : 'Card stats.'}
               </div>
             </div>
             <div style={{
@@ -1410,7 +1415,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                         ? 'The heat emanating from an Emberfolk\'s body can be turned up to 11, searing any sorry sap standing nearby.'
                         : localSheet?.species === 'Entomos'
                           ? '"Hardened shells protect the mighty while soft flesh makes the weak vulnerable." --Entomos saying'
-                          : 'Flavor text.'}
+                          : localSheet?.species === 'Human'
+                            ? '"Do more with more, that\'s what I always say!" --Kelson Graeber, Human Secessionist'
+                            : 'Flavor text.'}
             </div>
         </div>
         

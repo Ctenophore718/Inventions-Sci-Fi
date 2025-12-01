@@ -76,6 +76,13 @@ const CharacterSheetPerks: React.FC<CharacterSheetPerksProps> = ({
                 Entomos
               </span>
             )}
+            {sheet?.humanLanguages && sheet.humanLanguages.length > 0 && (
+              sheet.humanLanguages.map((lang, index) => (
+                <span key={index} style={{ fontWeight: 'normal', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', color: '#000' }}>
+                  {lang}
+                </span>
+              ))
+            )}
           </div>
           {/* Class Perk segment, visible if Class Perk dot is selected */}
           {charClass === 'Chemist' && sheet?.classCardDots?.[9]?.[0] && (
@@ -182,6 +189,13 @@ const CharacterSheetPerks: React.FC<CharacterSheetPerksProps> = ({
             <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
               <span>
                 <b><i style={{ color: '#5f422b' }}>Hiveminded.</i></b> <span style={{ color: '#000' }}>You instinctively understand hive mentality and can pick up on social hierarchies and dynamics after only a glance at the way a particular organization, department, or tribe operates. Gain an advantage on related skill rolls.</span>
+              </span>
+            </div>
+          )}
+          {sheet?.species === 'Human' && sheet?.speciesCardDots?.[4]?.[0] && (
+            <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <span>
+                <b><i style={{ color: '#2b315f' }}>Jack of All Trades.</i></b> <span style={{ color: '#000' }}>Your human determination and adaptability allow you to have a better chance at succeeding in any skill. Your minimum skill level for all skills becomes 14+.</span>
               </span>
             </div>
           )}
