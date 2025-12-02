@@ -573,6 +573,13 @@ const CharacterSheetPerks: React.FC<CharacterSheetPerksProps> = ({
             </span>
           </div>
           )}
+          {subspecies === 'Lithe Evolution' && sheet?.subspeciesCardDots?.[7]?.[0] && (
+          <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <span>
+              <b><i style={{ color: '#2b5f5f' }}>Elven Alacrity.</i></b> <span style={{ color: '#000' }}>You are both wise and sharp witted, being able to pick up on much subtler situations and understand the truth behind others' words and actions. Gain an advantage on related skill rolls.</span>
+            </span>
+          </div>
+          )}
         </div>
       </div>
   );

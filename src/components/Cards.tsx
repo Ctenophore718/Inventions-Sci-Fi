@@ -46,6 +46,7 @@ import { generateStinkbugCloudCardJSX } from "../utils/dynastesTechnique";
 import { generatePinDownCardJSX } from "../utils/mantidTechnique";
 import { generateActionSurgeCardJSX } from "../utils/humanTechnique";
 import { generateSizeMattersCardJSX } from "../utils/diminutiveTechnique";
+import { generateSharedWisdomCardJSX } from "../utils/litheTechnique";
 import React from "react";
 import type { CharacterSheet } from "../types/CharacterSheet";
 import { loadSheetById, saveCharacterSheet } from "../utils/storage";
@@ -464,6 +465,20 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
       const hp5Dots = subspeciesDots[3] || [];
       const hp10Dots = subspeciesDots[4] || [];
       const hp15Dots = subspeciesDots[5] || [];
+      
+      const hp5Bonus = hp5Dots.filter(Boolean).length * 5;
+      const hp10Bonus = hp10Dots.filter(Boolean).length * 10;
+      const hp15Bonus = (hp15Dots[0] ? 15 : 0);
+      
+      effectiveHP += 40 + hp5Bonus + hp10Bonus + hp15Bonus;
+    }
+    
+    // Add Lithe Evolution subspecies bonus
+    if (localSheet?.subspecies === 'Lithe Evolution') {
+      const subspeciesDots = localSheet?.subspeciesCardDots || [];
+      const hp5Dots = subspeciesDots[4] || [];
+      const hp10Dots = subspeciesDots[5] || [];
+      const hp15Dots = subspeciesDots[6] || [];
       
       const hp5Bonus = hp5Dots.filter(Boolean).length * 5;
       const hp10Bonus = hp10Dots.filter(Boolean).length * 10;
@@ -1498,6 +1513,8 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                             ? '#75904e'
                             : localSheet?.subspecies === 'Diminutive Evolution'
                             ? '#c3735f'
+                            : localSheet?.subspecies === 'Lithe Evolution'
+                            ? '#2b5f5f'
                             : 'black',
                 lineHeight: 1,
                 textAlign: 'left', 
@@ -1541,7 +1558,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                                               ? 'Pin Down'
                                               : localSheet?.subspecies === 'Diminutive Evolution'
                                                 ? 'Size Matters'
-                                                : 'Subspecies Card Name'}
+                                                : localSheet?.subspecies === 'Lithe Evolution'
+                                                  ? 'Shared Wisdom'
+                                                  : 'Subspecies Card Name'}
               </span>
               <span style={{
                 fontFamily: 'Arial, Helvetica, sans-serif',
@@ -1579,6 +1598,8 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                                             ? '#75904e'
                                             : localSheet?.subspecies === 'Diminutive Evolution'
                                             ? '#c3735f'
+                                            : localSheet?.subspecies === 'Lithe Evolution'
+                                            ? '#2b5f5f'
                                             : 'black',
                 lineHeight: 1,
                 whiteSpace: 'normal',
@@ -1621,7 +1642,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                                               ? 'Mantid'
                                               : localSheet?.subspecies === 'Diminutive Evolution'
                                                 ? (<>Diminutive<br/>Evolution</>)
-                                                : 'Subspecies'}</span>
+                                                : localSheet?.subspecies === 'Lithe Evolution'
+                                                  ? (<>Lithe<br/>Evolution</>)
+                                                  : 'Subspecies'}</span>
             </div>
             <img 
               src={localSheet?.species === 'Cerebronych'
@@ -1658,6 +1681,8 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                                             ? "/Pin Down.png"
                                             : localSheet?.subspecies === 'Diminutive Evolution'
                                             ? "/Size Matters.png"
+                                            : localSheet?.subspecies === 'Lithe Evolution'
+                                            ? "/Shared Wisdom.png"
                                             : "/Blank Card.png"}
               alt={localSheet?.species === 'Cerebronych'
                 ? "Limit Push"
@@ -1750,7 +1775,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                                                 ? `[${4 - (localSheet?.subspeciesCardDots?.[4]?.filter(Boolean).length ?? 0)}]`
                                                 : localSheet?.subspecies === 'Diminutive Evolution'
                                                   ? `[${3 - (localSheet?.subspeciesCardDots?.[2]?.filter(Boolean).length ?? 0)}]`
-                                                  : '[#]'}
+                                                  : localSheet?.subspecies === 'Lithe Evolution'
+                                                    ? `[${3 - (localSheet?.subspeciesCardDots?.[3]?.filter(Boolean).length ?? 0)}]`
+                                                    : '[#]'}
                 </span>
               </span>
             </div>
@@ -1865,7 +1892,12 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                                                 ? generateSizeMattersCardJSX(
                                                     3 + (localSheet?.subspeciesCardDots?.[1]?.filter(Boolean).length ?? 0)
                                                   )
-                                                : 'Card stats.'}
+                                                : localSheet?.subspecies === 'Lithe Evolution'
+                                                  ? generateSharedWisdomCardJSX(
+                                                      3 + (localSheet?.subspeciesCardDots?.[1]?.filter(Boolean).length ?? 0),
+                                                      localSheet?.subspeciesCardDots?.[2]?.[0] ?? false
+                                                    )
+                                                  : 'Card stats.'}
               </div>
             </div>
             <div style={{
@@ -1916,6 +1948,8 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                                             ? '"They say that my claws are fierce, but how pretty are my hypnotic eyes?" --Jesperine Kaardinen, Mantid Duchess'
                                             : localSheet?.subspecies === 'Diminutive Evolution'
                                             ? '"I can slip between your feet faster than you can point that gun at me and shoot." --Fresnia Freebottom, Diminutive Human Thief'
+                                            : localSheet?.subspecies === 'Lithe Evolution'
+                                            ? '"When you realize the mind is the ultimate substrate to all gross forms of materiality, nothing can ever truly harm you." --Kaelith Verela, Lithe Human Sage'
                                             : 'Flavor text.'}
             </div>
         </div>

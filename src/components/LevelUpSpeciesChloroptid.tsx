@@ -1900,7 +1900,7 @@ const LevelUpSpeciesChloroptid: React.FC<LevelUpSpeciesChloroptidProps> = ({
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>9xp</span>
               <span></span>
               {/* Row 2: +1 Speed dots */}
-              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1 Speed</span>
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1hx <b><i style={{ color: '#38761d' }}>Speed</i></b></span>
               {[0, 1].map(idx => {
                 const arr = safeGetSubspeciesDotsArray(4);
                 const xpCosts = [5, 9];
