@@ -458,6 +458,20 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
       effectiveHP += 35 + hp5Bonus + hp10Bonus + hp15Bonus;
     }
     
+    // Add Diminutive Evolution subspecies bonus
+    if (localSheet?.subspecies === 'Diminutive Evolution') {
+      const subspeciesDots = localSheet?.subspeciesCardDots || [];
+      const hp5Dots = subspeciesDots[3] || [];
+      const hp10Dots = subspeciesDots[4] || [];
+      const hp15Dots = subspeciesDots[5] || [];
+      
+      const hp5Bonus = hp5Dots.filter(Boolean).length * 5;
+      const hp10Bonus = hp10Dots.filter(Boolean).length * 10;
+      const hp15Bonus = (hp15Dots[0] ? 15 : 0);
+      
+      effectiveHP += 40 + hp5Bonus + hp10Bonus + hp15Bonus;
+    }
+    
     // Add class-specific bonuses
     if (localSheet?.charClass === 'Exospecialist') {
       effectiveHP += 20;

@@ -865,7 +865,13 @@ const LevelUpSpeciesHuman: React.FC<LevelUpSpeciesHumanProps> = ({
           <div style={{ color: '#990000', fontWeight: 'bold', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '12px', marginTop: '20px' }}>
             <div style={{ fontWeight: 'bold', color: '#990000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Hit Points</u></div>
             <span style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
-              <b><i style={{ color: '#990000' }}>Starting Hit Points.</i></b> 40
+              <b><i>Starting</i></b> <b><i style={{ color: '#990000' }}>Hit Points.</i></b> 40{(() => {
+                const hp5Bonus = safeGetSubspeciesDotsArray(3).filter(Boolean).length * 5;
+                const hp10Bonus = safeGetSubspeciesDotsArray(4).filter(Boolean).length * 10;
+                const hp15Bonus = safeGetSubspeciesDotsArray(5)[0] ? 15 : 0;
+                const totalBonus = hp5Bonus + hp10Bonus + hp15Bonus;
+                return totalBonus > 0 ? <> + <b>[{totalBonus}]</b></> : <> + <b>[0]</b></>;
+              })()} <b><i style={{ color: '#990000' }}>Hit Points</i></b>.
             </span>
           </div>
 
@@ -921,17 +927,13 @@ const LevelUpSpeciesHuman: React.FC<LevelUpSpeciesHumanProps> = ({
                 );
               })}
 
-              {/* Spacing row */}
-              <span></span><span></span><span></span><span></span>
-
               {/* Row 5: XP header for +10 HP */}
-              <span></span>
               <span></span>
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>7xp</span>
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>9xp</span>
+              <span></span>
               {/* Row 6: +10 HP dots */}
               <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+10 <b><i style={{ color: '#990000' }}>Hit Points</i></b></span>
-              <span></span>
               {[0, 1].map(idx => {
                 const arr = safeGetSubspeciesDotsArray(4);
                 const xpCosts = [7, 9];
@@ -968,10 +970,10 @@ const LevelUpSpeciesHuman: React.FC<LevelUpSpeciesHumanProps> = ({
           </div>
 
           {/* +15 HP Section */}
-          <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px', marginBottom: '16px' }}>
+          <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '-18px', marginBottom: '16px' }}>
             <div style={{
               display: 'grid',
-              gridTemplateColumns: '1fr 24px',
+              gridTemplateColumns: '1fr 24px 24px 24px',
               gridTemplateRows: 'repeat(2, auto)',
               columnGap: '6px',
               rowGap: '2px',
@@ -982,6 +984,8 @@ const LevelUpSpeciesHuman: React.FC<LevelUpSpeciesHumanProps> = ({
               {/* Row 1: XP header for +15 HP */}
               <span></span>
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>16xp</span>
+              <span></span>
+              <span></span>
               {/* Row 2: +15 HP dot */}
               <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+15 <b><i style={{ color: '#990000' }}>Hit Points</i></b></span>
               {[0].map(idx => {
@@ -1028,7 +1032,7 @@ const LevelUpSpeciesHuman: React.FC<LevelUpSpeciesHumanProps> = ({
           </div>
 
           {/* Half-Sized Humor */}
-          <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px', marginBottom: '16px' }}>
+          <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '-12px', marginBottom: '16px' }}>
             <div style={{
               display: 'grid',
               gridTemplateColumns: '1fr 24px',
@@ -1044,7 +1048,7 @@ const LevelUpSpeciesHuman: React.FC<LevelUpSpeciesHumanProps> = ({
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>9sp</span>
               {/* Row 2: Half-Sized Humor */}
               <div style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', paddingRight: '8px' }}>
-                <i><b>Half-Sized Humor.</b> You are quick with a joke and others find you pleasing to be around. As such, you are often seen as funny and non-threatening in most situations. Gain an advantage on related skill rolls when being friendly with other people.</i>
+                <i><b style={{ color: '#c3735f' }}>Half-Sized Humor.</b></i> You are quick with a joke and others find you pleasing to be around. As such, you are often seen as funny and non-threatening in most situations. Gain an advantage on related skill rolls when being friendly with other people.
               </div>
               {[0].map(idx => {
                 const arr = safeGetSubspeciesDotsArray(6);

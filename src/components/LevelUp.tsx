@@ -303,6 +303,20 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
       effectiveHP += 35 + hp5Bonus + hp10Bonus + hp15Bonus;
     }
     
+    // Add Diminutive Evolution subspecies bonus
+    if (sheet?.subspecies === 'Diminutive Evolution') {
+      const subspeciesDots = sheet?.subspeciesCardDots || [];
+      const hp5Dots = subspeciesDots[3] || [];
+      const hp10Dots = subspeciesDots[4] || [];
+      const hp15Dots = subspeciesDots[5] || [];
+      
+      const hp5Bonus = hp5Dots.filter(Boolean).length * 5;
+      const hp10Bonus = hp10Dots.filter(Boolean).length * 10;
+      const hp15Bonus = (hp15Dots[0] ? 15 : 0);
+      
+      effectiveHP += 40 + hp5Bonus + hp10Bonus + hp15Bonus;
+    }
+    
     // Add Cognizant species bonus
     if (sheet?.species === 'Cognizant') {
       const speciesDots = sheet?.speciesCardDots || [];
@@ -2543,6 +2557,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                         if (subspecies === "Apocritan" && skillName === "Survival") sources.push({ type: 'subspecies', color: "rgba(109,113,86,0.5)" });
                         if (subspecies === "Dynastes" && skillName === "Intimidation") sources.push({ type: 'subspecies', color: "rgba(51,69,146,0.5)" });
                         if (subspecies === "Mantid" && skillName === "Awareness") sources.push({ type: 'subspecies', color: "rgba(117,144,78,0.5)" });
+                        if (subspecies === "Diminutive Evolution" && skillName === "Thievery") sources.push({ type: 'subspecies', color: "rgba(195,115,95,0.5)" });
 
                         return sources;
                       };

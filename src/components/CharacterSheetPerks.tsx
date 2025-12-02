@@ -566,6 +566,13 @@ const CharacterSheetPerks: React.FC<CharacterSheetPerksProps> = ({
             </span>
           </div>
           )}
+          {subspecies === 'Diminutive Evolution' && sheet?.subspeciesCardDots?.[6]?.[0] && (
+          <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <span>
+              <b><i style={{ color: '#c3735f' }}>Half-Sized Humor.</i></b> <span style={{ color: '#000' }}>You are quick with a joke and others find you pleasing to be around. As such, you are often seen as funny and non-threatening in most situations. Gain an advantage on related skill rolls when being friendly with other people.</span>
+            </span>
+          </div>
+          )}
         </div>
       </div>
   );
