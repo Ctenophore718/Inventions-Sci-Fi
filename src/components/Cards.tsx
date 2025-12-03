@@ -47,6 +47,8 @@ import { generatePinDownCardJSX } from "../utils/mantidTechnique";
 import { generateActionSurgeCardJSX } from "../utils/humanTechnique";
 import { generateSizeMattersCardJSX } from "../utils/diminutiveTechnique";
 import { generateSharedWisdomCardJSX } from "../utils/litheTechnique";
+import { generateWarCryCardJSX } from "../utils/massiveTechnique";
+import { generateComeatMeBroCardJSX } from "../utils/stoutTechnique";
 import React from "react";
 import type { CharacterSheet } from "../types/CharacterSheet";
 import { loadSheetById, saveCharacterSheet } from "../utils/storage";
@@ -483,6 +485,34 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
       const hp5Bonus = hp5Dots.filter(Boolean).length * 5;
       const hp10Bonus = hp10Dots.filter(Boolean).length * 10;
       const hp15Bonus = (hp15Dots[0] ? 15 : 0);
+      
+      effectiveHP += 40 + hp5Bonus + hp10Bonus + hp15Bonus;
+    }
+    
+    // Add Massive Evolution subspecies bonus
+    if (localSheet?.subspecies === 'Massive Evolution') {
+      const subspeciesDots = localSheet?.subspeciesCardDots || [];
+      const hp5Dots = subspeciesDots[9] || [];
+      const hp10Dots = subspeciesDots[10] || [];
+      const hp15Dots = subspeciesDots[11] || [];
+      
+      const hp5Bonus = hp5Dots.filter(Boolean).length * 5;
+      const hp10Bonus = hp10Dots.filter(Boolean).length * 10;
+      const hp15Bonus = hp15Dots.filter(Boolean).length * 15;
+      
+      effectiveHP += 45 + hp5Bonus + hp10Bonus + hp15Bonus;
+    }
+    
+    // Add Stout Evolution subspecies bonus
+    if (localSheet?.subspecies === 'Stout Evolution') {
+      const subspeciesDots = localSheet?.subspeciesCardDots || [];
+      const hp5Dots = subspeciesDots[7] || [];
+      const hp10Dots = subspeciesDots[8] || [];
+      const hp15Dots = subspeciesDots[9] || [];
+      
+      const hp5Bonus = hp5Dots.filter(Boolean).length * 5;
+      const hp10Bonus = hp10Dots.filter(Boolean).length * 10;
+      const hp15Bonus = hp15Dots.filter(Boolean).length * 15;
       
       effectiveHP += 40 + hp5Bonus + hp10Bonus + hp15Bonus;
     }
@@ -1515,6 +1545,10 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                             ? '#c3735f'
                             : localSheet?.subspecies === 'Lithe Evolution'
                             ? '#2b5f5f'
+                            : localSheet?.subspecies === 'Massive Evolution'
+                            ? '#2b175f'
+                            : localSheet?.subspecies === 'Stout Evolution'
+                            ? '#5f2b2b'
                             : 'black',
                 lineHeight: 1,
                 textAlign: 'left', 
@@ -1560,7 +1594,11 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                                                 ? 'Size Matters'
                                                 : localSheet?.subspecies === 'Lithe Evolution'
                                                   ? 'Shared Wisdom'
-                                                  : 'Subspecies Card Name'}
+                                                  : localSheet?.subspecies === 'Massive Evolution'
+                                                    ? 'War Cry'
+                                                    : localSheet?.subspecies === 'Stout Evolution'
+                                                      ? 'Come at Me, Bro!'
+                                                      : 'Subspecies Card Name'}
               </span>
               <span style={{
                 fontFamily: 'Arial, Helvetica, sans-serif',
@@ -1600,6 +1638,10 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                                             ? '#c3735f'
                                             : localSheet?.subspecies === 'Lithe Evolution'
                                             ? '#2b5f5f'
+                                            : localSheet?.subspecies === 'Massive Evolution'
+                                            ? '#2b175f'
+                                            : localSheet?.subspecies === 'Stout Evolution'
+                                            ? '#5f2b2b'
                                             : 'black',
                 lineHeight: 1,
                 whiteSpace: 'normal',
@@ -1644,7 +1686,11 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                                                 ? (<>Diminutive<br/>Evolution</>)
                                                 : localSheet?.subspecies === 'Lithe Evolution'
                                                   ? (<>Lithe<br/>Evolution</>)
-                                                  : 'Subspecies'}</span>
+                                                  : localSheet?.subspecies === 'Massive Evolution'
+                                                    ? (<>Massive<br/>Evolution</>)
+                                                    : localSheet?.subspecies === 'Stout Evolution'
+                                                      ? (<>Stout<br/>Evolution</>)
+                                                      : 'Subspecies'}</span>
             </div>
             <img 
               src={localSheet?.species === 'Cerebronych'
@@ -1683,6 +1729,10 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                                             ? "/Size Matters.png"
                                             : localSheet?.subspecies === 'Lithe Evolution'
                                             ? "/Shared Wisdom.png"
+                                            : localSheet?.subspecies === 'Massive Evolution'
+                                            ? "/War Cry.png"
+                                            : localSheet?.subspecies === 'Stout Evolution'
+                                            ? "/Come at Me, Bro!.png"
                                             : "/Blank Card.png"}
               alt={localSheet?.species === 'Cerebronych'
                 ? "Limit Push"
@@ -1777,7 +1827,11 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                                                   ? `[${3 - (localSheet?.subspeciesCardDots?.[2]?.filter(Boolean).length ?? 0)}]`
                                                   : localSheet?.subspecies === 'Lithe Evolution'
                                                     ? `[${3 - (localSheet?.subspeciesCardDots?.[3]?.filter(Boolean).length ?? 0)}]`
-                                                    : '[#]'}
+                                                    : localSheet?.subspecies === 'Massive Evolution'
+                                                      ? `[${4 - (localSheet?.subspeciesCardDots?.[8]?.filter(Boolean).length ?? 0)}]`
+                                                      : localSheet?.subspecies === 'Stout Evolution'
+                                                        ? `[${4 - (localSheet?.subspeciesCardDots?.[6]?.filter(Boolean).length ?? 0)}]`
+                                                        : '[#]'}
                 </span>
               </span>
             </div>
@@ -1897,7 +1951,20 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                                                       3 + (localSheet?.subspeciesCardDots?.[1]?.filter(Boolean).length ?? 0),
                                                       localSheet?.subspeciesCardDots?.[2]?.[0] ?? false
                                                     )
-                                                  : 'Card stats.'}
+                                                  : localSheet?.subspecies === 'Massive Evolution'
+                                                    ? generateWarCryCardJSX(
+                                                        3 + (localSheet?.subspeciesCardDots?.[3]?.filter(Boolean).length ?? 0),
+                                                        1 + (localSheet?.subspeciesCardDots?.[4]?.filter(Boolean).length ?? 0),
+                                                        localSheet?.subspeciesCardDots?.[5]?.[0] ?? false,
+                                                        1 + (localSheet?.subspeciesCardDots?.[6]?.[0] ? 1 : 0) + (localSheet?.subspeciesCardDots?.[7]?.[0] ? 1 : 0)
+                                                      )
+                                                    : localSheet?.subspecies === 'Stout Evolution'
+                                                      ? generateComeatMeBroCardJSX(
+                                                          localSheet?.subspeciesCardDots?.[3]?.filter(Boolean).length ?? 0,
+                                                          localSheet?.subspeciesCardDots?.[4]?.[0] ?? false,
+                                                          localSheet?.subspeciesCardDots?.[5]?.[0] ?? false
+                                                        )
+                                                      : 'Card stats.'}
               </div>
             </div>
             <div style={{
@@ -1950,6 +2017,10 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                                             ? '"I can slip between your feet faster than you can point that gun at me and shoot." --Fresnia Freebottom, Diminutive Human Thief'
                                             : localSheet?.subspecies === 'Lithe Evolution'
                                             ? '"When you realize the mind is the ultimate substrate to all gross forms of materiality, nothing can ever truly harm you." --Kaelith Verela, Lithe Human Sage'
+                                            : localSheet?.subspecies === 'Massive Evolution'
+                                            ? '"You want to keep fighting? Let me make it easy for you -- you\'re already dead." --Gront Skullcrusher, Massive Human Warrior'
+                                            : localSheet?.subspecies === 'Stout Evolution'
+                                            ? '"I dun\' have time fer this twaddle -- lemme at dem basterds!" --Tagnar Redbeard, Stout Human Belter Battalion Grunt'
                                             : 'Flavor text.'}
             </div>
         </div>

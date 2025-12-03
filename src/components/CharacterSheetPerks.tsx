@@ -580,6 +580,13 @@ const CharacterSheetPerks: React.FC<CharacterSheetPerksProps> = ({
             </span>
           </div>
           )}
+          {subspecies === 'Massive Evolution' && sheet?.subspeciesCardDots?.[9]?.[0] && (
+          <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <span>
+              <b><i style={{ color: '#2b175f' }}>Ogre Spirit.</i></b> <span style={{ color: '#000' }}>Your ogre-like nature has led you to possess incredible strength and endurance in all things physical. You are also quite large and can lift heavy objects and reach high places. Gain an advantage on related skill rolls.</span>
+            </span>
+          </div>
+          )}
         </div>
       </div>
   );
