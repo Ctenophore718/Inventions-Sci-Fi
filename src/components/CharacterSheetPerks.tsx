@@ -76,6 +76,16 @@ const CharacterSheetPerks: React.FC<CharacterSheetPerksProps> = ({
                 Entomos
               </span>
             )}
+            {sheet?.species === 'Lumenaren' && (
+              <span style={{ fontWeight: 'normal', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', color: '#000' }}>
+                Lumenaren
+              </span>
+            )}
+            {sheet?.lumenarenLanguage && (
+              <span style={{ fontWeight: 'normal', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', color: '#000' }}>
+                {sheet.lumenarenLanguage}
+              </span>
+            )}
             {sheet?.humanLanguages && sheet.humanLanguages.length > 0 && (
               sheet.humanLanguages.map((lang, index) => (
                 <span key={index} style={{ fontWeight: 'normal', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', color: '#000' }}>
@@ -196,6 +206,13 @@ const CharacterSheetPerks: React.FC<CharacterSheetPerksProps> = ({
             <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
               <span>
                 <b><i style={{ color: '#2b315f' }}>Jack of All Trades.</i></b> <span style={{ color: '#000' }}>Your human determination and adaptability allow you to have a better chance at succeeding in any skill. Your minimum skill level for all skills becomes 14+.</span>
+              </span>
+            </div>
+          )}
+          {sheet?.species === 'Lumenaren' && sheet?.speciesCardDots?.[8]?.[0] && (
+            <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <span>
+                <b><i style={{ color: '#515f2b' }}>Natural Battery.</i></b> <span style={{ color: '#000' }}>You are a creature of pure energy and light, and can thus charge any adjacent technologic device up to 7hx in size to full power in seconds, from a simple stopwatch to a ship's engine.</span>
               </span>
             </div>
           )}
@@ -584,6 +601,20 @@ const CharacterSheetPerks: React.FC<CharacterSheetPerksProps> = ({
           <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
             <span>
               <b><i style={{ color: '#2b175f' }}>Ogre Spirit.</i></b> <span style={{ color: '#000' }}>Your ogre-like nature has led you to possess incredible strength and endurance in all things physical. You are also quite large and can lift heavy objects and reach high places. Gain an advantage on related skill rolls.</span>
+            </span>
+          </div>
+          )}
+          {subspecies === 'Stout Evolution' && sheet?.subspeciesCardDots?.[10]?.[0] && (
+          <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <span>
+              <b><i style={{ color: '#5f2b2b' }}>Dwarven Resilience.</i></b> <span style={{ color: '#000' }}>Your dwarf-like nature allows you to thrive in underground and/or dark environments as well as stomach hefty amounts of intoxication and poisoning. Gain an advantage on related skills.</span>
+            </span>
+          </div>
+          )}
+          {subspecies === 'Infrared' && sheet?.subspeciesCardDots?.[4]?.[0] && (
+          <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <span>
+              <b><i style={{ color: '#b17fbe' }}>Visions of Calefaction.</i></b> <span style={{ color: '#000' }}>Your natural infrared vision allows you to see easily in the dark, and you can spot any heat signatures from upwards of miles away. Gain an advantage on related skill rolls.</span>
             </span>
           </div>
           )}

@@ -2428,10 +2428,12 @@ const LevelUpSpeciesHuman: React.FC<LevelUpSpeciesHumanProps> = ({
               {[0].map(idx => {
                 const arr = safeGetSubspeciesDotsArray(1);
                 const xpCosts = [3];
+                const toxicImmunitySelected = safeGetSubspeciesDotsArray(2)[0];
                 return (
                   <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
                     <span
                       onClick={() => {
+                        if (toxicImmunitySelected && arr[idx]) return;
                         const newDots = safeCloneSubspeciesCardDots();
                         if (!arr[idx]) {
                           newDots[1][idx] = true;
@@ -2448,7 +2450,7 @@ const LevelUpSpeciesHuman: React.FC<LevelUpSpeciesHumanProps> = ({
                         borderRadius: '50%',
                         display: 'block',
                         background: arr[idx] ? '#000' : '#fff',
-                        cursor: 'pointer',
+                        cursor: (toxicImmunitySelected && arr[idx]) ? 'not-allowed' : 'pointer',
                         transition: 'background 0.2s'
                       }}
                     ></span>
@@ -2532,7 +2534,7 @@ const LevelUpSpeciesHuman: React.FC<LevelUpSpeciesHumanProps> = ({
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>8xp</span>
               <span></span>
               {/* Row 2: +1d6 Strike damage dots */}
-              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1d6 Strike damage</span>
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1d6 <b><i style={{ color: '#351c75' }}>Strike</i></b> Damage</span>
               {[0, 1].map(idx => {
                 const arr = safeGetSubspeciesDotsArray(3);
                 const xpCosts = [5, 8];
@@ -2571,9 +2573,9 @@ const LevelUpSpeciesHuman: React.FC<LevelUpSpeciesHumanProps> = ({
               <span></span>
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>8xp</span>
               <span></span>
-              {/* Row 4: Resist all damage */}
-              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>Resist all damage</span>
               <span></span>
+              {/* Row 4: Resist all damage */}
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}><i>Resist</i> all Damage</span>
               {[0].map(idx => {
                 const arr = safeGetSubspeciesDotsArray(4);
                 const xpCosts = [8];
@@ -2608,11 +2610,12 @@ const LevelUpSpeciesHuman: React.FC<LevelUpSpeciesHumanProps> = ({
               {/* Row 5: XP header for Immune to all conditions */}
               <span></span>
               <span></span>
+              <span></span>
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>7xp</span>
               <span></span>
               {/* Row 6: Immune to all conditions */}
-              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>Immune to all conditions</span>
               <span></span>
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}><i>Immune</i> to all conditions</span>
               {[0].map(idx => {
                 const arr = safeGetSubspeciesDotsArray(5);
                 const xpCosts = [7];
@@ -2646,11 +2649,13 @@ const LevelUpSpeciesHuman: React.FC<LevelUpSpeciesHumanProps> = ({
 
               {/* Row 7: XP header for -1 Cooldown */}
               <span></span>
+              <span></span>
+              <span></span>
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>4xp</span>
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>7xp</span>
               <span></span>
               {/* Row 8: -1 Cooldown dots */}
-              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>-1 Cooldown</span>
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>-1 <i>Cooldown</i></span>
               {[0, 1].map(idx => {
                 const arr = safeGetSubspeciesDotsArray(6);
                 const xpCosts = [4, 7];
@@ -2692,7 +2697,7 @@ const LevelUpSpeciesHuman: React.FC<LevelUpSpeciesHumanProps> = ({
           </div>
 
           <div style={{ fontSize: '1em', color: '#000', marginBottom: '6px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
-            <i><b>Starting Hit Points.</b> 40</i>
+            <i><b>Starting</b></i> <i><b style={{ color: '#990000' }}>Hit Points.</b></i> 40 + <b>[{(safeGetSubspeciesDotsArray(7).filter(Boolean).length * 5) + (safeGetSubspeciesDotsArray(8).filter(Boolean).length * 10) + (safeGetSubspeciesDotsArray(9).filter(Boolean).length * 15)}]</b> <i><b style={{ color: '#990000' }}>Hit Points</b></i>.
           </div>
 
           {/* Hit Points Upgrades */}
@@ -2713,7 +2718,7 @@ const LevelUpSpeciesHuman: React.FC<LevelUpSpeciesHumanProps> = ({
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>4xp</span>
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>5xp</span>
               {/* Row 2: +5 HP dots */}
-              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+5 Hit Points</span>
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+5 <i><b style={{ color: '#990000' }}>Hit Points</b></i></span>
               {[0, 1, 2].map(idx => {
                 const arr = safeGetSubspeciesDotsArray(7);
                 const xpCosts = [3, 4, 5];
@@ -2753,7 +2758,7 @@ const LevelUpSpeciesHuman: React.FC<LevelUpSpeciesHumanProps> = ({
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>9xp</span>
               <span></span>
               {/* Row 4: +10 HP dots */}
-              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+10 Hit Points</span>
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+10 <i><b style={{ color: '#990000' }}>Hit Points</b></i></span>
               {[0, 1].map(idx => {
                 const arr = safeGetSubspeciesDotsArray(8);
                 const xpCosts = [7, 9];
@@ -2789,11 +2794,12 @@ const LevelUpSpeciesHuman: React.FC<LevelUpSpeciesHumanProps> = ({
 
               {/* Row 5: XP header for +15 HP */}
               <span></span>
+              <span></span>
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>16xp</span>
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>19xp</span>
               <span></span>
               {/* Row 6: +15 HP dots */}
-              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+15 Hit Points</span>
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+15 <i><b style={{ color: '#990000' }}>Hit Points</b></i></span>
               {[0, 1].map(idx => {
                 const arr = safeGetSubspeciesDotsArray(9);
                 const xpCosts = [16, 19];

@@ -28,6 +28,7 @@ import LevelUpSpeciesCognizant from "./LevelUpSpeciesCognizant";
 import LevelUpSpeciesEmberfolk from "./LevelUpSpeciesEmberfolk";
 import LevelUpSpeciesEntomos from "./LevelUpSpeciesEntomos";
 import LevelUpSpeciesHuman from "./LevelUpSpeciesHuman";
+import LevelUpSpeciesLumenaren from "./LevelUpSpeciesLumenaren";
 import { calculateChemistFeatureData } from "../utils/chemistFeature";
 
 
@@ -53,6 +54,12 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
   // Debounce timer for auto-save
   const saveTimeoutRef = useRef<number | null>(null);
   
+  // Use ref for sheet to avoid stale closures in debounced callbacks
+  const sheetRef = useRef(sheet);
+  useEffect(() => {
+    sheetRef.current = sheet;
+  }, [sheet]);
+  
   // Auto-save helper function with debouncing
   const handleAutoSave = useCallback((fieldUpdates: Partial<CharacterSheet>) => {
     if (onAutoSave) {
@@ -63,9 +70,10 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
       
       // Debounce the save by 150ms to batch rapid changes
       saveTimeoutRef.current = setTimeout(() => {
-        if (sheet) {
-          // Update existing sheet
-          const updatedSheet = { ...sheet, ...fieldUpdates };
+        const currentSheet = sheetRef.current;
+        if (currentSheet) {
+          // Update existing sheet - use ref to get latest sheet state
+          const updatedSheet = { ...currentSheet, ...fieldUpdates };
           onAutoSave(updatedSheet);
         } else {
           // Create new sheet with updates - this handles new character creation
@@ -73,7 +81,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
         }
       }, 150);
     }
-  }, [onAutoSave, sheet]);
+  }, [onAutoSave]);
   
   // Cleanup timeout on unmount
   useEffect(() => {
@@ -231,6 +239,20 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
         const barkskinHitPointsBonus = (subspeciesDots[7]?.filter(Boolean).length || 0) * 10;
         effectiveHP += barkskinHitPointsBonus;
       }
+    }
+    
+    // Add Lumenaren species bonus
+    if (sheet?.species === 'Lumenaren') {
+      const speciesDots = sheet?.speciesCardDots || [];
+      const hp5Dots = speciesDots[4] || [];
+      const hp10Dots = speciesDots[5] || [];
+      const hp15Dots = speciesDots[6] || [];
+      
+      const hp5Bonus = hp5Dots.filter(Boolean).length * 5;
+      const hp10Bonus = hp10Dots.filter(Boolean).length * 10;
+      const hp15Bonus = (hp15Dots[0] ? 15 : 0);
+      
+      effectiveHP += 30 + hp5Bonus + hp10Bonus + hp15Bonus;
     }
     
     // Add Petran subspecies bonus
@@ -542,27 +564,35 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
     return () => document.removeEventListener('mousedown', handleClick);
   }, [isSummonHpMenuExpanded]);
 
+  // Sync state when sheet identity changes (i.e., switching to a different character)
+  // This effect should ONLY run on sheet.id change, not on every prop change
+  const prevSheetIdRef = useRef<string | undefined>(sheet?.id);
   React.useEffect(() => {
-    setXpTotal(sheet?.xpTotal ?? 0);
-    setSpTotal(sheet?.spTotal ?? 0);
-    setMaxHitPoints(sheet?.maxHitPoints ?? 0);
-    setSpSpent(sheet?.spSpent ?? 0);
-    setXpSpent(sheet?.xpSpent ?? 0);
-    setCurrentHitPoints(sheet?.currentHitPoints ?? sheet?.maxHitPoints ?? 0);
-    setCredits(sheet?.credits ?? 0);
-    setChemTokens(sheet?.chemTokens ?? 0);
-    setCurrentSummonHp(sheet?.currentSummonHp ?? 0);
-    setMaxSummonHp(sheet?.maxSummonHp ?? 0);
-    setDeathCount(sheet?.deathCount || 0);
-    setBackground(sheet?.background || "");
-    // Update skillDots when sheet changes
-    if (sheet?.skillDots) {
-      setSkillDots(sheet.skillDots);
-    } else {
-      // Initialize with default empty state
-      setSkillDots(Object.fromEntries(skillList.map(skill => [skill, Array(10).fill(false)])));
+    // Only run full sync when switching to a different character
+    if (sheet?.id !== prevSheetIdRef.current) {
+      prevSheetIdRef.current = sheet?.id;
+      
+      setXpTotal(sheet?.xpTotal ?? 0);
+      setSpTotal(sheet?.spTotal ?? 0);
+      setMaxHitPoints(sheet?.maxHitPoints ?? 0);
+      setSpSpent(sheet?.spSpent ?? 0);
+      setXpSpent(sheet?.xpSpent ?? 0);
+      setCurrentHitPoints(sheet?.currentHitPoints ?? sheet?.maxHitPoints ?? 0);
+      setCredits(sheet?.credits ?? 0);
+      setChemTokens(sheet?.chemTokens ?? 0);
+      setCurrentSummonHp(sheet?.currentSummonHp ?? 0);
+      setMaxSummonHp(sheet?.maxSummonHp ?? 0);
+      setDeathCount(sheet?.deathCount || 0);
+      setBackground(sheet?.background || "");
+      // Update skillDots when sheet changes
+      if (sheet?.skillDots) {
+        setSkillDots(sheet.skillDots);
+      } else {
+        // Initialize with default empty state
+        setSkillDots(Object.fromEntries(skillList.map(skill => [skill, Array(10).fill(false)])));
+      }
     }
-  }, [sheet?.id, sheet?.credits]);
+  }, [sheet?.id]);
 
   // Auto-dismiss notice after 2.5 seconds
   React.useEffect(() => {
@@ -1986,6 +2016,24 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
               />
             )}
             
+            {/* Lumenaren Species Content */}
+            {species === "Lumenaren" && (
+              <LevelUpSpeciesLumenaren
+                sheet={sheet}
+                species={species}
+                subspecies={subspecies}
+                contentType="species"
+                onAutoSave={handleAutoSave}
+                xpTotal={xpTotal}
+                spTotal={spTotal}
+                xpSpent={xpSpent}
+                spSpent={spSpent}
+                setXpSpent={setXpSpent}
+                setSpSpent={setSpSpent}
+                setNotice={setNotice}
+              />
+            )}
+            
             {/* Human Species Content */}
             {species === "Human" && (
               <LevelUpSpeciesHuman
@@ -2443,6 +2491,24 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
               />
             )}
             
+            {/* Infrared Subspecies Content */}
+            {subspecies === "Infrared" && (
+              <LevelUpSpeciesLumenaren
+                sheet={sheet}
+                species={species}
+                subspecies={subspecies}
+                contentType="subspecies"
+                onAutoSave={handleAutoSave}
+                xpTotal={xpTotal}
+                spTotal={spTotal}
+                xpSpent={xpSpent}
+                spSpent={spSpent}
+                setXpSpent={setXpSpent}
+                setSpSpent={setSpSpent}
+                setNotice={setNotice}
+              />
+            )}
+            
             {/* Cerebronych (cont.) Subspecies Content */}
             {species === "Cerebronych" && (
               <LevelUpSpeciesCerebronych
@@ -2636,6 +2702,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                         if (species === "Emberfolk" && skillName === "Xenomagic") sources.push({ type: 'species', color: "rgba(95,43,43,0.5)" });
                         if (species === "Entomos" && skillName === "Athletics") sources.push({ type: 'species', color: "rgba(95,66,43,0.5)" });
                         if (species === "Human" && skillName === "Culture") sources.push({ type: 'species', color: "rgba(43,49,95,0.5)" });
+                        if (species === "Lumenaren" && skillName === "Stealth") sources.push({ type: 'species', color: "rgba(81,95,43,0.5)" });
                         
                         // Subspecies boosters
                         if (subspecies === "Corvid" && skillName === "Thievery") sources.push({ type: 'subspecies', color: "rgba(117,144,78,0.5)" });
@@ -2650,6 +2717,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                         if (subspecies === "Utility Droid" && skillName === "Computers") sources.push({ type: 'subspecies', color: "rgba(189,137,31,0.5)" });
                         if (subspecies === "Petran" && skillName === "Survival") sources.push({ type: 'subspecies', color: "rgba(115,83,17,0.5)" });
                         if (subspecies === "Pyran" && skillName === "Performance") sources.push({ type: 'subspecies', color: "rgba(179,17,17,0.5)" });
+                        if (subspecies === "Infrared" && skillName === "Performance") sources.push({ type: 'subspecies', color: "rgba(177,127,190,0.5)" });
                         if (subspecies === "Apocritan" && skillName === "Survival") sources.push({ type: 'subspecies', color: "rgba(109,113,86,0.5)" });
                         if (subspecies === "Dynastes" && skillName === "Intimidation") sources.push({ type: 'subspecies', color: "rgba(51,69,146,0.5)" });
                         if (subspecies === "Mantid" && skillName === "Awareness") sources.push({ type: 'subspecies', color: "rgba(117,144,78,0.5)" });

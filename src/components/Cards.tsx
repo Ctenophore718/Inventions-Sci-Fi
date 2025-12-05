@@ -45,10 +45,12 @@ import { generateTenacityCardJSX } from "../utils/apocritanTechnique";
 import { generateStinkbugCloudCardJSX } from "../utils/dynastesTechnique";
 import { generatePinDownCardJSX } from "../utils/mantidTechnique";
 import { generateActionSurgeCardJSX } from "../utils/humanTechnique";
+import { generateLightspeedCardJSX } from "../utils/lumenarenTechnique";
 import { generateSizeMattersCardJSX } from "../utils/diminutiveTechnique";
 import { generateSharedWisdomCardJSX } from "../utils/litheTechnique";
 import { generateWarCryCardJSX } from "../utils/massiveTechnique";
 import { generateComeatMeBroCardJSX } from "../utils/stoutTechnique";
+import { generateHeatSinkCardJSX } from "../utils/infraredTechnique";
 import React from "react";
 import type { CharacterSheet } from "../types/CharacterSheet";
 import { loadSheetById, saveCharacterSheet } from "../utils/storage";
@@ -379,6 +381,20 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
       const hp15Bonus = (hp15Dots[0] ? 15 : 0);
       
       effectiveHP += 40 + hp5Bonus + hp10Bonus + hp15Bonus;
+    }
+    
+    // Add Lumenaren species bonus
+    if (localSheet?.species === 'Lumenaren') {
+      const speciesDots = localSheet?.speciesCardDots || [];
+      const hp5Dots = speciesDots[4] || [];
+      const hp10Dots = speciesDots[5] || [];
+      const hp15Dots = speciesDots[6] || [];
+      
+      const hp5Bonus = hp5Dots.filter(Boolean).length * 5;
+      const hp10Bonus = hp10Dots.filter(Boolean).length * 10;
+      const hp15Bonus = (hp15Dots[0] ? 15 : 0);
+      
+      effectiveHP += 30 + hp5Bonus + hp10Bonus + hp15Bonus;
     }
     
     // Add Barkskin subspecies bonus
@@ -1326,7 +1342,7 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                 fontFamily: 'Arial, Helvetica, sans-serif',
                 fontWeight: 'bold',
                 fontSize: 'clamp(0.8em, 4vw, 1.25em)',
-                color: localSheet?.species === 'Avenoch' ? '#2b5f59' : localSheet?.species === 'Cerebronych' ? '#5f5e2b' : localSheet?.species === 'Chloroptid' ? '#315f2b' : localSheet?.species === 'Cognizant' ? '#2b3b5f' : localSheet?.species === 'Emberfolk' ? '#5f2b2b' : localSheet?.species === 'Entomos' ? '#5f422b' : localSheet?.species === 'Human' ? '#2b315f' : 'black',
+                color: localSheet?.species === 'Avenoch' ? '#2b5f59' : localSheet?.species === 'Cerebronych' ? '#5f5e2b' : localSheet?.species === 'Chloroptid' ? '#315f2b' : localSheet?.species === 'Cognizant' ? '#2b3b5f' : localSheet?.species === 'Emberfolk' ? '#5f2b2b' : localSheet?.species === 'Entomos' ? '#5f422b' : localSheet?.species === 'Human' ? '#2b315f' : localSheet?.species === 'Lumenaren' ? '#515f2b' : 'black',
                 lineHeight: 1,
                 textAlign: 'left',
                 whiteSpace: 'nowrap',
@@ -1335,13 +1351,13 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                 flexShrink: 1,
                 marginRight: '5px'
               }}>
-                {localSheet?.species === 'Avenoch' ? 'Avian Gaze' : localSheet?.species === 'Cerebronych' ? 'Memory Manifest' : localSheet?.species === 'Chloroptid' ? 'Unusual Growth' : localSheet?.species === 'Cognizant' ? 'Local Area Network' : localSheet?.species === 'Emberfolk' ? 'Oppressive Heat' : localSheet?.species === 'Entomos' ? 'Iron Carapace' : localSheet?.species === 'Human' ? 'Action Surge' : 'Species Card Name'}
+                {localSheet?.species === 'Avenoch' ? 'Avian Gaze' : localSheet?.species === 'Cerebronych' ? 'Memory Manifest' : localSheet?.species === 'Chloroptid' ? 'Unusual Growth' : localSheet?.species === 'Cognizant' ? 'Local Area Network' : localSheet?.species === 'Emberfolk' ? 'Oppressive Heat' : localSheet?.species === 'Entomos' ? 'Iron Carapace' : localSheet?.species === 'Human' ? 'Action Surge' : localSheet?.species === 'Lumenaren' ? 'Lightspeed' : 'Species Card Name'}
               </span>
               <span style={{
                 fontFamily: 'Arial, Helvetica, sans-serif',
                 fontStyle: 'italic',
                 fontSize: '0.75em',
-                color: localSheet?.species === 'Avenoch' ? '#2b5f59' : localSheet?.species === 'Cerebronych' ? '#5f5e2b' : localSheet?.species === 'Chloroptid' ? '#315f2b' : localSheet?.species === 'Cognizant' ? '#2b3b5f' : localSheet?.species === 'Emberfolk' ? '#5f2b2b' : localSheet?.species === 'Entomos' ? '#5f422b' : localSheet?.species === 'Human' ? '#2b315f' : 'black',
+                color: localSheet?.species === 'Avenoch' ? '#2b5f59' : localSheet?.species === 'Cerebronych' ? '#5f5e2b' : localSheet?.species === 'Chloroptid' ? '#315f2b' : localSheet?.species === 'Cognizant' ? '#2b3b5f' : localSheet?.species === 'Emberfolk' ? '#5f2b2b' : localSheet?.species === 'Entomos' ? '#5f422b' : localSheet?.species === 'Human' ? '#2b315f' : localSheet?.species === 'Lumenaren' ? '#515f2b' : 'black',
                 lineHeight: 1,
                 whiteSpace: 'normal',
                 wordBreak: 'keep-all',
@@ -1349,11 +1365,11 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                 maxWidth: '72px',
                 display: 'inline-block',
                 textAlign: 'right'
-              }}>{localSheet?.species === 'Avenoch' ? 'Avenoch' : localSheet?.species === 'Cerebronych' ? 'Cerebronych' : localSheet?.species === 'Chloroptid' ? 'Chloroptid' : localSheet?.species === 'Cognizant' ? 'Cognizant' : localSheet?.species === 'Emberfolk' ? 'Emberfolk' : localSheet?.species === 'Entomos' ? 'Entomos' : localSheet?.species === 'Human' ? 'Human' : 'Species'}</span>
+              }}>{localSheet?.species === 'Avenoch' ? 'Avenoch' : localSheet?.species === 'Cerebronych' ? 'Cerebronych' : localSheet?.species === 'Chloroptid' ? 'Chloroptid' : localSheet?.species === 'Cognizant' ? 'Cognizant' : localSheet?.species === 'Emberfolk' ? 'Emberfolk' : localSheet?.species === 'Entomos' ? 'Entomos' : localSheet?.species === 'Human' ? 'Human' : localSheet?.species === 'Lumenaren' ? 'Lumenaren' : 'Species'}</span>
             </div>
             <img 
-              src={localSheet?.species === 'Avenoch' ? "/Avian Gaze.png" : localSheet?.species === 'Cerebronych' ? "/Memory Manifest.png" : localSheet?.species === 'Chloroptid' ? "/Unusual Growth.png" : localSheet?.species === 'Cognizant' ? "/Local Area Network.png" : localSheet?.species === 'Emberfolk' ? "/Oppressive Heat.png" : localSheet?.species === 'Entomos' ? "/Iron Carapace.png" : localSheet?.species === 'Human' ? "/Action Surge.png" : "/Blank Card.png"}
-              alt={localSheet?.species === 'Avenoch' ? "Avian Gaze" : localSheet?.species === 'Cerebronych' ? "Memory Manifest" : localSheet?.species === 'Chloroptid' ? "Unusual Growth" : localSheet?.species === 'Cognizant' ? "Local Area Network" : localSheet?.species === 'Emberfolk' ? "Oppressive Heat" : localSheet?.species === 'Entomos' ? "Iron Carapace" : localSheet?.species === 'Human' ? "Action Surge" : "Blank Card"}
+              src={localSheet?.species === 'Avenoch' ? "/Avian Gaze.png" : localSheet?.species === 'Cerebronych' ? "/Memory Manifest.png" : localSheet?.species === 'Chloroptid' ? "/Unusual Growth.png" : localSheet?.species === 'Cognizant' ? "/Local Area Network.png" : localSheet?.species === 'Emberfolk' ? "/Oppressive Heat.png" : localSheet?.species === 'Entomos' ? "/Iron Carapace.png" : localSheet?.species === 'Human' ? "/Action Surge.png" : localSheet?.species === 'Lumenaren' ? "/Lightspeed.png" : "/Blank Card.png"}
+              alt={localSheet?.species === 'Avenoch' ? "Avian Gaze" : localSheet?.species === 'Cerebronych' ? "Memory Manifest" : localSheet?.species === 'Chloroptid' ? "Unusual Growth" : localSheet?.species === 'Cognizant' ? "Local Area Network" : localSheet?.species === 'Emberfolk' ? "Oppressive Heat" : localSheet?.species === 'Entomos' ? "Iron Carapace" : localSheet?.species === 'Human' ? "Action Surge" : localSheet?.species === 'Lumenaren' ? "Lightspeed" : "Blank Card"}
               style={{
                 position: 'absolute',
                 top: 35,
@@ -1408,6 +1424,10 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                 <span style={{ color: '#bf9000', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '0.875em', fontStyle: 'italic', marginRight: 22, whiteSpace: 'nowrap', maxWidth: 'calc(100% - 120px)', overflow: 'hidden', textOverflow: 'ellipsis', textAlign: 'right' }}>
                   Cooldown <span style={{ fontWeight: 'bold', fontStyle: 'normal' }}>[{5 - (localSheet?.speciesCardDots?.[2]?.filter(Boolean).length || 0)}]</span>
                 </span>
+              ) : localSheet?.species === 'Lumenaren' ? (
+                <span style={{ color: '#bf9000', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '0.875em', fontStyle: 'italic', marginRight: 22, whiteSpace: 'nowrap', maxWidth: 'calc(100% - 120px)', overflow: 'hidden', textOverflow: 'ellipsis', textAlign: 'right' }}>
+                  Cooldown <span style={{ fontWeight: 'bold', fontStyle: 'normal' }}>[{3 - (localSheet?.speciesCardDots?.[3]?.filter(Boolean).length || 0)}]</span>
+                </span>
               ) : localSheet?.subclass === 'Air' ? (
                 <span style={{ color: '#bf9000', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '0.875em', fontStyle: 'italic', marginRight: 22, whiteSpace: 'nowrap', maxWidth: 'calc(100% - 120px)', overflow: 'hidden', textOverflow: 'ellipsis', textAlign: 'right' }}>
                   Cooldown <span style={{ fontWeight: 'bold', fontStyle: 'normal' }}>[{4 - ((localSheet?.subclassProgressionDots as any)?.airTechniqueCooldownDots?.filter(Boolean).length || 0)}]</span>
@@ -1446,7 +1466,7 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                 maxHeight: '100%',
                 overflow: 'hidden'
               }}>
-                {localSheet?.species === 'Avenoch' ? generateAvianGazeCardJSX(localSheet?.speciesCardDots) : localSheet?.species === 'Cerebronych' ? generateMemoryManifestCardJSX(localSheet?.speciesCardDots) : localSheet?.species === 'Chloroptid' ? generateUnusualGrowthCardJSX(localSheet?.speciesCardDots) : localSheet?.species === 'Cognizant' ? generateLocalAreaNetworkCardJSX(3 - (localSheet?.speciesCardDots?.[4]?.filter(Boolean).length || 0), 3 + (localSheet?.speciesCardDots?.[2]?.filter(Boolean).length || 0), localSheet?.speciesCardDots?.[3]?.[0] ? 1 : 0) : localSheet?.species === 'Emberfolk' ? generateOppressiveHeatCardJSX(4 - (localSheet?.speciesCardDots?.[5]?.filter(Boolean).length || 0), 3 + (localSheet?.speciesCardDots?.[2]?.filter(Boolean).length || 0), 1 + (localSheet?.speciesCardDots?.[3]?.filter(Boolean).length || 0), localSheet?.speciesCardDots?.[4]?.[0] ?? false) : localSheet?.species === 'Entomos' ? generateIronCarapaceCardJSX(3 - (localSheet?.speciesCardDots?.[4]?.filter(Boolean).length || 0), 2 + (localSheet?.speciesCardDots?.[2]?.filter(Boolean).length || 0), localSheet?.speciesCardDots?.[3]?.[0] ?? false) : localSheet?.species === 'Human' ? generateActionSurgeCardJSX(3 + (localSheet?.speciesCardDots?.[1]?.filter(Boolean).length || 0)) : 'Card stats.'}
+                {localSheet?.species === 'Avenoch' ? generateAvianGazeCardJSX(localSheet?.speciesCardDots) : localSheet?.species === 'Cerebronych' ? generateMemoryManifestCardJSX(localSheet?.speciesCardDots) : localSheet?.species === 'Chloroptid' ? generateUnusualGrowthCardJSX(localSheet?.speciesCardDots) : localSheet?.species === 'Cognizant' ? generateLocalAreaNetworkCardJSX(3 - (localSheet?.speciesCardDots?.[4]?.filter(Boolean).length || 0), 3 + (localSheet?.speciesCardDots?.[2]?.filter(Boolean).length || 0), localSheet?.speciesCardDots?.[3]?.[0] ? 1 : 0) : localSheet?.species === 'Emberfolk' ? generateOppressiveHeatCardJSX(4 - (localSheet?.speciesCardDots?.[5]?.filter(Boolean).length || 0), 3 + (localSheet?.speciesCardDots?.[2]?.filter(Boolean).length || 0), 1 + (localSheet?.speciesCardDots?.[3]?.filter(Boolean).length || 0), localSheet?.speciesCardDots?.[4]?.[0] ?? false) : localSheet?.species === 'Entomos' ? generateIronCarapaceCardJSX(3 - (localSheet?.speciesCardDots?.[4]?.filter(Boolean).length || 0), 2 + (localSheet?.speciesCardDots?.[2]?.filter(Boolean).length || 0), localSheet?.speciesCardDots?.[3]?.[0] ?? false) : localSheet?.species === 'Human' ? generateActionSurgeCardJSX(3 + (localSheet?.speciesCardDots?.[1]?.filter(Boolean).length || 0)) : localSheet?.species === 'Lumenaren' ? generateLightspeedCardJSX(10 + (localSheet?.speciesCardDots?.[2]?.filter(Boolean).length || 0) * 5) : 'Card stats.'}
               </div>
             </div>
             <div style={{
@@ -1477,7 +1497,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                           ? '"Hardened shells protect the mighty while soft flesh makes the weak vulnerable." --Entomos saying'
                           : localSheet?.species === 'Human'
                             ? '"Do more with more, that\'s what I always say!" --Kelson Graeber, Human Secessionist'
-                            : 'Flavor text.'}
+                            : localSheet?.species === 'Lumenaren'
+                              ? '"However vast the darkness, we must supply our own light." --Stanley Kubrick'
+                              : 'Flavor text.'}
             </div>
         </div>
         
@@ -1549,6 +1571,8 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                             ? '#2b175f'
                             : localSheet?.subspecies === 'Stout Evolution'
                             ? '#5f2b2b'
+                            : localSheet?.subspecies === 'Infrared'
+                            ? '#b17fbe'
                             : 'black',
                 lineHeight: 1,
                 textAlign: 'left', 
@@ -1598,7 +1622,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                                                     ? 'War Cry'
                                                     : localSheet?.subspecies === 'Stout Evolution'
                                                       ? 'Come at Me, Bro!'
-                                                      : 'Subspecies Card Name'}
+                                                      : localSheet?.subspecies === 'Infrared'
+                                                        ? 'Heat Sink'
+                                                        : 'Subspecies Card Name'}
               </span>
               <span style={{
                 fontFamily: 'Arial, Helvetica, sans-serif',
@@ -1642,6 +1668,8 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                                             ? '#2b175f'
                                             : localSheet?.subspecies === 'Stout Evolution'
                                             ? '#5f2b2b'
+                                            : localSheet?.subspecies === 'Infrared'
+                                            ? '#b17fbe'
                                             : 'black',
                 lineHeight: 1,
                 whiteSpace: 'normal',
@@ -1690,7 +1718,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                                                     ? (<>Massive<br/>Evolution</>)
                                                     : localSheet?.subspecies === 'Stout Evolution'
                                                       ? (<>Stout<br/>Evolution</>)
-                                                      : 'Subspecies'}</span>
+                                                      : localSheet?.subspecies === 'Infrared'
+                                                        ? 'Infrared'
+                                                        : 'Subspecies'}</span>
             </div>
             <img 
               src={localSheet?.species === 'Cerebronych'
@@ -1733,6 +1763,8 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                                             ? "/War Cry.png"
                                             : localSheet?.subspecies === 'Stout Evolution'
                                             ? "/Come at Me, Bro!.png"
+                                            : localSheet?.subspecies === 'Infrared'
+                                            ? "/Heat Sink.png"
                                             : "/Blank Card.png"}
               alt={localSheet?.species === 'Cerebronych'
                 ? "Limit Push"
@@ -1831,7 +1863,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                                                       ? `[${4 - (localSheet?.subspeciesCardDots?.[8]?.filter(Boolean).length ?? 0)}]`
                                                       : localSheet?.subspecies === 'Stout Evolution'
                                                         ? `[${4 - (localSheet?.subspeciesCardDots?.[6]?.filter(Boolean).length ?? 0)}]`
-                                                        : '[#]'}
+                                                        : localSheet?.subspecies === 'Infrared'
+                                                          ? `[${4 - (localSheet?.subspeciesCardDots?.[2]?.filter(Boolean).length ?? 0)}]`
+                                                          : '[#]'}
                 </span>
               </span>
             </div>
@@ -1964,7 +1998,12 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                                                           localSheet?.subspeciesCardDots?.[4]?.[0] ?? false,
                                                           localSheet?.subspeciesCardDots?.[5]?.[0] ?? false
                                                         )
-                                                      : 'Card stats.'}
+                                                      : localSheet?.subspecies === 'Infrared'
+                                                        ? <span style={{ fontSize: '0.86em' }}>{generateHeatSinkCardJSX(
+                                                            3 + (localSheet?.subspeciesCardDots?.[0]?.filter(Boolean).length ?? 0),
+                                                            localSheet?.subspeciesCardDots?.[1]?.[0] ?? false
+                                                          )}</span>
+                                                        : 'Card stats.'}
               </div>
             </div>
             <div style={{
@@ -2021,6 +2060,8 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                                             ? '"You want to keep fighting? Let me make it easy for you -- you\'re already dead." --Gront Skullcrusher, Massive Human Warrior'
                                             : localSheet?.subspecies === 'Stout Evolution'
                                             ? '"I dun\' have time fer this twaddle -- lemme at dem basterds!" --Tagnar Redbeard, Stout Human Belter Battalion Grunt'
+                                            : localSheet?.subspecies === 'Infrared'
+                                            ? '"Friends, your energy signature shall be melded with mine, and any harm that would befall you shall empower me instead." --Zenith, Infrared Devout'
                                             : 'Flavor text.'}
             </div>
         </div>

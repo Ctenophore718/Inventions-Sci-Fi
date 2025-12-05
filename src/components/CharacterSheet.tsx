@@ -4,6 +4,8 @@ import { generateOutOfSightJSX } from "../utils/diminutiveFeature";
 import { generateFleetOfFootFeatureJSX } from "../utils/litheFeature";
 import { generateILLSEEYOUINHELLFeatureJSX } from "../utils/massiveFeature";
 import { generateDieHardFeatureJSX } from "../utils/stoutFeature";
+import { generateImmutableEnergyReservesFeatureJSX } from "../utils/lumenarenFeature";
+import { generateInfraredTrackingFeatureJSX } from "../utils/infraredFeature";
 
 import type { CharacterSheet } from "../types/CharacterSheet";
 import { saveCharacterSheet, loadSheetById } from "../utils/storage";
@@ -482,6 +484,15 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
       })()
     : 0;
 
+  // Calculate Lumenaren species speed bonus (base 5 + speed dots from array 7)
+  const lumenarenSpeedBonus = sheet?.species === 'Lumenaren'
+    ? (() => {
+        const speciesDots = sheet?.speciesCardDots || [];
+        const speedDots = speciesDots[7] || [];
+        return 5 + speedDots.filter(Boolean).length;
+      })()
+    : 0;
+
   // Calculate Apocritan subspecies speed bonus
   const apocritanSpeedBonus = sheet?.subspecies === 'Apocritan'
     ? (sheet?.subspeciesCardDots?.[10]?.[0] ? 1 : 0)
@@ -496,7 +507,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
     ? (sheet?.subspeciesCardDots?.[7]?.filter(Boolean).length || 0)
     : 0;
   
-  const totalSpeed = baseSpeed + tacticianSpeedBonus + kineticSpeedBonus + mercurialSpeedBonus + airSpeedBonus + fireSpeedBonus + waterSpeedBonus + aeronautSpeedBonus + brawlerSpeedBonus + spectreSpeedBonus + avenochSpeedBonus + falcadorSpeedBonus + ammocoderSpeedBonus + pistoleerSpeedBonus + cerebronychSpeedBonus + chloroptidSpeedBonus + driftingSpeedBonus + cognizantSpeedBonus + emberfolkSpeedBonus + petranSpeedBonus + pyranSpeedBonus + entomosSpeedBonus + humanSpeedBonus + apocritanSpeedBonus + mantidSpeedBonus + litheEvolutionSpeedBonus;
+  const totalSpeed = baseSpeed + tacticianSpeedBonus + kineticSpeedBonus + mercurialSpeedBonus + airSpeedBonus + fireSpeedBonus + waterSpeedBonus + aeronautSpeedBonus + brawlerSpeedBonus + spectreSpeedBonus + avenochSpeedBonus + falcadorSpeedBonus + ammocoderSpeedBonus + pistoleerSpeedBonus + cerebronychSpeedBonus + chloroptidSpeedBonus + driftingSpeedBonus + cognizantSpeedBonus + emberfolkSpeedBonus + petranSpeedBonus + pyranSpeedBonus + entomosSpeedBonus + humanSpeedBonus + lumenarenSpeedBonus + apocritanSpeedBonus + mantidSpeedBonus + litheEvolutionSpeedBonus;
   const speed = totalSpeed > 0 ? `${totalSpeed}` : "0";
   
   // Calculate jump speed and jump amount for Kinetic subclass
@@ -601,6 +612,22 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
         const hp15Bonus = (hp15Dots[0] ? 15 : 0);
         
         return 40 + hp5Bonus + hp10Bonus + hp15Bonus;
+      })()
+    : 0;
+  
+  // Calculate Lumenaren species hit points bonus
+  const lumenarenHitPointsBonus = sheet?.species === 'Lumenaren'
+    ? (() => {
+        const speciesDots = sheet?.speciesCardDots || [];
+        const hp5Dots = speciesDots[4] || [];
+        const hp10Dots = speciesDots[5] || [];
+        const hp15Dots = speciesDots[6] || [];
+        
+        const hp5Bonus = hp5Dots.filter(Boolean).length * 5;
+        const hp10Bonus = hp10Dots.filter(Boolean).length * 10;
+        const hp15Bonus = (hp15Dots[0] ? 15 : 0);
+        
+        return 30 + hp5Bonus + hp10Bonus + hp15Bonus;
       })()
     : 0;
   
@@ -1515,10 +1542,9 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
     </span>
   );
 
-  const lumenarenFeatureJSX = (
-    <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#515f2b' }}>Immutable Energy Reserves.</i></b> You are <i>Immune</i> to the <b><i>Sleep</i></b> condition, <i>Resist</i> <b><u style={{ color: '#ffe700', display: 'inline-flex', alignItems: 'center' }}>Electric<img src="/Electric.png" alt="Electric" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> and <b><u style={{ color: '#516fff', display: 'inline-flex', alignItems: 'center' }}>Force<img src="/Force.png" alt="Force" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> and can naturally survive in the vacuum of space.
-    </span>
+  const lumenarenFeatureJSX = generateImmutableEnergyReservesFeatureJSX(
+    sheet?.speciesCardDots?.[0]?.[0] || false,
+    sheet?.speciesCardDots?.[1]?.[0] || false
   );
 
   const praedariFeatureJSX = (
@@ -1642,11 +1668,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
     sheet?.subspeciesCardDots?.[0]?.[0] || false
   );
 
-  const infraredFeatureJSX = (
-    <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#b17fbe' }}>Infrared Tracking.</i></b> All <b><i><span style={{ color: '#990000' }}>Attacks</span></i></b> you make automatically have the Arcing keyword.
-    </span>
-  );
+  const infraredFeatureJSX = generateInfraredTrackingFeatureJSX();
 
   const radiofrequentFeatureJSX = (
     <span style={{ color: '#000', fontWeight: 400 }}>
@@ -2471,6 +2493,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                   if (sheet?.species === "Emberfolk" && skillName === "Xenomagic") sources.push({ type: 'species', color: "rgba(95,43,43,0.5)" });
                   if (sheet?.species === "Entomos" && skillName === "Athletics") sources.push({ type: 'species', color: "rgba(95,66,43,0.5)" });
                   if (species === "Human" && skillName === "Culture") sources.push({ type: 'species', color: "rgba(43,49,95,0.5)" });
+                  if (species === "Lumenaren" && skillName === "Stealth") sources.push({ type: 'species', color: "rgba(81,95,43,0.5)" });
 
                   
                   // Subspecies boosters
@@ -2486,6 +2509,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                   if (subspecies === "Utility Droid" && skillName === "Computers") sources.push({ type: 'subspecies', color: "rgba(189,137,31,0.5)" });
                   if (subspecies === "Petran" && skillName === "Survival") sources.push({ type: 'subspecies', color: "rgba(115,83,17,0.5)" });
                   if (subspecies === "Pyran" && skillName === "Performance") sources.push({ type: 'subspecies', color: "rgba(179,17,17,0.5)" });
+                  if (subspecies === "Infrared" && skillName === "Performance") sources.push({ type: 'subspecies', color: "rgba(177,127,190,0.5)" });
                   if (subspecies === "Apocritan" && skillName === "Survival") sources.push({ type: 'subspecies', color: "rgba(109,113,86,0.5)" });
                   if (subspecies === "Dynastes" && skillName === "Intimidation") sources.push({ type: 'subspecies', color: "rgba(51,69,146,0.5)" });
                   if (subspecies === "Mantid" && skillName === "Awareness") sources.push({ type: 'subspecies', color: "rgba(117,144,78,0.5)" });
@@ -3705,6 +3729,8 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                           <span>{sheet?.subspeciesCardDots?.[4]?.[0] ? ', ' : ''}<b><i>Sleep</i></b></span>
                         )}
                       </span>
+                  : (subspecies === 'Infrared' && sheet?.subspeciesCardDots?.[3]?.[0])
+                    ? <span style={{ color: '#000', fontWeight: 'normal' }}><b><i>Spike</i></b> <b>(</b><b><u style={{ color: '#f90102', display: 'inline-flex', alignItems: 'center' }}>Fire<img src="/Fire.png" alt="Fire" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} /></u></b><b>)</b></span>
                   : (subspecies === 'Pyran' && sheet?.subspeciesCardDots?.[11]?.[0])
                     ? <span style={{ color: '#000', fontWeight: 'normal' }}><b><i>Spike</i></b> <b>(</b><b><u style={{ color: '#f90102', display: 'inline-flex', alignItems: 'center' }}>Fire<img src="/Fire.png" alt="Fire" style={{ width: 16, height: 16, verticalAlign: 'middle', marginLeft: 2 }} /></u></b><b>)</b></span>
                   : (subspecies === 'Petran' && sheet?.subspeciesCardDots?.[10]?.[0])
@@ -4010,6 +4036,16 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                   <u>Toxic</u> <img src="/Toxic.png" alt="Toxic" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
                 </span>
               )}
+              {species === 'Lumenaren' && !sheet?.speciesCardDots?.[0]?.[0] && !sheet?.speciesCardDots?.[1]?.[0] && (
+                <>
+                  <span style={{ marginLeft: 8, display: 'inline-flex', alignItems: 'center', color: '#d5d52a', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                    <u>Electric</u> <img src="/Electric.png" alt="Electric" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+                  </span>
+                  <span style={{ marginLeft: 8, display: 'inline-flex', alignItems: 'center', color: '#516fff', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                    <u>Force</u> <img src="/Force.png" alt="Force" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+                  </span>
+                </>
+              )}
               {hostSpecies === 'Lumenaren Host' && (
                 <>
                   <span style={{ marginLeft: 8, display: 'inline-flex', alignItems: 'center', color: '#d5d52a', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
@@ -4068,6 +4104,16 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
               <span style={{ marginLeft: 8, color: '#000', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                 <i>Blind</i>
               </span>
+            )}
+            {species === 'Lumenaren' && sheet?.speciesCardDots?.[0]?.[0] && !sheet?.speciesCardDots?.[1]?.[0] && (
+              <>
+                <span style={{ marginLeft: 8, display: 'inline-flex', alignItems: 'center', color: '#d5d52a', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                  <u>Electric</u> <img src="/Electric.png" alt="Electric" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+                </span>
+                <span style={{ marginLeft: 8, display: 'inline-flex', alignItems: 'center', color: '#516fff', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                  <u>Force</u> <img src="/Force.png" alt="Force" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+                </span>
+              </>
             )}
             {subspecies === 'Barkskin' && (
               <>
@@ -4399,6 +4445,16 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
             )}
           </div>
           <div style={{ fontWeight: 'bold', marginBottom: 2, fontFamily: 'Arial, sans-serif', color: '#666666', wordBreak: 'break-word', overflowWrap: 'break-word' }}><u>Absorptions</u>
+            {species === 'Lumenaren' && sheet?.speciesCardDots?.[1]?.[0] && (
+              <>
+                <span style={{ marginLeft: 8, display: 'inline-flex', alignItems: 'center', color: '#d5d52a', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                  <u>Electric</u> <img src="/Electric.png" alt="Electric" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+                </span>
+                <span style={{ marginLeft: 8, display: 'inline-flex', alignItems: 'center', color: '#516fff', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                  <u>Force</u> <img src="/Force.png" alt="Force" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+                </span>
+              </>
+            )}
             {species === 'Emberfolk' && sheet?.speciesCardDots?.[1]?.[0] && (
               <span style={{ marginLeft: 8, display: 'inline-flex', alignItems: 'center', color: '#f90102', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                 <u>Fire</u> <img src="/Fire.png" alt="Fire" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
@@ -5178,8 +5234,8 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                   <span style={{ fontWeight: 'bold', fontSize: '14px' }}>Max Hit Points:</span>
                   <span style={{ minWidth: '40px', textAlign: 'center' }}>
                     {charClass === "Exospecialist" 
-                      ? maxHitPoints + 20 + aeronautHitPointsBonus + brawlerHitPointsBonus + dreadnaughtHitPointsBonus + spectreHitPointsBonus + avenochHitPointsBonus + cerebronychHitPointsBonus + chloroptidHitPointsBonus + barkskinHitPointsBonus + petranHitPointsBonus + pyranHitPointsBonus + apocritanHitPointsBonus + dynastesHitPointsBonus + mantidHitPointsBonus + diminutiveEvolutionHitPointsBonus + litheEvolutionHitPointsBonus + massiveEvolutionHitPointsBonus + stoutEvolutionHitPointsBonus
-                      : maxHitPoints + avenochHitPointsBonus + cerebronychHitPointsBonus + chloroptidHitPointsBonus + barkskinHitPointsBonus + petranHitPointsBonus + pyranHitPointsBonus + apocritanHitPointsBonus + dynastesHitPointsBonus + mantidHitPointsBonus + diminutiveEvolutionHitPointsBonus + litheEvolutionHitPointsBonus + massiveEvolutionHitPointsBonus + stoutEvolutionHitPointsBonus}
+                      ? maxHitPoints + 20 + aeronautHitPointsBonus + brawlerHitPointsBonus + dreadnaughtHitPointsBonus + spectreHitPointsBonus + avenochHitPointsBonus + cerebronychHitPointsBonus + chloroptidHitPointsBonus + lumenarenHitPointsBonus + barkskinHitPointsBonus + petranHitPointsBonus + pyranHitPointsBonus + apocritanHitPointsBonus + dynastesHitPointsBonus + mantidHitPointsBonus + diminutiveEvolutionHitPointsBonus + litheEvolutionHitPointsBonus + massiveEvolutionHitPointsBonus + stoutEvolutionHitPointsBonus
+                      : maxHitPoints + avenochHitPointsBonus + cerebronychHitPointsBonus + chloroptidHitPointsBonus + lumenarenHitPointsBonus + barkskinHitPointsBonus + petranHitPointsBonus + pyranHitPointsBonus + apocritanHitPointsBonus + dynastesHitPointsBonus + mantidHitPointsBonus + diminutiveEvolutionHitPointsBonus + litheEvolutionHitPointsBonus + massiveEvolutionHitPointsBonus + stoutEvolutionHitPointsBonus}
                   </span>
                 </div>
                 <button
@@ -5187,8 +5243,8 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                   style={{ padding: '6px 36px', fontSize: '14px', whiteSpace: 'nowrap' }}
                   onClick={() => {
                     const maxHP = charClass === "Exospecialist" 
-                      ? maxHitPoints + 20 + aeronautHitPointsBonus + brawlerHitPointsBonus + dreadnaughtHitPointsBonus + spectreHitPointsBonus + avenochHitPointsBonus + cerebronychHitPointsBonus + chloroptidHitPointsBonus + barkskinHitPointsBonus + petranHitPointsBonus + pyranHitPointsBonus + apocritanHitPointsBonus + dynastesHitPointsBonus + mantidHitPointsBonus + diminutiveEvolutionHitPointsBonus + litheEvolutionHitPointsBonus + massiveEvolutionHitPointsBonus + stoutEvolutionHitPointsBonus
-                      : maxHitPoints + avenochHitPointsBonus + cerebronychHitPointsBonus + chloroptidHitPointsBonus + barkskinHitPointsBonus + petranHitPointsBonus + pyranHitPointsBonus + apocritanHitPointsBonus + dynastesHitPointsBonus + mantidHitPointsBonus + diminutiveEvolutionHitPointsBonus + litheEvolutionHitPointsBonus + massiveEvolutionHitPointsBonus + stoutEvolutionHitPointsBonus;
+                      ? maxHitPoints + 20 + aeronautHitPointsBonus + brawlerHitPointsBonus + dreadnaughtHitPointsBonus + spectreHitPointsBonus + avenochHitPointsBonus + cerebronychHitPointsBonus + chloroptidHitPointsBonus + lumenarenHitPointsBonus + barkskinHitPointsBonus + petranHitPointsBonus + pyranHitPointsBonus + apocritanHitPointsBonus + dynastesHitPointsBonus + mantidHitPointsBonus + diminutiveEvolutionHitPointsBonus + litheEvolutionHitPointsBonus + massiveEvolutionHitPointsBonus + stoutEvolutionHitPointsBonus
+                      : maxHitPoints + avenochHitPointsBonus + cerebronychHitPointsBonus + chloroptidHitPointsBonus + lumenarenHitPointsBonus + barkskinHitPointsBonus + petranHitPointsBonus + pyranHitPointsBonus + apocritanHitPointsBonus + dynastesHitPointsBonus + mantidHitPointsBonus + diminutiveEvolutionHitPointsBonus + litheEvolutionHitPointsBonus + massiveEvolutionHitPointsBonus + stoutEvolutionHitPointsBonus;
                     setCurrentHitPoints(maxHP);
                     handleAutoSave({ currentHitPoints: maxHP });
                   }}
