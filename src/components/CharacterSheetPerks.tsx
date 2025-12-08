@@ -618,6 +618,20 @@ const CharacterSheetPerks: React.FC<CharacterSheetPerksProps> = ({
             </span>
           </div>
           )}
+          {subspecies === 'Radiofrequent' && sheet?.subspeciesCardDots?.[4]?.[0] && (
+          <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <span>
+              <b><i style={{ color: '#bea97f' }}>Innate Communications.</i></b> <span style={{ color: '#000' }}>You can naturally pick up radio signals from various devices that have anything from basic radio antennae to bluetooth or wifi capabilities built into them. Gain an advantage on skill rolls related to deciphering any signals you detect.</span>
+            </span>
+          </div>
+          )}
+          {subspecies === 'X-Ray' && sheet?.subspeciesCardDots?.[4]?.[0] && (
+          <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <span>
+              <b><i style={{ color: '#7f8abe' }}>Penetrating Sight.</i></b> <span style={{ color: '#000' }}>You can see through soft and thin materials, such as cloth and skin, and can get the outlines and general shapes of hidden items. However, you cannot see through an inch of metal or a foot of stone. Consult your DM for more information.</span>
+            </span>
+          </div>
+          )}
         </div>
       </div>
   );

@@ -22,10 +22,14 @@ const App = () => {
 
   // Auto-save debounce timeout
   const autoSaveTimeoutRef = React.useRef<number | null>(null);
+  
+  // Ref to track pending updates - prevents race conditions with cross-window sync
+  const hasPendingUpdatesRef = React.useRef(false);
 
   // Enhanced auto-save function that handles any character changes
   const performAutoSave = React.useCallback(async (updatedSheet: CharacterSheet) => {
-
+    // Mark that we have pending updates
+    hasPendingUpdatesRef.current = true;
 
     // Debounce the save (don't update currentSheet here - it's already updated in updateCurrentSheet)
     if (autoSaveTimeoutRef.current) {
@@ -35,7 +39,8 @@ const App = () => {
     autoSaveTimeoutRef.current = window.setTimeout(async () => {
 
       await saveCharacterSheet(updatedSheet);
-
+      // Clear pending flag after save completes
+      hasPendingUpdatesRef.current = false;
     }, 300); // 300ms debounce for better UX
   }, []);
 
@@ -178,10 +183,15 @@ const App = () => {
 
   // Cross-window synchronization
   React.useEffect(() => {
+    const sheetId = currentSheet?.id;
+    
     const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === "rpg-character-sheets" && currentSheet?.id) {
+      // Skip if we have pending local updates
+      if (hasPendingUpdatesRef.current) return;
+      
+      if (e.key === "rpg-character-sheets" && sheetId) {
         // Reload the current character from storage
-        const updatedSheet = loadSheetById(currentSheet.id);
+        const updatedSheet = loadSheetById(sheetId);
         if (updatedSheet) {
           setCurrentSheet(updatedSheet);
           setCharClass(updatedSheet.charClass || "");
@@ -194,7 +204,10 @@ const App = () => {
     };
 
     const handleCharacterUpdate = (e: CustomEvent<{ sheet: CharacterSheet }>) => {
-      if (currentSheet?.id && e.detail.sheet.id === currentSheet.id) {
+      // Skip if we have pending local updates
+      if (hasPendingUpdatesRef.current) return;
+      
+      if (sheetId && e.detail.sheet.id === sheetId) {
         setCurrentSheet(e.detail.sheet);
         setCharClass(e.detail.sheet.charClass || "");
         setSubclass(e.detail.sheet.subclass || "");

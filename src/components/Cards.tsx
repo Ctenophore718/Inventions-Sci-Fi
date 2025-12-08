@@ -51,6 +51,8 @@ import { generateSharedWisdomCardJSX } from "../utils/litheTechnique";
 import { generateWarCryCardJSX } from "../utils/massiveTechnique";
 import { generateComeatMeBroCardJSX } from "../utils/stoutTechnique";
 import { generateHeatSinkCardJSX } from "../utils/infraredTechnique";
+import { generateSensoryDistortionCardJSX } from "../utils/radiofrequentTechnique";
+import { generateXRayVisionCardJSX } from "../utils/xrayTechnique";
 import React from "react";
 import type { CharacterSheet } from "../types/CharacterSheet";
 import { loadSheetById, saveCharacterSheet } from "../utils/storage";
@@ -231,24 +233,39 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
   const autoSaveTimeoutRef = React.useRef<number>(0);
   const pendingUpdatesRef = React.useRef<Partial<CharacterSheet>>({});
   
+  // Use ref for localSheet to avoid stale closures
+  const localSheetRef = React.useRef(localSheet);
+  React.useEffect(() => {
+    localSheetRef.current = localSheet;
+  }, [localSheet]);
+  
   const handleAutoSave = React.useCallback((updates: Partial<CharacterSheet>) => {
-    if (!localSheet) return;
+    const currentSheet = localSheetRef.current;
+    if (!currentSheet) return;
 
+    // Mark that we have pending updates - prevents external updates from overwriting
+    hasPendingUpdatesRef.current = true;
+    
     // Merge with pending updates
     pendingUpdatesRef.current = { ...pendingUpdatesRef.current, ...updates };
+    
+    // Update local state immediately for responsive UI
+    const immediateUpdate = { ...currentSheet, ...pendingUpdatesRef.current };
+    setLocalSheet(immediateUpdate);
 
     clearTimeout(autoSaveTimeoutRef.current);
     autoSaveTimeoutRef.current = window.setTimeout(() => {
+      const latestSheet = localSheetRef.current;
+      if (!latestSheet) return;
+      
       if (onAutoSave) {
         // Use the parent's auto-save function (goes through App's updateCurrentSheet)
-        const updatedSheet = { ...localSheet, ...pendingUpdatesRef.current };
+        const updatedSheet = { ...latestSheet, ...pendingUpdatesRef.current };
         onAutoSave(updatedSheet);
-        setLocalSheet(updatedSheet);
       } else {
         // Fallback to direct save if onAutoSave not provided
-        const updatedSheet = { ...localSheet, ...pendingUpdatesRef.current };
+        const updatedSheet = { ...latestSheet, ...pendingUpdatesRef.current };
         saveCharacterSheet(updatedSheet);
-        setLocalSheet(updatedSheet);
         
         // Notify other windows of the update
         window.dispatchEvent(new CustomEvent('characterUpdate', {
@@ -258,8 +275,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
       
       // Clear pending updates after save
       pendingUpdatesRef.current = {};
+      hasPendingUpdatesRef.current = false;
     }, 300);
-  }, [localSheet, onAutoSave]);
+  }, [onAutoSave]);
 
   // Cleanup effect: flush any pending saves when component unmounts or before navigation
   React.useEffect(() => {
@@ -268,14 +286,15 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
       clearTimeout(autoSaveTimeoutRef.current);
       
       // If there are pending updates, save them immediately
-      if (Object.keys(pendingUpdatesRef.current).length > 0 && localSheet) {
+      const currentSheet = localSheetRef.current;
+      if (Object.keys(pendingUpdatesRef.current).length > 0 && currentSheet) {
         if (onAutoSave) {
           // Use the parent's auto-save function
-          const updatedSheet = { ...localSheet, ...pendingUpdatesRef.current };
+          const updatedSheet = { ...currentSheet, ...pendingUpdatesRef.current };
           onAutoSave(updatedSheet);
         } else {
           // Fallback to direct save
-          const updatedSheet = { ...localSheet, ...pendingUpdatesRef.current };
+          const updatedSheet = { ...currentSheet, ...pendingUpdatesRef.current };
           saveCharacterSheet(updatedSheet);
           
           // Notify other windows of the update
@@ -284,9 +303,10 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
           }));
         }
         pendingUpdatesRef.current = {};
+        hasPendingUpdatesRef.current = false;
       }
     };
-  }, [localSheet, onAutoSave]);
+  }, [onAutoSave]);
 
   // Sync local state when localSheet changes
   React.useEffect(() => {
@@ -307,23 +327,41 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
     setLocalSheet(sheet);
   }, [sheet]);
 
+  // Track if we have pending local updates to prevent external updates from overwriting
+  const hasPendingUpdatesRef = React.useRef(false);
+  
   // Cross-window synchronization for character display (optimized)
   React.useEffect(() => {
     const handleStorageChange = (e: StorageEvent) => {
+      // Skip if we have pending local updates
+      if (hasPendingUpdatesRef.current) return;
+      
       if (e.key === "rpg-character-sheets" && sheet?.id) {
         const updatedSheet = loadSheetById(sheet.id);
-        if (updatedSheet && JSON.stringify(updatedSheet) !== JSON.stringify(localSheet)) {
-          setLocalSheet(updatedSheet);
+        if (updatedSheet) {
+          setLocalSheet(prev => {
+            // Only update if actually different
+            if (JSON.stringify(updatedSheet) !== JSON.stringify(prev)) {
+              return updatedSheet;
+            }
+            return prev;
+          });
         }
       }
     };
 
     const handleCharacterUpdate = (e: CustomEvent<{ sheet: CharacterSheet }>) => {
+      // Skip if we have pending local updates
+      if (hasPendingUpdatesRef.current) return;
+      
       if (sheet?.id && e.detail.sheet.id === sheet.id) {
-        // Only update if the sheet has actually changed
-        if (JSON.stringify(e.detail.sheet) !== JSON.stringify(localSheet)) {
-          setLocalSheet(e.detail.sheet);
-        }
+        setLocalSheet(prev => {
+          // Only update if actually different
+          if (JSON.stringify(e.detail.sheet) !== JSON.stringify(prev)) {
+            return e.detail.sheet;
+          }
+          return prev;
+        });
       }
     };
 
@@ -334,7 +372,7 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
       window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('character-updated', handleCharacterUpdate as EventListener);
     };
-  }, [sheet?.id, localSheet]);
+  }, [sheet?.id]); // Remove localSheet from dependencies to prevent re-registration on every state change
 
   // Calculate effective max HP with class bonuses
   const calculateEffectiveMaxHP = (): number => {
@@ -966,7 +1004,7 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                 maxWidth: '72px',
                 display: 'inline-block',
                 textAlign: 'right'
-              }}>{localSheet?.subclass === 'Air' ? <span style={{ color: '#0ee2df', fontWeight: 'bold' }}>Air</span> : localSheet?.subclass === 'Earth' ? <span style={{ color: '#e2b90e', fontWeight: 'bold' }}>Earth</span> : localSheet?.subclass === 'Fire' ? <span style={{ color: '#e25d0e', fontWeight: 'bold' }}>Fire</span> : localSheet?.subclass === 'Water' ? <span style={{ color: '#0e42e2', fontWeight: 'bold' }}>Water</span> : localSheet?.subclass === 'Anatomist' ? 'Anatomist' : localSheet?.subclass === 'Grenadier' ? 'Grenadier' : localSheet?.subclass === 'Necro' ? 'Necro' : localSheet?.subclass === 'Poisoner' ? 'Poisoner' : localSheet?.subclass === 'Coercive' ? 'Coercive' : localSheet?.subclass === 'Divinist' ? 'Divinist' : localSheet?.subclass === 'Naturalist' ? 'Naturalist' : localSheet?.subclass === 'Technologist' ? 'Technologist' : localSheet?.subclass === 'Beguiler' ? 'Beguiler' : localSheet?.subclass === 'Galvanic' ? 'Galvanic' : localSheet?.subclass === 'Tactician' ? 'Tactician' : localSheet?.subclass === 'Tyrant' ? 'Tyrant' : localSheet?.subclass === 'Inertial' ? 'Inertial' : localSheet?.subclass === 'Kinetic' ? <span style={{ color: '#7b941c' }}>Kinetic</span> : localSheet?.subclass === 'Mercurial' ? <span style={{ color: '#941c6c' }}>Mercurial</span> : localSheet?.subclass === 'Vectorial' ? <span style={{ color: '#531c94' }}>Vectorial</span> : localSheet?.subclass === 'Astral' ? 'Astral' : localSheet?.subclass === 'Chaos' ? 'Chaos' : localSheet?.subclass === 'Order' ? 'Order' : localSheet?.subclass === 'Void' ? 'Void' : localSheet?.subclass === 'Aeronaut' ? 'Aeronaut' : localSheet?.subclass === 'Brawler' ? 'Brawler' : localSheet?.subclass === 'Dreadnaught' ? 'Dreadnaught' : localSheet?.subclass === 'Spectre' ? 'Spectre' : localSheet?.subclass === 'Ammo Coder' ? <span>Ammo<br />Coder</span> : localSheet?.subclass === 'Ordnancer' ? 'Ordnancer' : localSheet?.subclass === 'Pistoleer' ? 'Pistoleer' : localSheet?.subclass === 'Sniper' ? <span style={{ color: '#0a6f91' }}>Sniper</span> : localSheet?.subclass === 'Hacker' ? 'Hacker' : localSheet?.subclass === 'Junker' ? 'Junker' : localSheet?.subclass === 'Nanoboticist' ? <span style={{ color: '#57b8b0' }}>Nanoboticist</span> : localSheet?.subclass === 'Tanker' ? <span style={{ color: '#808080' }}>Tanker</span> : 'Subclass'}</span>
+              }}>{localSheet?.subclass === 'Air' ? <span style={{ color: '#0ee2df', fontWeight: 'bold' }}>Air</span> : localSheet?.subclass === 'Earth' ? <span style={{ color: '#e2b90e', fontWeight: 'bold' }}>Earth</span> : localSheet?.subclass === 'Fire' ? <span style={{ color: '#e25d0e', fontWeight: 'bold' }}>Fire</span> : localSheet?.subclass === 'Water' ? <span style={{ color: '#0e42e2', fontWeight: 'bold' }}>Water</span> : localSheet?.subclass === 'Anatomist' ? 'Anatomist' : localSheet?.subclass === 'Grenadier' ? 'Grenadier' : localSheet?.subclass === 'Necro' ? 'Necro' : localSheet?.subclass === 'Poisoner' ? 'Poisoner' : localSheet?.subclass === 'Coercive' ? 'Coercive' : localSheet?.subclass === 'Divinist' ? 'Divinist' : localSheet?.subclass === 'Naturalist' ? 'Naturalist' : localSheet?.subclass === 'Technologist' ? 'Technologist' : localSheet?.subclass === 'Beguiler' ? 'Beguiler' : localSheet?.subclass === 'Galvanic' ? 'Galvanic' : localSheet?.subclass === 'Tactician' ? 'Tactician' : localSheet?.subclass === 'Tyrant' ? 'Tyrant' : localSheet?.subclass === 'Inertial' ? 'Inertial' : localSheet?.subclass === 'Kinetic' ? <span style={{ color: '#7b941c' }}>Kinetic</span> : localSheet?.subclass === 'Mercurial' ? <span style={{ color: '#941c6c' }}>Mercurial</span> : localSheet?.subclass === 'Vectorial' ? <span style={{ color: '#531c94' }}>Vectorial</span> : localSheet?.subclass === 'Astral' ? 'Astral' : localSheet?.subclass === 'Chaos' ? 'Chaos' : localSheet?.subclass === 'Order' ? 'Order' : localSheet?.subclass === 'Void' ? 'Void' : localSheet?.subclass === 'Aeronaut' ? 'Aeronaut' : localSheet?.subclass === 'Brawler' ? 'Brawler' : localSheet?.subclass === 'Dreadnaught' ? 'Dreadnaught' : localSheet?.subclass === 'Spectre' ? 'Spectre' : localSheet?.subclass === 'Ammo Coder' ? <span>Ammo<br />Coder</span> : localSheet?.subclass === 'Ordnancer' ? <>Rocket <br /> Launcher</> : localSheet?.subclass === 'Pistoleer' ? 'Pistoleer' : localSheet?.subclass === 'Sniper' ? <span style={{ color: '#0a6f91' }}>Sniper</span> : localSheet?.subclass === 'Hacker' ? 'Hacker' : localSheet?.subclass === 'Junker' ? 'Junker' : localSheet?.subclass === 'Nanoboticist' ? <span style={{ color: '#57b8b0' }}>Nanoboticist</span> : localSheet?.subclass === 'Tanker' ? <span style={{ color: '#808080' }}>Tanker</span> : 'Subclass'}</span>
             </div>
             <img 
               src={localSheet?.subclass === 'Anatomist' ? "/The Good Stuff.png" : localSheet?.subclass === 'Grenadier' ? "/The Big One.png" : localSheet?.subclass === 'Necro' ? "/Grasp of the Grave.png" : localSheet?.subclass === 'Poisoner' ? "/Toxic Takedown.png" : localSheet?.subclass === 'Coercive' ? "/Enemies On All Sides.png" : localSheet?.subclass === 'Divinist' ? "/Fate Reader.png" : localSheet?.subclass === 'Naturalist' ? "/Bed of Rejuvenation.png" : localSheet?.subclass === 'Technologist' ? "/Force Field.png" : localSheet?.subclass === 'Beguiler' ? "/Seduce.png" : localSheet?.subclass === 'Galvanic' ? "/Bolstering Oratory.png" : localSheet?.subclass === 'Tactician' ? "/Strategery.png" : localSheet?.subclass === 'Tyrant' ? "/Tyrannize.png" : localSheet?.subclass === 'Inertial' ? "/Gravity Well.png" : localSheet?.subclass === 'Kinetic' ? "/Grand Slam.png" : localSheet?.subclass === 'Mercurial' ? "/Haste.png" : localSheet?.subclass === 'Vectorial' ? "/Vector Clone.png" : localSheet?.subclass === 'Astral' ? "/Benefaction.png" : localSheet?.subclass === 'Chaos' ? "/Savagery.png" : localSheet?.subclass === 'Order' ? "/Bulwark.png" : localSheet?.subclass === 'Void' ? "/Weaken.png" : localSheet?.subclass === 'Air' ? "/Wings of Air.png" : localSheet?.subclass === 'Earth' ? "/Earthen Wall.png" : localSheet?.subclass === 'Fire' ? "/Firestorm.png" : localSheet?.subclass === 'Water' ? "/Cleansing Waters.png" : localSheet?.subclass === 'Aeronaut' ? "/Dive Bomb.png" : localSheet?.subclass === 'Brawler' ? "/The Ol' One-Two.png" : localSheet?.subclass === 'Dreadnaught' ? "/Barrage.png" : localSheet?.subclass === 'Spectre' ? "/Stealth Mode.png" : localSheet?.subclass === 'Ammo Coder' ? "/Encode Weakness.png" : localSheet?.subclass === 'Ordnancer' ? "/Artillery Strike.png" : localSheet?.subclass === 'Pistoleer' ? "/Bleedin' Bullets.png" : localSheet?.subclass === 'Sniper' ? "/Lay Low.png" : localSheet?.subclass === 'Hacker' ? "/Portal Swap.png" : localSheet?.subclass === 'Junker' ? "/Detonate.png" : localSheet?.subclass === 'Nanoboticist' ? "/Versatile Swarm.png" : localSheet?.subclass === 'Tanker' ? "/Bullet Magnet.png" : "/Blank Card.png"}
@@ -1573,6 +1611,10 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                             ? '#5f2b2b'
                             : localSheet?.subspecies === 'Infrared'
                             ? '#b17fbe'
+                            : localSheet?.subspecies === 'Radiofrequent'
+                            ? '#bea97f'
+                            : localSheet?.subspecies === 'X-Ray'
+                            ? '#7f8abe'
                             : 'black',
                 lineHeight: 1,
                 textAlign: 'left', 
@@ -1624,7 +1666,11 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                                                       ? 'Come at Me, Bro!'
                                                       : localSheet?.subspecies === 'Infrared'
                                                         ? 'Heat Sink'
-                                                        : 'Subspecies Card Name'}
+                                                        : localSheet?.subspecies === 'Radiofrequent'
+                                                          ? 'Sensory Distortion'
+                                                          : localSheet?.subspecies === 'X-Ray'
+                                                            ? 'X-Ray Vision'
+                                                            : 'Subspecies Card Name'}
               </span>
               <span style={{
                 fontFamily: 'Arial, Helvetica, sans-serif',
@@ -1670,6 +1716,10 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                                             ? '#5f2b2b'
                                             : localSheet?.subspecies === 'Infrared'
                                             ? '#b17fbe'
+                                            : localSheet?.subspecies === 'Radiofrequent'
+                                            ? '#bea97f'
+                                            : localSheet?.subspecies === 'X-Ray'
+                                            ? '#7f8abe'
                                             : 'black',
                 lineHeight: 1,
                 whiteSpace: 'normal',
@@ -1720,7 +1770,11 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                                                       ? (<>Stout<br/>Evolution</>)
                                                       : localSheet?.subspecies === 'Infrared'
                                                         ? 'Infrared'
-                                                        : 'Subspecies'}</span>
+                                                        : localSheet?.subspecies === 'Radiofrequent'
+                                                          ? <>Radio-<br />frequent</>
+                                                          : localSheet?.subspecies === 'X-Ray'
+                                                            ? 'X-Ray'
+                                                            : 'Subspecies'}</span>
             </div>
             <img 
               src={localSheet?.species === 'Cerebronych'
@@ -1765,6 +1819,10 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                                             ? "/Come at Me, Bro!.png"
                                             : localSheet?.subspecies === 'Infrared'
                                             ? "/Heat Sink.png"
+                                            : localSheet?.subspecies === 'Radiofrequent'
+                                            ? "/Sensory Distortion.png"
+                                            : localSheet?.subspecies === 'X-Ray'
+                                            ? "/X-Ray Vision.png"
                                             : "/Blank Card.png"}
               alt={localSheet?.species === 'Cerebronych'
                 ? "Limit Push"
@@ -1865,7 +1923,11 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                                                         ? `[${4 - (localSheet?.subspeciesCardDots?.[6]?.filter(Boolean).length ?? 0)}]`
                                                         : localSheet?.subspecies === 'Infrared'
                                                           ? `[${4 - (localSheet?.subspeciesCardDots?.[2]?.filter(Boolean).length ?? 0)}]`
-                                                          : '[#]'}
+                                                          : localSheet?.subspecies === 'Radiofrequent'
+                                                            ? `[${3 - (localSheet?.subspeciesCardDots?.[3]?.filter(Boolean).length ?? 0)}]`
+                                                            : localSheet?.subspecies === 'X-Ray'
+                                                              ? `[${3 - (localSheet?.subspeciesCardDots?.[3]?.filter(Boolean).length ?? 0)}]`
+                                                              : '[#]'}
                 </span>
               </span>
             </div>
@@ -2003,7 +2065,16 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                                                             3 + (localSheet?.subspeciesCardDots?.[0]?.filter(Boolean).length ?? 0),
                                                             localSheet?.subspeciesCardDots?.[1]?.[0] ?? false
                                                           )}</span>
-                                                        : 'Card stats.'}
+                                                        : localSheet?.subspecies === 'Radiofrequent'
+                                                          ? generateSensoryDistortionCardJSX(
+                                                              3 + (localSheet?.subspeciesCardDots?.[1]?.filter(Boolean).length ?? 0),
+                                                              (localSheet?.subspeciesCardDots?.[2]?.filter(Boolean).length ?? 0) * -2
+                                                            )
+                                                          : localSheet?.subspecies === 'X-Ray'
+                                                            ? generateXRayVisionCardJSX(
+                                                                3 + (localSheet?.subspeciesCardDots?.[2]?.filter(Boolean).length ?? 0)
+                                                              )
+                                                            : 'Card stats.'}
               </div>
             </div>
             <div style={{
@@ -2062,6 +2133,10 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                                             ? '"I dun\' have time fer this twaddle -- lemme at dem basterds!" --Tagnar Redbeard, Stout Human Belter Battalion Grunt'
                                             : localSheet?.subspecies === 'Infrared'
                                             ? '"Friends, your energy signature shall be melded with mine, and any harm that would befall you shall empower me instead." --Zenith, Infrared Devout'
+                                            : localSheet?.subspecies === 'Radiofrequent'
+                                            ? '"I canna tell if they\'s a mirage or some strange hypno-mind effect them Radioheads keep throwin\' at us, but it\'s real bad." --Bert Magee, Space Pirate'
+                                            : localSheet?.subspecies === 'X-Ray'
+                                            ? '"The light of mine eyes pierce through all things seen only on the visible spectrum… I can literally see into you and through you." --Vizz, X-Ray Lumenaren'
                                             : 'Flavor text.'}
             </div>
         </div>

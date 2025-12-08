@@ -6,6 +6,8 @@ import { generateILLSEEYOUINHELLFeatureJSX } from "../utils/massiveFeature";
 import { generateDieHardFeatureJSX } from "../utils/stoutFeature";
 import { generateImmutableEnergyReservesFeatureJSX } from "../utils/lumenarenFeature";
 import { generateInfraredTrackingFeatureJSX } from "../utils/infraredFeature";
+import { generateMisleadingSignalsFeatureJSX } from "../utils/radiofrequentFeature";
+import { generateIrradiateFeatureJSX } from "../utils/xrayFeature";
 
 import type { CharacterSheet } from "../types/CharacterSheet";
 import { saveCharacterSheet, loadSheetById } from "../utils/storage";
@@ -132,9 +134,18 @@ type Props = {
 
 const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, onHome, onAutoSave, charClass, setCharClass, subclass, setSubclass, species, setSpecies, subspecies, setSubspecies, hostSpecies, setHostSpecies }) => {
 
+  // Ref to track pending updates - prevents race conditions with cross-window sync
+  const hasPendingUpdatesRef = React.useRef(false);
+
   // Auto-save helper function
   const handleAutoSave = (fieldUpdates: Partial<CharacterSheet>) => {
+    // Mark that we have pending updates
+    hasPendingUpdatesRef.current = true;
     onAutoSave(fieldUpdates);
+    // Clear pending flag after a short delay (matches App.tsx debounce)
+    setTimeout(() => {
+      hasPendingUpdatesRef.current = false;
+    }, 350);
   };
 
   // Portrait upload state and ref
@@ -833,73 +844,82 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
 
   // Cross-window synchronization for this character
   React.useEffect(() => {
+    const sheetId = sheet?.id;
+    
     const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === "rpg-character-sheets" && sheet?.id) {
+      // Skip if we have pending local updates
+      if (hasPendingUpdatesRef.current) return;
+      
+      if (e.key === "rpg-character-sheets" && sheetId) {
         // Reload the current character from storage
-        const updatedSheet = loadSheetById(sheet.id);
+        const updatedSheet = loadSheetById(sheetId);
         if (updatedSheet) {
-        // Update all local state to match the stored character (only if changed)
-        if (updatedSheet.playerName !== playerName) setPlayerName(updatedSheet.playerName || "");
-        if (updatedSheet.name !== name) setName(updatedSheet.name || "");
-        if (updatedSheet.background !== background) setBackground(updatedSheet.background || "");
-        if (updatedSheet.resistances !== resistances) setResistances(updatedSheet.resistances || "");
-        if (updatedSheet.immunities !== immunities) setImmunities(updatedSheet.immunities || "");
-        if (updatedSheet.absorptions !== absorptions) setAbsorptions(updatedSheet.absorptions || "");
-        if (updatedSheet.movement !== movement) setMovement(updatedSheet.movement || "");
-        if (updatedSheet.strike !== strike) setStrike(updatedSheet.strike || "");
-        if (updatedSheet.xpTotal !== xpTotal) setXpTotal(updatedSheet.xpTotal || 0);
-        if (updatedSheet.spTotal !== spTotal) setSpTotal(updatedSheet.spTotal || 0);
-        if (updatedSheet.credits !== credits) setCredits(updatedSheet.credits ?? 0);
-        if (updatedSheet.chemTokens !== chemTokens) setChemTokens(updatedSheet.chemTokens ?? 0);
-        if (updatedSheet.currentSummonHp !== currentSummonHp) setCurrentSummonHp(updatedSheet.currentSummonHp ?? 0);
-        if (updatedSheet.maxSummonHp !== maxSummonHp) setMaxSummonHp(updatedSheet.maxSummonHp ?? 0);
-        if (updatedSheet.maxHitPoints !== maxHitPoints) setMaxHitPoints(updatedSheet.maxHitPoints ?? 0);
-        if (updatedSheet.classFeature !== classFeature) setClassFeature(updatedSheet.classFeature || "");
-        if (updatedSheet.portrait !== portraitUrl) setPortraitUrl(updatedSheet.portrait || null);
-        if (updatedSheet.spSpent !== spSpent) setSpSpent(updatedSheet.spSpent ?? 0);
-        if (JSON.stringify(updatedSheet.deathDots) !== JSON.stringify(deathDots)) setDeathDots(updatedSheet.deathDots || Array(10).fill(false));
-        if (updatedSheet.multiStrike !== multiStrike) setMultiStrike(updatedSheet.multiStrike || 0);
-        if (updatedSheet.strikeEffects !== strikeEffects) setStrikeEffects(updatedSheet.strikeEffects || "");          // Update character details if they've changed
-          if (updatedSheet.charClass !== charClass) setCharClass(updatedSheet.charClass || "");
-          if (updatedSheet.subclass !== subclass) setSubclass(updatedSheet.subclass || "");
-          if (updatedSheet.species !== species) setSpecies(updatedSheet.species || "");
-          if (updatedSheet.subspecies !== subspecies) setSubspecies(updatedSheet.subspecies || "");
-          if (updatedSheet.hostSpecies !== hostSpecies && setHostSpecies) setHostSpecies(updatedSheet.hostSpecies || "");
+          // Update all local state to match the stored character
+          setPlayerName(updatedSheet.playerName || "");
+          setName(updatedSheet.name || "");
+          setBackground(updatedSheet.background || "");
+          setResistances(updatedSheet.resistances || "");
+          setImmunities(updatedSheet.immunities || "");
+          setAbsorptions(updatedSheet.absorptions || "");
+          setMovement(updatedSheet.movement || "");
+          setStrike(updatedSheet.strike || "");
+          setXpTotal(updatedSheet.xpTotal || 0);
+          setSpTotal(updatedSheet.spTotal || 0);
+          setCredits(updatedSheet.credits ?? 0);
+          setChemTokens(updatedSheet.chemTokens ?? 0);
+          setCurrentSummonHp(updatedSheet.currentSummonHp ?? 0);
+          setMaxSummonHp(updatedSheet.maxSummonHp ?? 0);
+          setMaxHitPoints(updatedSheet.maxHitPoints ?? 0);
+          setClassFeature(updatedSheet.classFeature || "");
+          setPortraitUrl(updatedSheet.portrait || null);
+          setSpSpent(updatedSheet.spSpent ?? 0);
+          setDeathDots(updatedSheet.deathDots || Array(10).fill(false));
+          setMultiStrike(updatedSheet.multiStrike || 0);
+          setStrikeEffects(updatedSheet.strikeEffects || "");
+          // Update character details
+          setCharClass(updatedSheet.charClass || "");
+          setSubclass(updatedSheet.subclass || "");
+          setSpecies(updatedSheet.species || "");
+          setSubspecies(updatedSheet.subspecies || "");
+          if (setHostSpecies) setHostSpecies(updatedSheet.hostSpecies || "");
         }
       }
     };
 
     const handleCharacterUpdate = (e: CustomEvent<{ sheet: CharacterSheet }>) => {
-      if (sheet?.id && e.detail.sheet.id === sheet.id) {
+      // Skip if we have pending local updates
+      if (hasPendingUpdatesRef.current) return;
+      
+      if (sheetId && e.detail.sheet.id === sheetId) {
         const updatedSheet = e.detail.sheet;
-        // Update all local state to match the updated character (only if changed)
-        if (updatedSheet.playerName !== playerName) setPlayerName(updatedSheet.playerName || "");
-        if (updatedSheet.name !== name) setName(updatedSheet.name || "");
-        if (updatedSheet.background !== background) setBackground(updatedSheet.background || "");
-        if (updatedSheet.resistances !== resistances) setResistances(updatedSheet.resistances || "");
-        if (updatedSheet.immunities !== immunities) setImmunities(updatedSheet.immunities || "");
-        if (updatedSheet.absorptions !== absorptions) setAbsorptions(updatedSheet.absorptions || "");
-        if (updatedSheet.movement !== movement) setMovement(updatedSheet.movement || "");
-        if (updatedSheet.strike !== strike) setStrike(updatedSheet.strike || "");
-        if (updatedSheet.xpTotal !== xpTotal) setXpTotal(updatedSheet.xpTotal || 0);
-        if (updatedSheet.spTotal !== spTotal) setSpTotal(updatedSheet.spTotal || 0);
-        if (updatedSheet.credits !== credits) setCredits(updatedSheet.credits ?? 0);
-        if (updatedSheet.chemTokens !== chemTokens) setChemTokens(updatedSheet.chemTokens ?? 0);
-        if (updatedSheet.currentSummonHp !== currentSummonHp) setCurrentSummonHp(updatedSheet.currentSummonHp ?? 0);
-        if (updatedSheet.maxSummonHp !== maxSummonHp) setMaxSummonHp(updatedSheet.maxSummonHp ?? 0);
-        if (updatedSheet.classFeature !== classFeature) setClassFeature(updatedSheet.classFeature || "");
-        if (updatedSheet.portrait !== portraitUrl) setPortraitUrl(updatedSheet.portrait || null);
-        if (updatedSheet.spSpent !== spSpent) setSpSpent(updatedSheet.spSpent ?? 0);
-        if (JSON.stringify(updatedSheet.deathDots) !== JSON.stringify(deathDots)) setDeathDots(updatedSheet.deathDots || Array(10).fill(false));
-        if (updatedSheet.multiStrike !== multiStrike) setMultiStrike(updatedSheet.multiStrike || 0);
-        if (updatedSheet.strikeEffects !== strikeEffects) setStrikeEffects(updatedSheet.strikeEffects || "");
+        // Update all local state to match the updated character
+        setPlayerName(updatedSheet.playerName || "");
+        setName(updatedSheet.name || "");
+        setBackground(updatedSheet.background || "");
+        setResistances(updatedSheet.resistances || "");
+        setImmunities(updatedSheet.immunities || "");
+        setAbsorptions(updatedSheet.absorptions || "");
+        setMovement(updatedSheet.movement || "");
+        setStrike(updatedSheet.strike || "");
+        setXpTotal(updatedSheet.xpTotal || 0);
+        setSpTotal(updatedSheet.spTotal || 0);
+        setCredits(updatedSheet.credits ?? 0);
+        setChemTokens(updatedSheet.chemTokens ?? 0);
+        setCurrentSummonHp(updatedSheet.currentSummonHp ?? 0);
+        setMaxSummonHp(updatedSheet.maxSummonHp ?? 0);
+        setClassFeature(updatedSheet.classFeature || "");
+        setPortraitUrl(updatedSheet.portrait || null);
+        setSpSpent(updatedSheet.spSpent ?? 0);
+        setDeathDots(updatedSheet.deathDots || Array(10).fill(false));
+        setMultiStrike(updatedSheet.multiStrike || 0);
+        setStrikeEffects(updatedSheet.strikeEffects || "");
         
-        // Update character details if they've changed
-        if (updatedSheet.charClass !== charClass) setCharClass(updatedSheet.charClass || "");
-        if (updatedSheet.subclass !== subclass) setSubclass(updatedSheet.subclass || "");
-        if (updatedSheet.species !== species) setSpecies(updatedSheet.species || "");
-        if (updatedSheet.subspecies !== subspecies) setSubspecies(updatedSheet.subspecies || "");
-        if (updatedSheet.hostSpecies !== hostSpecies && setHostSpecies) setHostSpecies(updatedSheet.hostSpecies || "");
+        // Update character details
+        setCharClass(updatedSheet.charClass || "");
+        setSubclass(updatedSheet.subclass || "");
+        setSpecies(updatedSheet.species || "");
+        setSubspecies(updatedSheet.subspecies || "");
+        if (setHostSpecies) setHostSpecies(updatedSheet.hostSpecies || "");
       }
     };
 
@@ -912,7 +932,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
       window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('character-updated', handleCharacterUpdate as EventListener);
     };
-  }, [sheet?.id, charClass, subclass, species, subspecies, hostSpecies, credits, chemTokens, maxHitPoints]);
+  }, [sheet?.id, setCharClass, setSubclass, setSpecies, setSubspecies, setHostSpecies]);
 
   const classOptions = [
     { label: "Chemist", value: "Chemist", color: "#721131" },
@@ -1004,14 +1024,8 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
     Avenoch: [
       { label: "Corvid", value: "Corvid", color: "#75904e", species: "Avenoch" },
       { label: "Falcador", value: "Falcador", color: "#6d7156", species: "Avenoch" },
-      {
-        label: "Nocturne", value: "Nocturne", color: "#334592",
-        species: ""
-      },
-      {
-        label: "Vulturine", value: "Vulturine", color: "#a96d8c",
-        species: ""
-      },
+      { label: "Nocturne", value: "Nocturne", color: "#334592", species: "Avenoch" },
+      { label: "Vulturine", value: "Vulturine", color: "#a96d8c", species: "Avenoch" },
     ],
     Cerebronych: [],
     Chloroptid: [
@@ -1040,18 +1054,9 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
       { label: "Stout Evolution", value: "Stout Evolution", color: "#5f2b2b", species: "Human" },
     ],
     Lumenaren: [
-      {
-        label: "Infrared", value: "Infrared", color: "#b17fbe",
-        species: ""
-      },
-      {
-        label: "Radiofrequent", value: "Radiofrequent", color: "#bea97f",
-        species: ""
-      },
-      {
-        label: "X-Ray", value: "X-Ray", color: "#7f8abe",
-        species: ""
-      },
+      { label: "Infrared", value: "Infrared", color: "#b17fbe", species: "Lumenaren" },
+      { label: "Radiofrequent", value: "Radiofrequent", color: "#bea97f", species: "Lumenaren" },
+      { label: "X-Ray", value: "X-Ray", color: "#7f8abe", species: "Lumenaren" },
     ],
     Praedari: [
       { label: "Canid", value: "Canid", color: "#2f8da6", species: "Praedari" },
@@ -1670,17 +1675,12 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
 
   const infraredFeatureJSX = generateInfraredTrackingFeatureJSX();
 
-  const radiofrequentFeatureJSX = (
-    <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#bea97f' }}>Misleading Signals.</i></b> Enemies <b><i><span style={{ color: '#990000' }}>Attacking</span></i></b> you roll an additional Crit die and discard the highest rolled.
-    </span>
-  );
+  const radiofrequentFeatureJSX = generateMisleadingSignalsFeatureJSX(sheet?.subspeciesCardDots?.[0]?.[0] ?? false);
 
-  const xRayFeatureJSX = (
-    <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#7f8abe' }}>Irradiate.</i></b> Enemies starting their turn within <b>[3]</b>hx of you suffer <b>[2]</b> instances of the <b><i>Spike</i></b> (<b><u style={{ color: '#de7204', display: 'inline-flex', alignItems: 'center' }}>Chemical<img src="/Chemical.png" alt="Chemical" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b>) condition.
-    </span>
-  );
+  // X-Ray: range = 3 + upgrades from dots[0], spikeCount = 2 + upgrades from dots[1]
+  const xRayRange = 3 + (sheet?.subspeciesCardDots?.[0]?.filter(Boolean).length ?? 0);
+  const xRaySpikeCount = 2 + (sheet?.subspeciesCardDots?.[1]?.filter(Boolean).length ?? 0);
+  const xRayFeatureJSX = generateIrradiateFeatureJSX(xRayRange, xRaySpikeCount);
 
   const canidFeatureJSX = (
     <span style={{ color: '#000', fontWeight: 400 }}>
@@ -2510,6 +2510,8 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                   if (subspecies === "Petran" && skillName === "Survival") sources.push({ type: 'subspecies', color: "rgba(115,83,17,0.5)" });
                   if (subspecies === "Pyran" && skillName === "Performance") sources.push({ type: 'subspecies', color: "rgba(179,17,17,0.5)" });
                   if (subspecies === "Infrared" && skillName === "Performance") sources.push({ type: 'subspecies', color: "rgba(177,127,190,0.5)" });
+                  if (subspecies === "Radiofrequent" && skillName === "Deception") sources.push({ type: 'subspecies', color: "rgba(190,169,127,0.5)" });
+                  if (subspecies === "X-Ray" && skillName === "Investigation") sources.push({ type: 'subspecies', color: "rgba(127,138,190,0.5)" });
                   if (subspecies === "Apocritan" && skillName === "Survival") sources.push({ type: 'subspecies', color: "rgba(109,113,86,0.5)" });
                   if (subspecies === "Dynastes" && skillName === "Intimidation") sources.push({ type: 'subspecies', color: "rgba(51,69,146,0.5)" });
                   if (subspecies === "Mantid" && skillName === "Awareness") sources.push({ type: 'subspecies', color: "rgba(117,144,78,0.5)" });
@@ -3731,6 +3733,8 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                       </span>
                   : (subspecies === 'Infrared' && sheet?.subspeciesCardDots?.[3]?.[0])
                     ? <span style={{ color: '#000', fontWeight: 'normal' }}><b><i>Spike</i></b> <b>(</b><b><u style={{ color: '#f90102', display: 'inline-flex', alignItems: 'center' }}>Fire<img src="/Fire.png" alt="Fire" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} /></u></b><b>)</b></span>
+                  : (subspecies === 'Radiofrequent' && sheet?.subspeciesCardDots?.[4]?.[0])
+                    ? <span style={{ color: '#000', fontWeight: 'normal' }}><b><i>Confuse</i></b></span>
                   : (subspecies === 'Pyran' && sheet?.subspeciesCardDots?.[11]?.[0])
                     ? <span style={{ color: '#000', fontWeight: 'normal' }}><b><i>Spike</i></b> <b>(</b><b><u style={{ color: '#f90102', display: 'inline-flex', alignItems: 'center' }}>Fire<img src="/Fire.png" alt="Fire" style={{ width: 16, height: 16, verticalAlign: 'middle', marginLeft: 2 }} /></u></b><b>)</b></span>
                   : (subspecies === 'Petran' && sheet?.subspeciesCardDots?.[10]?.[0])
@@ -3792,6 +3796,8 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                           Toxic<img src="/Toxic.png" alt="Toxic" style={{ width: 14, height: 14, verticalAlign: 'middle', marginLeft: 2 }} />
                         </u></b> Damage, the creature instead stays at 1 <b><i style={{ color: '#990000' }}>Hit Point</i></b> and is under your complete control until the end of the encounter. If the creature dies, you lose control. After the battle, you can choose to inhabit the creature and abandon your current host, as long as that creature is a playable species. If you choose not to take on the new host, the creature you infest dies. Consult your DM for more information.
                       </span>
+                  : (subspecies === 'X-Ray' && sheet?.subspeciesCardDots?.[4]?.[0])
+                    ? <span style={{ color: '#000', fontWeight: 'normal' }}><b><i>Blind</i></b></span>
                     : strikeEffects
               }
           </div>
@@ -4143,6 +4149,11 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
             {subspecies === 'Lithe Evolution' && sheet?.subspeciesCardDots?.[0]?.[0] && (
               <span style={{ marginLeft: 8, color: '#000', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                 <i>Restrain</i>
+              </span>
+            )}
+            {subspecies === 'Radiofrequent' && sheet?.subspeciesCardDots?.[0]?.[0] && (
+              <span style={{ marginLeft: 8, color: '#000', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                <i>Crits</i>
               </span>
             )}
             {subspecies === 'Stout Evolution' && sheet?.subspeciesCardDots?.[0]?.[0] && (

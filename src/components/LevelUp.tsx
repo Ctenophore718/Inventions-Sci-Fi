@@ -54,6 +54,9 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
   // Debounce timer for auto-save
   const saveTimeoutRef = useRef<number | null>(null);
   
+  // Ref to track pending updates - prevents race conditions with cross-window sync
+  const hasPendingUpdatesRef = useRef(false);
+  
   // Use ref for sheet to avoid stale closures in debounced callbacks
   const sheetRef = useRef(sheet);
   useEffect(() => {
@@ -63,6 +66,9 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
   // Auto-save helper function with debouncing
   const handleAutoSave = useCallback((fieldUpdates: Partial<CharacterSheet>) => {
     if (onAutoSave) {
+      // Mark that we have pending updates
+      hasPendingUpdatesRef.current = true;
+      
       // Clear any pending save
       if (saveTimeoutRef.current) {
         clearTimeout(saveTimeoutRef.current);
@@ -79,6 +85,8 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
           // Create new sheet with updates - this handles new character creation
           onAutoSave(fieldUpdates);
         }
+        // Clear pending flag after save completes
+        hasPendingUpdatesRef.current = false;
       }, 150);
     }
   }, [onAutoSave]);
@@ -732,6 +740,31 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
       return;
     }
 
+    // Subclass-to-class mapping for auto-populating class when subclass is selected first
+    const subclassToClassMap: { [key: string]: string } = {
+      // Chemist subclasses
+      'Anatomist': 'Chemist', 'Grenadier': 'Chemist', 'Necro': 'Chemist', 'Poisoner': 'Chemist',
+      // Coder subclasses
+      'Coercive': 'Coder', 'Divinist': 'Coder', 'Naturalist': 'Coder', 'Technologist': 'Coder',
+      // Commander subclasses
+      'Beguiler': 'Commander', 'Galvanic': 'Commander', 'Tactician': 'Commander', 'Tyrant': 'Commander',
+      // Contemplative subclasses
+      'Inertial': 'Contemplative', 'Kinetic': 'Contemplative', 'Mercurial': 'Contemplative', 'Vectorial': 'Contemplative',
+      // Devout subclasses
+      'Astral': 'Devout', 'Chaos': 'Devout', 'Order': 'Devout', 'Void': 'Devout',
+      // Elementalist subclasses
+      'Air': 'Elementalist', 'Earth': 'Elementalist', 'Fire': 'Elementalist', 'Water': 'Elementalist',
+      // Exospecialist subclasses
+      'Aeronaut': 'Exospecialist', 'Brawler': 'Exospecialist', 'Dreadnaught': 'Exospecialist', 'Spectre': 'Exospecialist',
+      // Gunslinger subclasses
+      'Ammo Coder': 'Gunslinger', 'Ordnancer': 'Gunslinger', 'Pistoleer': 'Gunslinger', 'Sniper': 'Gunslinger',
+      // Technician subclasses
+      'Hacker': 'Technician', 'Junker': 'Technician', 'Nanoboticist': 'Technician', 'Tanker': 'Technician',
+    };
+    
+    // Auto-populate class if not already set
+    const correspondingClass = subclassToClassMap[newSubclass];
+
     // Only show confirmation if XP or SP has been spent
     const hasExpenditures = (xpSpent > 0) || (spSpent > 0);
     
@@ -749,7 +782,12 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
     if (hasExpenditures) {
       const resetSheet = resetAllExpenditures();
       if (resetSheet) {
-        const updatedSheet = { ...resetSheet, subclass: newSubclass };
+        const updatedSheet = { 
+          ...resetSheet, 
+          subclass: newSubclass,
+          // Auto-populate class if not set
+          charClass: charClass || correspondingClass || resetSheet.charClass
+        };
         saveCharacterSheet(updatedSheet);
         
         // Update local state
@@ -757,10 +795,20 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
         setSpSpent(0);
         setClassCardDots(Array(10).fill(false));
         setSkillDots(resetSheet.skillDots);
+        
+        // Auto-populate class if not set
+        if (!charClass && correspondingClass) {
+          setCharClass(correspondingClass);
+        }
       }
     } else {
-      // No expenditures, just update the subclass
-      handleAutoSave({ subclass: newSubclass });
+      // No expenditures, just update the subclass (and auto-populate class if needed)
+      const updates: Partial<CharacterSheet> = { subclass: newSubclass };
+      if (!charClass && correspondingClass) {
+        updates.charClass = correspondingClass;
+        setCharClass(correspondingClass);
+      }
+      handleAutoSave(updates);
     }
     
     setSubclass(newSubclass);
@@ -828,6 +876,31 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
       return;
     }
 
+    // Subspecies-to-species mapping for auto-populating species when subspecies is selected first
+    const subspeciesToSpeciesMap: { [key: string]: string } = {
+      // Avenoch subspecies
+      'Corvid': 'Avenoch', 'Falcador': 'Avenoch', 'Nocturne': 'Avenoch', 'Vulturine': 'Avenoch',
+      // Cerebronych subspecies
+      'Cerebronych (cont.)': 'Cerebronych',
+      // Chloroptid subspecies
+      'Barkskin': 'Chloroptid', 'Carnivorous': 'Chloroptid', 'Drifting': 'Chloroptid', 'Viny': 'Chloroptid',
+      // Cognizant subspecies
+      'Android': 'Cognizant', 'Utility Droid': 'Cognizant',
+      // Emberfolk subspecies
+      'Petran': 'Emberfolk', 'Pyran': 'Emberfolk',
+      // Entomos subspecies
+      'Apocritan': 'Entomos', 'Dynastes': 'Entomos', 'Mantid': 'Entomos',
+      // Human subspecies
+      'Diminutive Evolution': 'Human', 'Lithe Evolution': 'Human', 'Massive Evolution': 'Human', 'Stout Evolution': 'Human',
+      // Lumenaren subspecies
+      'Infrared': 'Lumenaren', 'Radiofrequent': 'Lumenaren', 'X-Ray': 'Lumenaren',
+      // Praedari subspecies
+      'Canid': 'Praedari', 'Felid': 'Praedari', 'Mustelid': 'Praedari', 'Ursid': 'Praedari',
+    };
+    
+    // Auto-populate species if not already set
+    const correspondingSpecies = subspeciesToSpeciesMap[newSubspecies];
+
     // Only show confirmation if XP or SP has been spent
     const hasExpenditures = (xpSpent > 0) || (spSpent > 0);
     
@@ -845,7 +918,12 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
     if (hasExpenditures) {
       const resetSheet = resetAllExpenditures();
       if (resetSheet) {
-        const updatedSheet = { ...resetSheet, subspecies: newSubspecies };
+        const updatedSheet = { 
+          ...resetSheet, 
+          subspecies: newSubspecies,
+          // Auto-populate species if not set
+          species: species || correspondingSpecies || resetSheet.species
+        };
         saveCharacterSheet(updatedSheet);
         
         // Update local state
@@ -853,10 +931,20 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
         setSpSpent(0);
         setClassCardDots(Array(10).fill(false));
         setSkillDots(resetSheet.skillDots);
+        
+        // Auto-populate species if not set
+        if (!species && correspondingSpecies) {
+          setSpecies(correspondingSpecies);
+        }
       }
     } else {
-      // No expenditures, just update the subspecies
-      handleAutoSave({ subspecies: newSubspecies });
+      // No expenditures, just update the subspecies (and auto-populate species if needed)
+      const updates: Partial<CharacterSheet> = { subspecies: newSubspecies };
+      if (!species && correspondingSpecies) {
+        updates.species = correspondingSpecies;
+        setSpecies(correspondingSpecies);
+      }
+      handleAutoSave(updates);
     }
     
     setSubspecies(newSubspecies);
@@ -904,66 +992,74 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
 
   // Cross-window synchronization for this character (optimized)
   React.useEffect(() => {
+    const sheetId = sheet?.id;
+    
     const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === "rpg-character-sheets" && sheet?.id) {
+      // Skip if we have pending local updates
+      if (hasPendingUpdatesRef.current) return;
+      
+      if (e.key === "rpg-character-sheets" && sheetId) {
         // Reload the current character from storage
-        const updatedSheet = loadSheetById(sheet.id);
+        const updatedSheet = loadSheetById(sheetId);
         if (updatedSheet) {
-          // Only update state if values have actually changed
-          if (updatedSheet.xpTotal !== xpTotal) setXpTotal(updatedSheet.xpTotal ?? 0);
-          if (updatedSheet.spTotal !== spTotal) setSpTotal(updatedSheet.spTotal ?? 0);
-          if (updatedSheet.maxHitPoints !== maxHitPoints) setMaxHitPoints(updatedSheet.maxHitPoints ?? 0);
-          if (updatedSheet.xpSpent !== xpSpent) setXpSpent(updatedSheet.xpSpent ?? 0);
-          if (updatedSheet.spSpent !== spSpent) setSpSpent(updatedSheet.spSpent ?? 0);
-          if (updatedSheet.credits !== credits) setCredits(updatedSheet.credits ?? 0);
-          if (updatedSheet.chemTokens !== chemTokens) setChemTokens(updatedSheet.chemTokens ?? 0);
+          // Update state with latest values
+          setXpTotal(updatedSheet.xpTotal ?? 0);
+          setSpTotal(updatedSheet.spTotal ?? 0);
+          setMaxHitPoints(updatedSheet.maxHitPoints ?? 0);
+          setXpSpent(updatedSheet.xpSpent ?? 0);
+          setSpSpent(updatedSheet.spSpent ?? 0);
+          setCredits(updatedSheet.credits ?? 0);
+          setChemTokens(updatedSheet.chemTokens ?? 0);
           
-          // Update dot states only if they've changed
-          if (updatedSheet.classCardDots && JSON.stringify(updatedSheet.classCardDots) !== JSON.stringify(classCardDots)) {
+          // Update dot states
+          if (updatedSheet.classCardDots) {
             setClassCardDots(updatedSheet.classCardDots.map((row: boolean[]) => [...row]));
           }
           
-          // Update skillDots only if they've changed
-          if (updatedSheet.skillDots && JSON.stringify(updatedSheet.skillDots) !== JSON.stringify(skillDots)) {
+          // Update skillDots
+          if (updatedSheet.skillDots) {
             setSkillDots(updatedSheet.skillDots);
           }
           
-          // Update character details only if they've changed
-          if (updatedSheet.charClass !== charClass) setCharClass(updatedSheet.charClass || "");
-          if (updatedSheet.subclass !== subclass) setSubclass(updatedSheet.subclass || "");
-          if (updatedSheet.species !== species) setSpecies(updatedSheet.species || "");
-          if (updatedSheet.subspecies !== subspecies) setSubspecies(updatedSheet.subspecies || "");
+          // Update character details
+          setCharClass(updatedSheet.charClass || "");
+          setSubclass(updatedSheet.subclass || "");
+          setSpecies(updatedSheet.species || "");
+          setSubspecies(updatedSheet.subspecies || "");
         }
       }
     };
 
     const handleCharacterUpdate = (e: CustomEvent<{ sheet: CharacterSheet }>) => {
-      if (sheet?.id && e.detail.sheet.id === sheet.id) {
+      // Skip if we have pending local updates
+      if (hasPendingUpdatesRef.current) return;
+      
+      if (sheetId && e.detail.sheet.id === sheetId) {
         const updatedSheet = e.detail.sheet;
-        // Only update state if values have actually changed
-        if (updatedSheet.xpTotal !== xpTotal) setXpTotal(updatedSheet.xpTotal ?? 0);
-        if (updatedSheet.spTotal !== spTotal) setSpTotal(updatedSheet.spTotal ?? 0);
-        if (updatedSheet.maxHitPoints !== maxHitPoints) setMaxHitPoints(updatedSheet.maxHitPoints ?? 0);
-        if (updatedSheet.xpSpent !== xpSpent) setXpSpent(updatedSheet.xpSpent ?? 0);
-        if (updatedSheet.spSpent !== spSpent) setSpSpent(updatedSheet.spSpent ?? 0);
-        if (updatedSheet.credits !== credits) setCredits(updatedSheet.credits ?? 0);
-        if (updatedSheet.chemTokens !== chemTokens) setChemTokens(updatedSheet.chemTokens ?? 0);
+        // Update state with latest values
+        setXpTotal(updatedSheet.xpTotal ?? 0);
+        setSpTotal(updatedSheet.spTotal ?? 0);
+        setMaxHitPoints(updatedSheet.maxHitPoints ?? 0);
+        setXpSpent(updatedSheet.xpSpent ?? 0);
+        setSpSpent(updatedSheet.spSpent ?? 0);
+        setCredits(updatedSheet.credits ?? 0);
+        setChemTokens(updatedSheet.chemTokens ?? 0);
         
-        // Update dot states only if they've changed
-        if (updatedSheet.classCardDots && JSON.stringify(updatedSheet.classCardDots) !== JSON.stringify(classCardDots)) {
+        // Update dot states
+        if (updatedSheet.classCardDots) {
           setClassCardDots(updatedSheet.classCardDots.map((row: boolean[]) => [...row]));
         }
         
-        // Update skillDots only if they've changed
-        if (updatedSheet.skillDots && JSON.stringify(updatedSheet.skillDots) !== JSON.stringify(skillDots)) {
+        // Update skillDots
+        if (updatedSheet.skillDots) {
           setSkillDots(updatedSheet.skillDots);
         }
         
-        // Update character details only if they've changed
-        if (updatedSheet.charClass !== charClass) setCharClass(updatedSheet.charClass || "");
-        if (updatedSheet.subclass !== subclass) setSubclass(updatedSheet.subclass || "");
-        if (updatedSheet.species !== species) setSpecies(updatedSheet.species || "");
-        if (updatedSheet.subspecies !== subspecies) setSubspecies(updatedSheet.subspecies || "");
+        // Update character details
+        setCharClass(updatedSheet.charClass || "");
+        setSubclass(updatedSheet.subclass || "");
+        setSpecies(updatedSheet.species || "");
+        setSubspecies(updatedSheet.subspecies || "");
       }
     };
 
@@ -976,7 +1072,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
       window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('character-updated', handleCharacterUpdate as EventListener);
     };
-  }, [sheet?.id, charClass, subclass, species, subspecies, xpTotal, spTotal, xpSpent, spSpent, credits, chemTokens, skillDots]);
+  }, [sheet?.id, setCharClass, setSubclass, setSpecies, setSubspecies]);
 
   // Auto-save when XP/SP totals change (debounced)
   const xpSpSaveTimeoutRef = useRef<number | null>(null);
@@ -1389,8 +1485,8 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
     Avenoch: [
       { label: "Corvid", value: "Corvid", color: "#75904e", species: "Avenoch" },
       { label: "Falcador", value: "Falcador", color: "#6d7156", species: "Avenoch" },
-      { label: "Nocturne", value: "Nocturne", color: "#334592", species: "" },
-      { label: "Vulturine", value: "Vulturine", color: "#a96d8c", species: "" },
+      { label: "Nocturne", value: "Nocturne", color: "#334592", species: "Avenoch" },
+      { label: "Vulturine", value: "Vulturine", color: "#a96d8c", species: "Avenoch" },
     ],
     Cerebronych: [
       { label: "Cerebronych (cont.)", value: "Cerebronych (cont.)", color: "#5f5e2b", species: "Cerebronych" },
@@ -1421,9 +1517,9 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
       { label: "Stout Evolution", value: "Stout Evolution", color: "#5f2b2b", species: "Human" },
     ],
     Lumenaren: [
-      { label: "Infrared", value: "Infrared", color: "#b17fbe", species: "" },
-      { label: "Radiofrequent", value: "Radiofrequent", color: "#bea97f", species: "" },
-      { label: "X-Ray", value: "X-Ray", color: "#7f8abe", species: "" },
+      { label: "Infrared", value: "Infrared", color: "#b17fbe", species: "Lumenaren" },
+      { label: "Radiofrequent", value: "Radiofrequent", color: "#bea97f", species: "Lumenaren" },
+      { label: "X-Ray", value: "X-Ray", color: "#7f8abe", species: "Lumenaren" },
     ],
     Praedari: [
       { label: "Canid", value: "Canid", color: "#2f8da6", species: "Praedari" },
@@ -2509,6 +2605,42 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
               />
             )}
             
+            {/* Radiofrequent Subspecies Content */}
+            {subspecies === "Radiofrequent" && (
+              <LevelUpSpeciesLumenaren
+                sheet={sheet}
+                species={species}
+                subspecies={subspecies}
+                contentType="subspecies"
+                onAutoSave={handleAutoSave}
+                xpTotal={xpTotal}
+                spTotal={spTotal}
+                xpSpent={xpSpent}
+                spSpent={spSpent}
+                setXpSpent={setXpSpent}
+                setSpSpent={setSpSpent}
+                setNotice={setNotice}
+              />
+            )}
+            
+            {/* X-Ray Subspecies Content */}
+            {subspecies === "X-Ray" && (
+              <LevelUpSpeciesLumenaren
+                sheet={sheet}
+                species={species}
+                subspecies={subspecies}
+                contentType="subspecies"
+                onAutoSave={handleAutoSave}
+                xpTotal={xpTotal}
+                spTotal={spTotal}
+                xpSpent={xpSpent}
+                spSpent={spSpent}
+                setXpSpent={setXpSpent}
+                setSpSpent={setSpSpent}
+                setNotice={setNotice}
+              />
+            )}
+            
             {/* Cerebronych (cont.) Subspecies Content */}
             {species === "Cerebronych" && (
               <LevelUpSpeciesCerebronych
@@ -2718,6 +2850,8 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                         if (subspecies === "Petran" && skillName === "Survival") sources.push({ type: 'subspecies', color: "rgba(115,83,17,0.5)" });
                         if (subspecies === "Pyran" && skillName === "Performance") sources.push({ type: 'subspecies', color: "rgba(179,17,17,0.5)" });
                         if (subspecies === "Infrared" && skillName === "Performance") sources.push({ type: 'subspecies', color: "rgba(177,127,190,0.5)" });
+                        if (subspecies === "Radiofrequent" && skillName === "Deception") sources.push({ type: 'subspecies', color: "rgba(190,169,127,0.5)" });
+                        if (subspecies === "X-Ray" && skillName === "Investigation") sources.push({ type: 'subspecies', color: "rgba(127,138,190,0.5)" });
                         if (subspecies === "Apocritan" && skillName === "Survival") sources.push({ type: 'subspecies', color: "rgba(109,113,86,0.5)" });
                         if (subspecies === "Dynastes" && skillName === "Intimidation") sources.push({ type: 'subspecies', color: "rgba(51,69,146,0.5)" });
                         if (subspecies === "Mantid" && skillName === "Awareness") sources.push({ type: 'subspecies', color: "rgba(117,144,78,0.5)" });
