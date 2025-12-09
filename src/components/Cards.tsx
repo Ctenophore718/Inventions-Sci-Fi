@@ -46,6 +46,9 @@ import { generateStinkbugCloudCardJSX } from "../utils/dynastesTechnique";
 import { generatePinDownCardJSX } from "../utils/mantidTechnique";
 import { generateActionSurgeCardJSX } from "../utils/humanTechnique";
 import { generateLightspeedCardJSX } from "../utils/lumenarenTechnique";
+import { generateFeralRageCardJSX } from "../utils/praedariTechnique";
+import { generateWolfpackTacticsCardJSX } from "../utils/canidTechnique";
+import { generateFelineAgilityCardJSX } from "../utils/felidTechnique";
 import { generateSizeMattersCardJSX } from "../utils/diminutiveTechnique";
 import { generateSharedWisdomCardJSX } from "../utils/litheTechnique";
 import { generateWarCryCardJSX } from "../utils/massiveTechnique";
@@ -569,6 +572,34 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
       const hp15Bonus = hp15Dots.filter(Boolean).length * 15;
       
       effectiveHP += 40 + hp5Bonus + hp10Bonus + hp15Bonus;
+    }
+    
+    // Add Canid subspecies bonus
+    if (localSheet?.subspecies === 'Canid') {
+      const subspeciesDots = localSheet?.subspeciesCardDots || [];
+      const hp5Dots = subspeciesDots[6] || [];
+      const hp10Dots = subspeciesDots[7] || [];
+      const hp15Dots = subspeciesDots[8] || [];
+      
+      const hp5Bonus = hp5Dots.filter(Boolean).length * 5;
+      const hp10Bonus = hp10Dots.filter(Boolean).length * 10;
+      const hp15Bonus = hp15Dots.filter(Boolean).length * 15;
+      
+      effectiveHP += 40 + hp5Bonus + hp10Bonus + hp15Bonus;
+    }
+    
+    // Add Felid subspecies bonus
+    if (localSheet?.subspecies === 'Felid') {
+      const subspeciesDots = localSheet?.subspeciesCardDots || [];
+      const hp5Dots = subspeciesDots[2] || [];
+      const hp10Dots = subspeciesDots[3] || [];
+      const hp15Dots = subspeciesDots[4] || [];
+      
+      const hp5Bonus = hp5Dots.filter(Boolean).length * 5;
+      const hp10Bonus = hp10Dots.filter(Boolean).length * 10;
+      const hp15Bonus = (hp15Dots[0] ? 15 : 0);
+      
+      effectiveHP += 35 + hp5Bonus + hp10Bonus + hp15Bonus;
     }
     
     // Add class-specific bonuses
@@ -1380,7 +1411,7 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                 fontFamily: 'Arial, Helvetica, sans-serif',
                 fontWeight: 'bold',
                 fontSize: 'clamp(0.8em, 4vw, 1.25em)',
-                color: localSheet?.species === 'Avenoch' ? '#2b5f59' : localSheet?.species === 'Cerebronych' ? '#5f5e2b' : localSheet?.species === 'Chloroptid' ? '#315f2b' : localSheet?.species === 'Cognizant' ? '#2b3b5f' : localSheet?.species === 'Emberfolk' ? '#5f2b2b' : localSheet?.species === 'Entomos' ? '#5f422b' : localSheet?.species === 'Human' ? '#2b315f' : localSheet?.species === 'Lumenaren' ? '#515f2b' : 'black',
+                color: localSheet?.species === 'Avenoch' ? '#2b5f59' : localSheet?.species === 'Cerebronych' ? '#5f5e2b' : localSheet?.species === 'Chloroptid' ? '#315f2b' : localSheet?.species === 'Cognizant' ? '#2b3b5f' : localSheet?.species === 'Emberfolk' ? '#5f2b2b' : localSheet?.species === 'Entomos' ? '#5f422b' : localSheet?.species === 'Human' ? '#2b315f' : localSheet?.species === 'Lumenaren' ? '#515f2b' : localSheet?.species === 'Praedari' ? '#5f2b5c' : 'black',
                 lineHeight: 1,
                 textAlign: 'left',
                 whiteSpace: 'nowrap',
@@ -1389,13 +1420,13 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                 flexShrink: 1,
                 marginRight: '5px'
               }}>
-                {localSheet?.species === 'Avenoch' ? 'Avian Gaze' : localSheet?.species === 'Cerebronych' ? 'Memory Manifest' : localSheet?.species === 'Chloroptid' ? 'Unusual Growth' : localSheet?.species === 'Cognizant' ? 'Local Area Network' : localSheet?.species === 'Emberfolk' ? 'Oppressive Heat' : localSheet?.species === 'Entomos' ? 'Iron Carapace' : localSheet?.species === 'Human' ? 'Action Surge' : localSheet?.species === 'Lumenaren' ? 'Lightspeed' : 'Species Card Name'}
+                {localSheet?.species === 'Avenoch' ? 'Avian Gaze' : localSheet?.species === 'Cerebronych' ? 'Memory Manifest' : localSheet?.species === 'Chloroptid' ? 'Unusual Growth' : localSheet?.species === 'Cognizant' ? 'Local Area Network' : localSheet?.species === 'Emberfolk' ? 'Oppressive Heat' : localSheet?.species === 'Entomos' ? 'Iron Carapace' : localSheet?.species === 'Human' ? 'Action Surge' : localSheet?.species === 'Lumenaren' ? 'Lightspeed' : localSheet?.species === 'Praedari' ? 'Feral Rage' : 'Species Card Name'}
               </span>
               <span style={{
                 fontFamily: 'Arial, Helvetica, sans-serif',
                 fontStyle: 'italic',
                 fontSize: '0.75em',
-                color: localSheet?.species === 'Avenoch' ? '#2b5f59' : localSheet?.species === 'Cerebronych' ? '#5f5e2b' : localSheet?.species === 'Chloroptid' ? '#315f2b' : localSheet?.species === 'Cognizant' ? '#2b3b5f' : localSheet?.species === 'Emberfolk' ? '#5f2b2b' : localSheet?.species === 'Entomos' ? '#5f422b' : localSheet?.species === 'Human' ? '#2b315f' : localSheet?.species === 'Lumenaren' ? '#515f2b' : 'black',
+                color: localSheet?.species === 'Avenoch' ? '#2b5f59' : localSheet?.species === 'Cerebronych' ? '#5f5e2b' : localSheet?.species === 'Chloroptid' ? '#315f2b' : localSheet?.species === 'Cognizant' ? '#2b3b5f' : localSheet?.species === 'Emberfolk' ? '#5f2b2b' : localSheet?.species === 'Entomos' ? '#5f422b' : localSheet?.species === 'Human' ? '#2b315f' : localSheet?.species === 'Lumenaren' ? '#515f2b' : localSheet?.species === 'Praedari' ? '#5f2b5c' : 'black',
                 lineHeight: 1,
                 whiteSpace: 'normal',
                 wordBreak: 'keep-all',
@@ -1403,11 +1434,11 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                 maxWidth: '72px',
                 display: 'inline-block',
                 textAlign: 'right'
-              }}>{localSheet?.species === 'Avenoch' ? 'Avenoch' : localSheet?.species === 'Cerebronych' ? 'Cerebronych' : localSheet?.species === 'Chloroptid' ? 'Chloroptid' : localSheet?.species === 'Cognizant' ? 'Cognizant' : localSheet?.species === 'Emberfolk' ? 'Emberfolk' : localSheet?.species === 'Entomos' ? 'Entomos' : localSheet?.species === 'Human' ? 'Human' : localSheet?.species === 'Lumenaren' ? 'Lumenaren' : 'Species'}</span>
+              }}>{localSheet?.species === 'Avenoch' ? 'Avenoch' : localSheet?.species === 'Cerebronych' ? 'Cerebronych' : localSheet?.species === 'Chloroptid' ? 'Chloroptid' : localSheet?.species === 'Cognizant' ? 'Cognizant' : localSheet?.species === 'Emberfolk' ? 'Emberfolk' : localSheet?.species === 'Entomos' ? 'Entomos' : localSheet?.species === 'Human' ? 'Human' : localSheet?.species === 'Lumenaren' ? 'Lumenaren' : localSheet?.species === 'Praedari' ? 'Praedari' : 'Species'}</span>
             </div>
             <img 
-              src={localSheet?.species === 'Avenoch' ? "/Avian Gaze.png" : localSheet?.species === 'Cerebronych' ? "/Memory Manifest.png" : localSheet?.species === 'Chloroptid' ? "/Unusual Growth.png" : localSheet?.species === 'Cognizant' ? "/Local Area Network.png" : localSheet?.species === 'Emberfolk' ? "/Oppressive Heat.png" : localSheet?.species === 'Entomos' ? "/Iron Carapace.png" : localSheet?.species === 'Human' ? "/Action Surge.png" : localSheet?.species === 'Lumenaren' ? "/Lightspeed.png" : "/Blank Card.png"}
-              alt={localSheet?.species === 'Avenoch' ? "Avian Gaze" : localSheet?.species === 'Cerebronych' ? "Memory Manifest" : localSheet?.species === 'Chloroptid' ? "Unusual Growth" : localSheet?.species === 'Cognizant' ? "Local Area Network" : localSheet?.species === 'Emberfolk' ? "Oppressive Heat" : localSheet?.species === 'Entomos' ? "Iron Carapace" : localSheet?.species === 'Human' ? "Action Surge" : localSheet?.species === 'Lumenaren' ? "Lightspeed" : "Blank Card"}
+              src={localSheet?.species === 'Avenoch' ? "/Avian Gaze.png" : localSheet?.species === 'Cerebronych' ? "/Memory Manifest.png" : localSheet?.species === 'Chloroptid' ? "/Unusual Growth.png" : localSheet?.species === 'Cognizant' ? "/Local Area Network.png" : localSheet?.species === 'Emberfolk' ? "/Oppressive Heat.png" : localSheet?.species === 'Entomos' ? "/Iron Carapace.png" : localSheet?.species === 'Human' ? "/Action Surge.png" : localSheet?.species === 'Lumenaren' ? "/Lightspeed.png" : localSheet?.species === 'Praedari' ? "/Feral Rage.png" : "/Blank Card.png"}
+              alt={localSheet?.species === 'Avenoch' ? "Avian Gaze" : localSheet?.species === 'Cerebronych' ? "Memory Manifest" : localSheet?.species === 'Chloroptid' ? "Unusual Growth" : localSheet?.species === 'Cognizant' ? "Local Area Network" : localSheet?.species === 'Emberfolk' ? "Oppressive Heat" : localSheet?.species === 'Entomos' ? "Iron Carapace" : localSheet?.species === 'Human' ? "Action Surge" : localSheet?.species === 'Lumenaren' ? "Lightspeed" : localSheet?.species === 'Praedari' ? "Feral Rage" : "Blank Card"}
               style={{
                 position: 'absolute',
                 top: 35,
@@ -1466,6 +1497,10 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                 <span style={{ color: '#bf9000', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '0.875em', fontStyle: 'italic', marginRight: 22, whiteSpace: 'nowrap', maxWidth: 'calc(100% - 120px)', overflow: 'hidden', textOverflow: 'ellipsis', textAlign: 'right' }}>
                   Cooldown <span style={{ fontWeight: 'bold', fontStyle: 'normal' }}>[{3 - (localSheet?.speciesCardDots?.[3]?.filter(Boolean).length || 0)}]</span>
                 </span>
+              ) : localSheet?.species === 'Praedari' ? (
+                <span style={{ color: '#bf9000', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '0.875em', fontStyle: 'italic', marginRight: 22, whiteSpace: 'nowrap', maxWidth: 'calc(100% - 120px)', overflow: 'hidden', textOverflow: 'ellipsis', textAlign: 'right' }}>
+                  Cooldown <span style={{ fontWeight: 'bold', fontStyle: 'normal' }}>[{4 - (localSheet?.speciesCardDots?.[5]?.filter(Boolean).length || 0)}]</span>
+                </span>
               ) : localSheet?.subclass === 'Air' ? (
                 <span style={{ color: '#bf9000', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '0.875em', fontStyle: 'italic', marginRight: 22, whiteSpace: 'nowrap', maxWidth: 'calc(100% - 120px)', overflow: 'hidden', textOverflow: 'ellipsis', textAlign: 'right' }}>
                   Cooldown <span style={{ fontWeight: 'bold', fontStyle: 'normal' }}>[{4 - ((localSheet?.subclassProgressionDots as any)?.airTechniqueCooldownDots?.filter(Boolean).length || 0)}]</span>
@@ -1504,7 +1539,7 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                 maxHeight: '100%',
                 overflow: 'hidden'
               }}>
-                {localSheet?.species === 'Avenoch' ? generateAvianGazeCardJSX(localSheet?.speciesCardDots) : localSheet?.species === 'Cerebronych' ? generateMemoryManifestCardJSX(localSheet?.speciesCardDots) : localSheet?.species === 'Chloroptid' ? generateUnusualGrowthCardJSX(localSheet?.speciesCardDots) : localSheet?.species === 'Cognizant' ? generateLocalAreaNetworkCardJSX(3 - (localSheet?.speciesCardDots?.[4]?.filter(Boolean).length || 0), 3 + (localSheet?.speciesCardDots?.[2]?.filter(Boolean).length || 0), localSheet?.speciesCardDots?.[3]?.[0] ? 1 : 0) : localSheet?.species === 'Emberfolk' ? generateOppressiveHeatCardJSX(4 - (localSheet?.speciesCardDots?.[5]?.filter(Boolean).length || 0), 3 + (localSheet?.speciesCardDots?.[2]?.filter(Boolean).length || 0), 1 + (localSheet?.speciesCardDots?.[3]?.filter(Boolean).length || 0), localSheet?.speciesCardDots?.[4]?.[0] ?? false) : localSheet?.species === 'Entomos' ? generateIronCarapaceCardJSX(3 - (localSheet?.speciesCardDots?.[4]?.filter(Boolean).length || 0), 2 + (localSheet?.speciesCardDots?.[2]?.filter(Boolean).length || 0), localSheet?.speciesCardDots?.[3]?.[0] ?? false) : localSheet?.species === 'Human' ? generateActionSurgeCardJSX(3 + (localSheet?.speciesCardDots?.[1]?.filter(Boolean).length || 0)) : localSheet?.species === 'Lumenaren' ? generateLightspeedCardJSX(10 + (localSheet?.speciesCardDots?.[2]?.filter(Boolean).length || 0) * 5) : 'Card stats.'}
+                {localSheet?.species === 'Avenoch' ? generateAvianGazeCardJSX(localSheet?.speciesCardDots) : localSheet?.species === 'Cerebronych' ? generateMemoryManifestCardJSX(localSheet?.speciesCardDots) : localSheet?.species === 'Chloroptid' ? generateUnusualGrowthCardJSX(localSheet?.speciesCardDots) : localSheet?.species === 'Cognizant' ? generateLocalAreaNetworkCardJSX(3 - (localSheet?.speciesCardDots?.[4]?.filter(Boolean).length || 0), 3 + (localSheet?.speciesCardDots?.[2]?.filter(Boolean).length || 0), localSheet?.speciesCardDots?.[3]?.[0] ? 1 : 0) : localSheet?.species === 'Emberfolk' ? generateOppressiveHeatCardJSX(4 - (localSheet?.speciesCardDots?.[5]?.filter(Boolean).length || 0), 3 + (localSheet?.speciesCardDots?.[2]?.filter(Boolean).length || 0), 1 + (localSheet?.speciesCardDots?.[3]?.filter(Boolean).length || 0), localSheet?.speciesCardDots?.[4]?.[0] ?? false) : localSheet?.species === 'Entomos' ? generateIronCarapaceCardJSX(3 - (localSheet?.speciesCardDots?.[4]?.filter(Boolean).length || 0), 2 + (localSheet?.speciesCardDots?.[2]?.filter(Boolean).length || 0), localSheet?.speciesCardDots?.[3]?.[0] ?? false) : localSheet?.species === 'Human' ? generateActionSurgeCardJSX(3 + (localSheet?.speciesCardDots?.[1]?.filter(Boolean).length || 0)) : localSheet?.species === 'Lumenaren' ? generateLightspeedCardJSX(10 + (localSheet?.speciesCardDots?.[2]?.filter(Boolean).length || 0) * 5) : localSheet?.species === 'Praedari' ? generateFeralRageCardJSX(1 + (localSheet?.speciesCardDots?.[2]?.filter(Boolean).length || 0), 1 + (localSheet?.speciesCardDots?.[3]?.filter(Boolean).length || 0), 1 + (localSheet?.speciesCardDots?.[4]?.filter(Boolean).length || 0)) : 'Card stats.'}
               </div>
             </div>
             <div style={{
@@ -1537,7 +1572,9 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                             ? '"Do more with more, that\'s what I always say!" --Kelson Graeber, Human Secessionist'
                             : localSheet?.species === 'Lumenaren'
                               ? '"However vast the darkness, we must supply our own light." --Stanley Kubrick'
-                              : 'Flavor text.'}
+                              : localSheet?.species === 'Praedari'
+                                ? '"I considered all options before me and concluded on a sound course of action: RAWRR!!!" --Jean du Lac, Canid Tactician'
+                                : 'Flavor text.'}
             </div>
         </div>
         
@@ -1615,6 +1652,10 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                             ? '#bea97f'
                             : localSheet?.subspecies === 'X-Ray'
                             ? '#7f8abe'
+                            : localSheet?.subspecies === 'Canid'
+                            ? '#2f8da6'
+                            : localSheet?.subspecies === 'Felid'
+                            ? '#b16326'
                             : 'black',
                 lineHeight: 1,
                 textAlign: 'left', 
@@ -1664,6 +1705,10 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                                                     ? 'War Cry'
                                                     : localSheet?.subspecies === 'Stout Evolution'
                                                       ? 'Come at Me, Bro!'
+                                                      : localSheet?.subspecies === 'Canid'
+                                                        ? 'Wolfpack Tactics'
+                                                      : localSheet?.subspecies === 'Felid'
+                                                        ? 'Feline Agility'
                                                       : localSheet?.subspecies === 'Infrared'
                                                         ? 'Heat Sink'
                                                         : localSheet?.subspecies === 'Radiofrequent'
@@ -1714,6 +1759,10 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                                             ? '#2b175f'
                                             : localSheet?.subspecies === 'Stout Evolution'
                                             ? '#5f2b2b'
+                                            : localSheet?.subspecies === 'Canid'
+                                            ? '#2f8da6'
+                                            : localSheet?.subspecies === 'Felid'
+                                            ? '#b16326'
                                             : localSheet?.subspecies === 'Infrared'
                                             ? '#b17fbe'
                                             : localSheet?.subspecies === 'Radiofrequent'
@@ -1768,7 +1817,11 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                                                     ? (<>Massive<br/>Evolution</>)
                                                     : localSheet?.subspecies === 'Stout Evolution'
                                                       ? (<>Stout<br/>Evolution</>)
-                                                      : localSheet?.subspecies === 'Infrared'
+                                                      : localSheet?.subspecies === 'Canid'
+                                                        ? 'Canid'
+                                                        : localSheet?.subspecies === 'Felid'
+                                                        ? 'Felid'
+                                                        : localSheet?.subspecies === 'Infrared'
                                                         ? 'Infrared'
                                                         : localSheet?.subspecies === 'Radiofrequent'
                                                           ? <>Radio-<br />frequent</>
@@ -1817,6 +1870,10 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                                             ? "/War Cry.png"
                                             : localSheet?.subspecies === 'Stout Evolution'
                                             ? "/Come at Me, Bro!.png"
+                                            : localSheet?.subspecies === 'Canid'
+                                            ? "/Wolfpack Tactics.png"
+                                            : localSheet?.subspecies === 'Felid'
+                                            ? "/Feline Agility.png"
                                             : localSheet?.subspecies === 'Infrared'
                                             ? "/Heat Sink.png"
                                             : localSheet?.subspecies === 'Radiofrequent'
@@ -1852,7 +1909,29 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                                       ? "Blazing Leap"
                                       : localSheet?.subspecies === 'Apocritan'
                                         ? "Tenacity"
-                                        : "Blank Card"}
+                                        : localSheet?.subspecies === 'Dynastes'
+                                          ? "Stinkbug Cloud"
+                                          : localSheet?.subspecies === 'Mantid'
+                                            ? "Pin Down"
+                                            : localSheet?.subspecies === 'Diminutive Evolution'
+                                              ? "Size Matters"
+                                              : localSheet?.subspecies === 'Lithe Evolution'
+                                                ? "Shared Wisdom"
+                                                : localSheet?.subspecies === 'Massive Evolution'
+                                                  ? "War Cry"
+                                                  : localSheet?.subspecies === 'Stout Evolution'
+                                                    ? "Come at Me, Bro!"
+                                                    : localSheet?.subspecies === 'Canid'
+                                                      ? "Wolfpack Tactics"
+                                                      : localSheet?.subspecies === 'Felid'
+                                                        ? "Feline Agility"
+                                                        : localSheet?.subspecies === 'Infrared'
+                                                          ? "Heat Sink"
+                                                          : localSheet?.subspecies === 'Radiofrequent'
+                                                            ? "Sensory Distortion"
+                                                            : localSheet?.subspecies === 'X-Ray'
+                                                              ? "X-Ray Vision"
+                                                              : "Blank Card"}
               style={{
                 position: 'absolute',
                 top: 35,
@@ -1921,7 +2000,11 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                                                       ? `[${4 - (localSheet?.subspeciesCardDots?.[8]?.filter(Boolean).length ?? 0)}]`
                                                       : localSheet?.subspecies === 'Stout Evolution'
                                                         ? `[${4 - (localSheet?.subspeciesCardDots?.[6]?.filter(Boolean).length ?? 0)}]`
-                                                        : localSheet?.subspecies === 'Infrared'
+                                                        : localSheet?.subspecies === 'Canid'
+                                                          ? `[${4 - (localSheet?.subspeciesCardDots?.[5]?.filter(Boolean).length ?? 0)}]`
+                                                          : localSheet?.subspecies === 'Felid'
+                                                          ? `[${3 - (localSheet?.subspeciesCardDots?.[1]?.filter(Boolean).length ?? 0)}]`
+                                                          : localSheet?.subspecies === 'Infrared'
                                                           ? `[${4 - (localSheet?.subspeciesCardDots?.[2]?.filter(Boolean).length ?? 0)}]`
                                                           : localSheet?.subspecies === 'Radiofrequent'
                                                             ? `[${3 - (localSheet?.subspeciesCardDots?.[3]?.filter(Boolean).length ?? 0)}]`
@@ -2060,7 +2143,18 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                                                           localSheet?.subspeciesCardDots?.[4]?.[0] ?? false,
                                                           localSheet?.subspeciesCardDots?.[5]?.[0] ?? false
                                                         )
-                                                      : localSheet?.subspecies === 'Infrared'
+                                                      : localSheet?.subspecies === 'Canid'
+                                                        ? generateWolfpackTacticsCardJSX(
+                                                            1 + (localSheet?.subspeciesCardDots?.[2]?.filter(Boolean).length ?? 0),
+                                                            (localSheet?.subspeciesCardDots?.[3]?.[0] ?? false) ? 2 : 0,
+                                                            1 + ((localSheet?.subspeciesCardDots?.[4]?.[0] ?? false) ? 1 : 0)
+                                                          )
+                                                        : localSheet?.subspecies === 'Felid'
+                                                        ? generateFelineAgilityCardJSX(
+                                                            3 + (localSheet?.subspeciesCardDots?.[1]?.filter(Boolean).length ?? 0),
+                                                            (localSheet?.subspeciesCardDots?.[0]?.filter(Boolean).length ?? 0)
+                                                          )
+                                                        : localSheet?.subspecies === 'Infrared'
                                                         ? <span style={{ fontSize: '0.86em' }}>{generateHeatSinkCardJSX(
                                                             3 + (localSheet?.subspeciesCardDots?.[0]?.filter(Boolean).length ?? 0),
                                                             localSheet?.subspeciesCardDots?.[1]?.[0] ?? false
@@ -2131,6 +2225,10 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                                             ? '"You want to keep fighting? Let me make it easy for you -- you\'re already dead." --Gront Skullcrusher, Massive Human Warrior'
                                             : localSheet?.subspecies === 'Stout Evolution'
                                             ? '"I dun\' have time fer this twaddle -- lemme at dem basterds!" --Tagnar Redbeard, Stout Human Belter Battalion Grunt'
+                                            : localSheet?.subspecies === 'Canid'
+                                            ? '"No self-respecting Canid truly believes in lone-wolf bravado. We are always stronger when we stick to the pack." --Ruff McGruff, Canid Galvanic'
+                                            : localSheet?.subspecies === 'Felid'
+                                            ? '"Yo, I\'mma cheetah, y\'all! I\'m un gato ninja, yo! Y\'all gonna have t\' do a helluva lot more than that t\' kill me!" --Whiskers González, Felid Junker'
                                             : localSheet?.subspecies === 'Infrared'
                                             ? '"Friends, your energy signature shall be melded with mine, and any harm that would befall you shall empower me instead." --Zenith, Infrared Devout'
                                             : localSheet?.subspecies === 'Radiofrequent'

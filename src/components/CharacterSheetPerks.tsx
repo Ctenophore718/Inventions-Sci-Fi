@@ -81,6 +81,11 @@ const CharacterSheetPerks: React.FC<CharacterSheetPerksProps> = ({
                 Lumenaren
               </span>
             )}
+            {sheet?.species === 'Praedari' && (
+              <span style={{ fontWeight: 'normal', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', color: '#000' }}>
+                Praedari
+              </span>
+            )}
             {sheet?.lumenarenLanguage && (
               <span style={{ fontWeight: 'normal', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', color: '#000' }}>
                 {sheet.lumenarenLanguage}
@@ -213,6 +218,13 @@ const CharacterSheetPerks: React.FC<CharacterSheetPerksProps> = ({
             <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
               <span>
                 <b><i style={{ color: '#515f2b' }}>Natural Battery.</i></b> <span style={{ color: '#000' }}>You are a creature of pure energy and light, and can thus charge any adjacent technologic device up to 7hx in size to full power in seconds, from a simple stopwatch to a ship's engine.</span>
+              </span>
+            </div>
+          )}
+          {sheet?.species === 'Praedari' && sheet?.speciesCardDots?.[9]?.[0] && (
+            <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+              <span>
+                <b><i style={{ color: '#5f2b5c' }}>Beast Speech.</i></b> <span style={{ color: '#000' }}>From birth, you've been intimately attuned with the natural world and the creatures living therein, and you can speak with natural fauna of all shapes and sizes.</span>
               </span>
             </div>
           )}
@@ -629,6 +641,20 @@ const CharacterSheetPerks: React.FC<CharacterSheetPerksProps> = ({
           <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
             <span>
               <b><i style={{ color: '#7f8abe' }}>Penetrating Sight.</i></b> <span style={{ color: '#000' }}>You can see through soft and thin materials, such as cloth and skin, and can get the outlines and general shapes of hidden items. However, you cannot see through an inch of metal or a foot of stone. Consult your DM for more information.</span>
+            </span>
+          </div>
+          )}
+          {subspecies === 'Canid' && sheet?.subspeciesCardDots?.[4]?.[0] && (
+          <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <span>
+              <b><i style={{ color: '#2f8da6' }}>Consummate Tracker.</i></b> <span style={{ color: '#000' }}>You are an expert tracker and can almost always find someone who is trying to elude you, whether through your natural senses or your penchant for predation. Gain an advantage on related skill rolls.</span>
+            </span>
+          </div>
+          )}
+          {subspecies === 'Felid' && sheet?.subspeciesCardDots?.[10]?.[0] && (
+          <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <span>
+              <b><i style={{ color: '#b16326' }}>Instinctive Stalker.</i></b> <span style={{ color: '#000' }}>When applied, your instincts allow you to silently hunt down your prey, either physically or mentally. Gain an advantage on skill rolls related to stealthily tracking down any target.</span>
             </span>
           </div>
           )}

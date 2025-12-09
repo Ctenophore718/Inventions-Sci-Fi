@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import type { CharacterSheet } from "../types/CharacterSheet";
 
 // Default Commander Dots structure: 10 arrays for each progression row
@@ -62,8 +62,31 @@ const LevelUpClassCommander: React.FC<LevelUpClassCommanderProps> = ({
     const [selectedRifles, setSelectedRifles] = useState<string[]>(sheet?.rifles || []);
     const [pendingRifle, setPendingRifle] = useState<string>("");
 
+    // Refs for race condition prevention
+    const xpSpentRef = useRef(xpSpent);
+    const spSpentRef = useRef(spSpent);
+    const hasPendingUpdatesRef = useRef(false);
+    const sheetRef = useRef(sheet);
+
+    // Sync refs with props
+    useEffect(() => {
+      if (!hasPendingUpdatesRef.current) {
+        xpSpentRef.current = xpSpent;
+      }
+    }, [xpSpent]);
+
+    useEffect(() => {
+      if (!hasPendingUpdatesRef.current) {
+        spSpentRef.current = spSpent;
+      }
+    }, [spSpent]);
+
+    useEffect(() => {
+      sheetRef.current = sheet;
+    }, [sheet]);
+
     // Sync selectedRifles when sheet prop changes
-    React.useEffect(() => {
+    useEffect(() => {
       const currentRifles = sheet?.rifles || [];
       setSelectedRifles([...currentRifles]);
     }, [sheet?.rifles]);
@@ -85,9 +108,9 @@ const LevelUpClassCommander: React.FC<LevelUpClassCommanderProps> = ({
     };
   
     // Save to sheet and localStorage
-    const persistClassCardDots = (newDots: boolean[][], spSpentDelta: number = 0, xpSpentDelta: number = 0) => {
-      let newSpSpent = spSpent + spSpentDelta;
-      let newXpSpent = xpSpent + xpSpentDelta;
+    const persistClassCardDots = useCallback((newDots: boolean[][], spSpentDelta: number = 0, xpSpentDelta: number = 0) => {
+      let newSpSpent = spSpentRef.current + spSpentDelta;
+      let newXpSpent = xpSpentRef.current + xpSpentDelta;
       // Enforce XP/SP cannot exceed total
       if (newXpSpent > xpTotal) {
         setNotice("Not enough xp!");
@@ -97,15 +120,21 @@ const LevelUpClassCommander: React.FC<LevelUpClassCommanderProps> = ({
         setNotice("Not enough sp!");
         return;
       }
+      hasPendingUpdatesRef.current = true;
       setClassCardDots(newDots);
       newSpSpent = Math.max(0, newSpSpent);
       newXpSpent = Math.max(0, newXpSpent);
+      spSpentRef.current = newSpSpent;
+      xpSpentRef.current = newXpSpent;
       setSpSpent(newSpSpent);
       setXpSpent(newXpSpent);
-      if (sheet && onAutoSave) {
+      if (sheetRef.current && onAutoSave) {
         onAutoSave({ classCardDots: newDots, spSpent: newSpSpent, xpSpent: newXpSpent });
       }
-    };
+      setTimeout(() => {
+        hasPendingUpdatesRef.current = false;
+      }, 100);
+    }, [xpTotal, spTotal, setNotice, setSpSpent, setXpSpent, onAutoSave]);
     
     // Helper function to handle dot clicking with sequential requirement
     // eslint-disable-next-line @typescript-eslint/no-unused-vars

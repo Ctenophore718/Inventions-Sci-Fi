@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import type { CharacterSheet } from "../types/CharacterSheet";
 import { generateSubtleMagicJSX } from "../utils/coderFeature";
 import { generateReflectionScriptJSX } from "../utils/coderTechnique";
@@ -73,6 +73,29 @@ const LevelUpClassCoder: React.FC<LevelUpClassCoderProps> = ({
     const [pendingAlgorithm, setPendingAlgorithm] = useState<string>("");
     const prevAlgorithmsRef = useRef<string[]>([]);
 
+    // Refs for race condition prevention
+    const xpSpentRef = useRef(xpSpent);
+    const spSpentRef = useRef(spSpent);
+    const hasPendingUpdatesRef = useRef(false);
+    const sheetRef = useRef(sheet);
+
+    // Sync refs with props
+    useEffect(() => {
+      if (!hasPendingUpdatesRef.current) {
+        xpSpentRef.current = xpSpent;
+      }
+    }, [xpSpent]);
+
+    useEffect(() => {
+      if (!hasPendingUpdatesRef.current) {
+        spSpentRef.current = spSpent;
+      }
+    }, [spSpent]);
+
+    useEffect(() => {
+      sheetRef.current = sheet;
+    }, [sheet]);
+
     // Sync selectedLenses when sheet prop changes
     useEffect(() => {
       const currentLenses = sheet?.lenses || [];
@@ -114,9 +137,9 @@ const LevelUpClassCoder: React.FC<LevelUpClassCoderProps> = ({
     };
   
     // Save to sheet and localStorage
-    const persistClassCardDots = (newDots: boolean[][], spSpentDelta: number = 0, xpSpentDelta: number = 0) => {
-      let newSpSpent = spSpent + spSpentDelta;
-      let newXpSpent = xpSpent + xpSpentDelta;
+    const persistClassCardDots = useCallback((newDots: boolean[][], spSpentDelta: number = 0, xpSpentDelta: number = 0) => {
+      let newSpSpent = spSpentRef.current + spSpentDelta;
+      let newXpSpent = xpSpentRef.current + xpSpentDelta;
       // Enforce XP/SP cannot exceed total
       if (newXpSpent > xpTotal) {
         setNotice("Not enough xp!");
@@ -126,15 +149,21 @@ const LevelUpClassCoder: React.FC<LevelUpClassCoderProps> = ({
         setNotice("Not enough sp!");
         return;
       }
+      hasPendingUpdatesRef.current = true;
       setClassCardDots(newDots);
       newSpSpent = Math.max(0, newSpSpent);
       newXpSpent = Math.max(0, newXpSpent);
+      spSpentRef.current = newSpSpent;
+      xpSpentRef.current = newXpSpent;
       setSpSpent(newSpSpent);
       setXpSpent(newXpSpent);
-      if (sheet && onAutoSave) {
+      if (sheetRef.current && onAutoSave) {
         onAutoSave({ classCardDots: newDots, spSpent: newSpSpent, xpSpent: newXpSpent });
       }
-    };
+      setTimeout(() => {
+        hasPendingUpdatesRef.current = false;
+      }, 100);
+    }, [xpTotal, spTotal, setNotice, setSpSpent, setXpSpent, onAutoSave]);
     
 
       return (

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import type { CharacterSheet } from "../types/CharacterSheet";
 import { generateMartyrJSX } from "../utils/astralFeature";
 import { generateBenefactionJSX } from "../utils/astralTechnique";
@@ -171,14 +171,37 @@ const LevelUpSubclassesDevout: React.FC<LevelUpSubclassesDevoutProps> = ({
     (sheet?.subclassProgressionDots as any)?.voidPerksSkillsDots || [false]
   );
 
+  // Refs to track latest values and prevent race conditions
+  const xpSpentRef = useRef(xpSpent);
+  const spSpentRef = useRef(spSpent);
+  const hasPendingUpdatesRef = useRef(false);
+  const sheetRef = useRef(sheet);
+
+  // Keep refs in sync with props
+  useEffect(() => {
+    xpSpentRef.current = xpSpent;
+  }, [xpSpent]);
+
+  useEffect(() => {
+    spSpentRef.current = spSpent;
+  }, [spSpent]);
+
+  useEffect(() => {
+    sheetRef.current = sheet;
+  }, [sheet]);
+
   // Helper function to handle XP dot clicking with sequential requirement
-  const handleDotClick = (
+  const handleDotClick = useCallback((
     currentArray: boolean[], 
     setArray: React.Dispatch<React.SetStateAction<boolean[]>>, 
     index: number, 
     xpCosts: number[],
     dotType?: string
   ) => {
+    if (hasPendingUpdatesRef.current) return;
+    hasPendingUpdatesRef.current = true;
+    setTimeout(() => { hasPendingUpdatesRef.current = false; }, 100);
+
     const newArray = [...currentArray];
     const rightmostChecked = currentArray.lastIndexOf(true);
     const canCheck = index === 0 || currentArray.slice(0, index).every(Boolean);
@@ -205,8 +228,8 @@ const LevelUpSubclassesDevout: React.FC<LevelUpSubclassesDevoutProps> = ({
     }
     
     if (xpDelta !== 0) {
-      // Enforce XP/SP cannot exceed total
-      const newXpSpent = xpSpent + xpDelta;
+      // Enforce XP/SP cannot exceed total - use ref for latest value
+      const newXpSpent = xpSpentRef.current + xpDelta;
       if (newXpSpent > xpTotal) {
         setNotice("Not enough xp!");
         return;
@@ -219,7 +242,7 @@ const LevelUpSubclassesDevout: React.FC<LevelUpSubclassesDevoutProps> = ({
       // Include progression dots in the XP change communication to prevent race conditions
       if (dotType && onAutoSave) {
         const progressionDots = {
-          ...sheet?.subclassProgressionDots,
+          ...sheetRef.current?.subclassProgressionDots,
           [dotType]: newArray
         };
         
@@ -231,7 +254,7 @@ const LevelUpSubclassesDevout: React.FC<LevelUpSubclassesDevoutProps> = ({
         
         if (dotType === 'astralHitPointsDots' || dotType === 'chaosHitPointsDots' || dotType === 'orderHitPointsDots' || dotType === 'voidHitPointsDots') {
           const hpBonus = newArray.filter(Boolean).length * 10;
-          const currentMaxHP = sheet?.maxHitPoints || 0;
+          const currentMaxHP = sheetRef.current?.maxHitPoints || 0;
           const oldHpBonus = currentArray.filter(Boolean).length * 10;
           const newMaxHP = currentMaxHP - oldHpBonus + hpBonus;
           updates.maxHitPoints = newMaxHP;
@@ -240,16 +263,20 @@ const LevelUpSubclassesDevout: React.FC<LevelUpSubclassesDevoutProps> = ({
         onAutoSave(updates);
       }
     }
-  };
+  }, [xpTotal, setNotice, setXpSpent, onAutoSave]);
 
   // Helper function to handle SP dots
-  const handleSpDotClick = (
+  const handleSpDotClick = useCallback((
     currentArray: boolean[], 
     setArray: React.Dispatch<React.SetStateAction<boolean[]>>, 
     index: number, 
     spCosts: number[],
     dotType?: string
   ) => {
+    if (hasPendingUpdatesRef.current) return;
+    hasPendingUpdatesRef.current = true;
+    setTimeout(() => { hasPendingUpdatesRef.current = false; }, 100);
+
     const newArray = [...currentArray];
     let spDelta = 0;
     
@@ -261,7 +288,7 @@ const LevelUpSubclassesDevout: React.FC<LevelUpSubclassesDevoutProps> = ({
       spDelta -= spCosts[index] || 0;
     }
     
-    const newSpSpent = spSpent + spDelta;
+    const newSpSpent = spSpentRef.current + spDelta;
     if (newSpSpent > spTotal) {
       setNotice("Not enough sp!");
       return;
@@ -274,7 +301,7 @@ const LevelUpSubclassesDevout: React.FC<LevelUpSubclassesDevoutProps> = ({
     // Include progression dots in the SP change communication to prevent race conditions
     if (dotType && onAutoSave) {
       const progressionDots = {
-        ...sheet?.subclassProgressionDots,
+        ...sheetRef.current?.subclassProgressionDots,
         [dotType]: newArray
       };
       onAutoSave({
@@ -283,7 +310,7 @@ const LevelUpSubclassesDevout: React.FC<LevelUpSubclassesDevoutProps> = ({
         spRemaining: spTotal - Math.max(0, newSpSpent)
       });
     }
-  };
+  }, [spTotal, setNotice, setSpSpent, onAutoSave]);
 
   return (
     <div style={{ width: '100%', textAlign: 'left', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>

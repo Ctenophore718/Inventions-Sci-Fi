@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import type { CharacterSheet } from "../types/CharacterSheet";
 import { generateAdaptablePhysiqueJSX } from "../utils/humanFeature";
 import { generateActionSurgeJSX } from "../utils/humanTechnique";
@@ -114,6 +114,41 @@ const LevelUpSpeciesHuman: React.FC<LevelUpSpeciesHumanProps> = ({
     return defaultHumanDots.map(row => [...row]);
   });
 
+  // Local state for subspecies card dots
+  const [subspeciesCardDots, setSubspeciesCardDots] = useState<boolean[][]>(() => {
+    if (sheet?.subspeciesCardDots && Array.isArray(sheet.subspeciesCardDots) && sheet.subspeciesCardDots.length > 0) {
+      return sheet.subspeciesCardDots.map(row => Array.isArray(row) ? [...row] : []);
+    }
+    // Return appropriate default based on subspecies
+    if (subspecies === 'Lithe Evolution') {
+      return defaultLitheDots.map(row => [...row]);
+    } else if (subspecies === 'Massive Evolution') {
+      return defaultMassiveDots.map(row => [...row]);
+    } else if (subspecies === 'Stout Evolution') {
+      return defaultStoutDots.map(row => [...row]);
+    }
+    return defaultDiminutiveDots.map(row => [...row]);
+  });
+
+  // Refs to always have the latest prop values (avoids race conditions with async auto-save)
+  const xpSpentRef = useRef(xpSpent);
+  const spSpentRef = useRef(spSpent);
+  const hasPendingUpdatesRef = useRef(false);
+  const sheetRef = useRef(sheet);
+
+  // Keep refs in sync with props
+  useEffect(() => {
+    xpSpentRef.current = xpSpent;
+  }, [xpSpent]);
+
+  useEffect(() => {
+    spSpentRef.current = spSpent;
+  }, [spSpent]);
+
+  useEffect(() => {
+    sheetRef.current = sheet;
+  }, [sheet]);
+
   // Helper function to safely access speciesCardDots array
   const safeGetDotsArray = (index: number): boolean[] => {
     if (!speciesCardDots || !Array.isArray(speciesCardDots) || index >= speciesCardDots.length) {
@@ -131,9 +166,10 @@ const LevelUpSpeciesHuman: React.FC<LevelUpSpeciesHumanProps> = ({
   };
 
   // Save to sheet and localStorage
-  const persistSpeciesCardDots = (newDots: boolean[][], spSpentDelta: number = 0, xpSpentDelta: number = 0) => {
-    let newSpSpent = spSpent + spSpentDelta;
-    let newXpSpent = xpSpent + xpSpentDelta;
+  const persistSpeciesCardDots = useCallback((newDots: boolean[][], spSpentDelta: number = 0, xpSpentDelta: number = 0) => {
+    // Use refs for latest values to avoid stale closures
+    let newSpSpent = spSpentRef.current + spSpentDelta;
+    let newXpSpent = xpSpentRef.current + xpSpentDelta;
     
     // Enforce XP/SP cannot exceed total
     if (newXpSpent > xpTotal) {
@@ -145,36 +181,35 @@ const LevelUpSpeciesHuman: React.FC<LevelUpSpeciesHumanProps> = ({
       return;
     }
     
+    // Mark that we have pending updates
+    hasPendingUpdatesRef.current = true;
+    
     setSpeciesCardDots(newDots);
     newSpSpent = Math.max(0, newSpSpent);
     newXpSpent = Math.max(0, newXpSpent);
+    
+    // Update refs immediately for next rapid click
+    spSpentRef.current = newSpSpent;
+    xpSpentRef.current = newXpSpent;
+    
     setSpSpent(newSpSpent);
     setXpSpent(newXpSpent);
     
-    if (sheet && onAutoSave) {
+    const currentSheet = sheetRef.current;
+    if (currentSheet && onAutoSave) {
       onAutoSave({ 
         speciesCardDots: newDots, 
         spSpent: newSpSpent, 
         xpSpent: newXpSpent
       });
+      // Clear pending flag after a short delay to allow save to process
+      setTimeout(() => {
+        hasPendingUpdatesRef.current = false;
+      }, 200);
+    } else {
+      hasPendingUpdatesRef.current = false;
     }
-  };
-
-  // Local state for subspecies card dots
-  const [subspeciesCardDots, setSubspeciesCardDots] = useState<boolean[][]>(() => {
-    if (sheet?.subspeciesCardDots && Array.isArray(sheet.subspeciesCardDots) && sheet.subspeciesCardDots.length > 0) {
-      return sheet.subspeciesCardDots.map(row => Array.isArray(row) ? [...row] : []);
-    }
-    // Return appropriate default based on subspecies
-    if (subspecies === 'Lithe Evolution') {
-      return defaultLitheDots.map(row => [...row]);
-    } else if (subspecies === 'Massive Evolution') {
-      return defaultMassiveDots.map(row => [...row]);
-    } else if (subspecies === 'Stout Evolution') {
-      return defaultStoutDots.map(row => [...row]);
-    }
-    return defaultDiminutiveDots.map(row => [...row]);
-  });
+  }, [xpTotal, spTotal, onAutoSave, setSpSpent, setXpSpent, setNotice]);
 
   // Helper function to safely access subspeciesCardDots array
   const safeGetSubspeciesDotsArray = (index: number): boolean[] => {
@@ -209,9 +244,10 @@ const LevelUpSpeciesHuman: React.FC<LevelUpSpeciesHumanProps> = ({
   };
 
   // Save subspecies dots to sheet and localStorage
-  const persistSubspeciesCardDots = (newDots: boolean[][], spSpentDelta: number = 0, xpSpentDelta: number = 0) => {
-    let newSpSpent = spSpent + spSpentDelta;
-    let newXpSpent = xpSpent + xpSpentDelta;
+  const persistSubspeciesCardDots = useCallback((newDots: boolean[][], spSpentDelta: number = 0, xpSpentDelta: number = 0) => {
+    // Use refs for latest values to avoid stale closures
+    let newSpSpent = spSpentRef.current + spSpentDelta;
+    let newXpSpent = xpSpentRef.current + xpSpentDelta;
     
     // Enforce XP/SP cannot exceed total
     if (newXpSpent > xpTotal) {
@@ -223,23 +259,39 @@ const LevelUpSpeciesHuman: React.FC<LevelUpSpeciesHumanProps> = ({
       return;
     }
     
+    // Mark that we have pending updates
+    hasPendingUpdatesRef.current = true;
+    
     setSubspeciesCardDots(newDots);
     newSpSpent = Math.max(0, newSpSpent);
     newXpSpent = Math.max(0, newXpSpent);
+    
+    // Update refs immediately for next rapid click
+    spSpentRef.current = newSpSpent;
+    xpSpentRef.current = newXpSpent;
+    
     setSpSpent(newSpSpent);
     setXpSpent(newXpSpent);
     
-    if (sheet && onAutoSave) {
+    const currentSheet = sheetRef.current;
+    if (currentSheet && onAutoSave) {
       onAutoSave({ 
         subspeciesCardDots: newDots, 
         spSpent: newSpSpent, 
         xpSpent: newXpSpent
       });
+      // Clear pending flag after a short delay to allow save to process
+      setTimeout(() => {
+        hasPendingUpdatesRef.current = false;
+      }, 200);
+    } else {
+      hasPendingUpdatesRef.current = false;
     }
-  };
+  }, [xpTotal, spTotal, onAutoSave, setSpSpent, setXpSpent, setNotice]);
 
   // Reset subspeciesCardDots when subspecies changes
   useEffect(() => {
+    if (hasPendingUpdatesRef.current) return;
     if (contentType === 'subspecies' && subspecies) {
       // Check if we need to reinitialize the dots structure
       const currentLength = subspeciesCardDots?.length || 0;

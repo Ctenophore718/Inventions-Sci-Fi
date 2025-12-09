@@ -29,6 +29,7 @@ import LevelUpSpeciesEmberfolk from "./LevelUpSpeciesEmberfolk";
 import LevelUpSpeciesEntomos from "./LevelUpSpeciesEntomos";
 import LevelUpSpeciesHuman from "./LevelUpSpeciesHuman";
 import LevelUpSpeciesLumenaren from "./LevelUpSpeciesLumenaren";
+import LevelUpSpeciesPraedari from "./LevelUpSpeciesPraedari";
 import { calculateChemistFeatureData } from "../utils/chemistFeature";
 
 
@@ -116,6 +117,19 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
   // Optionally, update local state if sheet changes
   const [spSpent, setSpSpent] = useState(sheet?.spSpent ?? 0);
   const [xpSpent, setXpSpent] = useState(sheet?.xpSpent ?? 0);
+
+  // Refs to track latest xpSpent/spSpent values (avoids stale closures in skill dot handlers)
+  const xpSpentRef = useRef(xpSpent);
+  const spSpentRef = useRef(spSpent);
+  
+  // Keep refs in sync with state
+  useEffect(() => {
+    xpSpentRef.current = xpSpent;
+  }, [xpSpent]);
+  
+  useEffect(() => {
+    spSpentRef.current = spSpent;
+  }, [spSpent]);
 
   // Add skillDots state for LevelUp (mirroring CharacterSheet)
   const skillList = [
@@ -387,6 +401,34 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
       const hp15Bonus = hp15Dots.filter(Boolean).length * 15;
       
       effectiveHP += 40 + hp5Bonus + hp10Bonus + hp15Bonus;
+    }
+    
+    // Add Canid subspecies bonus
+    if (sheet?.subspecies === 'Canid') {
+      const subspeciesDots = sheet?.subspeciesCardDots || [];
+      const hp5Dots = subspeciesDots[6] || [];
+      const hp10Dots = subspeciesDots[7] || [];
+      const hp15Dots = subspeciesDots[8] || [];
+      
+      const hp5Bonus = hp5Dots.filter(Boolean).length * 5;
+      const hp10Bonus = hp10Dots.filter(Boolean).length * 10;
+      const hp15Bonus = hp15Dots.filter(Boolean).length * 15;
+      
+      effectiveHP += 40 + hp5Bonus + hp10Bonus + hp15Bonus;
+    }
+    
+    // Add Felid subspecies bonus
+    if (sheet?.subspecies === 'Felid') {
+      const subspeciesDots = sheet?.subspeciesCardDots || [];
+      const hp5Dots = subspeciesDots[2] || [];
+      const hp10Dots = subspeciesDots[3] || [];
+      const hp15Dots = subspeciesDots[4] || [];
+      
+      const hp5Bonus = hp5Dots.filter(Boolean).length * 5;
+      const hp10Bonus = hp10Dots.filter(Boolean).length * 10;
+      const hp15Bonus = (hp15Dots[0] ? 15 : 0);
+      
+      effectiveHP += 35 + hp5Bonus + hp10Bonus + hp15Bonus;
     }
     
     // Add Cognizant species bonus
@@ -2164,6 +2206,22 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                 setNotice={setNotice}
               />
             )}
+            
+            {/* Praedari Species Content */}
+            {species === "Praedari" && (
+              <LevelUpSpeciesPraedari
+                sheet={sheet}
+                species={species}
+                onAutoSave={handleAutoSave}
+                xpTotal={xpTotal}
+                spTotal={spTotal}
+                xpSpent={xpSpent}
+                spSpent={spSpent}
+                setXpSpent={setXpSpent}
+                setSpSpent={setSpSpent}
+                setNotice={setNotice}
+              />
+            )}
         </div>
         {/* Subspecies Card */}
         <div style={{ background: '#fff', border: '2px solid #333', borderRadius: 8, boxShadow: '0 2px 4px rgba(0,0,0,0.1)', minHeight: 80, padding: '1.2rem', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -2641,6 +2699,42 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
               />
             )}
             
+            {/* Canid Subspecies Content */}
+            {subspecies === "Canid" && (
+              <LevelUpSpeciesPraedari
+                sheet={sheet}
+                species={species}
+                subspecies={subspecies}
+                contentType="subspecies"
+                onAutoSave={handleAutoSave}
+                xpTotal={xpTotal}
+                spTotal={spTotal}
+                xpSpent={xpSpent}
+                spSpent={spSpent}
+                setXpSpent={setXpSpent}
+                setSpSpent={setSpSpent}
+                setNotice={setNotice}
+              />
+            )}
+            
+            {/* Felid Subspecies Content */}
+            {subspecies === "Felid" && (
+              <LevelUpSpeciesPraedari
+                sheet={sheet}
+                species={species}
+                subspecies={subspecies}
+                contentType="subspecies"
+                onAutoSave={handleAutoSave}
+                xpTotal={xpTotal}
+                spTotal={spTotal}
+                xpSpent={xpSpent}
+                spSpent={spSpent}
+                setXpSpent={setXpSpent}
+                setSpSpent={setSpSpent}
+                setNotice={setNotice}
+              />
+            )}
+            
             {/* Cerebronych (cont.) Subspecies Content */}
             {species === "Cerebronych" && (
               <LevelUpSpeciesCerebronych
@@ -2835,6 +2929,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                         if (species === "Entomos" && skillName === "Athletics") sources.push({ type: 'species', color: "rgba(95,66,43,0.5)" });
                         if (species === "Human" && skillName === "Culture") sources.push({ type: 'species', color: "rgba(43,49,95,0.5)" });
                         if (species === "Lumenaren" && skillName === "Stealth") sources.push({ type: 'species', color: "rgba(81,95,43,0.5)" });
+                        if (species === "Praedari" && skillName === "Survival") sources.push({ type: 'species', color: "rgba(95,43,92,0.5)" });
                         
                         // Subspecies boosters
                         if (subspecies === "Corvid" && skillName === "Thievery") sources.push({ type: 'subspecies', color: "rgba(117,144,78,0.5)" });
@@ -2859,6 +2954,8 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                         if (subspecies === "Lithe Evolution" && skillName === "Acrobatics") sources.push({ type: 'subspecies', color: "rgba(43,95,95,0.5)" });
                         if (subspecies === "Massive Evolution" && skillName === "Athletics") sources.push({ type: 'subspecies', color: "rgba(43,23,95,0.5)" });
                         if (subspecies === "Stout Evolution" && skillName === "Survival") sources.push({ type: 'subspecies', color: "rgba(95,43,43,0.5)" });
+                        if (subspecies === "Canid" && skillName === "Intimidation") sources.push({ type: 'subspecies', color: "rgba(47,141,166,0.5)" });
+                        if (subspecies === "Felid" && skillName === "Acrobatics") sources.push({ type: 'subspecies', color: "rgba(177,99,38,0.5)" });
 
                         return sources;
                       };
@@ -3342,7 +3439,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                                     // Filling dots: calculate SP cost for new dots being filled (excluding free dots)
                                     console.log(`Attempting to fill ${skill} at index ${i} (column ${[20, 18, 16, 14, 12, 10, 8, 6, 4, 2][i]}+)`);
 
-                                    console.log(`Current SP spent: ${spSpent}, Total SP: ${sheet?.spTotal || 0}, Remaining: ${(sheet?.spTotal || 0) - spSpent}`);
+                                    console.log(`Current SP spent: ${spSpentRef.current}, Total SP: ${sheet?.spTotal || 0}, Remaining: ${(sheet?.spTotal || 0) - spSpentRef.current}`);
                                     
                                     for (let j = 0; j <= i; j++) {
                                       const isFree = isFreeDot(skill, j);
@@ -3354,8 +3451,8 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                                       }
                                     }
 
-                                    // Check if user has enough SP
-                                    if (spSpent + spDelta > (sheet?.spTotal || 0)) {
+                                    // Check if user has enough SP (use ref for latest value)
+                                    if (spSpentRef.current + spDelta > (sheet?.spTotal || 0)) {
 
                                       setNotice("Not enough sp!");
                                       return;
@@ -3398,8 +3495,9 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                                     return updatedSkillDots;
                                   });
 
-                                  // Update SP spent after skill dots are updated
-                                  const newSpSpent = spSpent + spDelta;
+                                  // Update SP spent after skill dots are updated (use ref for latest value)
+                                  const newSpSpent = spSpentRef.current + spDelta;
+                                  spSpentRef.current = newSpSpent; // Update ref immediately for rapid clicks
                                   setSpSpent(newSpSpent);
                                   
                                   // Auto-save the changes using the consistent pattern

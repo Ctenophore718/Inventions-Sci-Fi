@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import type { CharacterSheet } from "../types/CharacterSheet";
 import { generatePsychosomaticHarmonyJSX } from "../utils/contemplativeFeature";
 import { generateSwiftReactionJSX } from "../utils/contemplativeTechnique";
@@ -77,6 +77,29 @@ const LevelUpClassContemplative: React.FC<LevelUpClassContemplativeProps> = ({
     // Local state for pending discipline selection
     const [pendingDiscipline, setPendingDiscipline] = useState<string>("");
 
+    // Refs for race condition prevention
+    const xpSpentRef = useRef(xpSpent);
+    const spSpentRef = useRef(spSpent);
+    const hasPendingUpdatesRef = useRef(false);
+    const sheetRef = useRef(sheet);
+
+    // Sync refs with props
+    useEffect(() => {
+      if (!hasPendingUpdatesRef.current) {
+        xpSpentRef.current = xpSpent;
+      }
+    }, [xpSpent]);
+
+    useEffect(() => {
+      if (!hasPendingUpdatesRef.current) {
+        spSpentRef.current = spSpent;
+      }
+    }, [spSpent]);
+
+    useEffect(() => {
+      sheetRef.current = sheet;
+    }, [sheet]);
+
     // Sync selectedFocuses with sheet data when it changes
     useEffect(() => {
       if (sheet?.focuses) {
@@ -108,9 +131,9 @@ const LevelUpClassContemplative: React.FC<LevelUpClassContemplativeProps> = ({
     };
   
     // Save to sheet and localStorage
-    const persistClassCardDots = (newDots: boolean[][], spSpentDelta: number = 0, xpSpentDelta: number = 0) => {
-      let newSpSpent = spSpent + spSpentDelta;
-      let newXpSpent = xpSpent + xpSpentDelta;
+    const persistClassCardDots = useCallback((newDots: boolean[][], spSpentDelta: number = 0, xpSpentDelta: number = 0) => {
+      let newSpSpent = spSpentRef.current + spSpentDelta;
+      let newXpSpent = xpSpentRef.current + xpSpentDelta;
       // Enforce XP/SP cannot exceed total
       if (newXpSpent > xpTotal) {
         setNotice("Not enough xp!");
@@ -120,15 +143,21 @@ const LevelUpClassContemplative: React.FC<LevelUpClassContemplativeProps> = ({
         setNotice("Not enough sp!");
         return;
       }
+      hasPendingUpdatesRef.current = true;
       setClassCardDots(newDots);
       newSpSpent = Math.max(0, newSpSpent);
       newXpSpent = Math.max(0, newXpSpent);
+      spSpentRef.current = newSpSpent;
+      xpSpentRef.current = newXpSpent;
       setSpSpent(newSpSpent);
       setXpSpent(newXpSpent);
-      if (sheet && onAutoSave) {
+      if (sheetRef.current && onAutoSave) {
         onAutoSave({ classCardDots: newDots, spSpent: newSpSpent, xpSpent: newXpSpent });
       }
-    };
+      setTimeout(() => {
+        hasPendingUpdatesRef.current = false;
+      }, 100);
+    }, [xpTotal, spTotal, setNotice, setSpSpent, setXpSpent, onAutoSave]);
     
     // Helper function to handle dot clicking with sequential requirement
     const _handleDotClick = (

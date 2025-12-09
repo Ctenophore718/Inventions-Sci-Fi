@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback, useRef, useEffect } from "react";
 import type { CharacterSheet } from "../types/CharacterSheet";
 import { generateFirstInFlightJSX } from "../utils/avenochFeature";
 import { generateAvianGazeJSX } from "../utils/avenochTechnique";
@@ -101,6 +101,27 @@ const LevelUpSpeciesAvenoch: React.FC<LevelUpSpeciesAvenochProps> = ({
     return defaultAvenochDots.map(row => [...row]);
   });
 
+  // Refs to always have the latest prop values (avoids race conditions with async auto-save)
+  const xpSpentRef = useRef(xpSpent);
+  const spSpentRef = useRef(spSpent);
+  const hasPendingUpdatesRef = useRef(false);
+  const sheetRef = useRef(sheet);
+
+  // Keep refs in sync with props
+  useEffect(() => {
+    if (hasPendingUpdatesRef.current) return;
+    xpSpentRef.current = xpSpent;
+  }, [xpSpent]);
+
+  useEffect(() => {
+    if (hasPendingUpdatesRef.current) return;
+    spSpentRef.current = spSpent;
+  }, [spSpent]);
+
+  useEffect(() => {
+    sheetRef.current = sheet;
+  }, [sheet]);
+
   // Local state for subspecies card dots (Corvid/Falcador/Nocturne/Vulturine)
   const [subspeciesCardDots, setSubspeciesCardDots] = useState<boolean[][]>(() => {
     if (sheet?.subspeciesCardDots && Array.isArray(sheet.subspeciesCardDots) && sheet.subspeciesCardDots.length > 0) {
@@ -169,27 +190,32 @@ const LevelUpSpeciesAvenoch: React.FC<LevelUpSpeciesAvenochProps> = ({
   };
 
   // Save to sheet and localStorage
-  const persistSpeciesCardDots = (newDots: boolean[][], spSpentDelta: number = 0, xpSpentDelta: number = 0) => {
-    let newSpSpent = spSpent + spSpentDelta;
-    let newXpSpent = xpSpent + xpSpentDelta;
+  const persistSpeciesCardDots = useCallback((newDots: boolean[][], spSpentDelta: number = 0, xpSpentDelta: number = 0) => {
+    hasPendingUpdatesRef.current = true;
+    let newSpSpent = spSpentRef.current + spSpentDelta;
+    let newXpSpent = xpSpentRef.current + xpSpentDelta;
     
     // Enforce XP/SP cannot exceed total
     if (newXpSpent > xpTotal) {
       setNotice("Not enough xp!");
+      hasPendingUpdatesRef.current = false;
       return;
     }
     if (newSpSpent > spTotal) {
       setNotice("Not enough sp!");
+      hasPendingUpdatesRef.current = false;
       return;
     }
     
     setSpeciesCardDots(newDots);
     newSpSpent = Math.max(0, newSpSpent);
     newXpSpent = Math.max(0, newXpSpent);
+    spSpentRef.current = newSpSpent;
+    xpSpentRef.current = newXpSpent;
     setSpSpent(newSpSpent);
     setXpSpent(newXpSpent);
     
-    if (sheet && onAutoSave) {
+    if (sheetRef.current && onAutoSave) {
       // Only update dots and XP/SP, don't modify HP
       onAutoSave({ 
         speciesCardDots: newDots, 
@@ -197,37 +223,44 @@ const LevelUpSpeciesAvenoch: React.FC<LevelUpSpeciesAvenochProps> = ({
         xpSpent: newXpSpent
       });
     }
-  };
+    hasPendingUpdatesRef.current = false;
+  }, [xpTotal, spTotal, setNotice, setSpSpent, setXpSpent, onAutoSave]);
 
   // Save subspecies dots to sheet and localStorage
-  const persistSubspeciesCardDots = (newDots: boolean[][], spSpentDelta: number = 0, xpSpentDelta: number = 0) => {
-    let newSpSpent = spSpent + spSpentDelta;
-    let newXpSpent = xpSpent + xpSpentDelta;
+  const persistSubspeciesCardDots = useCallback((newDots: boolean[][], spSpentDelta: number = 0, xpSpentDelta: number = 0) => {
+    hasPendingUpdatesRef.current = true;
+    let newSpSpent = spSpentRef.current + spSpentDelta;
+    let newXpSpent = xpSpentRef.current + xpSpentDelta;
     
     // Enforce XP/SP cannot exceed total
     if (newXpSpent > xpTotal) {
       setNotice("Not enough xp!");
+      hasPendingUpdatesRef.current = false;
       return;
     }
     if (newSpSpent > spTotal) {
       setNotice("Not enough sp!");
+      hasPendingUpdatesRef.current = false;
       return;
     }
     
     setSubspeciesCardDots(newDots);
     newSpSpent = Math.max(0, newSpSpent);
     newXpSpent = Math.max(0, newXpSpent);
+    spSpentRef.current = newSpSpent;
+    xpSpentRef.current = newXpSpent;
     setSpSpent(newSpSpent);
     setXpSpent(newXpSpent);
     
-    if (sheet && onAutoSave) {
+    if (sheetRef.current && onAutoSave) {
       onAutoSave({ 
         subspeciesCardDots: newDots, 
         spSpent: newSpSpent, 
         xpSpent: newXpSpent
       });
     }
-  };
+    hasPendingUpdatesRef.current = false;
+  }, [xpTotal, spTotal, setNotice, setSpSpent, setXpSpent, onAutoSave]);
 
   return (
     <div>

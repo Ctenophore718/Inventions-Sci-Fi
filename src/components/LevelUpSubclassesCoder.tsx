@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import type { CharacterSheet } from "../types/CharacterSheet";
 import { saveCharacterSheet } from "../utils/storage";
 import { generateFieldOfCoercionJSX } from "../utils/coerciveFeature";
@@ -134,14 +134,37 @@ const LevelUpSubclassesCoder: React.FC<LevelUpSubclassesCoderProps> = ({
     (sheet?.subclassProgressionDots as any)?.technologistPerksSkillsDots || [false]
   );
 
+  // Refs to track latest values and prevent race conditions
+  const xpSpentRef = useRef(xpSpent);
+  const spSpentRef = useRef(spSpent);
+  const hasPendingUpdatesRef = useRef(false);
+  const sheetRef = useRef(sheet);
+
+  // Keep refs in sync with props
+  useEffect(() => {
+    xpSpentRef.current = xpSpent;
+  }, [xpSpent]);
+
+  useEffect(() => {
+    spSpentRef.current = spSpent;
+  }, [spSpent]);
+
+  useEffect(() => {
+    sheetRef.current = sheet;
+  }, [sheet]);
+
   // Helper function to handle XP dot clicking with sequential requirement
-  const handleDotClick = (
+  const handleDotClick = useCallback((
     currentArray: boolean[], 
     setArray: React.Dispatch<React.SetStateAction<boolean[]>>, 
     index: number, 
     xpCosts: number[],
     dotType?: string
   ) => {
+    if (hasPendingUpdatesRef.current) return;
+    hasPendingUpdatesRef.current = true;
+    setTimeout(() => { hasPendingUpdatesRef.current = false; }, 100);
+
     const newArray = [...currentArray];
     const rightmostChecked = currentArray.lastIndexOf(true);
     const canCheck = index === 0 || currentArray.slice(0, index).every(Boolean);
@@ -168,8 +191,8 @@ const LevelUpSubclassesCoder: React.FC<LevelUpSubclassesCoderProps> = ({
     }
     
     if (xpDelta !== 0) {
-      // Enforce XP/SP cannot exceed total
-      const newXpSpent = xpSpent + xpDelta;
+      // Enforce XP/SP cannot exceed total - use ref for latest value
+      const newXpSpent = xpSpentRef.current + xpDelta;
       if (newXpSpent > xpTotal) {
         setNotice("Not enough xp!");
         return;
@@ -182,7 +205,7 @@ const LevelUpSubclassesCoder: React.FC<LevelUpSubclassesCoderProps> = ({
       // Include progression dots in the XP change communication to prevent race conditions
       if (dotType && onAutoSave) {
         const progressionDots = {
-          ...sheet?.subclassProgressionDots,
+          ...sheetRef.current?.subclassProgressionDots,
           [dotType]: newArray
         };
         onAutoSave({
@@ -191,16 +214,20 @@ const LevelUpSubclassesCoder: React.FC<LevelUpSubclassesCoderProps> = ({
         });
       }
     }
-  };
+  }, [xpTotal, setNotice, setXpSpent, onAutoSave]);
 
   // Helper function to handle SP dots
-  const handleSpDotClick = (
+  const handleSpDotClick = useCallback((
     currentArray: boolean[], 
     setArray: React.Dispatch<React.SetStateAction<boolean[]>>, 
     index: number, 
     spCosts: number[],
     dotType?: string
   ) => {
+    if (hasPendingUpdatesRef.current) return;
+    hasPendingUpdatesRef.current = true;
+    setTimeout(() => { hasPendingUpdatesRef.current = false; }, 100);
+
     const newArray = [...currentArray];
     let spDelta = 0;
     
@@ -212,7 +239,7 @@ const LevelUpSubclassesCoder: React.FC<LevelUpSubclassesCoderProps> = ({
       spDelta -= spCosts[index] || 0;
     }
     
-    const newSpSpent = spSpent + spDelta;
+    const newSpSpent = spSpentRef.current + spDelta;
     if (newSpSpent > spTotal) {
       setNotice("Not enough sp!");
       return;
@@ -225,7 +252,7 @@ const LevelUpSubclassesCoder: React.FC<LevelUpSubclassesCoderProps> = ({
     // Include progression dots in the SP change communication to prevent race conditions
     if (dotType && onAutoSave) {
       const progressionDots = {
-        ...sheet?.subclassProgressionDots,
+        ...sheetRef.current?.subclassProgressionDots,
         [dotType]: newArray
       };
       onAutoSave({
@@ -234,7 +261,7 @@ const LevelUpSubclassesCoder: React.FC<LevelUpSubclassesCoderProps> = ({
         spRemaining: spTotal - Math.max(0, newSpSpent)
       });
     }
-  };
+  }, [spTotal, setNotice, setSpSpent, onAutoSave]);
 
   
   return (

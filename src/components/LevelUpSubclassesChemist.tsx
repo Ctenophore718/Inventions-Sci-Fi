@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import type { CharacterSheet } from "../types/CharacterSheet";
 
 type LevelUpSubclassesChemistProps = {
@@ -340,14 +340,37 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
   };
   */
 
+  // Refs to track latest values and prevent race conditions
+  const xpSpentRef = useRef(xpSpent);
+  const spSpentRef = useRef(spSpent);
+  const hasPendingUpdatesRef = useRef(false);
+  const sheetRef = useRef(sheet);
+
+  // Keep refs in sync with props
+  useEffect(() => {
+    xpSpentRef.current = xpSpent;
+  }, [xpSpent]);
+
+  useEffect(() => {
+    spSpentRef.current = spSpent;
+  }, [spSpent]);
+
+  useEffect(() => {
+    sheetRef.current = sheet;
+  }, [sheet]);
+
   // Helper function to handle dot clicking with sequential requirement
-  const handleDotClick = (
+  const handleDotClick = useCallback((
     currentArray: boolean[], 
     setArray: React.Dispatch<React.SetStateAction<boolean[]>>, 
     index: number, 
     xpCosts: number[],
     dotType?: string
   ) => {
+    if (hasPendingUpdatesRef.current) return;
+    hasPendingUpdatesRef.current = true;
+    setTimeout(() => { hasPendingUpdatesRef.current = false; }, 100);
+
     const newArray = [...currentArray];
     const rightmostChecked = currentArray.lastIndexOf(true);
     const canCheck = index === 0 || currentArray.slice(0, index).every(Boolean);
@@ -374,8 +397,8 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
     }
     
     if (xpDelta !== 0) {
-      // Check if spending would exceed totals
-      const newXpSpent = xpSpent + xpDelta;
+      // Check if spending would exceed totals - use ref for latest value
+      const newXpSpent = xpSpentRef.current + xpDelta;
       if (newXpSpent > xpTotal) {
         setNotice("Not enough xp!");
         return;
@@ -386,31 +409,35 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
       // Include progression dots in the XP change communication to prevent race conditions
       if (dotType && onAutoSave) {
         const progressionDots = {
-          ...sheet?.subclassProgressionDots,
+          ...sheetRef.current?.subclassProgressionDots,
           [dotType]: newArray
         };
         // Save both XP change AND progression dots in one operation
-        const newXpSpent = xpSpent + xpDelta;
-        const newSpSpent = spSpent;
-        setXpSpent(newXpSpent);
-        setSpSpent(newSpSpent);
+        const finalXpSpent = xpSpentRef.current + xpDelta;
+        const finalSpSpent = spSpentRef.current;
+        setXpSpent(finalXpSpent);
+        setSpSpent(finalSpSpent);
         onAutoSave({
-          xpSpent: newXpSpent,
-          spSpent: newSpSpent,
+          xpSpent: finalXpSpent,
+          spSpent: finalSpSpent,
           subclassProgressionDots: progressionDots
         });
       }
     }
-  };
+  }, [xpTotal, setNotice, setXpSpent, setSpSpent, onAutoSave]);
 
   // Helper function to handle SP dots (for Surgeon perk)
-  const handleSpDotClick = (
+  const handleSpDotClick = useCallback((
     currentArray: boolean[], 
     setArray: React.Dispatch<React.SetStateAction<boolean[]>>, 
     index: number, 
     spCosts: number[],
     dotType?: string
   ) => {
+    if (hasPendingUpdatesRef.current) return;
+    hasPendingUpdatesRef.current = true;
+    setTimeout(() => { hasPendingUpdatesRef.current = false; }, 100);
+
     const newArray = [...currentArray];
     let spDelta = 0;
     
@@ -422,8 +449,8 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
       spDelta -= spCosts[index] || 0;
     }
     
-    // Check if spending would exceed totals
-    const newSpSpent = spSpent + spDelta;
+    // Check if spending would exceed totals - use ref for latest value
+    const newSpSpent = spSpentRef.current + spDelta;
     if (newSpSpent > spTotal) {
       setNotice("Not enough sp!");
       return;
@@ -434,22 +461,22 @@ const LevelUpSubclassesChemist: React.FC<LevelUpSubclassesChemistProps> = ({
     // Include progression dots in the SP change communication to prevent race conditions
     if (dotType && onAutoSave) {
       const progressionDots = {
-        ...sheet?.subclassProgressionDots,
+        ...sheetRef.current?.subclassProgressionDots,
         [dotType]: newArray
       };
       // Save both SP change AND progression dots in one operation
-      const newXpSpent = xpSpent;
-      const newSpSpent = spSpent + spDelta;
-      setXpSpent(newXpSpent);
-      setSpSpent(newSpSpent);
+      const finalXpSpent = xpSpentRef.current;
+      const finalSpSpent = spSpentRef.current + spDelta;
+      setXpSpent(finalXpSpent);
+      setSpSpent(finalSpSpent);
       onAutoSave({
-        xpSpent: newXpSpent,
-        spSpent: newSpSpent,
-        spRemaining: spTotal - newSpSpent,
+        xpSpent: finalXpSpent,
+        spSpent: finalSpSpent,
+        spRemaining: spTotal - finalSpSpent,
         subclassProgressionDots: progressionDots
       });
     }
-  };
+  }, [spTotal, setNotice, setXpSpent, setSpSpent, onAutoSave]);
     
   return (
 

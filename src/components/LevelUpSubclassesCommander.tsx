@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import type { CharacterSheet } from "../types/CharacterSheet";
 import { generateLoyalServantsJSX } from "../utils/beguilerFeature";
 import { generateSeduceJSX } from "../utils/beguilerTechnique";
@@ -205,17 +205,40 @@ const LevelUpSubclassesCommander: React.FC<LevelUpSubclassesCommanderProps> = ({
   // State for pending blaster selection
   const [pendingBlaster, setPendingBlaster] = useState<string>("");
 
+  // Refs to track latest values and prevent race conditions
+  const xpSpentRef = useRef(xpSpent);
+  const spSpentRef = useRef(spSpent);
+  const hasPendingUpdatesRef = useRef(false);
+  const sheetRef = useRef(sheet);
+
+  // Keep refs in sync with props
+  useEffect(() => {
+    xpSpentRef.current = xpSpent;
+  }, [xpSpent]);
+
+  useEffect(() => {
+    spSpentRef.current = spSpent;
+  }, [spSpent]);
+
+  useEffect(() => {
+    sheetRef.current = sheet;
+  }, [sheet]);
+
   // Helper function to handle XP dot clicking with sequential requirement
-  const handleDotClick = (
+  const handleDotClick = useCallback((
     currentArray: boolean[],
     setArray: React.Dispatch<React.SetStateAction<boolean[]>>,
     index: number,
     xpCosts: number[],
     dotType?: string
   ) => {
+    if (hasPendingUpdatesRef.current) return;
+    hasPendingUpdatesRef.current = true;
+    setTimeout(() => { hasPendingUpdatesRef.current = false; }, 100);
+
     // Use the most up-to-date data from sheet to avoid XP drift
-    const actualCurrentArray = dotType && sheet?.subclassProgressionDots
-      ? ((sheet.subclassProgressionDots as any)[dotType] as boolean[] || currentArray)
+    const actualCurrentArray = dotType && sheetRef.current?.subclassProgressionDots
+      ? ((sheetRef.current.subclassProgressionDots as any)[dotType] as boolean[] || currentArray)
       : currentArray;
     
     const newArray = [...actualCurrentArray];
@@ -244,8 +267,8 @@ const LevelUpSubclassesCommander: React.FC<LevelUpSubclassesCommanderProps> = ({
     }
 
     if (xpDelta !== 0) {
-      // Enforce XP/SP cannot exceed total
-      const newXpSpent = xpSpent + xpDelta;
+      // Enforce XP/SP cannot exceed total - use ref for latest value
+      const newXpSpent = xpSpentRef.current + xpDelta;
       if (newXpSpent > xpTotal) {
         setNotice("Not enough xp!");
         return;
@@ -260,7 +283,7 @@ const LevelUpSubclassesCommander: React.FC<LevelUpSubclassesCommanderProps> = ({
       // Save to parent - parent will persist the changes
       if (dotType && onAutoSave) {
         const progressionDots = {
-          ...sheet?.subclassProgressionDots,
+          ...sheetRef.current?.subclassProgressionDots,
           [dotType]: newArray
         };
         onAutoSave({
@@ -269,19 +292,23 @@ const LevelUpSubclassesCommander: React.FC<LevelUpSubclassesCommanderProps> = ({
         });
       }
     }
-  };
+  }, [xpTotal, setNotice, setXpSpent, onAutoSave]);
 
   // Helper function to handle SP dots
-  const handleSpDotClick = (
+  const handleSpDotClick = useCallback((
     currentArray: boolean[],
     setArray: React.Dispatch<React.SetStateAction<boolean[]>>,
     index: number,
     spCosts: number[],
     dotType?: string
   ) => {
+    if (hasPendingUpdatesRef.current) return;
+    hasPendingUpdatesRef.current = true;
+    setTimeout(() => { hasPendingUpdatesRef.current = false; }, 100);
+
     // Use the most up-to-date data from sheet to avoid SP drift
-    const actualCurrentArray = dotType && sheet?.subclassProgressionDots
-      ? ((sheet.subclassProgressionDots as any)[dotType] as boolean[] || currentArray)
+    const actualCurrentArray = dotType && sheetRef.current?.subclassProgressionDots
+      ? ((sheetRef.current.subclassProgressionDots as any)[dotType] as boolean[] || currentArray)
       : currentArray;
     
     const newArray = [...actualCurrentArray];
@@ -295,7 +322,7 @@ const LevelUpSubclassesCommander: React.FC<LevelUpSubclassesCommanderProps> = ({
       spDelta -= spCosts[index] || 0;
     }
 
-    const newSpSpent = spSpent + spDelta;
+    const newSpSpent = spSpentRef.current + spDelta;
     if (newSpSpent > spTotal) {
       setNotice("Not enough sp!");
       return;
@@ -310,7 +337,7 @@ const LevelUpSubclassesCommander: React.FC<LevelUpSubclassesCommanderProps> = ({
     // Save to parent - parent will persist the changes
     if (dotType && onAutoSave) {
       const progressionDots = {
-        ...sheet?.subclassProgressionDots,
+        ...sheetRef.current?.subclassProgressionDots,
         [dotType]: newArray
       };
       onAutoSave({
@@ -319,7 +346,7 @@ const LevelUpSubclassesCommander: React.FC<LevelUpSubclassesCommanderProps> = ({
         spRemaining: spTotal - Math.max(0, newSpSpent)
       });
     }
-  };
+  }, [spTotal, setNotice, setSpSpent, onAutoSave]);
 
   // Handler for purchasing whips with credits
   const handleWhipPurchase = (whipName: string, cost: number) => {

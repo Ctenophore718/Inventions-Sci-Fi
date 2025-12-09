@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import type { CharacterSheet } from "../types/CharacterSheet";
 import { generateAirArmorJSX } from "../utils/airFeature";
 import { generateWingsOfAirJSX } from "../utils/airTechnique";
