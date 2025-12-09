@@ -3392,6 +3392,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
             {hostSpecies === 'Lithe Human Host' ? ', Climb' : ''}
             {subspecies === 'Lithe Evolution' ? ', Climb' : ''}
             {hostSpecies === 'Felid Praedari Host' ? ', Climb' : ''}
+            {subspecies === 'Felid' ? ', Climb' : ''}
             {hostSpecies === 'Mustelid Praedari Host' ? ', Burrow' : ''}
             {sheet?.species === 'Praedari' && sheet?.speciesCardDots?.[7]?.[0] ? ', Climb' : ''}
             {sheet?.species === 'Entomos' && sheet?.speciesCardDots?.[6]?.[0] ? ', Fly' : ''}
@@ -4278,6 +4279,11 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                   </span>
                 )}
               </>
+            )}
+            {subspecies === 'Felid' && (
+              <span style={{ marginLeft: 8, color: '#000', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                <i>Fall Damage</i>
+              </span>
             )}
             {species === 'Emberfolk' && (
               <>
