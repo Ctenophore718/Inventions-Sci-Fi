@@ -49,6 +49,7 @@ import { generateLightspeedCardJSX } from "../utils/lumenarenTechnique";
 import { generateFeralRageCardJSX } from "../utils/praedariTechnique";
 import { generateWolfpackTacticsCardJSX } from "../utils/canidTechnique";
 import { generateFelineAgilityCardJSX } from "../utils/felidTechnique";
+import { generateDubiousBadgerCardJSX } from "../utils/mustelidTechnique";
 import { generateSizeMattersCardJSX } from "../utils/diminutiveTechnique";
 import { generateSharedWisdomCardJSX } from "../utils/litheTechnique";
 import { generateWarCryCardJSX } from "../utils/massiveTechnique";
@@ -600,6 +601,20 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
       const hp15Bonus = (hp15Dots[0] ? 15 : 0);
       
       effectiveHP += 35 + hp5Bonus + hp10Bonus + hp15Bonus;
+    }
+
+    // Add Mustelid subspecies bonus
+    if (localSheet?.subspecies === 'Mustelid') {
+      const subspeciesDots = localSheet?.subspeciesCardDots || [];
+      const hp5Dots = subspeciesDots[4] || [];
+      const hp10Dots = subspeciesDots[5] || [];
+      const hp15Dots = subspeciesDots[6] || [];
+      
+      const hp5Bonus = hp5Dots.filter(Boolean).length * 5;
+      const hp10Bonus = hp10Dots.filter(Boolean).length * 10;
+      const hp15Bonus = (hp15Dots[0] ? 15 : 0);
+      
+      effectiveHP += 30 + hp5Bonus + hp10Bonus + hp15Bonus;
     }
     
     // Add class-specific bonuses
@@ -1656,6 +1671,8 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                             ? '#2f8da6'
                             : localSheet?.subspecies === 'Felid'
                             ? '#b16326'
+                            : localSheet?.subspecies === 'Mustelid'
+                            ? '#699239'
                             : 'black',
                 lineHeight: 1,
                 textAlign: 'left', 
@@ -1709,6 +1726,8 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                                                         ? 'Wolfpack Tactics'
                                                       : localSheet?.subspecies === 'Felid'
                                                         ? 'Feline Agility'
+                                                      : localSheet?.subspecies === 'Mustelid'
+                                                        ? 'Dubious Badger'
                                                       : localSheet?.subspecies === 'Infrared'
                                                         ? 'Heat Sink'
                                                         : localSheet?.subspecies === 'Radiofrequent'
@@ -1763,6 +1782,8 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                                             ? '#2f8da6'
                                             : localSheet?.subspecies === 'Felid'
                                             ? '#b16326'
+                                            : localSheet?.subspecies === 'Mustelid'
+                                            ? '#699239'
                                             : localSheet?.subspecies === 'Infrared'
                                             ? '#b17fbe'
                                             : localSheet?.subspecies === 'Radiofrequent'
@@ -1821,6 +1842,8 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                                                         ? 'Canid'
                                                         : localSheet?.subspecies === 'Felid'
                                                         ? 'Felid'
+                                                        : localSheet?.subspecies === 'Mustelid'
+                                                        ? 'Mustelid'
                                                         : localSheet?.subspecies === 'Infrared'
                                                         ? 'Infrared'
                                                         : localSheet?.subspecies === 'Radiofrequent'
@@ -1874,6 +1897,8 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                                             ? "/Wolfpack Tactics.png"
                                             : localSheet?.subspecies === 'Felid'
                                             ? "/Feline Agility.png"
+                                            : localSheet?.subspecies === 'Mustelid'
+                                            ? "/Dubious Badger.png"
                                             : localSheet?.subspecies === 'Infrared'
                                             ? "/Heat Sink.png"
                                             : localSheet?.subspecies === 'Radiofrequent'
@@ -2004,6 +2029,8 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                                                           ? `[${4 - (localSheet?.subspeciesCardDots?.[5]?.filter(Boolean).length ?? 0)}]`
                                                           : localSheet?.subspecies === 'Felid'
                                                           ? `[${3 - (localSheet?.subspeciesCardDots?.[1]?.filter(Boolean).length ?? 0)}]`
+                                                          : localSheet?.subspecies === 'Mustelid'
+                                                          ? `[${3 - (localSheet?.subspeciesCardDots?.[3]?.filter(Boolean).length ?? 0)}]`
                                                           : localSheet?.subspecies === 'Infrared'
                                                           ? `[${4 - (localSheet?.subspeciesCardDots?.[2]?.filter(Boolean).length ?? 0)}]`
                                                           : localSheet?.subspecies === 'Radiofrequent'
@@ -2154,6 +2181,12 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                                                             3 + (localSheet?.subspeciesCardDots?.[1]?.filter(Boolean).length ?? 0),
                                                             (localSheet?.subspeciesCardDots?.[0]?.filter(Boolean).length ?? 0)
                                                           )
+                                                        : localSheet?.subspecies === 'Mustelid'
+                                                        ? generateDubiousBadgerCardJSX(
+                                                            1 + (localSheet?.subspeciesCardDots?.[0]?.[0] ? 1 : 0),
+                                                            localSheet?.subspeciesCardDots?.[1]?.[0] ? '[Spike (Toxic)]' : '[ - ]',
+                                                            localSheet?.subspeciesCardDots?.[2]?.[0] ? '[Demoralize]' : '[ - ]'
+                                                          )
                                                         : localSheet?.subspecies === 'Infrared'
                                                         ? <span style={{ fontSize: '0.86em' }}>{generateHeatSinkCardJSX(
                                                             3 + (localSheet?.subspeciesCardDots?.[0]?.filter(Boolean).length ?? 0),
@@ -2229,6 +2262,8 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                                             ? '"No self-respecting Canid truly believes in lone-wolf bravado. We are always stronger when we stick to the pack." --Ruff McGruff, Canid Galvanic'
                                             : localSheet?.subspecies === 'Felid'
                                             ? '"Yo, I\'mma cheetah, y\'all! I\'m un gato ninja, yo! Y\'all gonna have t\' do a helluva lot more than that t\' kill me!" --Whiskers González, Felid Junker'
+                                            : localSheet?.subspecies === 'Mustelid'
+                                            ? '"I never trust any of them mustards or whatever y\'all call \'em! They\'ll steal everything ya got right from under your nose if you\'re not careful!" --Anonymous'
                                             : localSheet?.subspecies === 'Infrared'
                                             ? '"Friends, your energy signature shall be melded with mine, and any harm that would befall you shall empower me instead." --Zenith, Infrared Devout'
                                             : localSheet?.subspecies === 'Radiofrequent'

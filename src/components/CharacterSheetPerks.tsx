@@ -658,6 +658,13 @@ const CharacterSheetPerks: React.FC<CharacterSheetPerksProps> = ({
             </span>
           </div>
           )}
+          {subspecies === 'Mustelid' && sheet?.subspeciesCardDots?.[9]?.[0] && (
+          <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <span>
+              <b><i style={{ color: '#699239' }}>Wily Trickster.</i></b> <span style={{ color: '#000' }}>You are naturally gifted at weaseling your way out of or into situations both physical and social, whether by squirming through tight areas or fast talking your way out of a tricky situation. Gain an advantage on related skill rolls.</span>
+            </span>
+          </div>
+          )}
         </div>
       </div>
   );

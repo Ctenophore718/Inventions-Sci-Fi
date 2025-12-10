@@ -430,6 +430,20 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
       
       effectiveHP += 35 + hp5Bonus + hp10Bonus + hp15Bonus;
     }
+
+    // Add Mustelid subspecies bonus
+    if (sheet?.subspecies === 'Mustelid') {
+      const subspeciesDots = sheet?.subspeciesCardDots || [];
+      const hp5Dots = subspeciesDots[4] || [];
+      const hp10Dots = subspeciesDots[5] || [];
+      const hp15Dots = subspeciesDots[6] || [];
+      
+      const hp5Bonus = hp5Dots.filter(Boolean).length * 5;
+      const hp10Bonus = hp10Dots.filter(Boolean).length * 10;
+      const hp15Bonus = (hp15Dots[0] ? 15 : 0);
+      
+      effectiveHP += 30 + hp5Bonus + hp10Bonus + hp15Bonus;
+    }
     
     // Add Cognizant species bonus
     if (sheet?.species === 'Cognizant') {
@@ -2734,6 +2748,24 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                 setNotice={setNotice}
               />
             )}
+
+            {/* Mustelid Subspecies Content */}
+            {subspecies === "Mustelid" && (
+              <LevelUpSpeciesPraedari
+                sheet={sheet}
+                species={species}
+                subspecies={subspecies}
+                contentType="subspecies"
+                onAutoSave={handleAutoSave}
+                xpTotal={xpTotal}
+                spTotal={spTotal}
+                xpSpent={xpSpent}
+                spSpent={spSpent}
+                setXpSpent={setXpSpent}
+                setSpSpent={setSpSpent}
+                setNotice={setNotice}
+              />
+            )}
             
             {/* Cerebronych (cont.) Subspecies Content */}
             {species === "Cerebronych" && (
@@ -2956,6 +2988,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                         if (subspecies === "Stout Evolution" && skillName === "Survival") sources.push({ type: 'subspecies', color: "rgba(95,43,43,0.5)" });
                         if (subspecies === "Canid" && skillName === "Intimidation") sources.push({ type: 'subspecies', color: "rgba(47,141,166,0.5)" });
                         if (subspecies === "Felid" && skillName === "Acrobatics") sources.push({ type: 'subspecies', color: "rgba(177,99,38,0.5)" });
+                        if (subspecies === "Mustelid" && skillName === "Thievery") sources.push({ type: 'subspecies', color: "rgba(105,146,57,0.5)" });
 
                         return sources;
                       };

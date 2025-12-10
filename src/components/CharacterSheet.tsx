@@ -10,6 +10,7 @@ import { generateMisleadingSignalsFeatureJSX } from "../utils/radiofrequentFeatu
 import { generateIrradiateFeatureJSX } from "../utils/xrayFeature";
 import { generateInspiredHunterFeatureJSX } from "../utils/canidFeature";
 import { generateCatsGraceFeatureJSX } from "../utils/felidFeature";
+import { generateWeaselFeatureJSX } from "../utils/mustelidFeature";
 
 import type { CharacterSheet } from "../types/CharacterSheet";
 import { saveCharacterSheet, loadSheetById } from "../utils/storage";
@@ -539,8 +540,13 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
   const felidSpeedBonus = sheet?.subspecies === 'Felid'
     ? 1 + (sheet?.subspeciesCardDots?.[5]?.filter(Boolean).length || 0)
     : 0;
+
+  // Calculate Mustelid subspecies speed bonus (+1 if speed dot is selected)
+  const mustelidSpeedBonus = sheet?.subspecies === 'Mustelid'
+    ? (sheet?.subspeciesCardDots?.[7]?.filter(Boolean).length || 0)
+    : 0;
   
-  const totalSpeed = baseSpeed + tacticianSpeedBonus + kineticSpeedBonus + mercurialSpeedBonus + airSpeedBonus + fireSpeedBonus + waterSpeedBonus + aeronautSpeedBonus + brawlerSpeedBonus + spectreSpeedBonus + avenochSpeedBonus + falcadorSpeedBonus + ammocoderSpeedBonus + pistoleerSpeedBonus + cerebronychSpeedBonus + chloroptidSpeedBonus + driftingSpeedBonus + cognizantSpeedBonus + emberfolkSpeedBonus + petranSpeedBonus + pyranSpeedBonus + entomosSpeedBonus + humanSpeedBonus + lumenarenSpeedBonus + apocritanSpeedBonus + mantidSpeedBonus + litheEvolutionSpeedBonus + praedariSpeedBonus + canidSpeedBonus + felidSpeedBonus;
+  const totalSpeed = baseSpeed + tacticianSpeedBonus + kineticSpeedBonus + mercurialSpeedBonus + airSpeedBonus + fireSpeedBonus + waterSpeedBonus + aeronautSpeedBonus + brawlerSpeedBonus + spectreSpeedBonus + avenochSpeedBonus + falcadorSpeedBonus + ammocoderSpeedBonus + pistoleerSpeedBonus + cerebronychSpeedBonus + chloroptidSpeedBonus + driftingSpeedBonus + cognizantSpeedBonus + emberfolkSpeedBonus + petranSpeedBonus + pyranSpeedBonus + entomosSpeedBonus + humanSpeedBonus + lumenarenSpeedBonus + apocritanSpeedBonus + mantidSpeedBonus + litheEvolutionSpeedBonus + praedariSpeedBonus + canidSpeedBonus + felidSpeedBonus + mustelidSpeedBonus;
   const speed = totalSpeed > 0 ? `${totalSpeed}` : "0";
   
   // Calculate jump speed and jump amount for Kinetic subclass
@@ -583,6 +589,14 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
     : 0;
   const felidJumpAmountBonus = sheet?.subspecies === 'Felid' && sheet?.subspeciesCardDots?.[6]?.[0]
     ? 1 + (sheet?.subspeciesCardDots?.[7]?.filter(Boolean).length || 0)
+    : 0;
+
+  // Mustelid subspecies jump speed and jump amount
+  const mustelidJumpSpeedBonus = sheet?.subspecies === 'Mustelid' && sheet?.subspeciesCardDots?.[8]?.[0]
+    ? 3
+    : 0;
+  const mustelidJumpAmountBonus = sheet?.subspecies === 'Mustelid' && sheet?.subspeciesCardDots?.[8]?.[0]
+    ? 1
     : 0;
   
   const strikeDamage = sheet?.strikeDamage || "";
@@ -839,6 +853,22 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
         const hp15Bonus = hp15Dots.filter(Boolean).length * 15;
         
         return 40 + hp5Bonus + hp10Bonus + hp15Bonus;
+      })()
+    : 0;
+
+  // Calculate Mustelid subspecies hit points bonus
+  const mustelidHitPointsBonus = sheet?.subspecies === 'Mustelid'
+    ? (() => {
+        const subspeciesDots = sheet?.subspeciesCardDots || [];
+        const hp5Dots = subspeciesDots[4] || [];
+        const hp10Dots = subspeciesDots[5] || [];
+        const hp15Dots = subspeciesDots[6] || [];
+        
+        const hp5Bonus = hp5Dots.filter(Boolean).length * 5;
+        const hp10Bonus = hp10Dots.filter(Boolean).length * 10;
+        const hp15Bonus = hp15Dots.filter(Boolean).length * 15;
+        
+        return 30 + hp5Bonus + hp10Bonus + hp15Bonus;
       })()
     : 0;
   
@@ -1740,7 +1770,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
   
   const mustelidFeatureJSX = (
     <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#699239' }}>Weasel.</i></b> You gain a <b><i style={{ color: '#38761d' }}>Burrow Speed</i></b> and are <i>Immune</i> to the <b><i>Restrain</i></b> condition. Additionally you can use the <i>Thievery</i> skill once per turn without using an <i>Action</i>.
+      {generateWeaselFeatureJSX()}
     </span>
   );
   
@@ -2564,7 +2594,9 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                   if (subspecies === "Lithe Evolution" && skillName === "Acrobatics") sources.push({ type: 'subspecies', color: "rgba(43,95,95,0.5)" });
                   if (subspecies === "Massive Evolution" && skillName === "Athletics") sources.push({ type: 'subspecies', color: "rgba(43,23,95,0.5)" });
                   if (subspecies === "Stout Evolution" && skillName === "Survival") sources.push({ type: 'subspecies', color: "rgba(95,43,43,0.5)" });
+                  if (subspecies === "Canid" && skillName === "Intimidation") sources.push({ type: 'subspecies', color: "rgba(47,141,166,0.5)" });
                   if (subspecies === "Felid" && skillName === "Acrobatics") sources.push({ type: 'subspecies', color: "rgba(177,99,38,0.5)" });
+                  if (subspecies === "Mustelid" && skillName === "Thievery") sources.push({ type: 'subspecies', color: "rgba(105,146,57,0.5)" });
  
                   
                   return sources;
@@ -3394,6 +3426,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
             {hostSpecies === 'Felid Praedari Host' ? ', Climb' : ''}
             {subspecies === 'Felid' ? ', Climb' : ''}
             {hostSpecies === 'Mustelid Praedari Host' ? ', Burrow' : ''}
+            {subspecies === 'Mustelid' ? ', Burrow' : ''}
             {sheet?.species === 'Praedari' && sheet?.speciesCardDots?.[7]?.[0] ? ', Climb' : ''}
             {sheet?.species === 'Entomos' && sheet?.speciesCardDots?.[6]?.[0] ? ', Fly' : ''}
           </div>
@@ -3486,8 +3519,8 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                 : resistances
             }
           </div>
-          <div className={styles.horizontalLabel} style={{ color: '#38761d', fontWeight: 'bold' }}><u>Jump Amount</u> {kineticJumpAmountBonus > 0 ? kineticJumpAmountBonus : mercurialJumpAmountBonus > 0 ? mercurialJumpAmountBonus : pyranJumpAmountBonus > 0 ? pyranJumpAmountBonus : mantidJumpAmountBonus > 0 ? mantidJumpAmountBonus : felidJumpAmountBonus > 0 ? felidJumpAmountBonus : "0"}</div>
-          <div className={styles.horizontalLabel} style={{ color: '#38761d', fontWeight: 'bold' }}><u>Jump Speed</u> {(kineticJumpSpeedBonus > 0 ? kineticJumpSpeedBonus : mercurialJumpSpeedBonus > 0 ? mercurialJumpSpeedBonus : pyranJumpSpeedBonus > 0 ? pyranJumpSpeedBonus : mantidJumpSpeedBonus > 0 ? mantidJumpSpeedBonus : felidJumpSpeedBonus > 0 ? felidJumpSpeedBonus : "") + (kineticJumpSpeedBonus > 0 || mercurialJumpSpeedBonus > 0 || pyranJumpSpeedBonus > 0 || mantidJumpSpeedBonus > 0 || felidJumpSpeedBonus > 0 ? "hx" : "0hx")}</div>
+          <div className={styles.horizontalLabel} style={{ color: '#38761d', fontWeight: 'bold' }}><u>Jump Amount</u> {kineticJumpAmountBonus > 0 ? kineticJumpAmountBonus : mercurialJumpAmountBonus > 0 ? mercurialJumpAmountBonus : pyranJumpAmountBonus > 0 ? pyranJumpAmountBonus : mantidJumpAmountBonus > 0 ? mantidJumpAmountBonus : felidJumpAmountBonus > 0 ? felidJumpAmountBonus : mustelidJumpAmountBonus > 0 ? mustelidJumpAmountBonus : "0"}</div>
+          <div className={styles.horizontalLabel} style={{ color: '#38761d', fontWeight: 'bold' }}><u>Jump Speed</u> {(kineticJumpSpeedBonus > 0 ? kineticJumpSpeedBonus : mercurialJumpSpeedBonus > 0 ? mercurialJumpSpeedBonus : pyranJumpSpeedBonus > 0 ? pyranJumpSpeedBonus : mantidJumpSpeedBonus > 0 ? mantidJumpSpeedBonus : felidJumpSpeedBonus > 0 ? felidJumpSpeedBonus : mustelidJumpSpeedBonus > 0 ? mustelidJumpSpeedBonus : "") + (kineticJumpSpeedBonus > 0 || mercurialJumpSpeedBonus > 0 || pyranJumpSpeedBonus > 0 || mantidJumpSpeedBonus > 0 || felidJumpSpeedBonus > 0 || mustelidJumpSpeedBonus > 0 ? "hx" : "0hx")}</div>
         </div>
       </div>
 
@@ -4283,6 +4316,11 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
             {subspecies === 'Felid' && (
               <span style={{ marginLeft: 8, color: '#000', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                 <i>Fall Damage</i>
+              </span>
+            )}
+            {subspecies === 'Mustelid' && (
+              <span style={{ marginLeft: 8, color: '#000', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                <i>Restrain</i>
               </span>
             )}
             {species === 'Emberfolk' && (
@@ -5310,8 +5348,8 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                   <span style={{ fontWeight: 'bold', fontSize: '14px' }}>Max Hit Points:</span>
                   <span style={{ minWidth: '40px', textAlign: 'center' }}>
                     {charClass === "Exospecialist" 
-                      ? maxHitPoints + 20 + aeronautHitPointsBonus + brawlerHitPointsBonus + dreadnaughtHitPointsBonus + spectreHitPointsBonus + avenochHitPointsBonus + cerebronychHitPointsBonus + chloroptidHitPointsBonus + lumenarenHitPointsBonus + barkskinHitPointsBonus + petranHitPointsBonus + pyranHitPointsBonus + apocritanHitPointsBonus + dynastesHitPointsBonus + mantidHitPointsBonus + diminutiveEvolutionHitPointsBonus + litheEvolutionHitPointsBonus + massiveEvolutionHitPointsBonus + stoutEvolutionHitPointsBonus + canidHitPointsBonus
-                      : maxHitPoints + avenochHitPointsBonus + cerebronychHitPointsBonus + chloroptidHitPointsBonus + lumenarenHitPointsBonus + barkskinHitPointsBonus + petranHitPointsBonus + pyranHitPointsBonus + apocritanHitPointsBonus + dynastesHitPointsBonus + mantidHitPointsBonus + diminutiveEvolutionHitPointsBonus + litheEvolutionHitPointsBonus + massiveEvolutionHitPointsBonus + stoutEvolutionHitPointsBonus + canidHitPointsBonus}
+                      ? maxHitPoints + 20 + aeronautHitPointsBonus + brawlerHitPointsBonus + dreadnaughtHitPointsBonus + spectreHitPointsBonus + avenochHitPointsBonus + cerebronychHitPointsBonus + chloroptidHitPointsBonus + lumenarenHitPointsBonus + barkskinHitPointsBonus + petranHitPointsBonus + pyranHitPointsBonus + apocritanHitPointsBonus + dynastesHitPointsBonus + mantidHitPointsBonus + diminutiveEvolutionHitPointsBonus + litheEvolutionHitPointsBonus + massiveEvolutionHitPointsBonus + stoutEvolutionHitPointsBonus + canidHitPointsBonus + mustelidHitPointsBonus
+                      : maxHitPoints + avenochHitPointsBonus + cerebronychHitPointsBonus + chloroptidHitPointsBonus + lumenarenHitPointsBonus + barkskinHitPointsBonus + petranHitPointsBonus + pyranHitPointsBonus + apocritanHitPointsBonus + dynastesHitPointsBonus + mantidHitPointsBonus + diminutiveEvolutionHitPointsBonus + litheEvolutionHitPointsBonus + massiveEvolutionHitPointsBonus + stoutEvolutionHitPointsBonus + canidHitPointsBonus + mustelidHitPointsBonus}
                   </span>
                 </div>
                 <button
@@ -5319,8 +5357,8 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                   style={{ padding: '6px 36px', fontSize: '14px', whiteSpace: 'nowrap' }}
                   onClick={() => {
                     const maxHP = charClass === "Exospecialist" 
-                      ? maxHitPoints + 20 + aeronautHitPointsBonus + brawlerHitPointsBonus + dreadnaughtHitPointsBonus + spectreHitPointsBonus + avenochHitPointsBonus + cerebronychHitPointsBonus + chloroptidHitPointsBonus + lumenarenHitPointsBonus + barkskinHitPointsBonus + petranHitPointsBonus + pyranHitPointsBonus + apocritanHitPointsBonus + dynastesHitPointsBonus + mantidHitPointsBonus + diminutiveEvolutionHitPointsBonus + litheEvolutionHitPointsBonus + massiveEvolutionHitPointsBonus + stoutEvolutionHitPointsBonus + canidHitPointsBonus
-                      : maxHitPoints + avenochHitPointsBonus + cerebronychHitPointsBonus + chloroptidHitPointsBonus + lumenarenHitPointsBonus + barkskinHitPointsBonus + petranHitPointsBonus + pyranHitPointsBonus + apocritanHitPointsBonus + dynastesHitPointsBonus + mantidHitPointsBonus + diminutiveEvolutionHitPointsBonus + litheEvolutionHitPointsBonus + massiveEvolutionHitPointsBonus + stoutEvolutionHitPointsBonus + canidHitPointsBonus;
+                      ? maxHitPoints + 20 + aeronautHitPointsBonus + brawlerHitPointsBonus + dreadnaughtHitPointsBonus + spectreHitPointsBonus + avenochHitPointsBonus + cerebronychHitPointsBonus + chloroptidHitPointsBonus + lumenarenHitPointsBonus + barkskinHitPointsBonus + petranHitPointsBonus + pyranHitPointsBonus + apocritanHitPointsBonus + dynastesHitPointsBonus + mantidHitPointsBonus + diminutiveEvolutionHitPointsBonus + litheEvolutionHitPointsBonus + massiveEvolutionHitPointsBonus + stoutEvolutionHitPointsBonus + canidHitPointsBonus + mustelidHitPointsBonus
+                      : maxHitPoints + avenochHitPointsBonus + cerebronychHitPointsBonus + chloroptidHitPointsBonus + lumenarenHitPointsBonus + barkskinHitPointsBonus + petranHitPointsBonus + pyranHitPointsBonus + apocritanHitPointsBonus + dynastesHitPointsBonus + mantidHitPointsBonus + diminutiveEvolutionHitPointsBonus + litheEvolutionHitPointsBonus + massiveEvolutionHitPointsBonus + stoutEvolutionHitPointsBonus + canidHitPointsBonus + mustelidHitPointsBonus;
                     setCurrentHitPoints(maxHP);
                     handleAutoSave({ currentHitPoints: maxHP });
                   }}
@@ -5410,8 +5448,8 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
           }}
         >
           hp: {currentHitPoints}/{charClass === "Exospecialist" 
-            ? maxHitPoints + 20 + aeronautHitPointsBonus + brawlerHitPointsBonus + dreadnaughtHitPointsBonus + spectreHitPointsBonus + avenochHitPointsBonus + cerebronychHitPointsBonus + chloroptidHitPointsBonus + barkskinHitPointsBonus + petranHitPointsBonus + pyranHitPointsBonus + apocritanHitPointsBonus + dynastesHitPointsBonus + mantidHitPointsBonus + diminutiveEvolutionHitPointsBonus + litheEvolutionHitPointsBonus + massiveEvolutionHitPointsBonus + stoutEvolutionHitPointsBonus + canidHitPointsBonus
-            : maxHitPoints + avenochHitPointsBonus + cerebronychHitPointsBonus + chloroptidHitPointsBonus + barkskinHitPointsBonus + petranHitPointsBonus + pyranHitPointsBonus + apocritanHitPointsBonus + dynastesHitPointsBonus + mantidHitPointsBonus + diminutiveEvolutionHitPointsBonus + litheEvolutionHitPointsBonus + massiveEvolutionHitPointsBonus + stoutEvolutionHitPointsBonus + canidHitPointsBonus}
+            ? maxHitPoints + 20 + aeronautHitPointsBonus + brawlerHitPointsBonus + dreadnaughtHitPointsBonus + spectreHitPointsBonus + avenochHitPointsBonus + cerebronychHitPointsBonus + chloroptidHitPointsBonus + barkskinHitPointsBonus + petranHitPointsBonus + pyranHitPointsBonus + apocritanHitPointsBonus + dynastesHitPointsBonus + mantidHitPointsBonus + diminutiveEvolutionHitPointsBonus + litheEvolutionHitPointsBonus + massiveEvolutionHitPointsBonus + stoutEvolutionHitPointsBonus + canidHitPointsBonus + mustelidHitPointsBonus
+            : maxHitPoints + avenochHitPointsBonus + cerebronychHitPointsBonus + chloroptidHitPointsBonus + barkskinHitPointsBonus + petranHitPointsBonus + pyranHitPointsBonus + apocritanHitPointsBonus + dynastesHitPointsBonus + mantidHitPointsBonus + diminutiveEvolutionHitPointsBonus + litheEvolutionHitPointsBonus + massiveEvolutionHitPointsBonus + stoutEvolutionHitPointsBonus + canidHitPointsBonus + mustelidHitPointsBonus}
         </button>
       </div>
 
