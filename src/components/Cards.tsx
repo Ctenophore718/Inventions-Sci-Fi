@@ -627,7 +627,7 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
       
       const hp5Bonus = hp5Dots.filter(Boolean).length * 5;
       const hp10Bonus = hp10Dots.filter(Boolean).length * 10;
-      const hp15Bonus = (hp15Dots[0] ? 15 : 0);
+      const hp15Bonus = hp15Dots.filter(Boolean).length * 15;
       
       effectiveHP += 45 + hp5Bonus + hp10Bonus + hp15Bonus;
     }
@@ -2056,6 +2056,8 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                                                           ? `[${3 - (localSheet?.subspeciesCardDots?.[1]?.filter(Boolean).length ?? 0)}]`
                                                           : localSheet?.subspecies === 'Mustelid'
                                                           ? `[${3 - (localSheet?.subspeciesCardDots?.[3]?.filter(Boolean).length ?? 0)}]`
+                                                          : localSheet?.subspecies === 'Ursid'
+                                                          ? `[${4 - (localSheet?.subspeciesCardDots?.[8]?.filter(Boolean).length ?? 0)}]`
                                                           : localSheet?.subspecies === 'Infrared'
                                                           ? `[${4 - (localSheet?.subspeciesCardDots?.[2]?.filter(Boolean).length ?? 0)}]`
                                                           : localSheet?.subspecies === 'Radiofrequent'
@@ -2214,8 +2216,8 @@ const Cards: React.FC<CardsProps> = ({ sheet, onBack, onLevelUp, onHome, onAutoS
                                                           )
                                                         : localSheet?.subspecies === 'Ursid'
                                                         ? generateProtectiveInstinctsCardJSX(
-                                                            0,
-                                                            (localSheet?.subspeciesCardDots?.[7]?.[0] ? 1 : 0)
+                                                            (localSheet?.subspeciesCardDots?.[6]?.filter(Boolean).length || 0) + (localSheet?.subspeciesCardDots?.[7]?.[0] ? 1 : 0),
+                                                            localSheet?.subspeciesCardDots?.[7]?.[0] || false
                                                           )
                                                         : localSheet?.subspecies === 'Infrared'
                                                         ? <span style={{ fontSize: '0.86em' }}>{generateHeatSinkCardJSX(

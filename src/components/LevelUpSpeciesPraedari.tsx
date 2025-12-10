@@ -3032,8 +3032,8 @@ const LevelUpSpeciesPraedari: React.FC<LevelUpSpeciesPraedariProps> = ({
             <span style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
               {generateProtectiveInstinctsJSX(
                 4 - safeGetSubspeciesDotsArray(8).slice(0, 2).filter(Boolean).length,
-                0,
-                safeGetSubspeciesDotsArray(7)?.[0] ? 1 : 0
+                safeGetSubspeciesDotsArray(6).filter(Boolean).length + (safeGetSubspeciesDotsArray(7)?.[0] ? 1 : 0),
+                safeGetSubspeciesDotsArray(7)?.[0] || false
               )}
             </span>
           </div>
@@ -3100,7 +3100,7 @@ const LevelUpSpeciesPraedari: React.FC<LevelUpSpeciesPraedariProps> = ({
               <span></span>
               <span></span>
               {/* Row 4: +1hx range continued dot */}
-              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>You <b><i style={{ color: '#1a56db' }}>Resist</i></b> <b><i style={{ color: '#990000' }}>Damage</i></b> taken</span>
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>You <i>Resist</i> Damage taken</span>
               {[0].map(idx => {
                 const arr = safeGetSubspeciesDotsArray(7);
                 const xpCosts = [16];
@@ -3261,7 +3261,7 @@ const LevelUpSpeciesPraedari: React.FC<LevelUpSpeciesPraedariProps> = ({
               {/* Row 4: +10 Hit Points dots */}
               <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+10 <b><i style={{ color: '#990000' }}>Hit Points</i></b></span>
               {[0, 1, 2].map(idx => {
-                const arr = safeGetSubspeciesDotsArray(9);
+                const arr = safeGetSubspeciesDotsArray(10);
                 const xpCosts = [7, 9, 12];
                 const canSelect = idx === 0 || arr[idx - 1];
                 const canUncheck = !arr.slice(idx + 1).some(Boolean);
@@ -3275,10 +3275,10 @@ const LevelUpSpeciesPraedari: React.FC<LevelUpSpeciesPraedariProps> = ({
                             setNotice("Not enough xp!");
                             return;
                           }
-                          newDots[9][idx] = true;
+                          newDots[10][idx] = true;
                           persistSubspeciesCardDots(newDots, 0, xpCosts[idx]);
                         } else if (arr[idx] && canUncheck) {
-                          newDots[9][idx] = false;
+                          newDots[10][idx] = false;
                           persistSubspeciesCardDots(newDots, 0, -xpCosts[idx]);
                         }
                       }}
@@ -3305,7 +3305,7 @@ const LevelUpSpeciesPraedari: React.FC<LevelUpSpeciesPraedariProps> = ({
               {/* Row 6: +15 Hit Points dots */}
               <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+15 <b><i style={{ color: '#990000' }}>Hit Points</i></b></span>
               {[0, 1, 2].map(idx => {
-                const arr = safeGetSubspeciesDotsArray(10);
+                const arr = safeGetSubspeciesDotsArray(11);
                 const xpCosts = [16, 20, 25];
                 const canSelect = idx === 0 || arr[idx - 1];
                 const canUncheck = !arr.slice(idx + 1).some(Boolean);
@@ -3319,10 +3319,10 @@ const LevelUpSpeciesPraedari: React.FC<LevelUpSpeciesPraedariProps> = ({
                             setNotice("Not enough xp!");
                             return;
                           }
-                          newDots[10][idx] = true;
+                          newDots[11][idx] = true;
                           persistSubspeciesCardDots(newDots, 0, xpCosts[idx]);
                         } else if (arr[idx] && canUncheck) {
-                          newDots[10][idx] = false;
+                          newDots[11][idx] = false;
                           persistSubspeciesCardDots(newDots, 0, -xpCosts[idx]);
                         }
                       }}
@@ -3369,7 +3369,7 @@ const LevelUpSpeciesPraedari: React.FC<LevelUpSpeciesPraedariProps> = ({
               <span></span>
               <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>9sp</span>
               {/* Row 2: Bear Strength dot */}
-              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'left', paddingRight: '8px' }}><b><i style={{ color: '#4a5568' }}>Bear Strength.</i></b> You are incredibly strong and didn't have to work for it. Lucky you. Gain an advantage on related skill rolls.</span>
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'left', paddingRight: '8px' }}><b><i style={{ color: '#9026b1' }}>Bear Strength.</i></b> You are incredibly strong and didn't have to work for it. Lucky you. Gain an advantage on related skill rolls.</span>
               {[0].map(idx => {
                 const arr = safeGetSubspeciesDotsArray(12);
                 const spCosts = [9];

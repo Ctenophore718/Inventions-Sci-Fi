@@ -665,6 +665,13 @@ const CharacterSheetPerks: React.FC<CharacterSheetPerksProps> = ({
             </span>
           </div>
           )}
+          {subspecies === 'Ursid' && sheet?.subspeciesCardDots?.[12]?.[0] && (
+          <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <span>
+              <b><i style={{ color: '#9026b1' }}>Bear Strength.</i></b> <span style={{ color: '#000' }}>You are incredibly strong and didn't have to work for it. Lucky you. Gain an advantage on related skill rolls.</span>
+            </span>
+          </div>
+          )}
         </div>
       </div>
   );

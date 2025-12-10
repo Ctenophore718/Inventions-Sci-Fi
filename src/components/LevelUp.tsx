@@ -333,6 +333,20 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
       effectiveHP += 45 + hp5Bonus + hp10Bonus + hp15Bonus;
     }
     
+    // Add Ursid subspecies bonus
+    if (sheet?.subspecies === 'Ursid') {
+      const subspeciesDots = sheet?.subspeciesCardDots || [];
+      const hp5Dots = subspeciesDots[9] || [];
+      const hp10Dots = subspeciesDots[10] || [];
+      const hp15Dots = subspeciesDots[11] || [];
+      
+      const hp5Bonus = hp5Dots.filter(Boolean).length * 5;
+      const hp10Bonus = hp10Dots.filter(Boolean).length * 10;
+      const hp15Bonus = hp15Dots.filter(Boolean).length * 15;
+      
+      effectiveHP += 45 + hp5Bonus + hp10Bonus + hp15Bonus;
+    }
+    
     // Add Mantid subspecies bonus
     if (sheet?.subspecies === 'Mantid') {
       const subspeciesDots = sheet?.subspeciesCardDots || [];
@@ -3007,6 +3021,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                         if (subspecies === "Canid" && skillName === "Intimidation") sources.push({ type: 'subspecies', color: "rgba(47,141,166,0.5)" });
                         if (subspecies === "Felid" && skillName === "Acrobatics") sources.push({ type: 'subspecies', color: "rgba(177,99,38,0.5)" });
                         if (subspecies === "Mustelid" && skillName === "Thievery") sources.push({ type: 'subspecies', color: "rgba(105,146,57,0.5)" });
+                        if (subspecies === "Ursid" && skillName === "Athletics") sources.push({ type: 'subspecies', color: "rgba(144,38,177,0.5)" });
 
                         return sources;
                       };
@@ -3196,6 +3211,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                           // Check for Ordnancer Athletics booster dot
                           // Ordnancer Athletics booster always goes at position 2, same as class boosters
                           const isOrdnancerAthletics = subclass === "Ordnancer" && skill === "Athletics" && i === 2;
+                          const isUrsidAthletics = subspecies === "Ursid" && skill === "Athletics" && i === 2;
 
                           // Check for Pistoleer Thievery booster dot
                           // Pistoleer Thievery booster always goes at position 2, same as class boosters
@@ -3241,7 +3257,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                           // Pyran Performance booster always goes at position 2, same as class boosters
                           const isPyranPerformance = subspecies === "Pyran" && skill === "Performance" && i === 2;
 
-                          if (isChemistInvestigation || isCoderOikomagic || isCommanderDiplomacy || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine || isGrenadierIntimidation || isNecroSurvival || isPoisonerThievery || isCoerciveDeception || isBeguilerDeception || isDivinistInvestigation || isNaturalistSurvival || isTechnologistTechnology || isGalvanicAthletics || isTacticianAwareness || isTyrantIntimidation || isInertialDiplomacy || isKineticAthletics || isMercurialAcrobatics || isVectorialPiloting || isAstralMedicine || isChaosIntimidation || isOrderCulture || isVoidStealth || isAirAcrobatics || isEarthSurvival || isFireIntimidation || isWaterMedicine || isAeronautPiloting || isBrawlerSurvival || isDreadnaughtIntimidation || isSpectreStealth || isAmmoCoderOikomagic || isOrdnancerAthletics || isPistoleerThievery || isSniperStealth || isHackerComputers || isJunkerThievery || isNanoboticistAcrobatics || isTankerPiloting || isAvenochAwareness || isChloroptidAwareness || isBarkskinSurvival || isPetranSurvival || isPyranPerformance) {
+                          if (isChemistInvestigation || isCoderOikomagic || isCommanderDiplomacy || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine || isGrenadierIntimidation || isNecroSurvival || isPoisonerThievery || isCoerciveDeception || isBeguilerDeception || isDivinistInvestigation || isNaturalistSurvival || isTechnologistTechnology || isGalvanicAthletics || isTacticianAwareness || isTyrantIntimidation || isInertialDiplomacy || isKineticAthletics || isMercurialAcrobatics || isVectorialPiloting || isAstralMedicine || isChaosIntimidation || isOrderCulture || isVoidStealth || isAirAcrobatics || isEarthSurvival || isFireIntimidation || isWaterMedicine || isAeronautPiloting || isBrawlerSurvival || isDreadnaughtIntimidation || isSpectreStealth || isAmmoCoderOikomagic || isOrdnancerAthletics || isUrsidAthletics || isPistoleerThievery || isSniperStealth || isHackerComputers || isJunkerThievery || isNanoboticistAcrobatics || isTankerPiloting || isAvenochAwareness || isChloroptidAwareness || isBarkskinSurvival || isPetranSurvival || isPyranPerformance) {
                             checked = true; // Force third dot to be filled for class booster dots
                           }
 
@@ -3286,6 +3302,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                             if (isSpectreStealth) return "rgba(106,61,216,0.5)";
                             if (isAmmoCoderOikomagic) return "rgba(10,57,145,0.5)";
                             if (isOrdnancerAthletics) return "rgba(145,10,10,0.5)";
+                            if (isUrsidAthletics) return "rgba(144,38,177,0.5)";
                             if (isPistoleerThievery) return "rgba(90,145,10,0.5)";
                             if (isSniperStealth) return "rgba(10,111,145,0.5)";
                             if (isHackerComputers) return "rgba(92,87,184,0.5)";
