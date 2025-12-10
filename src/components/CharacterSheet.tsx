@@ -11,6 +11,7 @@ import { generateIrradiateFeatureJSX } from "../utils/xrayFeature";
 import { generateInspiredHunterFeatureJSX } from "../utils/canidFeature";
 import { generateCatsGraceFeatureJSX } from "../utils/felidFeature";
 import { generateWeaselFeatureJSX } from "../utils/mustelidFeature";
+import { generateNaturalInsulationJSX } from "../utils/ursidFeature";
 
 import type { CharacterSheet } from "../types/CharacterSheet";
 import { saveCharacterSheet, loadSheetById } from "../utils/storage";
@@ -1774,11 +1775,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
     </span>
   );
   
-  const ursidFeatureJSX = (
-    <span style={{ color: '#000', fontWeight: 400 }}>
-      <b><i style={{ color: '#9026b1' }}>Natural Insulation.</i></b> You <i>Resist</i> <b><u style={{ color: '#3ebbff', display: 'inline-flex', alignItems: 'center' }}>Cold<img src="/Cold.png" alt="Cold" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> and <b><u style={{ color: '#915927', display: 'inline-flex', alignItems: 'center' }}>Bludgeoning<img src="/Bludgeoning.png" alt="Bludgeoning" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> and are <i>Immune</i> to the <b><i>Restrain</i></b> condition. Your size is 3hx.
-    </span>
-  );
+  const ursidFeatureJSX = generateNaturalInsulationJSX(sheet);
 
   // Helper functions for Attack Weapons/Spells dropdown
   const getAvailablePrimaryAttacks = () => {
@@ -4165,6 +4162,30 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                   </span>
                 </>
               )}
+              {subspecies === 'Ursid' && (
+                <>
+                  {!sheet?.subspeciesCardDots?.[1]?.[0] && (
+                    <span style={{ marginLeft: 8, display: 'inline-flex', alignItems: 'center', color: '#3ebbff', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                      <u>Cold</u> <img src="/Cold.png" alt="Cold" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+                    </span>
+                  )}
+                  {!sheet?.subspeciesCardDots?.[0]?.[0] && (
+                    <span style={{ marginLeft: 8, display: 'inline-flex', alignItems: 'center', color: '#915927', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                      <u>Bludgeoning</u> <img src="/Bludgeoning.png" alt="Bludgeoning" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+                    </span>
+                  )}
+                  {sheet?.subspeciesCardDots?.[2]?.[0] && !sheet?.subspeciesCardDots?.[3]?.[0] && (
+                    <span style={{ marginLeft: 8, display: 'inline-flex', alignItems: 'center', color: '#d5d52a', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                      <u>Electric</u> <img src="/Electric.png" alt="Electric" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+                    </span>
+                  )}
+                  {sheet?.subspeciesCardDots?.[4]?.[0] && !sheet?.subspeciesCardDots?.[5]?.[0] && (
+                    <span style={{ marginLeft: 8, display: 'inline-flex', alignItems: 'center', color: '#f90102', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                      <u>Fire</u> <img src="/Fire.png" alt="Fire" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+                    </span>
+                  )}
+                </>
+              )}
             </div>
           <div style={{ fontWeight: 'bold', marginBottom: 2, fontFamily: 'Arial, sans-serif', color: '#666666', wordBreak: 'break-word', overflowWrap: 'break-word' }}><u>Immunities</u>
             {species === 'Cerebronych' && (
@@ -4322,6 +4343,33 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
               <span style={{ marginLeft: 8, color: '#000', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                 <i>Restrain</i>
               </span>
+            )}
+            {subspecies === 'Ursid' && (
+              <>
+                <span style={{ marginLeft: 8, color: '#000', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                  <i>Restrain</i>
+                </span>
+                {sheet?.subspeciesCardDots?.[1]?.[0] && (
+                  <span style={{ marginLeft: 8, display: 'inline-flex', alignItems: 'center', color: '#3ebbff', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                    <u>Cold</u> <img src="/Cold.png" alt="Cold" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+                  </span>
+                )}
+                {sheet?.subspeciesCardDots?.[0]?.[0] && (
+                  <span style={{ marginLeft: 8, display: 'inline-flex', alignItems: 'center', color: '#915927', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                    <u>Bludgeoning</u> <img src="/Bludgeoning.png" alt="Bludgeoning" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+                  </span>
+                )}
+                {sheet?.subspeciesCardDots?.[3]?.[0] && (
+                  <span style={{ marginLeft: 8, display: 'inline-flex', alignItems: 'center', color: '#d5d52a', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                    <u>Electric</u> <img src="/Electric.png" alt="Electric" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+                  </span>
+                )}
+                {sheet?.subspeciesCardDots?.[5]?.[0] && (
+                  <span style={{ marginLeft: 8, display: 'inline-flex', alignItems: 'center', color: '#f90102', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                    <u>Fire</u> <img src="/Fire.png" alt="Fire" style={{ width: 16, height: 16, marginLeft: 2, verticalAlign: 'middle' }} />
+                  </span>
+                )}
+              </>
             )}
             {species === 'Emberfolk' && (
               <>

@@ -8,6 +8,8 @@ import { generateCatsGraceJSX } from "../utils/felidFeature";
 import { generateFelineAgilityJSX } from "../utils/felidTechnique";
 import { generateWeaselJSX } from "../utils/mustelidFeature";
 import { generateDubiousBadgerJSX } from "../utils/mustelidTechnique";
+import { generateNaturalInsulationJSX } from "../utils/ursidFeature";
+import { generateProtectiveInstinctsJSX } from "../utils/ursidTechnique";
 
 type LevelUpSpeciesPraedariProps = {
   sheet: CharacterSheet | null;
@@ -97,6 +99,23 @@ const LevelUpSpeciesPraedari: React.FC<LevelUpSpeciesPraedariProps> = ({
     [false],               // Perk: Wily Trickster (9sp)
   ];
 
+  // Ursid subspecies card dots default structure
+  const defaultUrsidDots = [
+    [false],               // Feature: Bludgeoning Immunity (5xp)
+    [false],               // Feature: Cold Immunity (3xp)
+    [false],               // Feature: Electric Resistance (3xp)
+    [false],               // Feature: Electric Immunity (5xp)
+    [false],               // Feature: Fire Resistance (3xp)
+    [false],               // Feature: Fire Immunity (5xp)
+    [false, false, false], // Technique: +1hx Range (5xp, 7xp, 10xp)
+    [false],               // Technique: +1hx Range final + You Resist Damage taken (16xp)
+    [false, false],        // Technique: -1 Cooldown (7xp, 7xp)
+    [false, false, false], // Hit Points: +5 (3xp, 4xp, 5xp)
+    [false, false, false], // Hit Points: +10 (7xp, 9xp, 12xp)
+    [false, false, false], // Hit Points: +15 (16xp, 20xp, 25xp)
+    [false],               // Perk: Bear Strength (9sp)
+  ];
+
   // Local state for species card dots
   const [speciesCardDots, setSpeciesCardDots] = useState<boolean[][]>(() => {
     if (sheet?.speciesCardDots && Array.isArray(sheet.speciesCardDots) && sheet.speciesCardDots.length > 0) {
@@ -118,6 +137,9 @@ const LevelUpSpeciesPraedari: React.FC<LevelUpSpeciesPraedariProps> = ({
     }
     if (subspecies === 'Mustelid') {
       return defaultMustelidDots.map(row => [...row]);
+    }
+    if (subspecies === 'Ursid') {
+      return defaultUrsidDots.map(row => [...row]);
     }
     return [];
   });
@@ -2684,6 +2706,687 @@ const LevelUpSpeciesPraedari: React.FC<LevelUpSpeciesPraedariProps> = ({
                           persistSubspeciesCardDots(newDots, spCosts[idx], 0);
                         } else {
                           newDots[9][idx] = false;
+                          persistSubspeciesCardDots(newDots, -spCosts[idx], 0);
+                        }
+                      }}
+                      style={{
+                        width: '15px',
+                        height: '15px',
+                        border: '2px solid #000',
+                        borderRadius: '50%',
+                        display: 'block',
+                        background: arr[idx] ? '#000' : '#fff',
+                        cursor: 'pointer',
+                        transition: 'background 0.2s'
+                      }}
+                    ></span>
+                  </span>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Ursid Subspecies Content */}
+      {subspecies === "Ursid" && contentType === 'subspecies' && (
+        <div style={{ width: '100%', marginTop: '1rem', textAlign: 'left', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
+          
+          {/* Feature Section */}
+          <div style={{ color: '#0b5394', fontWeight: 'bold', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '16px' }}>
+            <div style={{ fontWeight: 'bold', color: '#0b5394', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Feature</u></div>
+            <span style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
+              {generateNaturalInsulationJSX()}
+            </span>
+          </div>
+
+          {/* Feature Upgrades Table */}
+          <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px', marginBottom: '16px' }}>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 24px 24px 24px',
+              gridTemplateRows: 'repeat(12, auto)',
+              columnGap: '6px',
+              rowGap: '2px',
+              alignItems: 'start',
+              width: '100%',
+              paddingLeft: '4px'
+            }}>
+              {/* Row 1: XP header for Bludgeoning Immunity */}
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>5xp</span>
+              <span></span>
+              <span></span>
+              {/* Row 2: Bludgeoning Immunity dot */}
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}><b><u style={{ color: '#915927', display: 'inline-flex', alignItems: 'center' }}>Bludgeoning<img src="/Bludgeoning.png" alt="Bludgeoning" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> <i>Immunity</i></span>
+              {[0].map(idx => {
+                const arr = safeGetSubspeciesDotsArray(0);
+                const xpCosts = [5];
+                return (
+                  <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
+                    <span
+                      onClick={() => {
+                        const newDots = safeCloneSubspeciesCardDots();
+                        if (!arr[idx]) {
+                          if (xpSpent + xpCosts[idx] > xpTotal) {
+                            setNotice("Not enough xp!");
+                            return;
+                          }
+                          newDots[0][idx] = true;
+                          persistSubspeciesCardDots(newDots, 0, xpCosts[idx]);
+                        } else {
+                          newDots[0][idx] = false;
+                          persistSubspeciesCardDots(newDots, 0, -xpCosts[idx]);
+                        }
+                      }}
+                      style={{
+                        width: '15px',
+                        height: '15px',
+                        border: '2px solid #000',
+                        borderRadius: '50%',
+                        display: 'block',
+                        background: arr[idx] ? '#000' : '#fff',
+                        cursor: 'pointer',
+                        transition: 'background 0.2s'
+                      }}
+                    ></span>
+                  </span>
+                );
+              })}
+
+              {/* Row 3: XP header for Cold Immunity */}
+              <span></span>
+              <span></span>
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>3xp</span>
+              <span></span>
+              <span></span>
+              {/* Row 4: Cold Immunity dot */}
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}><b><u style={{ color: '#3ebbff', display: 'inline-flex', alignItems: 'center' }}>Cold<img src="/Cold.png" alt="Cold" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> <i>Immunity</i></span>
+              {[0].map(idx => {
+                const arr = safeGetSubspeciesDotsArray(1);
+                const xpCosts = [3];
+                return (
+                  <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
+                    <span
+                      onClick={() => {
+                        const newDots = safeCloneSubspeciesCardDots();
+                        if (!arr[idx]) {
+                          if (xpSpent + xpCosts[idx] > xpTotal) {
+                            setNotice("Not enough xp!");
+                            return;
+                          }
+                          newDots[1][idx] = true;
+                          persistSubspeciesCardDots(newDots, 0, xpCosts[idx]);
+                        } else {
+                          newDots[1][idx] = false;
+                          persistSubspeciesCardDots(newDots, 0, -xpCosts[idx]);
+                        }
+                      }}
+                      style={{
+                        width: '15px',
+                        height: '15px',
+                        border: '2px solid #000',
+                        borderRadius: '50%',
+                        display: 'block',
+                        background: arr[idx] ? '#000' : '#fff',
+                        cursor: 'pointer',
+                        transition: 'background 0.2s'
+                      }}
+                    ></span>
+                  </span>
+                );
+              })}
+
+              {/* Row 5: XP header for Electric Resistance */}
+              <span></span>
+              <span></span>
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>3xp</span>
+              <span></span>
+              <span></span>
+              {/* Row 6: Electric Resistance dot */}
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}><b><u style={{ color: '#d5d52a', display: 'inline-flex', alignItems: 'center' }}>Electric<img src="/Electric.png" alt="Electric" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> <i>Resistance</i></span>
+              
+              {[0].map(idx => {
+                const arr = safeGetSubspeciesDotsArray(2);
+                const electricImmunityArr = safeGetSubspeciesDotsArray(3);
+                const xpCosts = [3];
+                const canUncheck = !electricImmunityArr[0];
+                return (
+                  <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
+                    <span
+                      onClick={() => {
+                        const newDots = safeCloneSubspeciesCardDots();
+                        if (!arr[idx]) {
+                          if (xpSpent + xpCosts[idx] > xpTotal) {
+                            setNotice("Not enough xp!");
+                            return;
+                          }
+                          newDots[2][idx] = true;
+                          persistSubspeciesCardDots(newDots, 0, xpCosts[idx]);
+                        } else if (arr[idx] && canUncheck) {
+                          newDots[2][idx] = false;
+                          persistSubspeciesCardDots(newDots, 0, -xpCosts[idx]);
+                        }
+                      }}
+                      style={{
+                        width: '15px',
+                        height: '15px',
+                        border: '2px solid #000',
+                        borderRadius: '50%',
+                        display: 'block',
+                        background: arr[idx] ? '#000' : '#fff',
+                        cursor: (!arr[idx] || canUncheck) ? 'pointer' : 'not-allowed',
+                        transition: 'background 0.2s'
+                      }}
+                    ></span>
+                  </span>
+                );
+              })}
+
+              {/* Row 7: XP header for Electric Immunity */}
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>5xp</span>
+              <span></span>
+              {/* Row 8: Electric Immunity dot */}
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}><b><u style={{ color: '#d5d52a', display: 'inline-flex', alignItems: 'center' }}>Electric<img src="/Electric.png" alt="Electric" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> <i>Immunity</i></span>
+              <span style={{ textAlign: 'center', fontSize: '1.2em', fontWeight: 'bold', color: '#000' }}>⤷</span>
+              {[0].map(idx => {
+                const arr = safeGetSubspeciesDotsArray(3);
+                const electricResistanceArr = safeGetSubspeciesDotsArray(2);
+                const xpCosts = [5];
+                const canSelect = electricResistanceArr[0];
+                return (
+                  <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
+                    <span
+                      onClick={() => {
+                        const newDots = safeCloneSubspeciesCardDots();
+                        if (!arr[idx] && canSelect) {
+                          if (xpSpent + xpCosts[idx] > xpTotal) {
+                            setNotice("Not enough xp!");
+                            return;
+                          }
+                          newDots[3][idx] = true;
+                          persistSubspeciesCardDots(newDots, 0, xpCosts[idx]);
+                        } else if (arr[idx]) {
+                          newDots[3][idx] = false;
+                          persistSubspeciesCardDots(newDots, 0, -xpCosts[idx]);
+                        }
+                      }}
+                      style={{
+                        width: '15px',
+                        height: '15px',
+                        border: '2px solid #000',
+                        borderRadius: '50%',
+                        display: 'block',
+                        background: arr[idx] ? '#000' : '#fff',
+                        cursor: (canSelect || arr[idx]) ? 'pointer' : 'not-allowed',
+                        transition: 'background 0.2s'
+                      }}
+                    ></span>
+                  </span>
+                );
+              })}
+
+              {/* Row 9: XP header for Fire Resistance */}
+              <span></span>
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>3xp</span>
+              <span></span>
+              <span></span>
+              {/* Row 10: Fire Resistance dot */}
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}><b><u style={{ color: '#f90102', display: 'inline-flex', alignItems: 'center' }}>Fire<img src="/Fire.png" alt="Fire" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> <i>Resistance</i></span>
+              {[0].map(idx => {
+                const arr = safeGetSubspeciesDotsArray(4);
+                const fireImmunityArr = safeGetSubspeciesDotsArray(5);
+                const xpCosts = [3];
+                const canUncheck = !fireImmunityArr[0];
+                return (
+                  <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
+                    <span
+                      onClick={() => {
+                        const newDots = safeCloneSubspeciesCardDots();
+                        if (!arr[idx]) {
+                          if (xpSpent + xpCosts[idx] > xpTotal) {
+                            setNotice("Not enough xp!");
+                            return;
+                          }
+                          newDots[4][idx] = true;
+                          persistSubspeciesCardDots(newDots, 0, xpCosts[idx]);
+                        } else if (arr[idx] && canUncheck) {
+                          newDots[4][idx] = false;
+                          persistSubspeciesCardDots(newDots, 0, -xpCosts[idx]);
+                        }
+                      }}
+                      style={{
+                        width: '15px',
+                        height: '15px',
+                        border: '2px solid #000',
+                        borderRadius: '50%',
+                        display: 'block',
+                        background: arr[idx] ? '#000' : '#fff',
+                        cursor: (!arr[idx] || canUncheck) ? 'pointer' : 'not-allowed',
+                        transition: 'background 0.2s'
+                      }}
+                    ></span>
+                  </span>
+                );
+              })}
+
+              {/* Row 11: XP header for Fire Immunity */}
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>5xp</span>
+              <span></span>
+              {/* Row 12: Fire Immunity dot */}
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}><b><u style={{ color: '#f90102', display: 'inline-flex', alignItems: 'center' }}>Fire<img src="/Fire.png" alt="Fire" style={{ width: 14, height: 14, marginLeft: 2, verticalAlign: 'middle' }} /></u></b> <i>Immunity</i></span>
+              <span style={{ textAlign: 'center', fontSize: '1.2em', fontWeight: 'bold', color: '#000' }}>⤷</span>
+              {[0].map(idx => {
+                const arr = safeGetSubspeciesDotsArray(5);
+                const fireResistanceArr = safeGetSubspeciesDotsArray(4);
+                const xpCosts = [5];
+                const canSelect = fireResistanceArr[0];
+                return (
+                  <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
+                    <span
+                      onClick={() => {
+                        const newDots = safeCloneSubspeciesCardDots();
+                        if (!arr[idx] && canSelect) {
+                          if (xpSpent + xpCosts[idx] > xpTotal) {
+                            setNotice("Not enough xp!");
+                            return;
+                          }
+                          newDots[5][idx] = true;
+                          persistSubspeciesCardDots(newDots, 0, xpCosts[idx]);
+                        } else if (arr[idx]) {
+                          newDots[5][idx] = false;
+                          persistSubspeciesCardDots(newDots, 0, -xpCosts[idx]);
+                        }
+                      }}
+                      style={{
+                        width: '15px',
+                        height: '15px',
+                        border: '2px solid #000',
+                        borderRadius: '50%',
+                        display: 'block',
+                        background: arr[idx] ? '#000' : '#fff',
+                        cursor: (canSelect || arr[idx]) ? 'pointer' : 'not-allowed',
+                        transition: 'background 0.2s'
+                      }}
+                    ></span>
+                  </span>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Technique Section */}
+          <div style={{ color: '#bf9000', fontWeight: 'bold', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '12px', marginTop: '20px' }}>
+            <div style={{ fontWeight: 'bold', color: '#bf9000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Technique</u></div>
+            <span style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
+              {generateProtectiveInstinctsJSX(
+                4 - safeGetSubspeciesDotsArray(8).slice(0, 2).filter(Boolean).length,
+                0,
+                safeGetSubspeciesDotsArray(7)?.[0] ? 1 : 0
+              )}
+            </span>
+          </div>
+
+          {/* Technique Upgrades Table */}
+          <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px', marginBottom: '16px' }}>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 24px 24px 24px',
+              gridTemplateRows: 'repeat(6, auto)',
+              columnGap: '6px',
+              rowGap: '2px',
+              alignItems: 'start',
+              width: '100%',
+              paddingLeft: '4px'
+            }}>
+              {/* Row 1: XP header for +1hx range */}
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>5xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>7xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>10xp</span>
+              {/* Row 2: +1hx range dots */}
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+1hx</span>
+              {[0, 1, 2].map(idx => {
+                const arr = safeGetSubspeciesDotsArray(6);
+                const xpCosts = [5, 7, 10];
+                const canSelect = idx === 0 || arr[idx - 1];
+                const canUncheck = !arr.slice(idx + 1).some(Boolean);
+                return (
+                  <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
+                    <span
+                      onClick={() => {
+                        const newDots = safeCloneSubspeciesCardDots();
+                        if (!arr[idx] && canSelect) {
+                          if (xpSpent + xpCosts[idx] > xpTotal) {
+                            setNotice("Not enough xp!");
+                            return;
+                          }
+                          newDots[6][idx] = true;
+                          persistSubspeciesCardDots(newDots, 0, xpCosts[idx]);
+                        } else if (arr[idx] && canUncheck) {
+                          newDots[6][idx] = false;
+                          persistSubspeciesCardDots(newDots, 0, -xpCosts[idx]);
+                        }
+                      }}
+                      style={{
+                        width: '15px',
+                        height: '15px',
+                        border: '2px solid #000',
+                        borderRadius: '50%',
+                        display: 'block',
+                        background: arr[idx] ? '#000' : '#fff',
+                        cursor: ((canSelect && !arr[idx]) || (canUncheck && arr[idx])) ? 'pointer' : 'not-allowed',
+                        transition: 'background 0.2s'
+                      }}
+                    ></span>
+                  </span>
+                );
+              })}
+
+              {/* Row 3: XP header for +1hx range continued */}
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>16xp</span>
+              <span></span>
+              <span></span>
+              {/* Row 4: +1hx range continued dot */}
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>You <b><i style={{ color: '#1a56db' }}>Resist</i></b> <b><i style={{ color: '#990000' }}>Damage</i></b> taken</span>
+              {[0].map(idx => {
+                const arr = safeGetSubspeciesDotsArray(7);
+                const xpCosts = [16];
+                return (
+                  <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
+                    <span
+                      onClick={() => {
+                        const newDots = safeCloneSubspeciesCardDots();
+                        if (!arr[idx]) {
+                          if (xpSpent + xpCosts[idx] > xpTotal) {
+                            setNotice("Not enough xp!");
+                            return;
+                          }
+                          newDots[7][idx] = true;
+                          persistSubspeciesCardDots(newDots, 0, xpCosts[idx]);
+                        } else {
+                          newDots[7][idx] = false;
+                          persistSubspeciesCardDots(newDots, 0, -xpCosts[idx]);
+                        }
+                      }}
+                      style={{
+                        width: '15px',
+                        height: '15px',
+                        border: '2px solid #000',
+                        borderRadius: '50%',
+                        display: 'block',
+                        background: arr[idx] ? '#000' : '#fff',
+                        cursor: 'pointer',
+                        transition: 'background 0.2s'
+                      }}
+                    ></span>
+                  </span>
+                );
+              })}
+
+              {/* Row 5: XP header for -1 Cooldown */}
+              <span></span>
+              <span></span>
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>7xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>7xp</span>
+              <span></span>
+              {/* Row 6: -1 Cooldown dots */}
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>-1 <i>Cooldown</i></span>
+              {[0, 1].map(idx => {
+                const arr = safeGetSubspeciesDotsArray(8);
+                const xpCosts = [7, 7];
+                const canSelect = idx === 0 || arr[idx - 1];
+                const canUncheck = !arr.slice(idx + 1).some(Boolean);
+                return (
+                  <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
+                    <span
+                      onClick={() => {
+                        const newDots = safeCloneSubspeciesCardDots();
+                        if (!arr[idx] && canSelect) {
+                          if (xpSpent + xpCosts[idx] > xpTotal) {
+                            setNotice("Not enough xp!");
+                            return;
+                          }
+                          newDots[8][idx] = true;
+                          persistSubspeciesCardDots(newDots, 0, xpCosts[idx]);
+                        } else if (arr[idx] && canUncheck) {
+                          newDots[8][idx] = false;
+                          persistSubspeciesCardDots(newDots, 0, -xpCosts[idx]);
+                        }
+                      }}
+                      style={{
+                        width: '15px',
+                        height: '15px',
+                        border: '2px solid #000',
+                        borderRadius: '50%',
+                        display: 'block',
+                        background: arr[idx] ? '#000' : '#fff',
+                        cursor: ((canSelect && !arr[idx]) || (canUncheck && arr[idx])) ? 'pointer' : 'not-allowed',
+                        transition: 'background 0.2s'
+                      }}
+                    ></span>
+                  </span>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Hit Points Section */}
+          <div style={{ color: '#990000', fontWeight: 'bold', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', marginBottom: '12px', marginTop: '20px' }}>
+            <div style={{ fontWeight: 'bold', color: '#990000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Hit Points</u></div>
+            <span style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
+              <b><i>Starting</i></b> <b><i style={{ color: '#990000' }}>Hit Points.</i></b> 45 + <b>[{(() => {
+                const hp5Count = safeGetSubspeciesDotsArray(9).filter(Boolean).length;
+                const hp10Count = safeGetSubspeciesDotsArray(10).filter(Boolean).length;
+                const hp15Count = safeGetSubspeciesDotsArray(11).filter(Boolean).length;
+                return hp5Count * 5 + hp10Count * 10 + hp15Count * 15;
+              })()}]</b> <b><i style={{ color: '#990000' }}>Hit Points</i></b>.
+            </span>
+          </div>
+
+          {/* Hit Points Upgrades Table */}
+          <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '12px', marginBottom: '16px' }}>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 24px 24px 24px',
+              gridTemplateRows: 'repeat(9, auto)',
+              columnGap: '6px',
+              rowGap: '2px',
+              alignItems: 'start',
+              width: '100%',
+              paddingLeft: '4px'
+            }}>
+              {/* Row 1: XP header for +5 Hit Points */}
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>3xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>4xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>5xp</span>
+              {/* Row 2: +5 Hit Points dots */}
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+5 <b><i style={{ color: '#990000' }}>Hit Points</i></b></span>
+              {[0, 1, 2].map(idx => {
+                const arr = safeGetSubspeciesDotsArray(9);
+                const xpCosts = [3, 4, 5];
+                const canSelect = idx === 0 || arr[idx - 1];
+                const canUncheck = !arr.slice(idx + 1).some(Boolean);
+                return (
+                  <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
+                    <span
+                      onClick={() => {
+                        const newDots = safeCloneSubspeciesCardDots();
+                        if (!arr[idx] && canSelect) {
+                          if (xpSpent + xpCosts[idx] > xpTotal) {
+                            setNotice("Not enough xp!");
+                            return;
+                          }
+                          newDots[9][idx] = true;
+                          persistSubspeciesCardDots(newDots, 0, xpCosts[idx]);
+                        } else if (arr[idx] && canUncheck) {
+                          newDots[9][idx] = false;
+                          persistSubspeciesCardDots(newDots, 0, -xpCosts[idx]);
+                        }
+                      }}
+                      style={{
+                        width: '15px',
+                        height: '15px',
+                        border: '2px solid #000',
+                        borderRadius: '50%',
+                        display: 'block',
+                        background: arr[idx] ? '#000' : '#fff',
+                        cursor: ((canSelect && !arr[idx]) || (canUncheck && arr[idx])) ? 'pointer' : 'not-allowed',
+                        transition: 'background 0.2s'
+                      }}
+                    ></span>
+                  </span>
+                );
+              })}
+
+              {/* Row 3: XP header for +10 Hit Points */}
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>7xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>9xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>12xp</span>
+              {/* Row 4: +10 Hit Points dots */}
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+10 <b><i style={{ color: '#990000' }}>Hit Points</i></b></span>
+              {[0, 1, 2].map(idx => {
+                const arr = safeGetSubspeciesDotsArray(9);
+                const xpCosts = [7, 9, 12];
+                const canSelect = idx === 0 || arr[idx - 1];
+                const canUncheck = !arr.slice(idx + 1).some(Boolean);
+                return (
+                  <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
+                    <span
+                      onClick={() => {
+                        const newDots = safeCloneSubspeciesCardDots();
+                        if (!arr[idx] && canSelect) {
+                          if (xpSpent + xpCosts[idx] > xpTotal) {
+                            setNotice("Not enough xp!");
+                            return;
+                          }
+                          newDots[9][idx] = true;
+                          persistSubspeciesCardDots(newDots, 0, xpCosts[idx]);
+                        } else if (arr[idx] && canUncheck) {
+                          newDots[9][idx] = false;
+                          persistSubspeciesCardDots(newDots, 0, -xpCosts[idx]);
+                        }
+                      }}
+                      style={{
+                        width: '15px',
+                        height: '15px',
+                        border: '2px solid #000',
+                        borderRadius: '50%',
+                        display: 'block',
+                        background: arr[idx] ? '#000' : '#fff',
+                        cursor: ((canSelect && !arr[idx]) || (canUncheck && arr[idx])) ? 'pointer' : 'not-allowed',
+                        transition: 'background 0.2s'
+                      }}
+                    ></span>
+                  </span>
+                );
+              })}
+
+              {/* Row 5: XP header for +15 Hit Points */}
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>16xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>20xp</span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>25xp</span>
+              {/* Row 6: +15 Hit Points dots */}
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'right', paddingRight: '8px' }}>+15 <b><i style={{ color: '#990000' }}>Hit Points</i></b></span>
+              {[0, 1, 2].map(idx => {
+                const arr = safeGetSubspeciesDotsArray(10);
+                const xpCosts = [16, 20, 25];
+                const canSelect = idx === 0 || arr[idx - 1];
+                const canUncheck = !arr.slice(idx + 1).some(Boolean);
+                return (
+                  <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
+                    <span
+                      onClick={() => {
+                        const newDots = safeCloneSubspeciesCardDots();
+                        if (!arr[idx] && canSelect) {
+                          if (xpSpent + xpCosts[idx] > xpTotal) {
+                            setNotice("Not enough xp!");
+                            return;
+                          }
+                          newDots[10][idx] = true;
+                          persistSubspeciesCardDots(newDots, 0, xpCosts[idx]);
+                        } else if (arr[idx] && canUncheck) {
+                          newDots[10][idx] = false;
+                          persistSubspeciesCardDots(newDots, 0, -xpCosts[idx]);
+                        }
+                      }}
+                      style={{
+                        width: '15px',
+                        height: '15px',
+                        border: '2px solid #000',
+                        borderRadius: '50%',
+                        display: 'block',
+                        background: arr[idx] ? '#000' : '#fff',
+                        cursor: ((canSelect && !arr[idx]) || (canUncheck && arr[idx])) ? 'pointer' : 'not-allowed',
+                        transition: 'background 0.2s'
+                      }}
+                    ></span>
+                  </span>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Perks Section */}
+          <div style={{ fontSize: '1em', color: '#434343', fontFamily: 'Arial, Helvetica, sans-serif', fontWeight: 'bold', marginBottom: '12px', marginTop: '20px' }}>
+            <div style={{ fontWeight: 'bold', color: '#434343', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Perks</u></div>
+            <span style={{ color: '#000', fontWeight: 400, fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em' }}>
+              <b><i style={{ color: '#434343' }}>Skills.</i></b> <i>Athletics</i> +2
+            </span>
+          </div>
+
+          {/* Perks Upgrades */}
+          <div style={{ fontSize: '0.95em', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '-12px', marginBottom: '16px' }}>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 24px',
+              gridTemplateRows: 'auto auto',
+              columnGap: '6px',
+              rowGap: '2px',
+              alignItems: 'start',
+              marginTop: '8px',
+              marginBottom: '2px',
+              width: '100%',
+              paddingLeft: '4px'
+            }}>
+              {/* Row 1: SP header for Bear Strength */}
+              <span></span>
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#222', textAlign: 'center', width: '100%' }}>9sp</span>
+              {/* Row 2: Bear Strength dot */}
+              <span style={{ fontSize: '1em', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'left', paddingRight: '8px' }}><b><i style={{ color: '#4a5568' }}>Bear Strength.</i></b> You are incredibly strong and didn't have to work for it. Lucky you. Gain an advantage on related skill rolls.</span>
+              {[0].map(idx => {
+                const arr = safeGetSubspeciesDotsArray(12);
+                const spCosts = [9];
+                return (
+                  <span key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px' }}>
+                    <span
+                      onClick={() => {
+                        const newDots = safeCloneSubspeciesCardDots();
+                        if (!arr[idx]) {
+                          if (spSpent + spCosts[idx] > spTotal) {
+                            setNotice("Not enough sp!");
+                            return;
+                          }
+                          newDots[12][idx] = true;
+                          persistSubspeciesCardDots(newDots, spCosts[idx], 0);
+                        } else {
+                          newDots[12][idx] = false;
                           persistSubspeciesCardDots(newDots, -spCosts[idx], 0);
                         }
                       }}
