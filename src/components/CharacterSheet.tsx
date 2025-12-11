@@ -116,6 +116,7 @@ import { generateIroncladJSX } from "../utils/tankerFeature";
 
 import CharacterSheetInventory from "./CharacterSheetInventory";
 import CharacterSheetPerks from "./CharacterSheetPerks";
+import CharacterSheetBackground from "./CharacterSheetBackground";
 
 type Props = {
   sheet: CharacterSheet | null;
@@ -2611,19 +2612,38 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                   if (subspecies === "Felid" && skillName === "Acrobatics") sources.push({ type: 'subspecies', color: "rgba(177,99,38,0.5)" });
                   if (subspecies === "Mustelid" && skillName === "Thievery") sources.push({ type: 'subspecies', color: "rgba(105,146,57,0.5)" });
                   if (subspecies === "Ursid" && skillName === "Athletics") sources.push({ type: 'subspecies', color: "rgba(144,38,177,0.5)" });
- 
+
+                  // Background boosters
+                  if (sheet?.background === "Adherent of the Pollen Collective" && skillName === "Medicine") sources.push({ type: 'background', color: "rgba(102,102,102,0.5)" });
+                  if (sheet?.background === "Adherent of the Pollen Collective" && skillName === "Survival") sources.push({ type: 'background', color: "rgba(102,102,102,0.5)" });
                   
                   return sources;
                 };
                 
-                // Helper function to get booster positions for a skill (handles overlaps)
+                // Helper function to get anti-booster skills (skills that lose an auto-filled dot)
+                const getAntiBoosterSkills = () => {
+                  const antiSkills = [];
+                  if (sheet?.background === "Adherent of the Pollen Collective") {
+                    antiSkills.push("Investigation", "Technology");
+                  }
+                  return antiSkills;
+                };
+
+                // Helper function to get booster positions for a skill (handles overlaps and anti-boosters)
                 const getBoosterPositions = (skillName: string) => {
                   const sources = getBoosterSources(skillName);
+                  const antiBoosterSkills = getAntiBoosterSkills();
+                  const hasAntiBooster = antiBoosterSkills.includes(skillName);
+                  
                   if (sources.length === 0) return [];
                   
-                  // Assign positions: first booster at position 2, second at position 3, third at position 4, etc.
+                  // If skill has anti-booster, shift all booster positions left by 1 (positions 1, 2, 3 instead of 2, 3, 4)
+                  // This effectively removes the 18+ auto-dot and shifts boosters into 18+ and 16+ columns
+                  const startPosition = hasAntiBooster ? 1 : 2;
+                  
+                  // Assign positions: first booster at startPosition, second at startPosition+1, third at startPosition+2, etc.
                   return sources.map((source, index) => ({
-                    position: 2 + index,
+                    position: startPosition + index,
                     color: source.color,
                     type: source.type
                   }));
@@ -2632,6 +2652,8 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                 return skillList.map(skill => {
                   const dots = sheet?.skillDots?.[skill] || [];
                   const boosterPositions = getBoosterPositions(skill);
+                  const antiBoosterSkills = getAntiBoosterSkills();
+                  const hasAntiBooster = antiBoosterSkills.includes(skill);
                   
                   // Check for Jack of All Trades (Human perk)
                   const jackOfAllTradesDots = sheet?.species === "Human" && sheet?.speciesCardDots && sheet.speciesCardDots[4] && sheet.speciesCardDots[4][0];
@@ -2640,8 +2662,8 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                   let displayDots = [];
                   
                   if (isNewCharacter) {
-                    // New characters default to first two dots, plus any booster dots
-                    displayDots = [true, true];
+                    // New characters default to first two dots, unless skill has anti-booster (then only first dot)
+                    displayDots = hasAntiBooster ? [true, false] : [true, true];
                     
                     // Add Jack of All Trades dots at positions 2 and 3 if selected
                     if (jackOfAllTradesDots) {
@@ -2661,16 +2683,19 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                     const lastFilledIndex = displayDots.lastIndexOf(true);
                     value = lastFilledIndex >= 0 ? skillColumnValues[lastFilledIndex] + "+" : "18+";
                   } else {
-                    // For existing characters, ensure first two dots are always present
+                    // For existing characters, ensure first two dots are present unless skill has anti-booster
                     displayDots = [...dots];
                     
-                    // Ensure we have at least the first two starter dots
-                    while (displayDots.length < 2) {
+                    // Ensure we have at least the appropriate number of starter dots
+                    const starterDots = hasAntiBooster ? 1 : 2;
+                    while (displayDots.length < starterDots) {
                       displayDots.push(false);
                     }
-                    // Force first two dots to always be true (starter dots)
+                    // Force first dot to always be true (20+), and second dot only if no anti-booster
                     displayDots[0] = true;
-                    displayDots[1] = true;
+                    if (!hasAntiBooster) {
+                      displayDots[1] = true;
+                    }
                     
                     // Add Jack of All Trades dots at positions 2 and 3 if selected
                     if (jackOfAllTradesDots) {
@@ -4685,7 +4710,9 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
       {/* Background card: row 4, column 4 */}
       <div className={styles.backgroundCard}>
   <h3 style={{ marginTop: 0, textDecoration: 'underline', fontFamily: 'Arial, sans-serif' }}>Background</h3>
-        <div className={styles.cardContent}></div>
+        <div className={styles.cardContent}>
+          <CharacterSheetBackground sheet={sheet} />
+        </div>
       </div>
 
       <CharacterSheetPerks

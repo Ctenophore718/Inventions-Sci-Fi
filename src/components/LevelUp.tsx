@@ -30,6 +30,7 @@ import LevelUpSpeciesEntomos from "./LevelUpSpeciesEntomos";
 import LevelUpSpeciesHuman from "./LevelUpSpeciesHuman";
 import LevelUpSpeciesLumenaren from "./LevelUpSpeciesLumenaren";
 import LevelUpSpeciesPraedari from "./LevelUpSpeciesPraedari";
+import LevelUpBackground from "./LevelUpBackground";
 import { calculateChemistFeatureData } from "../utils/chemistFeature";
 
 
@@ -168,9 +169,23 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
     const isNewCharacter = !sheet || !sheet.hasFreeSkillStarterDots;
     
     if (isNewCharacter) {
+      // Determine which skills have anti-boosters (lose the 18+ auto-dot)
+      const antiBoosterSkills: string[] = [];
+      if (sheet?.background === "Adherent of the Pollen Collective") {
+        antiBoosterSkills.push("Investigation", "Technology");
+      }
 
-      // Create skill dots with first two columns filled
-      const newSkillDots = Object.fromEntries(skillList.map(skill => [skill, [true, true, false, false, false, false, false, false, false, false]]));
+      // Create skill dots with first two columns filled, except for anti-booster skills which only get first column
+      const newSkillDots = Object.fromEntries(
+        skillList.map(skill => {
+          const hasAntiBooster = antiBoosterSkills.includes(skill);
+          // Anti-booster skills: [true, false, ...], normal skills: [true, true, ...]
+          return [skill, hasAntiBooster 
+            ? [true, false, false, false, false, false, false, false, false, false]
+            : [true, true, false, false, false, false, false, false, false, false]
+          ];
+        })
+      );
       
       const skillUpdates = {
         hasFreeSkillStarterDots: true,
@@ -185,6 +200,35 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
       handleAutoSave(skillUpdates);
     }
   }, [sheet?.id, sheet?.hasFreeSkillStarterDots]);
+  
+  // Update skill dots when background changes to handle anti-booster effects
+  useEffect(() => {
+    if (!sheet || !sheet.skillDots) return;
+    
+    // Determine which skills should have anti-boosters
+    const antiBoosterSkills: string[] = [];
+    if (sheet.background === "Adherent of the Pollen Collective") {
+      antiBoosterSkills.push("Investigation", "Technology");
+    }
+    
+    // Check if we need to update any skill dots
+    let needsUpdate = false;
+    const updatedSkillDots = { ...sheet.skillDots };
+    
+    antiBoosterSkills.forEach(skill => {
+      if (updatedSkillDots[skill] && updatedSkillDots[skill][1] === true) {
+        // This anti-booster skill still has the 18+ dot filled - remove it
+        updatedSkillDots[skill] = [...updatedSkillDots[skill]];
+        updatedSkillDots[skill][1] = false;
+        needsUpdate = true;
+      }
+    });
+    
+    if (needsUpdate) {
+      setSkillDots(updatedSkillDots);
+      handleAutoSave({ skillDots: updatedSkillDots });
+    }
+  }, [sheet?.background]);
   
   // Local state for HP functionality
   const [currentHitPoints, setCurrentHitPoints] = useState<number>(sheet?.currentHitPoints ?? sheet?.maxHitPoints ?? 0);
@@ -2820,9 +2864,9 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
 
 
         {/* Background Card */}
-        <div style={{ background: '#fff', border: '2px solid #333', borderRadius: 8, boxShadow: '0 2px 4px rgba(0,0,0,0.1)', minHeight: 80, padding: '1.2rem', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <div style={{ fontWeight: 'bold', color: 'black', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1.1em', marginBottom: 6 }}>Background</div>
-            <div className={styles.selectWrapper} style={{ width: '100%' }}>
+        <div style={{ background: '#fff', border: '2px solid #000', borderRadius: 8, boxShadow: '0 2px 4px rgba(0,0,0,0.1)', minHeight: 80, padding: '1.2rem', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <div style={{ fontWeight: 'bold', color: '#000', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1.1em', marginBottom: 6 }}>Background</div>
+            <div className={styles.selectWrapper} style={{ width: '100%', marginBottom: '1rem' }}>
             <select
               value={background}
               onChange={e => {
@@ -2864,6 +2908,19 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                 ))}
               </select>
             </div>
+            
+            {/* Background Details */}
+            <LevelUpBackground
+              sheet={sheet}
+              onAutoSave={handleAutoSave}
+              xpTotal={xpTotal}
+              spTotal={spTotal}
+              xpSpent={xpSpent}
+              spSpent={spSpent}
+              setXpSpent={setXpSpent}
+              setSpSpent={setSpSpent}
+              setNotice={setNotice}
+            />
         </div>
 
 
@@ -3023,17 +3080,37 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                         if (subspecies === "Mustelid" && skillName === "Thievery") sources.push({ type: 'subspecies', color: "rgba(105,146,57,0.5)" });
                         if (subspecies === "Ursid" && skillName === "Athletics") sources.push({ type: 'subspecies', color: "rgba(144,38,177,0.5)" });
 
+                        // Background boosters
+                        if (sheet?.background === "Adherent of the Pollen Collective" && skillName === "Medicine") sources.push({ type: 'background', color: "rgba(102,102,102,0.5)" });
+                        if (sheet?.background === "Adherent of the Pollen Collective" && skillName === "Survival") sources.push({ type: 'background', color: "rgba(102,102,102,0.5)" });
+
                         return sources;
                       };
                       
-                      // Helper function to get booster positions for a skill (handles overlaps)
+                      // Helper function to get anti-booster skills (skills that lose an auto-filled dot)
+                      const getAntiBoosterSkills = () => {
+                        const antiSkills = [];
+                        if (sheet?.background === "Adherent of the Pollen Collective") {
+                          antiSkills.push("Investigation", "Technology");
+                        }
+                        return antiSkills;
+                      };
+
+                      // Helper function to get booster positions for a skill (handles overlaps and anti-boosters)
                       const getBoosterPositions = (skillName: string) => {
                         const sources = getBoosterSources(skillName);
+                        const antiBoosterSkills = getAntiBoosterSkills();
+                        const hasAntiBooster = antiBoosterSkills.includes(skillName);
+                        
                         if (sources.length === 0) return [];
                         
-                        // Assign positions: first booster at position 2, second at position 3, third at position 4, etc.
+                        // If skill has anti-booster, shift all booster positions left by 1 (positions 1, 2, 3 instead of 2, 3, 4)
+                        // This effectively removes the 18+ auto-dot and shifts boosters into 18+ and 16+ columns
+                        const startPosition = hasAntiBooster ? 1 : 2;
+                        
+                        // Assign positions: first booster at startPosition, second at startPosition+1, third at startPosition+2, etc.
                         return sources.map((source, index) => ({
-                          position: 2 + index,
+                          position: startPosition + index,
                           color: source.color,
                           type: source.type
                         }));
@@ -3055,11 +3132,14 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                           }}>{skill}</td>
                         {(skillDots[skill] || Array(10).fill(false)).map((checked, i) => {
                           const skillDotsForSkill = skillDots[skill] || Array(10).fill(false);
+                          const antiBoosterSkills = getAntiBoosterSkills();
+                          const hasAntiBooster = antiBoosterSkills.includes(skill);
                           
                           // CRITICAL FIX: Force first two columns to always be checked
                           // These are the free starter dots that all characters get automatically
                           // This ensures they display immediately, even before useEffect completes
-                          const isFirstTwoColumns = i === 0 || i === 1;
+                          // EXCEPTION: If skill has anti-booster, only fill column 0 (20+), not column 1 (18+)
+                          const isFirstTwoColumns = i === 0 || (i === 1 && !hasAntiBooster);
                           if (isFirstTwoColumns) {
                             checked = true;
                           }
@@ -3480,9 +3560,18 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                                   
                                   // Helper function to check if a position is a free dot (starter or booster)
                                   const isFreeDot = (skillName: string, position: number) => {
-                                    // Positions 0 and 1 are always free starter dots for all skills
-                                    if (position === 0 || position === 1) {
+                                    // Check for anti-booster skills
+                                    const antiBoosterSkills = getAntiBoosterSkills();
+                                    const hasAntiBooster = antiBoosterSkills.includes(skillName);
+                                    
+                                    // Position 0 (20+) is always free for all skills
+                                    if (position === 0) {
                                       return true;
+                                    }
+                                    
+                                    // Position 1 (18+) is free for normal skills, but NOT for anti-booster skills
+                                    if (position === 1) {
+                                      return !hasAntiBooster;
                                     }
                                     
                                     // Positions 2 and 3 are free if Jack of All Trades is selected (Human perk)

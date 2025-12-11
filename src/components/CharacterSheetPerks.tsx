@@ -98,6 +98,16 @@ const CharacterSheetPerks: React.FC<CharacterSheetPerksProps> = ({
                 </span>
               ))
             )}
+            {sheet?.background === 'Adherent of the Pollen Collective' && (
+              <span style={{ fontWeight: 'normal', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', color: '#000' }}>
+                Chloroptid
+              </span>
+            )}
+            {sheet?.pollenCollectiveLanguage && (
+              <span style={{ fontWeight: 'normal', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', color: '#000' }}>
+                {sheet.pollenCollectiveLanguage}
+              </span>
+            )}
           </div>
           {/* Class Perk segment, visible if Class Perk dot is selected */}
           {charClass === 'Chemist' && sheet?.classCardDots?.[9]?.[0] && (

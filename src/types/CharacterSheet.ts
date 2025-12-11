@@ -14,6 +14,7 @@ export type CharacterSheet = {
   cerebronychLanguage?: string; // For Cerebronych species - selected bonus language from subspecies card
   cognizantLanguage?: string; // For Cognizant species - selected bonus language from species card
   lumenarenLanguage?: string; // For Lumenaren species - selected bonus language
+  pollenCollectiveLanguage?: string; // For Adherent of the Pollen Collective background - selected bonus language
   background: string;
 
 
@@ -399,5 +400,10 @@ export type CharacterSheet = {
     nanoboticistMovementFlightDot?: boolean[];
     nanoboticistPerksSkillsDots?: boolean[];
     // Add other subclasses as needed
+  };
+
+  // Background progression dots (specific to each background)
+  backgroundProgressionDots?: {
+    pollenCollectiveGreenThumbDots?: boolean[];
   };
 };
