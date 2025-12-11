@@ -113,6 +113,16 @@ const CharacterSheetPerks: React.FC<CharacterSheetPerksProps> = ({
                 Defteran
               </span>
             )}
+            {sheet?.background === 'Awakened Machine' && (
+              <span style={{ fontWeight: 'normal', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', color: '#000' }}>
+                Defteran
+              </span>
+            )}
+            {sheet?.awakenedMachineLanguage && (
+              <span style={{ fontWeight: 'normal', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', color: '#000' }}>
+                {sheet.awakenedMachineLanguage}
+              </span>
+            )}
           </div>
           {/* Class Perk segment, visible if Class Perk dot is selected */}
           {charClass === 'Chemist' && sheet?.classCardDots?.[9]?.[0] && (
@@ -700,6 +710,13 @@ const CharacterSheetPerks: React.FC<CharacterSheetPerksProps> = ({
           <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
             <span>
               <b><i style={{ color: '#000' }}>Atrocities of the Empire.</i></b> <span style={{ color: '#000' }}>You've garnered a unique camaraderie of all enemies of Defteros and are fast friends with all opposed to the Woman King Aelys. Gain an advantage on related skill rolls.</span>
+            </span>
+          </div>
+          )}
+          {sheet?.background === 'Awakened Machine' && sheet?.backgroundProgressionDots?.awakenedMachineFilthyCogDots?.[0] && (
+          <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <span>
+              <b><i style={{ color: '#000' }}>No Longer a Filthy Cog.</i></b> <span style={{ color: '#000' }}>You are deeply cognizant of the slavery and servitude other bots often find themselves in. Gain an advantage on skill rolls while relating with Cognizants, droids or other machines who are or once were slaves to biological masters.</span>
             </span>
           </div>
           )}

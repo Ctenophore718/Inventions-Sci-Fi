@@ -375,6 +375,15 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [charClass]);
+
+  // Clear Awakened Machine background if species changes away from Cognizant
+  React.useEffect(() => {
+    if (!sheet) return;
+    if (sheet.background === "Awakened Machine" && sheet.species !== "Cognizant") {
+      handleAutoSave({ background: "" });
+    }
+  }, [sheet?.species, sheet?.background]);
+
   // Removed unused XP/SP fields
 
   // Combat fields
@@ -1243,10 +1252,10 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
     return colorMap[hostValue] || <span style={{ fontWeight: 'bold', color: '#000' }}>Select Host</span>;
   };
 
-  const backgroundOptions = [
+  const allBackgroundOptions = [
     { label: "Adherent of the Pollen Collective", value: "Adherent of the Pollen Collective", color: "#666666" },
     { label: "Anti-Deft Secessionist", value: "Anti-Deft Secessionist", color: "#666666" },
-    { label: "Awakened Machine", value: "Awakened Machine", color: "#666666" },
+    { label: "Awakened Machine", value: "Awakened Machine", color: "#666666", prerequisite: "Cognizant" },
     { label: "Belt Miner", value: "Belt Miner", color: "#666666" },
     { label: "Black Market Executive", value: "Black Market Executive", color: "#666666" },
     { label: "Combat Medic", value: "Combat Medic", color: "#666666" },
@@ -1271,6 +1280,9 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
     { label: "Traveling Performer", value: "Traveling Performer", color: "#666666" },
     { label: "Wandering Yogi", value: "Wandering Yogi", color: "#666666" },
   ];
+
+  // No filtering - show all backgrounds
+  const backgroundOptions = allBackgroundOptions;
 
   // Add this after the other feature JSX constants
   const anatomistFeatureJSX = generateAnatomicalPrecisionJSX(
@@ -2529,6 +2541,10 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                   if (charClass === "Commander" && skillName === "Diplomacy") sources.push({ type: 'class', color: "rgba(113,114,17,0.5)" });
                   if (charClass === "Contemplative" && skillName === "Awareness") sources.push({ type: 'class', color: "rgba(17,99,114,0.5)" });
                   if (charClass === "Devout" && skillName === "Xenomagic") sources.push({ type: 'class', color: "rgba(107,17,114,0.5)" });
+                  
+                  // Background boosters
+                  if (sheet?.background === "Awakened Machine" && skillName === "Awareness") sources.push({ type: 'background', color: "rgba(102,102,102,0.5)" });
+                  if (sheet?.background === "Awakened Machine" && skillName === "Investigation") sources.push({ type: 'background', color: "rgba(102,102,102,0.5)" });
                   if (charClass === "Elementalist" && skillName === "Xenomagic") sources.push({ type: 'class', color: "rgba(35,17,114,0.5)" });
                   if (charClass === "Exospecialist" && skillName === "Athletics") sources.push({ type: 'class', color: "rgba(17,114,51,0.5)" });
                   if (charClass === "Gunslinger" && skillName === "Deception") sources.push({ type: 'class', color: "rgba(78,114,17,0.5)" });
@@ -2631,6 +2647,9 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                   if (sheet?.background === "Anti-Deft Secessionist") {
                     antiSkills.push("Diplomacy", "Intimidation");
                   }
+                  if (sheet?.background === "Awakened Machine") {
+                    antiSkills.push("Culture", "Performance");
+                  }
                   return antiSkills;
                 };
 
@@ -2664,7 +2683,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                   const jackOfAllTradesDots = sheet?.species === "Human" && sheet?.speciesCardDots && sheet.speciesCardDots[4] && sheet.speciesCardDots[4][0];
                   
                   let value;
-                  let displayDots = [];
+                  let displayDots: boolean[] = [];
                   
                   if (isNewCharacter) {
                     // New characters default to first two dots, unless skill has anti-booster (then only first dot)
@@ -2677,14 +2696,16 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                     }
                     
                     // Add booster dots at their appropriate positions
-                    // Only auto-fill boosters at position 2 or higher (position 1 boosters from anti-booster skills should not be auto-filled)
+                    // Positions 2+ are auto-filled, position 1 boosters are NOT auto-filled but extend the array
                     boosterPositions.forEach(bp => {
                       while (displayDots.length <= bp.position) {
                         displayDots.push(false);
                       }
                       if (bp.position >= 2) {
+                        // Positions 2+ are always auto-filled for new characters
                         displayDots[bp.position] = true;
                       }
+                      // Position 1 boosters are not auto-filled, but the array is extended to include them
                     });
                     
                     // Calculate value based on rightmost filled dot
@@ -2715,14 +2736,16 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                     }
                     
                     // Ensure all booster dots are shown at their proper positions
-                    // Only auto-fill boosters at position 2 or higher (position 1 boosters from anti-booster skills should not be auto-filled)
+                    // Positions 2+ are auto-filled, position 1 boosters are NOT auto-filled but extend the array
                     boosterPositions.forEach(bp => {
                       while (displayDots.length <= bp.position) {
                         displayDots.push(false);
                       }
                       if (bp.position >= 2) {
+                        // Positions 2+ are always shown
                         displayDots[bp.position] = true;
                       }
+                      // Position 1 boosters are not auto-filled, but the array is extended to include them
                     });
                     
                     let idx = displayDots.lastIndexOf(true);
@@ -2731,12 +2754,14 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                   
                   // Render visual dots
                   const dotElements = displayDots.map((isFilled, dotIndex) => {
-                    if (!isFilled) return null;
-                    
                     // Check if this is a booster dot
                     const boosterAtPosition = boosterPositions.find(bp => bp.position === dotIndex);
                     // Check if this is a Jack of All Trades dot
                     const isJackOfAllTradesDot = jackOfAllTradesDots && (dotIndex === 2 || dotIndex === 3);
+                    
+                    // Render the dot if it's filled OR if it's a booster position
+                    if (!isFilled && !boosterAtPosition) return null;
+                    
                     const dotColor = boosterAtPosition ? boosterAtPosition.color : (isJackOfAllTradesDot ? 'rgba(43,49,95,0.25)' : '#666');
                     
                     return (
@@ -2790,12 +2815,18 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
             <label>
               <span style={{ fontFamily: 'Arial, sans-serif' }}>Background</span>
               <div className={styles.selectWrapper}>
-                <select 
-                  value={background} 
+                <select
+                  value={background}
                   onChange={e => {
-                    setBackground(e.target.value);
-                    handleAutoSave({ background: e.target.value });
-                  }} 
+                    const newBackground = e.target.value;
+                    // Check prerequisite for Awakened Machine
+                    if (newBackground === "Awakened Machine" && species !== "Cognizant") {
+                      if (setNotice) setNotice("Prerequisite: Species must be Cognizant");
+                      return;
+                    }
+                    setBackground(newBackground);
+                    handleAutoSave({ background: newBackground });
+                  }}
                   className={styles.colorSelect}
                   style={{ 
                     fontWeight: 'bold',

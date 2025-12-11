@@ -177,6 +177,9 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
       if (sheet?.background === "Anti-Deft Secessionist") {
         antiBoosterSkills.push("Diplomacy", "Intimidation");
       }
+      if (sheet?.background === "Awakened Machine") {
+        antiBoosterSkills.push("Culture", "Performance");
+      }
 
       // Create skill dots with first two columns filled, except for anti-booster skills which only get first column
       const newSkillDots = Object.fromEntries(
@@ -215,6 +218,9 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
     }
     if (sheet.background === "Anti-Deft Secessionist") {
       antiBoosterSkills.push("Diplomacy", "Intimidation");
+    }
+    if (sheet.background === "Awakened Machine") {
+      antiBoosterSkills.push("Culture", "Performance");
     }
     
     // Check if we need to update any skill dots
@@ -567,10 +573,10 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   
   // Background options
-  const backgroundOptions = [
+  const allBackgroundOptions = [
     { label: "Adherent of the Pollen Collective", value: "Adherent of the Pollen Collective", color: "#666666" },
     { label: "Anti-Deft Secessionist", value: "Anti-Deft Secessionist", color: "#666666" },
-    { label: "Awakened Machine", value: "Awakened Machine", color: "#666666" },
+    { label: "Awakened Machine", value: "Awakened Machine", color: "#666666", prerequisite: "Cognizant" },
     { label: "Belt Miner", value: "Belt Miner", color: "#666666" },
     { label: "Black Market Executive", value: "Black Market Executive", color: "#666666" },
     { label: "Combat Medic", value: "Combat Medic", color: "#666666" },
@@ -595,6 +601,9 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
     { label: "Traveling Performer", value: "Traveling Performer", color: "#666666" },
     { label: "Wandering Yogi", value: "Wandering Yogi", color: "#666666" },
   ];
+  
+  // No filtering - show all backgrounds
+  const backgroundOptions = allBackgroundOptions;
   
   const menuRef = React.useRef<HTMLDivElement>(null);
   const waffleRef = React.useRef<HTMLButtonElement>(null);
@@ -2876,8 +2885,14 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
             <select
               value={background}
               onChange={e => {
-                handleBackgroundChange(e.target.value);
-                handleAutoSave({ background: e.target.value });
+                const newBackground = e.target.value;
+                // Check prerequisite for Awakened Machine
+                if (newBackground === "Awakened Machine" && species !== "Cognizant") {
+                  if (setNotice) setNotice("Prerequisite: Species must be Cognizant");
+                  return;
+                }
+                handleBackgroundChange(newBackground);
+                handleAutoSave({ background: newBackground });
               }}
               className={styles.colorSelect + ' ' + styles.selectedBackgroundColor}
               style={{
@@ -3091,6 +3106,8 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                         if (sheet?.background === "Adherent of the Pollen Collective" && skillName === "Survival") sources.push({ type: 'background', color: "rgba(102,102,102,0.5)" });
                         if (sheet?.background === "Anti-Deft Secessionist" && skillName === "Culture") sources.push({ type: 'background', color: "rgba(102,102,102,0.5)" });
                         if (sheet?.background === "Anti-Deft Secessionist" && skillName === "Survival") sources.push({ type: 'background', color: "rgba(102,102,102,0.5)" });
+                        if (sheet?.background === "Awakened Machine" && skillName === "Awareness") sources.push({ type: 'background', color: "rgba(102,102,102,0.5)" });
+                        if (sheet?.background === "Awakened Machine" && skillName === "Investigation") sources.push({ type: 'background', color: "rgba(102,102,102,0.5)" });
 
                         return sources;
                       };
@@ -3103,6 +3120,9 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                         }
                         if (sheet?.background === "Anti-Deft Secessionist") {
                           antiSkills.push("Diplomacy", "Intimidation");
+                        }
+                        if (sheet?.background === "Awakened Machine") {
+                          antiSkills.push("Culture", "Performance");
                         }
                         return antiSkills;
                       };

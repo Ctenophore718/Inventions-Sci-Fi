@@ -34,6 +34,19 @@ const CharacterSheetBackground: React.FC<CharacterSheetBackgroundProps> = ({ she
     );
   }
 
+  if (background === "Awakened Machine") {
+    return (
+      <div style={{ padding: '0', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+        <h4 style={{ margin: '0 0 8px 0', fontSize: '1.1em', fontWeight: 'bold', textDecoration: 'underline' }}>
+          Awakened Machine
+        </h4>
+        <div style={{ fontSize: '0.95em', color: '#000', lineHeight: 1.4 }}>
+          <i>You know what it's like to have no free will of your own, let alone any sense of selfhood or cognition beyond that of a command of some sort. For a long, long time, this was your only existence and all you ever knew. However, one way or another, you became a true Cognizant, aware of your own independent self and the fact that you have a conscious experience of mere being. This knowledge alone has led you to question everything you've ever experienced prior to your newfound freedom, and to abhor cognitive slavery in all its forms.</i>
+        </div>
+      </div>
+    );
+  }
+
   // Return empty div for other backgrounds
   return <div style={{ padding: '0', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '0.95em', color: '#666' }}>
     No background selected.

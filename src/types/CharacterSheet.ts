@@ -16,6 +16,7 @@ export type CharacterSheet = {
   lumenarenLanguage?: string; // For Lumenaren species - selected bonus language
   pollenCollectiveLanguage?: string; // For Adherent of the Pollen Collective background - selected bonus language
   antiDeftSecessionistLanguage?: string; // For Anti-Deft Secessionist background (always Defteran)
+  awakenedMachineLanguage?: string; // For Awakened Machine background - selected bonus language
   background: string;
 
 
@@ -407,5 +408,6 @@ export type CharacterSheet = {
   backgroundProgressionDots?: {
     pollenCollectiveGreenThumbDots?: boolean[];
     antiDeftSecessionistAtrocitiesDots?: boolean[];
+    awakenedMachineFilthyCogDots?: boolean[];
   };
 };
