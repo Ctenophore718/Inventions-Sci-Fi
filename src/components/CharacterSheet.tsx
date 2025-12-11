@@ -2616,6 +2616,8 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                   // Background boosters
                   if (sheet?.background === "Adherent of the Pollen Collective" && skillName === "Medicine") sources.push({ type: 'background', color: "rgba(102,102,102,0.5)" });
                   if (sheet?.background === "Adherent of the Pollen Collective" && skillName === "Survival") sources.push({ type: 'background', color: "rgba(102,102,102,0.5)" });
+                  if (sheet?.background === "Anti-Deft Secessionist" && skillName === "Culture") sources.push({ type: 'background', color: "rgba(102,102,102,0.5)" });
+                  if (sheet?.background === "Anti-Deft Secessionist" && skillName === "Survival") sources.push({ type: 'background', color: "rgba(102,102,102,0.5)" });
                   
                   return sources;
                 };
@@ -2625,6 +2627,9 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                   const antiSkills = [];
                   if (sheet?.background === "Adherent of the Pollen Collective") {
                     antiSkills.push("Investigation", "Technology");
+                  }
+                  if (sheet?.background === "Anti-Deft Secessionist") {
+                    antiSkills.push("Diplomacy", "Intimidation");
                   }
                   return antiSkills;
                 };
@@ -2672,11 +2677,14 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                     }
                     
                     // Add booster dots at their appropriate positions
+                    // Only auto-fill boosters at position 2 or higher (position 1 boosters from anti-booster skills should not be auto-filled)
                     boosterPositions.forEach(bp => {
                       while (displayDots.length <= bp.position) {
                         displayDots.push(false);
                       }
-                      displayDots[bp.position] = true;
+                      if (bp.position >= 2) {
+                        displayDots[bp.position] = true;
+                      }
                     });
                     
                     // Calculate value based on rightmost filled dot
@@ -2707,11 +2715,14 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                     }
                     
                     // Ensure all booster dots are shown at their proper positions
+                    // Only auto-fill boosters at position 2 or higher (position 1 boosters from anti-booster skills should not be auto-filled)
                     boosterPositions.forEach(bp => {
                       while (displayDots.length <= bp.position) {
                         displayDots.push(false);
                       }
-                      displayDots[bp.position] = true;
+                      if (bp.position >= 2) {
+                        displayDots[bp.position] = true;
+                      }
                     });
                     
                     let idx = displayDots.lastIndexOf(true);

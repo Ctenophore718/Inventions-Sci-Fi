@@ -15,7 +15,20 @@ const CharacterSheetBackground: React.FC<CharacterSheetBackgroundProps> = ({ she
           Adherent of the Pollen Collective
         </h4>
         <div style={{ fontSize: '0.95em', color: '#000', lineHeight: 1.4 }}>
-          The Pollen Collective is an interplanetary organization that focuses on the protection and flourishing of natural life in all forms across the galaxy. Adherents can be found in many walks of life, from wandering monks to druids protecting sacred groves to government officials tasked with making eco-conscious decisions amidst an environmentally hostile culture. Those who have spent much of their time practicing the tenants of the Pollen Collective have a deep connection to the roots of life.
+          <i>The Pollen Collective is an interplanetary organization that focuses on the protection and flourishing of natural life in all forms across the galaxy. Adherents can be found in many walks of life, from wandering monks to druids protecting sacred groves to government officials tasked with making eco-conscious decisions amidst an environmentally hostile culture. Those who have spent much of their time practicing the tenants of the Pollen Collective have a deep connection to the roots of life.</i>
+        </div>
+      </div>
+    );
+  }
+
+  if (background === "Anti-Deft Secessionist") {
+    return (
+      <div style={{ padding: '0', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+        <h4 style={{ margin: '0 0 8px 0', fontSize: '1.1em', fontWeight: 'bold', textDecoration: 'underline' }}>
+          Anti-Deft Secessionist
+        </h4>
+        <div style={{ fontSize: '0.95em', color: '#000', lineHeight: 1.4 }}>
+          <i>As part of an Anti-Deft militia, you've had an extremely hard time during the battles against the Defteran Empire. The Woman King Aelys' torture methods were applied to great effect against you and/or your comrades, and any survivors during this dark period have been inevitably changed for the rest of their lives, often for the worse. The physical and emotional demands of war have made you stoic and stalwart, but the horrors of war committed by both sides weighs heavy on your heart.</i>
         </div>
       </div>
     );

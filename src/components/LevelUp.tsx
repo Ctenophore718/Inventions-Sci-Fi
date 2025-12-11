@@ -174,6 +174,9 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
       if (sheet?.background === "Adherent of the Pollen Collective") {
         antiBoosterSkills.push("Investigation", "Technology");
       }
+      if (sheet?.background === "Anti-Deft Secessionist") {
+        antiBoosterSkills.push("Diplomacy", "Intimidation");
+      }
 
       // Create skill dots with first two columns filled, except for anti-booster skills which only get first column
       const newSkillDots = Object.fromEntries(
@@ -209,6 +212,9 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
     const antiBoosterSkills: string[] = [];
     if (sheet.background === "Adherent of the Pollen Collective") {
       antiBoosterSkills.push("Investigation", "Technology");
+    }
+    if (sheet.background === "Anti-Deft Secessionist") {
+      antiBoosterSkills.push("Diplomacy", "Intimidation");
     }
     
     // Check if we need to update any skill dots
@@ -3083,6 +3089,8 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                         // Background boosters
                         if (sheet?.background === "Adherent of the Pollen Collective" && skillName === "Medicine") sources.push({ type: 'background', color: "rgba(102,102,102,0.5)" });
                         if (sheet?.background === "Adherent of the Pollen Collective" && skillName === "Survival") sources.push({ type: 'background', color: "rgba(102,102,102,0.5)" });
+                        if (sheet?.background === "Anti-Deft Secessionist" && skillName === "Culture") sources.push({ type: 'background', color: "rgba(102,102,102,0.5)" });
+                        if (sheet?.background === "Anti-Deft Secessionist" && skillName === "Survival") sources.push({ type: 'background', color: "rgba(102,102,102,0.5)" });
 
                         return sources;
                       };
@@ -3092,6 +3100,9 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                         const antiSkills = [];
                         if (sheet?.background === "Adherent of the Pollen Collective") {
                           antiSkills.push("Investigation", "Technology");
+                        }
+                        if (sheet?.background === "Anti-Deft Secessionist") {
+                          antiSkills.push("Diplomacy", "Intimidation");
                         }
                         return antiSkills;
                       };
@@ -3146,7 +3157,9 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                           
                           // Check if this position has a booster dot (handles overlaps)
                           const boosterAtThisPosition = boosterPositions.find(bp => bp.position === i);
-                          if (boosterAtThisPosition) {
+                          // Only auto-fill booster dots at position 2 or higher
+                          // Position 1 boosters (from anti-booster skills) should NOT be auto-filled
+                          if (boosterAtThisPosition && i >= 2) {
                             checked = true;
                           }
                           
@@ -3337,8 +3350,10 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                           // Pyran Performance booster always goes at position 2, same as class boosters
                           const isPyranPerformance = subspecies === "Pyran" && skill === "Performance" && i === 2;
 
-                          if (isChemistInvestigation || isCoderOikomagic || isCommanderDiplomacy || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine || isGrenadierIntimidation || isNecroSurvival || isPoisonerThievery || isCoerciveDeception || isBeguilerDeception || isDivinistInvestigation || isNaturalistSurvival || isTechnologistTechnology || isGalvanicAthletics || isTacticianAwareness || isTyrantIntimidation || isInertialDiplomacy || isKineticAthletics || isMercurialAcrobatics || isVectorialPiloting || isAstralMedicine || isChaosIntimidation || isOrderCulture || isVoidStealth || isAirAcrobatics || isEarthSurvival || isFireIntimidation || isWaterMedicine || isAeronautPiloting || isBrawlerSurvival || isDreadnaughtIntimidation || isSpectreStealth || isAmmoCoderOikomagic || isOrdnancerAthletics || isUrsidAthletics || isPistoleerThievery || isSniperStealth || isHackerComputers || isJunkerThievery || isNanoboticistAcrobatics || isTankerPiloting || isAvenochAwareness || isChloroptidAwareness || isBarkskinSurvival || isPetranSurvival || isPyranPerformance) {
-                            checked = true; // Force third dot to be filled for class booster dots
+                          // Legacy auto-fill logic for boosters at position 2
+                          // DO NOT auto-fill if this skill has an anti-booster (booster shifted to position 1)
+                          if (!hasAntiBooster && (isChemistInvestigation || isCoderOikomagic || isCommanderDiplomacy || isContemplativeAwareness || isDevoutXenomagic || isElementalistXenomagic || isExospecialistAthletics || isGunslingerDeception || isTechnicianTechnology || isAnatomistMedicine || isGrenadierIntimidation || isNecroSurvival || isPoisonerThievery || isCoerciveDeception || isBeguilerDeception || isDivinistInvestigation || isNaturalistSurvival || isTechnologistTechnology || isGalvanicAthletics || isTacticianAwareness || isTyrantIntimidation || isInertialDiplomacy || isKineticAthletics || isMercurialAcrobatics || isVectorialPiloting || isAstralMedicine || isChaosIntimidation || isOrderCulture || isVoidStealth || isAirAcrobatics || isEarthSurvival || isFireIntimidation || isWaterMedicine || isAeronautPiloting || isBrawlerSurvival || isDreadnaughtIntimidation || isSpectreStealth || isAmmoCoderOikomagic || isOrdnancerAthletics || isUrsidAthletics || isPistoleerThievery || isSniperStealth || isHackerComputers || isJunkerThievery || isNanoboticistAcrobatics || isTankerPiloting || isAvenochAwareness || isChloroptidAwareness || isBarkskinSurvival || isPetranSurvival || isPyranPerformance || isHumanCulture)) {
+                            checked = true; // Force third dot to be filled for class booster dots (unless skill has anti-booster)
                           }
 
                           // Define class-specific colors for automatic skill dots
@@ -3411,123 +3426,153 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                           // Calculate the SP cost if this dot were clicked (for cursor and tooltip)
                           let spCostForThisDot = 0;
                           if (canCheck) {
+                            // Check if this is an anti-booster skill
+                            const antiBoosterSkills = getAntiBoosterSkills();
+                            const isAntiBoosterSkill = antiBoosterSkills.includes(skill);
+                            
+                            // Check if position 1 has a booster (for anti-booster skills, booster shifts to position 1)
+                            const hasBoosterAtPosition1 = isAntiBoosterSkill && boosterPositions.some(bp => bp.position === 1);
+                            
                             for (let j = 0; j <= i; j++) {
-                              if (!skillDotsForSkill[j] && !((j === 0 || j === 1) || 
-                                  (j === 2 && (
-                                    (charClass === "Chemist" && skill === "Investigation") ||
-                                    (charClass === "Coder" && skill === "Oikomagic") ||
-                                    (charClass === "Exospecialist" && skill === "Athletics") ||
-                                    (charClass === "Commander" && skill === "Diplomacy") ||
-                                    (charClass === "Contemplative" && skill === "Awareness") ||
-                                    (charClass === "Devout" && skill === "Xenomagic") ||
-                                    (charClass === "Elementalist" && skill === "Xenomagic") ||
-                                    (charClass === "Gunslinger" && skill === "Deception") ||
-                                    (charClass === "Technician" && skill === "Technology") ||
-                                    (subclass === "Anatomist" && skill === "Medicine") ||
-                                    (subclass === "Grenadier" && skill === "Intimidation") ||
-                                    (subclass === "Necro" && skill === "Survival") ||
-                                    (subclass === "Poisoner" && skill === "Thievery") ||
-                                    (subclass === "Coercive" && skill === "Deception") ||
-                                    (subclass === "Beguiler" && skill === "Deception") ||
-                                    (subclass === "Divinist" && skill === "Investigation") ||
-                                    (subclass === "Naturalist" && skill === "Survival") ||
-                                    (subclass === "Technologist" && skill === "Technology") ||
-                                    (subclass === "Galvanic" && skill === "Athletics") ||
-                                    (subclass === "Tactician" && skill === "Awareness") ||
-                                    (subclass === "Tyrant" && skill === "Intimidation") ||
-                                    (subclass === "Inertial" && skill === "Diplomacy") ||
-                                    (subclass === "Kinetic" && skill === "Athletics") ||
-                                    (subclass === "Mercurial" && skill === "Acrobatics") ||
-                                    (subclass === "Vectorial" && skill === "Piloting") ||
-                                    (subclass === "Astral" && skill === "Medicine") ||
-                                    (subclass === "Chaos" && skill === "Intimidation") ||
-                                    (subclass === "Order" && skill === "Culture") ||
-                                    (subclass === "Void" && skill === "Stealth") ||
-                                    (subclass === "Air" && skill === "Acrobatics") ||
-                                    (subclass === "Earth" && skill === "Survival") ||
-                                    (subclass === "Fire" && skill === "Intimidation") ||
-                                    (subclass === "Water" && skill === "Medicine") ||
-                                    (subclass === "Aeronaut" && skill === "Piloting") ||
-                                    (subclass === "Brawler" && skill === "Survival") ||
-                                    (subclass === "Dreadnaught" && skill === "Intimidation") ||
-                                    (subclass === "Spectre" && skill === "Stealth") ||
-                                    (subclass === "Ammo Coder" && skill === "Oikomagic") ||
-                                    (subclass === "Ordnancer" && skill === "Athletics") ||
-                                    (subclass === "Pistoleer" && skill === "Thievery") ||
-                                    (subclass === "Sniper" && skill === "Stealth") ||
-                                    (subclass === "Hacker" && skill === "Computers") ||
-                                    (subclass === "Junker" && skill === "Thievery") ||
-                                    (subclass === "Nanoboticist" && skill === "Acrobatics") ||
-                                    (subclass === "Tanker" && skill === "Piloting") ||
-                                    (species === "Avenoch" && skill === "Awareness") ||
-                                    (species === "Chloroptid" && skill === "Awareness") ||
-                                    (species === "Human" && skill === "Culture") ||
-                                    (subspecies === "Barkskin" && skill === "Survival") ||
-                                    (subspecies === "Petran" && skill === "Survival") ||
-                                    (subspecies === "Pyran" && skill === "Performance")
-                                  ))
-                              )) {
+                              // Position j is free if:
+                              // - j is 0 (20+ always free), OR
+                              // - j is 1 and NOT anti-booster skill (18+ free for normal skills), OR
+                              // - j is 1 and has a booster at position 1 (booster makes it free even for anti-booster skills), OR
+                              // - j is 2 and is a booster position for non-anti-booster skills
+                              const isFreePosition = (j === 0 || 
+                                (j === 1 && (!isAntiBoosterSkill || hasBoosterAtPosition1)) ||
+                                (j === 2 && !isAntiBoosterSkill && (
+                                  (charClass === "Chemist" && skill === "Investigation") ||
+                                  (charClass === "Coder" && skill === "Oikomagic") ||
+                                  (charClass === "Exospecialist" && skill === "Athletics") ||
+                                  (charClass === "Commander" && skill === "Diplomacy") ||
+                                  (charClass === "Contemplative" && skill === "Awareness") ||
+                                  (charClass === "Devout" && skill === "Xenomagic") ||
+                                  (charClass === "Elementalist" && skill === "Xenomagic") ||
+                                  (charClass === "Gunslinger" && skill === "Deception") ||
+                                  (charClass === "Technician" && skill === "Technology") ||
+                                  (subclass === "Anatomist" && skill === "Medicine") ||
+                                  (subclass === "Grenadier" && skill === "Intimidation") ||
+                                  (subclass === "Necro" && skill === "Survival") ||
+                                  (subclass === "Poisoner" && skill === "Thievery") ||
+                                  (subclass === "Coercive" && skill === "Deception") ||
+                                  (subclass === "Beguiler" && skill === "Deception") ||
+                                  (subclass === "Divinist" && skill === "Investigation") ||
+                                  (subclass === "Naturalist" && skill === "Survival") ||
+                                  (subclass === "Technologist" && skill === "Technology") ||
+                                  (subclass === "Galvanic" && skill === "Athletics") ||
+                                  (subclass === "Tactician" && skill === "Awareness") ||
+                                  (subclass === "Tyrant" && skill === "Intimidation") ||
+                                  (subclass === "Inertial" && skill === "Diplomacy") ||
+                                  (subclass === "Kinetic" && skill === "Athletics") ||
+                                  (subclass === "Mercurial" && skill === "Acrobatics") ||
+                                  (subclass === "Vectorial" && skill === "Piloting") ||
+                                  (subclass === "Astral" && skill === "Medicine") ||
+                                  (subclass === "Chaos" && skill === "Intimidation") ||
+                                  (subclass === "Order" && skill === "Culture") ||
+                                  (subclass === "Void" && skill === "Stealth") ||
+                                  (subclass === "Air" && skill === "Acrobatics") ||
+                                  (subclass === "Earth" && skill === "Survival") ||
+                                  (subclass === "Fire" && skill === "Intimidation") ||
+                                  (subclass === "Water" && skill === "Medicine") ||
+                                  (subclass === "Aeronaut" && skill === "Piloting") ||
+                                  (subclass === "Brawler" && skill === "Survival") ||
+                                  (subclass === "Dreadnaught" && skill === "Intimidation") ||
+                                  (subclass === "Spectre" && skill === "Stealth") ||
+                                  (subclass === "Ammo Coder" && skill === "Oikomagic") ||
+                                  (subclass === "Ordnancer" && skill === "Athletics") ||
+                                  (subclass === "Pistoleer" && skill === "Thievery") ||
+                                  (subclass === "Sniper" && skill === "Stealth") ||
+                                  (subclass === "Hacker" && skill === "Computers") ||
+                                  (subclass === "Junker" && skill === "Thievery") ||
+                                  (subclass === "Nanoboticist" && skill === "Acrobatics") ||
+                                  (subclass === "Tanker" && skill === "Piloting") ||
+                                  (species === "Avenoch" && skill === "Awareness") ||
+                                  (species === "Chloroptid" && skill === "Awareness") ||
+                                  (species === "Human" && skill === "Culture") ||
+                                  (subspecies === "Barkskin" && skill === "Survival") ||
+                                  (subspecies === "Petran" && skill === "Survival") ||
+                                  (subspecies === "Pyran" && skill === "Performance")
+                                ))
+                              );
+                              
+                              if (!skillDotsForSkill[j] && !isFreePosition) {
                                 spCostForThisDot += [1, 1, 2, 2, 3, 4, 5, 6, 8, 10][j];
                               }
                             }
                           } else if (canUncheck) {
                             // Calculate refund amount for unchecking
+                            // Check if this is an anti-booster skill
+                            const antiBoosterSkills = getAntiBoosterSkills();
+                            const isAntiBoosterSkill = antiBoosterSkills.includes(skill);
+                            
+                            // Check if position 1 has a booster (for anti-booster skills, booster shifts to position 1)
+                            const hasBoosterAtPosition1 = isAntiBoosterSkill && boosterPositions.some(bp => bp.position === 1);
+                            
                             for (let j = i; j < skillDotsForSkill.length; j++) {
-                              if (skillDotsForSkill[j] && !((j === 0 || j === 1) || 
-                                  (j === 2 && (
-                                    (charClass === "Chemist" && skill === "Investigation") ||
-                                    (charClass === "Coder" && skill === "Oikomagic") ||
-                                    (charClass === "Exospecialist" && skill === "Athletics") ||
-                                    (charClass === "Commander" && skill === "Diplomacy") ||
-                                    (charClass === "Contemplative" && skill === "Awareness") ||
-                                    (charClass === "Devout" && skill === "Xenomagic") ||
-                                    (charClass === "Elementalist" && skill === "Xenomagic") ||
-                                    (charClass === "Gunslinger" && skill === "Deception") ||
-                                    (charClass === "Technician" && skill === "Technology") ||
-                                    (subclass === "Anatomist" && skill === "Medicine") ||
-                                    (subclass === "Grenadier" && skill === "Intimidation") ||
-                                    (subclass === "Necro" && skill === "Survival") ||
-                                    (subclass === "Poisoner" && skill === "Thievery") ||
-                                    (subclass === "Coercive" && skill === "Deception") ||
-                                    (subclass === "Beguiler" && skill === "Deception") ||
-                                    (subclass === "Divinist" && skill === "Investigation") ||
-                                    (subclass === "Naturalist" && skill === "Survival") ||
-                                    (subclass === "Technologist" && skill === "Technology") ||
-                                    (subclass === "Galvanic" && skill === "Athletics") ||
-                                    (subclass === "Tactician" && skill === "Awareness") ||
-                                    (subclass === "Tyrant" && skill === "Intimidation") ||
-                                    (subclass === "Inertial" && skill === "Diplomacy") ||
-                                    (subclass === "Kinetic" && skill === "Athletics") ||
-                                    (subclass === "Mercurial" && skill === "Acrobatics") ||
-                                    (subclass === "Vectorial" && skill === "Piloting") ||
-                                    (subclass === "Astral" && skill === "Medicine") ||
-                                    (subclass === "Chaos" && skill === "Intimidation") ||
-                                    (subclass === "Order" && skill === "Culture") ||
-                                    (subclass === "Void" && skill === "Stealth") ||
-                                    (subclass === "Air" && skill === "Acrobatics") ||
-                                    (subclass === "Earth" && skill === "Survival") ||
-                                    (subclass === "Fire" && skill === "Intimidation") ||
-                                    (subclass === "Water" && skill === "Medicine") ||
-                                    (subclass === "Aeronaut" && skill === "Piloting") ||
-                                    (subclass === "Brawler" && skill === "Survival") ||
-                                    (subclass === "Dreadnaught" && skill === "Intimidation") ||
-                                    (subclass === "Spectre" && skill === "Stealth") ||
-                                    (subclass === "Ammo Coder" && skill === "Oikomagic") ||
-                                    (subclass === "Ordnancer" && skill === "Athletics") ||
-                                    (subclass === "Pistoleer" && skill === "Thievery") ||
-                                    (subclass === "Sniper" && skill === "Stealth") ||
-                                    (subclass === "Hacker" && skill === "Computers") ||
-                                    (subclass === "Junker" && skill === "Thievery") ||
-                                    (subclass === "Nanoboticist" && skill === "Acrobatics") ||
-                                    (subclass === "Tanker" && skill === "Piloting") ||
-                                    (species === "Avenoch" && skill === "Awareness") ||
-                                    (species === "Chloroptid" && skill === "Awareness") ||
-                                    (species === "Human" && skill === "Culture") ||
-                                    (subspecies === "Barkskin" && skill === "Survival") ||
-                                    (subspecies === "Petran" && skill === "Survival") ||
-                                    (subspecies === "Pyran" && skill === "Performance")
-                                  ))
-                              )) {
+                              // Position j is free if:
+                              // - j is 0 (20+ always free), OR
+                              // - j is 1 and NOT anti-booster skill (18+ free for normal skills), OR
+                              // - j is 1 and has a booster at position 1 (booster makes it free even for anti-booster skills), OR
+                              // - j is 2 and is a booster position for non-anti-booster skills
+                              const isFreePosition = (j === 0 || 
+                                (j === 1 && (!isAntiBoosterSkill || hasBoosterAtPosition1)) ||
+                                (j === 2 && !isAntiBoosterSkill && (
+                                  (charClass === "Chemist" && skill === "Investigation") ||
+                                  (charClass === "Coder" && skill === "Oikomagic") ||
+                                  (charClass === "Exospecialist" && skill === "Athletics") ||
+                                  (charClass === "Commander" && skill === "Diplomacy") ||
+                                  (charClass === "Contemplative" && skill === "Awareness") ||
+                                  (charClass === "Devout" && skill === "Xenomagic") ||
+                                  (charClass === "Elementalist" && skill === "Xenomagic") ||
+                                  (charClass === "Gunslinger" && skill === "Deception") ||
+                                  (charClass === "Technician" && skill === "Technology") ||
+                                  (subclass === "Anatomist" && skill === "Medicine") ||
+                                  (subclass === "Grenadier" && skill === "Intimidation") ||
+                                  (subclass === "Necro" && skill === "Survival") ||
+                                  (subclass === "Poisoner" && skill === "Thievery") ||
+                                  (subclass === "Coercive" && skill === "Deception") ||
+                                  (subclass === "Beguiler" && skill === "Deception") ||
+                                  (subclass === "Divinist" && skill === "Investigation") ||
+                                  (subclass === "Naturalist" && skill === "Survival") ||
+                                  (subclass === "Technologist" && skill === "Technology") ||
+                                  (subclass === "Galvanic" && skill === "Athletics") ||
+                                  (subclass === "Tactician" && skill === "Awareness") ||
+                                  (subclass === "Tyrant" && skill === "Intimidation") ||
+                                  (subclass === "Inertial" && skill === "Diplomacy") ||
+                                  (subclass === "Kinetic" && skill === "Athletics") ||
+                                  (subclass === "Mercurial" && skill === "Acrobatics") ||
+                                  (subclass === "Vectorial" && skill === "Piloting") ||
+                                  (subclass === "Astral" && skill === "Medicine") ||
+                                  (subclass === "Chaos" && skill === "Intimidation") ||
+                                  (subclass === "Order" && skill === "Culture") ||
+                                  (subclass === "Void" && skill === "Stealth") ||
+                                  (subclass === "Air" && skill === "Acrobatics") ||
+                                  (subclass === "Earth" && skill === "Survival") ||
+                                  (subclass === "Fire" && skill === "Intimidation") ||
+                                  (subclass === "Water" && skill === "Medicine") ||
+                                  (subclass === "Aeronaut" && skill === "Piloting") ||
+                                  (subclass === "Brawler" && skill === "Survival") ||
+                                  (subclass === "Dreadnaught" && skill === "Intimidation") ||
+                                  (subclass === "Spectre" && skill === "Stealth") ||
+                                  (subclass === "Ammo Coder" && skill === "Oikomagic") ||
+                                  (subclass === "Ordnancer" && skill === "Athletics") ||
+                                  (subclass === "Pistoleer" && skill === "Thievery") ||
+                                  (subclass === "Sniper" && skill === "Stealth") ||
+                                  (subclass === "Hacker" && skill === "Computers") ||
+                                  (subclass === "Junker" && skill === "Thievery") ||
+                                  (subclass === "Nanoboticist" && skill === "Acrobatics") ||
+                                  (subclass === "Tanker" && skill === "Piloting") ||
+                                  (species === "Avenoch" && skill === "Awareness") ||
+                                  (species === "Chloroptid" && skill === "Awareness") ||
+                                  (species === "Human" && skill === "Culture") ||
+                                  (subspecies === "Barkskin" && skill === "Survival") ||
+                                  (subspecies === "Petran" && skill === "Survival") ||
+                                  (subspecies === "Pyran" && skill === "Performance")
+                                ))
+                              );
+                              
+                              if (skillDotsForSkill[j] && !isFreePosition) {
                                 spCostForThisDot += [1, 1, 2, 2, 3, 4, 5, 6, 8, 10][j];
                               }
                             }
@@ -3569,9 +3614,13 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                                       return true;
                                     }
                                     
-                                    // Position 1 (18+) is free for normal skills, but NOT for anti-booster skills
+                                    // Check if this position has a booster dot (handles overlaps)
+                                    const skillBoosterPositions = getBoosterPositions(skillName);
+                                    const hasBoosterAtThisPosition = skillBoosterPositions.some(bp => bp.position === position);
+                                    
+                                    // Position 1 (18+) is free for normal skills OR if it has a booster (even for anti-booster skills)
                                     if (position === 1) {
-                                      return !hasAntiBooster;
+                                      return !hasAntiBooster || hasBoosterAtThisPosition;
                                     }
                                     
                                     // Positions 2 and 3 are free if Jack of All Trades is selected (Human perk)
@@ -3580,9 +3629,8 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                                       return true;
                                     }
                                     
-                                    // Check if this position has a booster dot (handles overlaps)
-                                    const skillBoosterPositions = getBoosterPositions(skillName);
-                                    return skillBoosterPositions.some(bp => bp.position === position);
+                                    // Any other position with a booster is free
+                                    return hasBoosterAtThisPosition;
                                   };
                                   
                                   const rightmostChecked = currentSkillDots.lastIndexOf(true);
@@ -3687,7 +3735,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                                   height: isMobile ? 14 : 18,
                                   borderRadius: '50%',
                                   border: (boosterAtThisPosition || isLockedColumn || isJackOfAllTrades) ? `2px solid ${boosterAtThisPosition ? boosterAtThisPosition.color : (isJackOfAllTrades ? 'rgba(43,49,95,0.25)' : '#666')}` : '2px solid #000',
-                                  background: checked ? (boosterAtThisPosition ? boosterAtThisPosition.color : (isJackOfAllTrades ? 'rgba(43,49,95,0.25)' : (isLockedColumn ? '#666' : '#000'))) : '#fff',
+                                  background: boosterAtThisPosition ? boosterAtThisPosition.color : (checked ? (isJackOfAllTrades ? 'rgba(43,49,95,0.25)' : (isLockedColumn ? '#666' : '#000')) : (isLockedColumn ? '#666' : '#fff')),
                                   cursor: (isLockedColumn || boosterAtThisPosition || isJackOfAllTrades) ? 'not-allowed' : (canAffordCheck || canUncheck ? 'pointer' : 'not-allowed'),
                                   opacity: (isLockedColumn || boosterAtThisPosition || isJackOfAllTrades) ? 1 : (canAffordCheck || canUncheck ? 1 : 0.4),
                                 }}

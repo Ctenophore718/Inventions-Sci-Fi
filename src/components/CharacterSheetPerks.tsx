@@ -108,6 +108,11 @@ const CharacterSheetPerks: React.FC<CharacterSheetPerksProps> = ({
                 {sheet.pollenCollectiveLanguage}
               </span>
             )}
+            {sheet?.background === 'Anti-Deft Secessionist' && (
+              <span style={{ fontWeight: 'normal', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', color: '#000' }}>
+                Defteran
+              </span>
+            )}
           </div>
           {/* Class Perk segment, visible if Class Perk dot is selected */}
           {charClass === 'Chemist' && sheet?.classCardDots?.[9]?.[0] && (
@@ -679,6 +684,22 @@ const CharacterSheetPerks: React.FC<CharacterSheetPerksProps> = ({
           <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
             <span>
               <b><i style={{ color: '#9026b1' }}>Bear Strength.</i></b> <span style={{ color: '#000' }}>You are incredibly strong and didn't have to work for it. Lucky you. Gain an advantage on related skill rolls.</span>
+            </span>
+          </div>
+          )}
+          
+          {/* Background Perks */}
+          {sheet?.background === 'Adherent of the Pollen Collective' && sheet?.backgroundProgressionDots?.pollenCollectiveGreenThumbDots?.[0] && (
+          <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <span>
+              <b><i style={{ color: '#000' }}>Green Thumb.</i></b> <span style={{ color: '#000' }}>Your training within the Pollen Collective has allowed you to become adept at planting seeds and maintaining any flora from gardens to entire forests. Gain an advantage on skills related to the growth and maintenance of the natural world.</span>
+            </span>
+          </div>
+          )}
+          {sheet?.background === 'Anti-Deft Secessionist' && sheet?.backgroundProgressionDots?.antiDeftSecessionistAtrocitiesDots?.[0] && (
+          <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <span>
+              <b><i style={{ color: '#000' }}>Atrocities of the Empire.</i></b> <span style={{ color: '#000' }}>You've garnered a unique camaraderie of all enemies of Defteros and are fast friends with all opposed to the Woman King Aelys. Gain an advantage on related skill rolls.</span>
             </span>
           </div>
           )}
