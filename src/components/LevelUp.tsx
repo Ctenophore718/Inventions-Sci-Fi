@@ -1,7 +1,7 @@
 import React from "react";
 import { useState, useEffect, useCallback, useRef } from "react";
 import type { CharacterSheet } from "../types/CharacterSheet";
-import { saveCharacterSheet, loadSheetById } from "../utils/storage";
+import { loadSheetById } from "../utils/storage";
 import styles from "./CharacterSheet.module.css";
 import LevelUpClassChemist from "./LevelUpClassChemist";
 import LevelUpClassCoder from "./LevelUpClassCoder";
@@ -163,6 +163,11 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
     }
   });
   
+  // Local state to track if starter dots have been applied (prevents race condition)
+  const [hasAppliedStarterDots, setHasAppliedStarterDots] = useState<boolean>(() => {
+    return sheet?.hasFreeSkillStarterDots ?? false;
+  });
+  
   // Initialize skillDots for new characters with starter dots
   useEffect(() => {
     // Check if this is a new character that hasn't had starter dots set yet
@@ -207,6 +212,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
       
       // Update local state
       setSkillDots(newSkillDots);
+      setHasAppliedStarterDots(true); // Mark starter dots as applied immediately
       
       // Auto-save the updates
       handleAutoSave(skillUpdates);
@@ -857,7 +863,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
       const resetSheet = resetAllExpenditures();
       if (resetSheet) {
         const updatedSheet = { ...resetSheet, charClass: newClass, subclass: "" }; // Reset subclass too
-        saveCharacterSheet(updatedSheet);
+        handleAutoSave(updatedSheet);
         
         // Update local state
         setXpSpent(0);
@@ -929,7 +935,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
           // Auto-populate class if not set
           charClass: charClass || correspondingClass || resetSheet.charClass
         };
-        saveCharacterSheet(updatedSheet);
+        handleAutoSave(updatedSheet);
         
         // Update local state
         setXpSpent(0);
@@ -986,7 +992,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
         // Auto-set Cerebronych (cont.) when Cerebronych is selected
         const newSubspecies = newSpecies === "Cerebronych" ? "Cerebronych (cont.)" : "";
         const updatedSheet = { ...resetSheet, species: newSpecies, subspecies: newSubspecies };
-        saveCharacterSheet(updatedSheet);
+        handleAutoSave(updatedSheet);
         
         // Update local state
         setXpSpent(0);
@@ -1065,7 +1071,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
           // Auto-populate species if not set
           species: species || correspondingSpecies || resetSheet.species
         };
-        saveCharacterSheet(updatedSheet);
+        handleAutoSave(updatedSheet);
         
         // Update local state
         setXpSpent(0);
@@ -1115,7 +1121,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
       const resetSheet = resetAllExpenditures();
       if (resetSheet) {
         const updatedSheet = { ...resetSheet, background: newBackground };
-        saveCharacterSheet(updatedSheet);
+        handleAutoSave(updatedSheet);
         
         // Update local state
         setXpSpent(0);
@@ -1215,55 +1221,29 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
     };
   }, [sheet?.id, setCharClass, setSubclass, setSpecies, setSubspecies]);
 
-  // Auto-save when XP/SP totals change (debounced)
-  const xpSpSaveTimeoutRef = useRef<number | null>(null);
+  // Auto-save when XP/SP totals change - uses centralized handleAutoSave
+  const xpSpPrevRef = useRef({ xpTotal: sheet?.xpTotal ?? 0, spTotal: sheet?.spTotal ?? 0 });
   React.useEffect(() => {
-    if (sheet && (sheet.xpTotal !== xpTotal || sheet.spTotal !== spTotal)) {
-      // Clear any pending save
-      if (xpSpSaveTimeoutRef.current) {
-        clearTimeout(xpSpSaveTimeoutRef.current);
-      }
-      
-      // Debounce the save by 300ms for typing
-      xpSpSaveTimeoutRef.current = setTimeout(() => {
-        const updatedSheet = { ...sheet, xpTotal, spTotal };
-        saveCharacterSheet(updatedSheet);
-      }, 300);
+    // Only save if values actually changed from what we last saved
+    if (sheet && (xpSpPrevRef.current.xpTotal !== xpTotal || xpSpPrevRef.current.spTotal !== spTotal)) {
+      xpSpPrevRef.current = { xpTotal, spTotal };
+      handleAutoSave({ xpTotal, spTotal });
     }
-    
-    return () => {
-      if (xpSpSaveTimeoutRef.current) {
-        clearTimeout(xpSpSaveTimeoutRef.current);
-      }
-    };
-  }, [xpTotal, spTotal, sheet]);
+  }, [xpTotal, spTotal, sheet, handleAutoSave]);
 
-  // Auto-save skillDots when they change (but not on initial load, debounced)
-  const skillDotsSaveTimeoutRef = useRef<number | null>(null);
+  // Auto-save skillDots when they change - uses centralized handleAutoSave
+  const skillDotsPrevRef = useRef<string>(JSON.stringify(sheet?.skillDots ?? {}));
   React.useEffect(() => {
-    if (sheet && sheet.skillDots && JSON.stringify(sheet.skillDots) !== JSON.stringify(skillDots)) {
-      // Clear any pending save
-      if (skillDotsSaveTimeoutRef.current) {
-        clearTimeout(skillDotsSaveTimeoutRef.current);
-      }
-      
-      // Debounce the save by 200ms
-      skillDotsSaveTimeoutRef.current = setTimeout(() => {
-        const updatedSheet = {
-          ...sheet,
-          skillDots,
-          spRemaining: spTotal - spSpent
-        };
-        saveCharacterSheet(updatedSheet);
-      }, 200);
+    const currentDotsStr = JSON.stringify(skillDots);
+    // Only save if skillDots actually changed from what we last saved
+    if (sheet && skillDotsPrevRef.current !== currentDotsStr) {
+      skillDotsPrevRef.current = currentDotsStr;
+      handleAutoSave({
+        skillDots,
+        spRemaining: spTotal - spSpent
+      });
     }
-    
-    return () => {
-      if (skillDotsSaveTimeoutRef.current) {
-        clearTimeout(skillDotsSaveTimeoutRef.current);
-      }
-    };
-  }, [skillDots, sheet, spTotal, spSpent]);
+  }, [skillDots, sheet, spTotal, spSpent, handleAutoSave]);
 
   // Sync classCardDots state when sheet or charClass changes
   React.useEffect(() => {
@@ -3625,7 +3605,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                           
                           const hasEnoughSP = spSpent + spCostForThisDot <= (sheet?.spTotal || 0);
                           const canAffordCheck = canCheck && hasEnoughSP;
-                          const hasFreeDots = sheet?.hasFreeSkillStarterDots;
+                          const hasFreeDots = hasAppliedStarterDots; // Use local state instead of sheet prop
                           const isLockedColumn = hasFreeDots && isFirstTwoColumns;
                           
                           return (

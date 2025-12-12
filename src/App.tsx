@@ -264,10 +264,11 @@ const App = () => {
     setCurrentSheet(newSheet);
     void performAutoSave(newSheet);
     
-    setView("editor");
+    // Navigate to Level Up page for new characters
+    setView("levelup");
   };
 
-  // Auto-save when shared state changes (debounced to prevent excessive saves)
+  // Sync shared state changes to currentSheet (uses centralized performAutoSave)
   React.useEffect(() => {
     if (!currentSheet) return;
     
@@ -280,23 +281,19 @@ const App = () => {
     );
 
     if (hasChanges) {
-      // Debounce the save to prevent rapid-fire saves
-      const timeoutId = window.setTimeout(async () => {
-        const updatedSheet = {
-          ...currentSheet,
-          charClass,
-          subclass,
-          species,
-          subspecies
-        } as CharacterSheet;
-        setCurrentSheet(updatedSheet);
-        // Async save
-        await saveCharacterSheet(updatedSheet);
-      }, 100); // 100ms debounce
-
-      return () => clearTimeout(timeoutId);
+      const updatedSheet = {
+        ...currentSheet,
+        charClass,
+        subclass,
+        species,
+        subspecies,
+        hostSpecies
+      } as CharacterSheet;
+      setCurrentSheet(updatedSheet);
+      // Use centralized save - it already has debouncing
+      void performAutoSave(updatedSheet);
     }
-  }, [charClass, subclass, species, subspecies, currentSheet]);
+  }, [charClass, subclass, species, subspecies, hostSpecies, currentSheet, performAutoSave]);
 
   const handleLevelUp = async () => {
 

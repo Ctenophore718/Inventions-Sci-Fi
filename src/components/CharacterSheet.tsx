@@ -2802,20 +2802,9 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
             <label>
               <span style={{ fontFamily: 'Arial, sans-serif' }}>Background</span>
               <div className={styles.selectWrapper}>
-                <select
-                  value={background}
-                  onChange={e => {
-                    const newBackground = e.target.value;
-                    // Check prerequisite for Awakened Machine
-                    if (newBackground === "Awakened Machine" && species !== "Cognizant") {
-                      if (setNotice) setNotice("Prerequisite: Species must be Cognizant");
-                      return;
-                    }
-                    setBackground(newBackground);
-                    handleAutoSave({ background: newBackground });
-                  }}
-                  className={styles.colorSelect}
+                <div
                   style={{ 
+                    fontFamily: 'Arial, Helvetica, sans-serif',
                     fontWeight: 'bold',
                     padding: '4px 8px',
                     borderRadius: '4px',
@@ -2823,24 +2812,15 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                     color: backgroundOptions.find(opt => opt.value === background)?.color || '#000',
                     textAlign: 'center',
                     minWidth: '120px',
-                    background: 'white'
+                    background: 'white',
+                    minHeight: '24px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
                   }}
                 >
-                  <option value="" style={{ color: 'black', backgroundColor: 'white',  }}>Select Background</option>
-                  {backgroundOptions.map(opt => (
-                    <option 
-                      key={opt.value} 
-                      value={opt.value} 
-                      style={{ 
-                        color: opt.color,
-                        backgroundColor: 'white',
-                        fontWeight: 'bold'
-                      }}
-                    >
-                      {opt.label}
-                    </option>
-                  ))}
-                </select>
+                  {background || '—'}
+                </div>
               </div>
             </label>
           </div>
@@ -2850,131 +2830,73 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
             <label>
               <span style={{ fontFamily: 'Arial, sans-serif' }}>Class</span>
               <div className={styles.selectWrapper}>
-                <select 
-                  value={charClass}
-                  onChange={e => {
-                    setCharClass(e.target.value);
-                    setSubclass(""); 
-                    handleAutoSave({ charClass: e.target.value, subclass: "" });
-                  }} 
-                  className={styles.colorSelect + ' ' + styles.selectedClassColor}
+                <div
                   style={{ 
-                    '--selected-class-color': classOptions.find(opt => opt.value === charClass)?.color || '#000',
+                    fontFamily: 'Arial, Helvetica, sans-serif',
                     fontWeight: 'bold',
                     padding: '4px 8px',
                     borderRadius: '4px',
                     border: '1px solid #ccc',
                     textAlign: 'center',
-                    color: `${classOptions.find(opt => opt.value === charClass)?.color || '#000'} !important`,
+                    color: classOptions.find(opt => opt.value === charClass)?.color || '#000',
                     minWidth: '120px',
-                    background: 'white'
-                  } as React.CSSProperties}
+                    background: 'white',
+                    minHeight: '24px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
                 >
-                  <option value="" style={{ color: 'black', backgroundColor: 'white' }}>Select Class</option>
-                  {classOptions.map(opt => (
-                    <option 
-                      key={opt.value} 
-                      value={opt.value} 
-                      style={{ 
-                        color: opt.color,
-                        backgroundColor: 'white',
-                        fontWeight: 'bold'
-                      }}
-                    >
-                      {opt.label}
-                    </option>
-                  ))}
-                </select>
+                  {charClass || '—'}
+                </div>
               </div>
             </label>
             <label>
               <span style={{ fontFamily: 'Arial, sans-serif' }}>Subclass</span>
               <div className={styles.selectWrapper}>
-                <select 
-                  value={subclass} 
-                  onChange={e => {
-                    const val = e.target.value;
-                    setSubclass(val);
-                    if (!charClass && val) {
-                      const found = allSubclassOptions.find(opt => opt.value === val);
-                      if (found) {
-                        setCharClass(found.class);
-                        handleAutoSave({ subclass: val, charClass: found.class });
-                      } else {
-                        handleAutoSave({ subclass: val });
-                      }
-                    } else {
-                      handleAutoSave({ subclass: val });
-                    }
-                  }}
-                  className={styles.colorSelect + ' ' + styles.selectedSubclassColor}
+                <div
                   style={{ 
-                    '--selected-subclass-color': subclassOptions.find(opt => opt.value === subclass)?.color || '#000',
+                    fontFamily: 'Arial, Helvetica, sans-serif',
                     fontWeight: 'bold',
                     padding: '4px 8px',
                     borderRadius: '4px',
                     border: '1px solid #ccc',
                     textAlign: 'center',
-                    color: `${(subclassOptions.find(opt => opt.value === subclass) || allSubclassOptions.find(opt => opt.value === subclass))?.color || '#000'} !important`,
+                    color: (subclassOptions.find(opt => opt.value === subclass) || allSubclassOptions.find(opt => opt.value === subclass))?.color || '#000',
                     minWidth: '120px',
-                    background: 'white'
-                  } as React.CSSProperties}
+                    background: 'white',
+                    minHeight: '24px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
                 >
-                  <option value="" style={{ color: 'black', backgroundColor: 'white' }}>Select Subclass</option>
-                  {(charClass ? subclassOptions : allSubclassOptions).map(opt => (
-                    <option 
-                      key={opt.value} 
-                      value={opt.value} 
-                      style={{ 
-                        color: opt.color,
-                        backgroundColor: 'white',
-                        fontWeight: 'bold'
-                      }}
-                    >
-                      {opt.label}
-                    </option>
-                  ))}
-                </select>
+                  {subclass || '—'}
+                </div>
               </div>
             </label>
             <label>
               <span style={{ fontFamily: 'Arial, sans-serif' }}>Species</span>
               <div className={styles.selectWrapper}>
-                <select 
-                  value={species} 
-                  onChange={e => {
-                    setSpecies(e.target.value);
-                    setSubspecies("");
-                    handleAutoSave({ species: e.target.value, subspecies: "" });
-                  }}
-                  className={styles.colorSelect + ' ' + styles.selectedSpeciesColor}
+                <div
                   style={{ 
-                    '--selected-species-color': speciesOptions.find(opt => opt.value === species)?.color || '#000',
+                    fontFamily: 'Arial, Helvetica, sans-serif',
                     fontWeight: 'bold',
                     padding: '4px 8px',
                     borderRadius: '4px',
                     border: '1px solid #ccc',
                     textAlign: 'center',
-                    color: `${(speciesOptions.find(opt => opt.value === species)) || allSubspeciesOptions.find(opt => opt.value === species)?.color || '#000'} !important`,
+                    color: speciesOptions.find(opt => opt.value === species)?.color || '#000',
                     minWidth: '120px',
-                    background: 'white'
-                  } as React.CSSProperties}
+                    background: 'white',
+                    minHeight: '24px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
                 >
-                  <option value="" style={{ color: 'black', backgroundColor: 'white' }}>Select Species</option>
-                  {speciesOptions.map(opt => (
-                    <option 
-                      key={opt.value} 
-                      value={opt.value} 
-                      style={{ 
-                        color: opt.color,
-                        backgroundColor: 'white',
-                        fontWeight: 'bold'
-                      }}
-                    >
-                      {opt.label}
-                    </option>
-                  ))}
-                </select>
+                  {species || '—'}
+                </div>
               </div>
             </label>
             <label>
@@ -2983,99 +2905,47 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
               </span>
               <div className={styles.selectWrapper}>
                 {species === "Cerebronych" ? (
-                  // Standard dropdown for Cerebronych Host
-                  <select 
-                    value={hostSpecies || ""} 
-                    onChange={e => {
-                      const val = e.target.value;
-                      if (setHostSpecies) setHostSpecies(val);
-                      handleAutoSave({ hostSpecies: val });
-                    }}
-                    className={`${styles.colorSelect} ${styles.selectedHostColor}`}
+                  // Read-only display for Cerebronych Host
+                  <div
                     style={{ 
+                      fontFamily: 'Arial, Helvetica, sans-serif',
                       fontWeight: 'bold',
                       padding: '4px 8px',
                       borderRadius: '4px',
                       border: '1px solid #ccc',
                       textAlign: 'center',
-                      ['--selected-host-color' as any]: hostSpecies ? (hostOptions.find(opt => opt.value === hostSpecies)?.color || '#000') : '#000',
+                      color: hostSpecies ? (hostOptions.find(opt => opt.value === hostSpecies)?.color || '#000') : '#000',
                       minWidth: '120px',
-                      background: 'white'
-                    } as React.CSSProperties}
+                      background: 'white',
+                      minHeight: '24px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}
                   >
-                    <option value="" style={{ color: 'black', backgroundColor: 'white' }}>
-                      Select Host
-                    </option>
-                    {hostOptions.map(opt => (
-                      <option 
-                        key={opt.value} 
-                        value={opt.value} 
-                        style={{ 
-                          color: opt.color,
-                          backgroundColor: 'white',
-                          fontWeight: 'bold'
-                        }}
-                      >
-                        {opt.label}
-                      </option>
-                    ))}
-                  </select>
+                    {hostSpecies || '—'}
+                  </div>
                 ) : (
-                  // Standard dropdown for other species
-                  <select 
-                    value={subspecies} 
-                    onChange={e => {
-                      const val = e.target.value;
-                      setSubspecies(val);
-                      // Special case: Nocturne and Vulturine should always set species to Avenoch
-                      if (val === "Nocturne" || val === "Vulturine") {
-                        setSpecies("Avenoch");
-                        handleAutoSave({ subspecies: val, species: "Avenoch" });
-                      } else if ((val === "Infrared" || val === "Radiofrequent" || val === "X-Ray") && !species) {
-                        setSpecies("Lumenaren");
-                        handleAutoSave({ subspecies: val, species: "Lumenaren" });
-                      } else if (!species && val) {
-                        const found = allSubspeciesOptions.find(opt => opt.value === val);
-                        if (found && found.species) {
-                          setSpecies(found.species);
-                          handleAutoSave({ subspecies: val, species: found.species });
-                        } else {
-                          handleAutoSave({ subspecies: val });
-                        }
-                      } else {
-                        handleAutoSave({ subspecies: val });
-                      }
-                    }}
-                    className={styles.colorSelect + ' ' + styles.selectedSubspeciesColor}
+                  // Read-only display for other species
+                  <div
                     style={{ 
-                      '--selected-subspecies-color': (subspeciesOptions.find(opt => opt.value === subspecies) || allSubspeciesOptions.find(opt => opt.value === subspecies))?.color || '#000',
+                      fontFamily: 'Arial, Helvetica, sans-serif',
                       fontWeight: 'bold',
                       padding: '4px 8px',
                       borderRadius: '4px',
                       border: '1px solid #ccc',
                       textAlign: 'center',
-                      color: `${(subspeciesOptions.find(opt => opt.value === subspecies) || allSubspeciesOptions.find(opt => opt.value === subspecies))?.color || '#000'} !important`,
+                      color: (subspeciesOptions.find(opt => opt.value === subspecies) || allSubspeciesOptions.find(opt => opt.value === subspecies))?.color || '#000',
                       minWidth: '120px',
-                      background: 'white'
-                    } as React.CSSProperties}
+                      background: 'white',
+                      minHeight: '24px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}
                   >
-                    <option value="" style={{ color: 'black', backgroundColor: 'white' }}>
-                      Select Subspecies
-                    </option>
-                    {(species ? subspeciesOptions : allSubspeciesOptions).map(opt => (
-                      <option 
-                        key={opt.value} 
-                        value={opt.value} 
-                        style={{ 
-                          color: opt.color,
-                          backgroundColor: 'white',
-                          fontWeight: 'bold'
-                        }}
-                      >
-                        {opt.label}
-                      </option>
-                    ))}
-                  </select>
+                    {subspecies || '—'}
+                  </div>
                 )}
               </div>
             </label>

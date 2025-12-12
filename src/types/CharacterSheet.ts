@@ -246,6 +246,8 @@ export type CharacterSheet = {
     // Technologist subclass progression (Coder)
     technologistStrikeRestrainDots?: boolean[];
     technologistPerksSkillsDots?: boolean[];
+    technologistTechniqueReflectHalfDots?: boolean[];
+    technologistTechniqueReflectFullDots?: boolean[];
     // Poisoner venom master dots
     poisonerVenomMasterDots?: boolean[];
     // Beguiler subclass progression (Commander)

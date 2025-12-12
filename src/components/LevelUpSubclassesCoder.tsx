@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import type { CharacterSheet } from "../types/CharacterSheet";
-import { saveCharacterSheet } from "../utils/storage";
 import { generateFieldOfCoercionJSX } from "../utils/coerciveFeature";
 import { generateEnemiesOnAllSidesJSX } from "../utils/coerciveTechnique";
 import { generateBoughbenderJSX } from "../utils/naturalistFeature";
@@ -1373,7 +1372,7 @@ const LevelUpSubclassesCoder: React.FC<LevelUpSubclassesCoderProps> = ({
                   onClick={() => {
                     // If unchecking reflect half and reflect full is checked, uncheck reflect full first
                     if (technologistTechniqueReflectHalfDots[0] && technologistTechniqueReflectFullDots[0]) {
-                      // Uncheck both with direct save to avoid race conditions
+                      // Uncheck both using centralized save
                       const newReflectHalfArray = [false];
                       const newReflectFullArray = [false];
                       const totalXpDelta = -14; // -5 for half, -9 for full
@@ -1382,18 +1381,16 @@ const LevelUpSubclassesCoder: React.FC<LevelUpSubclassesCoderProps> = ({
                       setTechnologistTechniqueReflectFullDots(newReflectFullArray);
                       setXpSpent(Math.max(0, xpSpent + totalXpDelta));
                       
-                      // Direct save to avoid race conditions
-                      if (sheet) {
-                        const updatedSheet = {
-                          ...sheet,
+                      // Use centralized save through onAutoSave
+                      if (sheet && onAutoSave) {
+                        onAutoSave({
                           subclassProgressionDots: {
                             ...sheet.subclassProgressionDots,
                             technologistTechniqueReflectHalfDots: newReflectHalfArray,
                             technologistTechniqueReflectFullDots: newReflectFullArray
-                          },
+                          } as any,
                           xpSpent: Math.max(0, xpSpent + totalXpDelta)
-                        };
-                        saveCharacterSheet(updatedSheet);
+                        });
                       }
                     } else {
                       handleDotClick(technologistTechniqueReflectHalfDots, setTechnologistTechniqueReflectHalfDots, 0, [5], 'technologistTechniqueReflectHalfDots');
