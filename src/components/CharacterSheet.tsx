@@ -2698,90 +2698,57 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                   let value;
                   let displayDots: boolean[] = [];
                   
-                  if (isNewCharacter) {
-                    // New characters default to first two dots, unless skill has anti-booster (then only first dot)
-                    displayDots = hasAntiBooster ? [true, false] : [true, true];
-                    
-                    // Add Jack of All Trades dots at positions 2 and 3 if selected
-                    if (jackOfAllTradesDots) {
-                      displayDots[2] = true;
-                      displayDots[3] = true;
-                    }
-                    
-                    // Add booster dots at their appropriate positions
-                    // Positions 2+ are auto-filled, position 1 boosters are NOT auto-filled but extend the array
-                    boosterPositions.forEach(bp => {
-                      while (displayDots.length <= bp.position) {
-                        displayDots.push(false);
-                      }
-                      if (bp.position >= 2) {
-                        // Positions 2+ are always auto-filled for new characters
-                        displayDots[bp.position] = true;
-                      }
-                      // Position 1 boosters are not auto-filled, but the array is extended to include them
-                    });
-                    
-                    // Calculate value based on rightmost filled dot
-                    const lastFilledIndex = displayDots.lastIndexOf(true);
-                    // Anti-booster skills: position 0 = 20+ (same as normal), but position 1 is removed
-                    value = lastFilledIndex >= 0 ? skillColumnValues[lastFilledIndex] + "+" : "-";
-                  } else {
-                    // For existing characters, ensure first two dots are present unless skill has anti-booster
-                    displayDots = [...dots];
-                    
-                    // Ensure we have at least the appropriate number of starter dots
-                    const starterDots = hasAntiBooster ? 1 : 2;
-                    while (displayDots.length < starterDots) {
-                      displayDots.push(false);
-                    }
-                    // Force first dot to always be true (20+), and second dot only if no anti-booster
-                    displayDots[0] = true;
-                    if (!hasAntiBooster) {
-                      displayDots[1] = true;
-                    }
-                    
-                    // Add Jack of All Trades dots at positions 2 and 3 if selected
-                    if (jackOfAllTradesDots) {
-                      while (displayDots.length <= 3) {
-                        displayDots.push(false);
-                      }
-                      displayDots[2] = true;
-                      displayDots[3] = true;
-                    }
-                    
-                    // Ensure all booster dots are shown at their proper positions
-                    // Positions 2+ are auto-filled, position 1 boosters are NOT auto-filled but extend the array
-                    boosterPositions.forEach(bp => {
-                      while (displayDots.length <= bp.position) {
-                        displayDots.push(false);
-                      }
-                      if (bp.position >= 2) {
-                        // Positions 2+ are always shown
-                        displayDots[bp.position] = true;
-                      }
-                      // Position 1 boosters are not auto-filled, but the array is extended to include them
-                    });
-                    
-                    let idx = displayDots.lastIndexOf(true);
-                    // Anti-booster skills: position 0 = 20+ (same as normal), but position 1 is removed
-                    value = idx >= 0 ? skillColumnValues[idx] + "+" : "-";
+                  // Build displayDots array by combining stored dots + auto-filled dots
+                  // Start with stored skillDots data
+                  displayDots = [...dots];
+                  
+                  // Determine how many positions we need based on boosters
+                  const maxBoosterPosition = boosterPositions.length > 0 
+                    ? Math.max(...boosterPositions.map(bp => bp.position))
+                    : -1;
+                  const minRequiredLength = Math.max(
+                    hasAntiBooster ? 1 : 2,  // Starter dots
+                    jackOfAllTradesDots ? 4 : 0,  // Jack of All Trades
+                    maxBoosterPosition + 1  // Booster positions
+                  );
+                  
+                  // Extend array to required length
+                  while (displayDots.length < minRequiredLength) {
+                    displayDots.push(false);
                   }
                   
-                  // Render visual dots
+                  // Mark auto-filled positions as true
+                  displayDots[0] = true; // 20+ is always filled
+                  if (!hasAntiBooster) {
+                    displayDots[1] = true; // 18+ filled for non-anti-booster skills
+                  }
+                  
+                  // Jack of All Trades dots at positions 2 and 3
+                  if (jackOfAllTradesDots) {
+                    displayDots[2] = true;
+                    displayDots[3] = true;
+                  }
+                  
+                  // Booster dots are auto-filled at ALL positions (including position 1 for anti-booster skills)
+                  boosterPositions.forEach(bp => {
+                    displayDots[bp.position] = true;
+                  });
+                  
+                  // Calculate value based on rightmost filled dot
+                  let idx = displayDots.lastIndexOf(true);
+                  value = idx >= 0 ? skillColumnValues[idx] + "+" : "-";
+                  
+                  // Render visual dots - show all filled dots (including filled anti-booster positions)
                   const dotElements = displayDots.map((isFilled, dotIndex) => {
-                    // Check if this is a booster dot
+                    // Skip unfilled dots
+                    if (!isFilled) return null;
+                    
+                    // Check if this position has a booster
                     const boosterAtPosition = boosterPositions.find(bp => bp.position === dotIndex);
                     // Check if this is a Jack of All Trades dot
                     const isJackOfAllTradesDot = jackOfAllTradesDots && (dotIndex === 2 || dotIndex === 3);
-                    // Check if this is an anti-booster position (position 1 with anti-booster effect)
-                    const isAntiBoosterPosition = hasAntiBooster && dotIndex === 1;
                     
-                    // Don't render anti-booster position at all in character sheet
-                    if (isAntiBoosterPosition) return null;
-                    
-                    // Render the dot if it's filled OR if it's a booster position
-                    if (!isFilled && !boosterAtPosition) return null;
-                    
+                    // Determine dot color: booster color takes priority, then Jack of All Trades, then default
                     const dotColor = boosterAtPosition ? boosterAtPosition.color : (isJackOfAllTradesDot ? 'rgba(43,49,95,0.25)' : '#666');
                     
                     return (
