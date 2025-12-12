@@ -2541,10 +2541,6 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                   if (charClass === "Commander" && skillName === "Diplomacy") sources.push({ type: 'class', color: "rgba(113,114,17,0.5)" });
                   if (charClass === "Contemplative" && skillName === "Awareness") sources.push({ type: 'class', color: "rgba(17,99,114,0.5)" });
                   if (charClass === "Devout" && skillName === "Xenomagic") sources.push({ type: 'class', color: "rgba(107,17,114,0.5)" });
-                  
-                  // Background boosters
-                  if (sheet?.background === "Awakened Machine" && skillName === "Awareness") sources.push({ type: 'background', color: "rgba(102,102,102,0.5)" });
-                  if (sheet?.background === "Awakened Machine" && skillName === "Investigation") sources.push({ type: 'background', color: "rgba(102,102,102,0.5)" });
                   if (charClass === "Elementalist" && skillName === "Xenomagic") sources.push({ type: 'class', color: "rgba(35,17,114,0.5)" });
                   if (charClass === "Exospecialist" && skillName === "Athletics") sources.push({ type: 'class', color: "rgba(17,114,51,0.5)" });
                   if (charClass === "Gunslinger" && skillName === "Deception") sources.push({ type: 'class', color: "rgba(78,114,17,0.5)" });
@@ -2634,6 +2630,14 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                   if (sheet?.background === "Adherent of the Pollen Collective" && skillName === "Survival") sources.push({ type: 'background', color: "rgba(102,102,102,0.5)" });
                   if (sheet?.background === "Anti-Deft Secessionist" && skillName === "Culture") sources.push({ type: 'background', color: "rgba(102,102,102,0.5)" });
                   if (sheet?.background === "Anti-Deft Secessionist" && skillName === "Survival") sources.push({ type: 'background', color: "rgba(102,102,102,0.5)" });
+                  if (sheet?.background === "Awakened Machine" && skillName === "Awareness") sources.push({ type: 'background', color: "rgba(102,102,102,0.5)" });
+                  if (sheet?.background === "Awakened Machine" && skillName === "Investigation") sources.push({ type: 'background', color: "rgba(102,102,102,0.5)" });
+                  if (sheet?.background === "Belt Miner" && skillName === "Athletics") sources.push({ type: 'background', color: "rgba(102,102,102,0.5)" });
+                  if (sheet?.background === "Belt Miner" && skillName === "Awareness") sources.push({ type: 'background', color: "rgba(102,102,102,0.5)" });
+                  if (sheet?.background === "Black Market Executive" && skillName === "Deception") sources.push({ type: 'background', color: "rgba(102,102,102,0.5)" });
+                  if (sheet?.background === "Black Market Executive" && skillName === "Diplomacy") sources.push({ type: 'background', color: "rgba(102,102,102,0.5)" });
+                  if (sheet?.background === "Combat Medic" && skillName === "Medicine") sources.push({ type: 'background', color: "rgba(102,102,102,0.5)" });
+                  if (sheet?.background === "Combat Medic" && skillName === "Performance") sources.push({ type: 'background', color: "rgba(102,102,102,0.5)" });
                   
                   return sources;
                 };
@@ -2649,6 +2653,15 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                   }
                   if (sheet?.background === "Awakened Machine") {
                     antiSkills.push("Culture", "Performance");
+                  }
+                  if (sheet?.background === "Belt Miner") {
+                    antiSkills.push("Culture", "Performance");
+                  }
+                  if (sheet?.background === "Black Market Executive") {
+                    antiSkills.push("Awareness", "Survival");
+                  }
+                  if (sheet?.background === "Combat Medic") {
+                    antiSkills.push("Deception", "Stealth");
                   }
                   return antiSkills;
                 };
@@ -2710,7 +2723,8 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                     
                     // Calculate value based on rightmost filled dot
                     const lastFilledIndex = displayDots.lastIndexOf(true);
-                    value = lastFilledIndex >= 0 ? skillColumnValues[lastFilledIndex] + "+" : "18+";
+                    // Anti-booster skills: position 0 = 20+ (same as normal), but position 1 is removed
+                    value = lastFilledIndex >= 0 ? skillColumnValues[lastFilledIndex] + "+" : "-";
                   } else {
                     // For existing characters, ensure first two dots are present unless skill has anti-booster
                     displayDots = [...dots];
@@ -2749,6 +2763,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                     });
                     
                     let idx = displayDots.lastIndexOf(true);
+                    // Anti-booster skills: position 0 = 20+ (same as normal), but position 1 is removed
                     value = idx >= 0 ? skillColumnValues[idx] + "+" : "-";
                   }
                   
@@ -2758,6 +2773,11 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                     const boosterAtPosition = boosterPositions.find(bp => bp.position === dotIndex);
                     // Check if this is a Jack of All Trades dot
                     const isJackOfAllTradesDot = jackOfAllTradesDots && (dotIndex === 2 || dotIndex === 3);
+                    // Check if this is an anti-booster position (position 1 with anti-booster effect)
+                    const isAntiBoosterPosition = hasAntiBooster && dotIndex === 1;
+                    
+                    // Don't render anti-booster position at all in character sheet
+                    if (isAntiBoosterPosition) return null;
                     
                     // Render the dot if it's filled OR if it's a booster position
                     if (!isFilled && !boosterAtPosition) return null;
@@ -2773,7 +2793,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                           height: 10,
                           borderRadius: '50%',
                           background: dotColor,
-                          marginRight: 2
+                          marginRight: 2,
                         }}
                       />
                     );

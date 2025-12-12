@@ -17,6 +17,9 @@ export type CharacterSheet = {
   pollenCollectiveLanguage?: string; // For Adherent of the Pollen Collective background - selected bonus language
   antiDeftSecessionistLanguage?: string; // For Anti-Deft Secessionist background (always Defteran)
   awakenedMachineLanguage?: string; // For Awakened Machine background - selected bonus language
+  beltMinerLanguage?: string; // For Belt Miner background - selected bonus language
+  blackMarketExecutiveLanguages?: string[]; // For Black Market Executive background - selected bonus languages (max 2)
+  combatMedicLanguages?: string[]; // For Combat Medic background - selected bonus languages (max 2)
   background: string;
 
 
@@ -409,5 +412,8 @@ export type CharacterSheet = {
     pollenCollectiveGreenThumbDots?: boolean[];
     antiDeftSecessionistAtrocitiesDots?: boolean[];
     awakenedMachineFilthyCogDots?: boolean[];
+    beltMinerMinersKnowledgeDots?: boolean[];
+    blackMarketExecutiveQuestionableNegotiationsDots?: boolean[];
+    combatMedicHorrorsOfWarDots?: boolean[];
   };
 };

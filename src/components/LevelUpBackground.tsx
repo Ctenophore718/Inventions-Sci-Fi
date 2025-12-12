@@ -34,6 +34,12 @@ const LevelUpBackground: React.FC<LevelUpBackgroundProps> = ({
       if (index === 0) return sheet.backgroundProgressionDots.antiDeftSecessionistAtrocitiesDots || [];
     } else if (background === "Awakened Machine") {
       if (index === 0) return sheet.backgroundProgressionDots.awakenedMachineFilthyCogDots || [];
+    } else if (background === "Belt Miner") {
+      if (index === 0) return sheet.backgroundProgressionDots.beltMinerMinersKnowledgeDots || [];
+    } else if (background === "Black Market Executive") {
+      if (index === 0) return sheet.backgroundProgressionDots.blackMarketExecutiveQuestionableNegotiationsDots || [];
+    } else if (background === "Combat Medic") {
+      if (index === 0) return sheet.backgroundProgressionDots.combatMedicHorrorsOfWarDots || [];
     }
     return [];
   };
@@ -47,13 +53,22 @@ const LevelUpBackground: React.FC<LevelUpBackgroundProps> = ({
         return { antiDeftSecessionistAtrocitiesDots: [false] };
       } else if (background === "Awakened Machine") {
         return { awakenedMachineFilthyCogDots: [false] };
+      } else if (background === "Belt Miner") {
+        return { beltMinerMinersKnowledgeDots: [false] };
+      } else if (background === "Black Market Executive") {
+        return { blackMarketExecutiveQuestionableNegotiationsDots: [false] };
+      } else if (background === "Combat Medic") {
+        return { combatMedicHorrorsOfWarDots: [false] };
       }
       return {};
     }
     return {
       pollenCollectiveGreenThumbDots: sheet.backgroundProgressionDots.pollenCollectiveGreenThumbDots ? [...sheet.backgroundProgressionDots.pollenCollectiveGreenThumbDots] : undefined,
       antiDeftSecessionistAtrocitiesDots: sheet.backgroundProgressionDots.antiDeftSecessionistAtrocitiesDots ? [...sheet.backgroundProgressionDots.antiDeftSecessionistAtrocitiesDots] : undefined,
-      awakenedMachineFilthyCogDots: sheet.backgroundProgressionDots.awakenedMachineFilthyCogDots ? [...sheet.backgroundProgressionDots.awakenedMachineFilthyCogDots] : undefined
+      awakenedMachineFilthyCogDots: sheet.backgroundProgressionDots.awakenedMachineFilthyCogDots ? [...sheet.backgroundProgressionDots.awakenedMachineFilthyCogDots] : undefined,
+      beltMinerMinersKnowledgeDots: sheet.backgroundProgressionDots.beltMinerMinersKnowledgeDots ? [...sheet.backgroundProgressionDots.beltMinerMinersKnowledgeDots] : undefined,
+      blackMarketExecutiveQuestionableNegotiationsDots: sheet.backgroundProgressionDots.blackMarketExecutiveQuestionableNegotiationsDots ? [...sheet.backgroundProgressionDots.blackMarketExecutiveQuestionableNegotiationsDots] : undefined,
+      combatMedicHorrorsOfWarDots: sheet.backgroundProgressionDots.combatMedicHorrorsOfWarDots ? [...sheet.backgroundProgressionDots.combatMedicHorrorsOfWarDots] : undefined
     };
   };
 
@@ -528,6 +543,613 @@ const LevelUpBackground: React.FC<LevelUpBackgroundProps> = ({
                           const newDots = safeCloneBackgroundDots();
                           if (newDots && newDots.awakenedMachineFilthyCogDots) {
                             for (let j = idx; j < arr.length; ++j) newDots.awakenedMachineFilthyCogDots[j] = false;
+                          }
+                          persistBackgroundDots(newDots || {}, -8);
+                        }
+                      }}
+                      style={{
+                        width: '15px',
+                        height: '15px',
+                        border: '2px solid #000',
+                        borderRadius: '50%',
+                        display: 'block',
+                        background: arr[idx] ? '#000' : '#fff',
+                        cursor: 'pointer',
+                        transition: 'background 0.2s'
+                      }}
+                    ></span>
+                  );
+                })()}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (background === "Belt Miner") {
+    return (
+      <div style={{ width: '100%', fontSize: '1em' }}>
+        {/* Description */}
+        <div style={{ fontSize: '1em', color: '#000', marginBottom: '12px', fontFamily: 'Arial, Helvetica, sans-serif', lineHeight: 1.4 }}>
+        <div style={{ fontWeight: 'bold', color: '#000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Description</u></div>
+          <i>The years of your childhood and early adulthood were filled with long grueling hours in the mine. Perhaps such physical labor was just a job to get you by, or perhaps you were born into servitude under an oppressive empire. In either case, you've become physically fit and naturally aware of your surroundings after your time in the mines.</i>
+        </div>
+
+        {/* Perks Header */}
+        <div style={{ fontWeight: 'bold', color: '#000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+          <u>Perks</u>
+        </div>
+
+        {/* Skills */}
+        <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+          <i><b>Skills.</b></i> <i>Athletics</i> +2, <i>Awareness</i> +2,<br />
+          <i>Culture</i> -2, <i>Performance</i> -2
+        </div>
+
+        {/* Languages */}
+        <div style={{ fontSize: '1em', color: '#000', marginBottom: '-12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+          <i><b>Languages.</b></i> Choose 1
+          
+          {/* Language Dropdown */}
+          <div style={{ marginTop: '8px', marginLeft: '24px' }}>
+            <select
+              value=""
+              onChange={(e) => {
+                const val = e.target.value;
+                if (val && onAutoSave) {
+                  onAutoSave({ beltMinerLanguage: val });
+                }
+              }}
+              disabled={!!sheet?.beltMinerLanguage}
+              style={{
+                fontSize: '1em',
+                padding: '2px 8px',
+                borderRadius: '6px',
+                border: '1px solid #ccc',
+                background: sheet?.beltMinerLanguage ? '#eee' : '#fff',
+                textAlign: 'left',
+                minWidth: '200px',
+                fontFamily: 'Arial, Helvetica, sans-serif',
+                fontWeight: 'bold',
+                color: '#000',
+                cursor: sheet?.beltMinerLanguage ? 'not-allowed' : 'pointer'
+              }}
+            >
+              <option value="" style={{ color: 'black', backgroundColor: 'white' }}>
+                {sheet?.beltMinerLanguage ? 'Language Selected' : 'Languages'}
+              </option>
+              {!sheet?.beltMinerLanguage && sheet?.species !== 'Avenoch' && (
+                <option value="Avenoch" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Avenoch</option>
+              )}
+              {!sheet?.beltMinerLanguage && (
+                <option value="Binary" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Binary</option>
+              )}
+              {!sheet?.beltMinerLanguage && (
+                <option value="Body Language" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Body Language</option>
+              )}
+              {!sheet?.beltMinerLanguage && sheet?.species !== 'Cerebronych' && (
+                <option value="Cerebronych" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Cerebronych</option>
+              )}
+              {!sheet?.beltMinerLanguage && sheet?.species !== 'Chloroptid' && (
+                <option value="Chloroptid" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Chloroptid</option>
+              )}
+              {!sheet?.beltMinerLanguage && (
+                <option value="Defteran" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Defteran</option>
+              )}
+              {!sheet?.beltMinerLanguage && sheet?.species !== 'Entomos' && (
+                <option value="Entomos" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Entomos</option>
+              )}
+              {!sheet?.beltMinerLanguage && (
+                <option value="Hycryptice" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Hycryptice</option>
+              )}
+              {!sheet?.beltMinerLanguage && (
+                <option value="Galactapol Jargon" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Galactapol Jargon</option>
+              )}
+              {!sheet?.beltMinerLanguage && sheet?.species !== 'Lumenaren' && (
+                <option value="Lumenaren" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Lumenaren</option>
+              )}
+              {!sheet?.beltMinerLanguage && (
+                <option value="Lux" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Lux</option>
+              )}
+              {!sheet?.beltMinerLanguage && sheet?.charClass !== 'Coder' && (
+                <option value="Oikovox" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Oikovox</option>
+              )}
+              {!sheet?.beltMinerLanguage && sheet?.species !== 'Praedari' && (
+                <option value="Praedari" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Praedari</option>
+              )}
+              {!sheet?.beltMinerLanguage && sheet?.charClass !== 'Elementalist' && (
+                <option value="Xenoelemental" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Xenoelemental</option>
+              )}
+              {!sheet?.beltMinerLanguage && sheet?.charClass !== 'Devout' && (
+                <option value="Xenovox" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Xenovox</option>
+              )}
+            </select>
+
+            {/* Display selected language */}
+            {sheet?.beltMinerLanguage && (
+              <div style={{ marginTop: '4px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ color: '#000', fontWeight: 'bold' }}>
+                  {sheet.beltMinerLanguage}
+                </span>
+                <button
+                  onClick={() => {
+                    if (onAutoSave) {
+                      onAutoSave({ beltMinerLanguage: undefined });
+                    }
+                  }}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: '#cc0000',
+                    fontSize: '1.2em',
+                    cursor: 'pointer',
+                    padding: 0,
+                    lineHeight: 1
+                  }}
+                  title="Remove language"
+                >
+                  ×
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Miner's Knowledge Perk */}
+        <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '20px' }}>
+          <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', gap: '12px' }}>
+            <span style={{ display: 'inline-block', maxWidth: 'calc(100% - 40px)' }}>
+              <b><i style={{ color: '#000' }}>Miner's Knowledge.</i></b> Your experience from the mines has given you the ability to discern various metals, ores, and soils. You can also determine the structural integrity of any object made of these materials. Gain an advantage on related skill rolls.
+            </span>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '24px',
+              gridTemplateRows: 'repeat(2, auto)',
+              alignItems: 'start',
+              marginLeft: '4px',
+            }}>
+              {/* Row 1: 7sp */}
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#000', textAlign: 'center', width: '100%' }}>7sp</span>
+              {/* Row 2: dot (interactive) */}
+              <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px', width: '100%' }}>
+                {(() => {
+                  const arr = safeGetBackgroundDotsArray(0);
+                  const idx = 0;
+                  const canCheck = idx === 0 || arr.slice(0, idx).every(Boolean);
+                  const rightmostChecked = arr.lastIndexOf(true);
+                  const canUncheck = arr[idx] && idx === rightmostChecked;
+                  const availableSp = (spTotal || 0) - (spSpent || 0);
+                  const canAfford = availableSp >= 7;
+
+                  return (
+                    <span
+                      onClick={() => {
+                        if (!arr[idx] && canCheck) {
+                          if (!canAfford) {
+                            if (setNotice) setNotice('Not enough sp!');
+                            return;
+                          }
+                          const newDots = safeCloneBackgroundDots();
+                          if (newDots && newDots.beltMinerMinersKnowledgeDots) {
+                            for (let j = 0; j <= idx; ++j) newDots.beltMinerMinersKnowledgeDots[j] = true;
+                          }
+                          persistBackgroundDots(newDots || {}, 7);
+                        } else if (arr[idx] && canUncheck) {
+                          const newDots = safeCloneBackgroundDots();
+                          if (newDots && newDots.beltMinerMinersKnowledgeDots) {
+                            for (let j = idx; j < arr.length; ++j) newDots.beltMinerMinersKnowledgeDots[j] = false;
+                          }
+                          persistBackgroundDots(newDots || {}, -7);
+                        }
+                      }}
+                      style={{
+                        width: '15px',
+                        height: '15px',
+                        border: '2px solid #000',
+                        borderRadius: '50%',
+                        display: 'block',
+                        background: arr[idx] ? '#000' : '#fff',
+                        cursor: 'pointer',
+                        transition: 'background 0.2s'
+                      }}
+                    ></span>
+                  );
+                })()}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (background === "Black Market Executive") {
+    return (
+      <div style={{ width: '100%', fontSize: '1em' }}>
+        {/* Description */}
+        <div style={{ fontSize: '1em', color: '#000', marginBottom: '12px', fontFamily: 'Arial, Helvetica, sans-serif', lineHeight: 1.4 }}>
+        <div style={{ fontWeight: 'bold', color: '#000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Description</u></div>
+          <i>A lifetime of shady dealings, smuggling and underground activity has led you to become a leader in the black market. Whether it was to feed your family or to just feed your insatiable greed, you've become adept at deceiving would-be customers and performing transactions outside of the prying eyes of the law. You're viewed as a criminal by many and an entrepreneurial genius by others.</i>
+        </div>
+
+        {/* Perks Header */}
+        <div style={{ fontWeight: 'bold', color: '#000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+          <u>Perks</u>
+        </div>
+
+        {/* Skills */}
+        <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+          <i><b>Skills.</b></i> <i>Deception</i> +2, <i>Diplomacy</i> +2,<br />
+          <i>Awareness</i> -2, <i>Survival</i> -2
+        </div>
+
+        {/* Languages */}
+        <div style={{ fontSize: '1em', color: '#000', marginBottom: '-12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+          <i><b>Languages.</b></i> Choose 2
+          
+          {/* Language Dropdown */}
+          <div style={{ marginTop: '8px', marginLeft: '24px' }}>
+            <select
+              value=""
+              onChange={(e) => {
+                const val = e.target.value;
+                if (val && onAutoSave) {
+                  const currentLanguages = sheet?.blackMarketExecutiveLanguages || [];
+                  if (currentLanguages.length < 2 && !currentLanguages.includes(val)) {
+                    onAutoSave({ blackMarketExecutiveLanguages: [...currentLanguages, val] });
+                  }
+                }
+              }}
+              disabled={!!(sheet?.blackMarketExecutiveLanguages && sheet.blackMarketExecutiveLanguages.length >= 2)}
+              style={{
+                fontSize: '1em',
+                padding: '2px 8px',
+                borderRadius: '6px',
+                border: '1px solid #ccc',
+                background: (sheet?.blackMarketExecutiveLanguages && sheet.blackMarketExecutiveLanguages.length >= 2) ? '#eee' : '#fff',
+                textAlign: 'left',
+                minWidth: '200px',
+                fontFamily: 'Arial, Helvetica, sans-serif',
+                fontWeight: 'bold',
+                color: '#000',
+                cursor: (sheet?.blackMarketExecutiveLanguages && sheet.blackMarketExecutiveLanguages.length >= 2) ? 'not-allowed' : 'pointer'
+              }}
+            >
+              <option value="" style={{ color: 'black', backgroundColor: 'white' }}>
+                {(sheet?.blackMarketExecutiveLanguages && sheet.blackMarketExecutiveLanguages.length >= 2) ? 'Languages Selected' : 'Languages'}
+              </option>
+              {(!sheet?.blackMarketExecutiveLanguages || sheet.blackMarketExecutiveLanguages.length < 2) && sheet?.species !== 'Avenoch' && !sheet?.blackMarketExecutiveLanguages?.includes('Avenoch') && (
+                <option value="Avenoch" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Avenoch</option>
+              )}
+              {(!sheet?.blackMarketExecutiveLanguages || sheet.blackMarketExecutiveLanguages.length < 2) && !sheet?.blackMarketExecutiveLanguages?.includes('Binary') && (
+                <option value="Binary" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Binary</option>
+              )}
+              {(!sheet?.blackMarketExecutiveLanguages || sheet.blackMarketExecutiveLanguages.length < 2) && !sheet?.blackMarketExecutiveLanguages?.includes('Body Language') && (
+                <option value="Body Language" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Body Language</option>
+              )}
+              {(!sheet?.blackMarketExecutiveLanguages || sheet.blackMarketExecutiveLanguages.length < 2) && sheet?.species !== 'Cerebronych' && !sheet?.blackMarketExecutiveLanguages?.includes('Cerebronych') && (
+                <option value="Cerebronych" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Cerebronych</option>
+              )}
+              {(!sheet?.blackMarketExecutiveLanguages || sheet.blackMarketExecutiveLanguages.length < 2) && sheet?.species !== 'Chloroptid' && !sheet?.blackMarketExecutiveLanguages?.includes('Chloroptid') && (
+                <option value="Chloroptid" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Chloroptid</option>
+              )}
+              {(!sheet?.blackMarketExecutiveLanguages || sheet.blackMarketExecutiveLanguages.length < 2) && !sheet?.blackMarketExecutiveLanguages?.includes('Defteran') && (
+                <option value="Defteran" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Defteran</option>
+              )}
+              {(!sheet?.blackMarketExecutiveLanguages || sheet.blackMarketExecutiveLanguages.length < 2) && sheet?.species !== 'Entomos' && !sheet?.blackMarketExecutiveLanguages?.includes('Entomos') && (
+                <option value="Entomos" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Entomos</option>
+              )}
+              {(!sheet?.blackMarketExecutiveLanguages || sheet.blackMarketExecutiveLanguages.length < 2) && !sheet?.blackMarketExecutiveLanguages?.includes('Hycryptice') && (
+                <option value="Hycryptice" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Hycryptice</option>
+              )}
+              {(!sheet?.blackMarketExecutiveLanguages || sheet.blackMarketExecutiveLanguages.length < 2) && !sheet?.blackMarketExecutiveLanguages?.includes('Galactapol Jargon') && (
+                <option value="Galactapol Jargon" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Galactapol Jargon</option>
+              )}
+              {(!sheet?.blackMarketExecutiveLanguages || sheet.blackMarketExecutiveLanguages.length < 2) && sheet?.species !== 'Lumenaren' && !sheet?.blackMarketExecutiveLanguages?.includes('Lumenaren') && (
+                <option value="Lumenaren" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Lumenaren</option>
+              )}
+              {(!sheet?.blackMarketExecutiveLanguages || sheet.blackMarketExecutiveLanguages.length < 2) && !sheet?.blackMarketExecutiveLanguages?.includes('Lux') && (
+                <option value="Lux" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Lux</option>
+              )}
+              {(!sheet?.blackMarketExecutiveLanguages || sheet.blackMarketExecutiveLanguages.length < 2) && sheet?.charClass !== 'Coder' && !sheet?.blackMarketExecutiveLanguages?.includes('Oikovox') && (
+                <option value="Oikovox" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Oikovox</option>
+              )}
+              {(!sheet?.blackMarketExecutiveLanguages || sheet.blackMarketExecutiveLanguages.length < 2) && sheet?.species !== 'Praedari' && !sheet?.blackMarketExecutiveLanguages?.includes('Praedari') && (
+                <option value="Praedari" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Praedari</option>
+              )}
+              {(!sheet?.blackMarketExecutiveLanguages || sheet.blackMarketExecutiveLanguages.length < 2) && sheet?.charClass !== 'Elementalist' && !sheet?.blackMarketExecutiveLanguages?.includes('Xenoelemental') && (
+                <option value="Xenoelemental" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Xenoelemental</option>
+              )}
+              {(!sheet?.blackMarketExecutiveLanguages || sheet.blackMarketExecutiveLanguages.length < 2) && sheet?.charClass !== 'Devout' && !sheet?.blackMarketExecutiveLanguages?.includes('Xenovox') && (
+                <option value="Xenovox" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Xenovox</option>
+              )}
+            </select>
+
+            {/* Display selected languages */}
+            {sheet?.blackMarketExecutiveLanguages && sheet.blackMarketExecutiveLanguages.length > 0 && (
+              <div style={{ marginTop: '4px', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                {sheet.blackMarketExecutiveLanguages.map((lang, idx) => (
+                  <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <span style={{ color: '#000', fontWeight: 'bold' }}>
+                      {lang}
+                    </span>
+                    <button
+                      onClick={() => {
+                        if (onAutoSave) {
+                          const updated = sheet.blackMarketExecutiveLanguages?.filter((l, i) => i !== idx) || [];
+                          onAutoSave({ blackMarketExecutiveLanguages: updated.length > 0 ? updated : undefined });
+                        }
+                      }}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        color: '#cc0000',
+                        fontSize: '1.2em',
+                        cursor: 'pointer',
+                        padding: 0,
+                        lineHeight: 1
+                      }}
+                      title="Remove language"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Questionable Negotiations Perk */}
+        <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '20px' }}>
+          <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', gap: '12px' }}>
+            <span style={{ display: 'inline-block', maxWidth: 'calc(100% - 40px)' }}>
+              <b><i style={{ color: '#000' }}>Questionable Negotiations.</i></b> You are a skilled salesperson in every negative sense of the word, and can easily haggle your way through almost any trade. Gain an advantage on related skill rolls.
+            </span>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '24px',
+              gridTemplateRows: 'repeat(2, auto)',
+              alignItems: 'start',
+              marginLeft: '4px',
+            }}>
+              {/* Row 1: 10sp */}
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#000', textAlign: 'center', width: '100%' }}>10sp</span>
+              {/* Row 2: dot (interactive) */}
+              <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px', width: '100%' }}>
+                {(() => {
+                  const arr = safeGetBackgroundDotsArray(0);
+                  const idx = 0;
+                  const canCheck = idx === 0 || arr.slice(0, idx).every(Boolean);
+                  const rightmostChecked = arr.lastIndexOf(true);
+                  const canUncheck = arr[idx] && idx === rightmostChecked;
+                  const availableSp = (spTotal || 0) - (spSpent || 0);
+                  const canAfford = availableSp >= 10;
+
+                  return (
+                    <span
+                      onClick={() => {
+                        if (!arr[idx] && canCheck) {
+                          if (!canAfford) {
+                            if (setNotice) setNotice('Not enough sp!');
+                            return;
+                          }
+                          const newDots = safeCloneBackgroundDots();
+                          if (newDots && newDots.blackMarketExecutiveQuestionableNegotiationsDots) {
+                            for (let j = 0; j <= idx; ++j) newDots.blackMarketExecutiveQuestionableNegotiationsDots[j] = true;
+                          }
+                          persistBackgroundDots(newDots || {}, 10);
+                        } else if (arr[idx] && canUncheck) {
+                          const newDots = safeCloneBackgroundDots();
+                          if (newDots && newDots.blackMarketExecutiveQuestionableNegotiationsDots) {
+                            for (let j = idx; j < arr.length; ++j) newDots.blackMarketExecutiveQuestionableNegotiationsDots[j] = false;
+                          }
+                          persistBackgroundDots(newDots || {}, -10);
+                        }
+                      }}
+                      style={{
+                        display: 'inline-block',
+                        width: '15px',
+                        height: '15px',
+                        border: '2px solid #000',
+                        borderRadius: '50%',
+                        background: arr[idx] ? '#000' : '#fff',
+                        cursor: canCheck || canUncheck ? 'pointer' : 'not-allowed',
+                        transition: 'background 0.2s'
+                      }}
+                    />
+                  );
+                })()}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (background === "Combat Medic") {
+    return (
+      <div style={{ width: '100%', fontSize: '1em' }}>
+        {/* Description */}
+        <div style={{ fontSize: '1em', color: '#000', marginBottom: '12px', fontFamily: 'Arial, Helvetica, sans-serif', lineHeight: 1.4 }}>
+        <div style={{ fontWeight: 'bold', color: '#000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Description</u></div>
+          <i>You've seen the horrors of war, but it was rarely from behind the scope of a rifle. Instead, you were charged with tending to the wounded in the midst of battle. You saw scores of suffering individuals in unspeakable pain, and the trauma of such experiences have stayed with you since then. However, so has your superb experience within medicine in the field. You've thus learned to use whatever is available to help you keep your comrades alive.</i>
+        </div>
+
+        {/* Perks Header */}
+        <div style={{ fontWeight: 'bold', color: '#000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+          <u>Perks</u>
+        </div>
+
+        {/* Skills */}
+        <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+          <i><b>Skills.</b></i> <i>Medicine</i> +2, <i>Performance</i> +2,<br />
+          <i>Deception</i> -2, <i>Stealth</i> -2
+        </div>
+
+        {/* Languages */}
+        <div style={{ fontSize: '1em', color: '#000', marginBottom: '-12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+          <i><b>Languages.</b></i> Choose 2
+          
+          {/* Language Dropdown */}
+          <div style={{ marginTop: '8px', marginLeft: '24px' }}>
+            <select
+              value=""
+              onChange={(e) => {
+                const val = e.target.value;
+                if (val && onAutoSave) {
+                  const currentLanguages = sheet?.combatMedicLanguages || [];
+                  if (currentLanguages.length < 2 && !currentLanguages.includes(val)) {
+                    onAutoSave({ combatMedicLanguages: [...currentLanguages, val] });
+                  }
+                }
+              }}
+              disabled={!!(sheet?.combatMedicLanguages && sheet.combatMedicLanguages.length >= 2)}
+              style={{
+                fontSize: '1em',
+                padding: '2px 8px',
+                borderRadius: '6px',
+                border: '1px solid #ccc',
+                background: (sheet?.combatMedicLanguages && sheet.combatMedicLanguages.length >= 2) ? '#eee' : '#fff',
+                textAlign: 'left',
+                minWidth: '200px',
+                fontFamily: 'Arial, Helvetica, sans-serif',
+                fontWeight: 'bold',
+                color: '#000',
+                cursor: (sheet?.combatMedicLanguages && sheet.combatMedicLanguages.length >= 2) ? 'not-allowed' : 'pointer'
+              }}
+            >
+              <option value="" style={{ color: 'black', backgroundColor: 'white' }}>
+                {(sheet?.combatMedicLanguages && sheet.combatMedicLanguages.length >= 2) ? 'Languages Selected' : 'Languages'}
+              </option>
+              {!(sheet?.combatMedicLanguages && sheet.combatMedicLanguages.includes('Avenoch')) && sheet?.species !== 'Avenoch' && (
+                <option value="Avenoch" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Avenoch</option>
+              )}
+              {!(sheet?.combatMedicLanguages && sheet.combatMedicLanguages.includes('Binary')) && (
+                <option value="Binary" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Binary</option>
+              )}
+              {!(sheet?.combatMedicLanguages && sheet.combatMedicLanguages.includes('Body Language')) && (
+                <option value="Body Language" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Body Language</option>
+              )}
+              {!(sheet?.combatMedicLanguages && sheet.combatMedicLanguages.includes('Cerebronych')) && sheet?.species !== 'Cerebronych' && (
+                <option value="Cerebronych" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Cerebronych</option>
+              )}
+              {!(sheet?.combatMedicLanguages && sheet.combatMedicLanguages.includes('Chloroptid')) && sheet?.species !== 'Chloroptid' && (
+                <option value="Chloroptid" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Chloroptid</option>
+              )}
+              {!(sheet?.combatMedicLanguages && sheet.combatMedicLanguages.includes('Defteran')) && (
+                <option value="Defteran" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Defteran</option>
+              )}
+              {!(sheet?.combatMedicLanguages && sheet.combatMedicLanguages.includes('Entomos')) && sheet?.species !== 'Entomos' && (
+                <option value="Entomos" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Entomos</option>
+              )}
+              {!(sheet?.combatMedicLanguages && sheet.combatMedicLanguages.includes('Hycryptice')) && (
+                <option value="Hycryptice" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Hycryptice</option>
+              )}
+              {!(sheet?.combatMedicLanguages && sheet.combatMedicLanguages.includes('Galactapol Jargon')) && (
+                <option value="Galactapol Jargon" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Galactapol Jargon</option>
+              )}
+              {!(sheet?.combatMedicLanguages && sheet.combatMedicLanguages.includes('Lumenaren')) && sheet?.species !== 'Lumenaren' && (
+                <option value="Lumenaren" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Lumenaren</option>
+              )}
+              {!(sheet?.combatMedicLanguages && sheet.combatMedicLanguages.includes('Lux')) && (
+                <option value="Lux" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Lux</option>
+              )}
+              {!(sheet?.combatMedicLanguages && sheet.combatMedicLanguages.includes('Oikovox')) && sheet?.charClass !== 'Coder' && (
+                <option value="Oikovox" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Oikovox</option>
+              )}
+              {!(sheet?.combatMedicLanguages && sheet.combatMedicLanguages.includes('Praedari')) && sheet?.species !== 'Praedari' && (
+                <option value="Praedari" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Praedari</option>
+              )}
+              {!(sheet?.combatMedicLanguages && sheet.combatMedicLanguages.includes('Xenoelemental')) && sheet?.charClass !== 'Elementalist' && (
+                <option value="Xenoelemental" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Xenoelemental</option>
+              )}
+              {!(sheet?.combatMedicLanguages && sheet.combatMedicLanguages.includes('Xenovox')) && sheet?.charClass !== 'Devout' && (
+                <option value="Xenovox" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Xenovox</option>
+              )}
+            </select>
+
+            {/* Display selected languages */}
+            {sheet?.combatMedicLanguages && sheet.combatMedicLanguages.length > 0 && (
+              <div style={{ marginTop: '4px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                {sheet.combatMedicLanguages.map((lang, idx) => (
+                  <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ color: '#000', fontWeight: 'bold' }}>
+                      {lang}
+                    </span>
+                    <button
+                      onClick={() => {
+                        if (onAutoSave) {
+                          const updatedLanguages = sheet.combatMedicLanguages!.filter((_, i) => i !== idx);
+                          onAutoSave({ combatMedicLanguages: updatedLanguages.length > 0 ? updatedLanguages : undefined });
+                        }
+                      }}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        color: '#cc0000',
+                        fontSize: '1.2em',
+                        cursor: 'pointer',
+                        padding: 0,
+                        lineHeight: 1
+                      }}
+                      title="Remove language"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Horrors of War Perk */}
+        <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '20px' }}>
+          <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', gap: '12px' }}>
+            <span style={{ display: 'inline-block', maxWidth: 'calc(100% - 40px)' }}>
+              <b><i style={{ color: '#000' }}>Horrors of War.</i></b> You've endured a great deal of suffering through the suffering, pain and death of many of those around you on the battlefield. Gain an advantage on related skill rolls when tending to a wound or relating with other veterans.
+            </span>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '24px',
+              gridTemplateRows: 'repeat(2, auto)',
+              alignItems: 'start',
+              marginLeft: '4px',
+            }}>
+              {/* Row 1: 8sp */}
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#000', textAlign: 'center', width: '100%' }}>8sp</span>
+              {/* Row 2: dot (interactive) */}
+              <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px', width: '100%' }}>
+                {(() => {
+                  const arr = safeGetBackgroundDotsArray(0);
+                  const idx = 0;
+                  const canCheck = idx === 0 || arr.slice(0, idx).every(Boolean);
+                  const rightmostChecked = arr.lastIndexOf(true);
+                  const canUncheck = arr[idx] && idx === rightmostChecked;
+                  const availableSp = (spTotal || 0) - (spSpent || 0);
+                  const canAfford = availableSp >= 8;
+
+                  return (
+                    <span
+                      onClick={() => {
+                        if (!arr[idx] && canCheck) {
+                          if (!canAfford) {
+                            if (setNotice) setNotice('Not enough sp!');
+                            return;
+                          }
+                          const newDots = safeCloneBackgroundDots();
+                          if (newDots && newDots.combatMedicHorrorsOfWarDots) {
+                            for (let j = 0; j <= idx; ++j) newDots.combatMedicHorrorsOfWarDots[j] = true;
+                          }
+                          persistBackgroundDots(newDots || {}, 8);
+                        } else if (arr[idx] && canUncheck) {
+                          const newDots = safeCloneBackgroundDots();
+                          if (newDots && newDots.combatMedicHorrorsOfWarDots) {
+                            for (let j = idx; j < arr.length; ++j) newDots.combatMedicHorrorsOfWarDots[j] = false;
                           }
                           persistBackgroundDots(newDots || {}, -8);
                         }

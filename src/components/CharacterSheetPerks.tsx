@@ -123,6 +123,25 @@ const CharacterSheetPerks: React.FC<CharacterSheetPerksProps> = ({
                 {sheet.awakenedMachineLanguage}
               </span>
             )}
+            {sheet?.beltMinerLanguage && (
+              <span style={{ fontWeight: 'normal', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', color: '#000' }}>
+                {sheet.beltMinerLanguage}
+              </span>
+            )}
+            {sheet?.blackMarketExecutiveLanguages && sheet.blackMarketExecutiveLanguages.length > 0 && (
+              sheet.blackMarketExecutiveLanguages.map((lang, idx) => (
+                <span key={idx} style={{ fontWeight: 'normal', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', color: '#000' }}>
+                  {lang}
+                </span>
+              ))
+            )}
+            {sheet?.combatMedicLanguages && sheet.combatMedicLanguages.length > 0 && (
+              sheet.combatMedicLanguages.map((lang, idx) => (
+                <span key={idx} style={{ fontWeight: 'normal', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', color: '#000' }}>
+                  {lang}
+                </span>
+              ))
+            )}
           </div>
           {/* Class Perk segment, visible if Class Perk dot is selected */}
           {charClass === 'Chemist' && sheet?.classCardDots?.[9]?.[0] && (
@@ -717,6 +736,27 @@ const CharacterSheetPerks: React.FC<CharacterSheetPerksProps> = ({
           <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
             <span>
               <b><i style={{ color: '#000' }}>No Longer a Filthy Cog.</i></b> <span style={{ color: '#000' }}>You are deeply cognizant of the slavery and servitude other bots often find themselves in. Gain an advantage on skill rolls while relating with Cognizants, droids or other machines who are or once were slaves to biological masters.</span>
+            </span>
+          </div>
+          )}
+          {sheet?.background === 'Belt Miner' && sheet?.backgroundProgressionDots?.beltMinerMinersKnowledgeDots?.[0] && (
+          <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <span>
+              <b><i style={{ color: '#000' }}>Miner's Knowledge.</i></b> <span style={{ color: '#000' }}>Your experience from the mines has given you the ability to discern various metals, ores, and soils. You can also determine the structural integrity of any object made of these materials. Gain an advantage on related skill rolls.</span>
+            </span>
+          </div>
+          )}
+          {sheet?.background === 'Black Market Executive' && sheet?.backgroundProgressionDots?.blackMarketExecutiveQuestionableNegotiationsDots?.[0] && (
+          <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <span>
+              <b><i style={{ color: '#000' }}>Questionable Negotiations.</i></b> <span style={{ color: '#000' }}>You are a skilled salesperson in every negative sense of the word, and can easily haggle your way through almost any trade. Gain an advantage on related skill rolls.</span>
+            </span>
+          </div>
+          )}
+          {sheet?.background === 'Combat Medic' && sheet?.backgroundProgressionDots?.combatMedicHorrorsOfWarDots?.[0] && (
+          <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <span>
+              <b><i style={{ color: '#000' }}>Horrors of War.</i></b> <span style={{ color: '#000' }}>You've endured a great deal of suffering through the suffering, pain and death of many of those around you on the battlefield. Gain an advantage on related skill rolls when tending to a wound or relating with other veterans.</span>
             </span>
           </div>
           )}

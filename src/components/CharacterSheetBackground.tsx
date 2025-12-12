@@ -47,6 +47,45 @@ const CharacterSheetBackground: React.FC<CharacterSheetBackgroundProps> = ({ she
     );
   }
 
+  if (background === "Belt Miner") {
+    return (
+      <div style={{ padding: '0', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+        <h4 style={{ margin: '0 0 8px 0', fontSize: '1.1em', fontWeight: 'bold', textDecoration: 'underline' }}>
+          Belt Miner
+        </h4>
+        <div style={{ fontSize: '0.95em', color: '#000', lineHeight: 1.4 }}>
+          <i>The years of your childhood and early adulthood were filled with long grueling hours in the mine. Perhaps such physical labor was just a job to get you by, or perhaps you were born into servitude under an oppressive empire. In either case, you've become physically fit and naturally aware of your surroundings after your time in the mines.</i>
+        </div>
+      </div>
+    );
+  }
+
+  if (background === "Black Market Executive") {
+    return (
+      <div style={{ padding: '0', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+        <h4 style={{ margin: '0 0 8px 0', fontSize: '1.1em', fontWeight: 'bold', textDecoration: 'underline' }}>
+          Black Market Executive
+        </h4>
+        <div style={{ fontSize: '0.95em', color: '#000', lineHeight: 1.4 }}>
+          <i>A lifetime of shady dealings, smuggling and underground activity has led you to become a leader in the black market. Whether it was to feed your family or to just feed your insatiable greed, you've become adept at deceiving would-be customers and performing transactions outside of the prying eyes of the law. You're viewed as a criminal by many and an entrepreneurial genius by others.</i>
+        </div>
+      </div>
+    );
+  }
+
+  if (background === "Combat Medic") {
+    return (
+      <div style={{ padding: '0', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+        <h4 style={{ margin: '0 0 8px 0', fontSize: '1.1em', fontWeight: 'bold', textDecoration: 'underline' }}>
+          Combat Medic
+        </h4>
+        <div style={{ fontSize: '0.95em', color: '#000', lineHeight: 1.4 }}>
+          <i>You've seen the horrors of war, but it was rarely from behind the scope of a rifle. Instead, you were charged with tending to the wounded in the midst of battle. You saw scores of suffering individuals in unspeakable pain, and the trauma of such experiences have stayed with you since then. However, so has your superb experience within medicine in the field. You've thus learned to use whatever is available to help you keep your comrades alive.</i>
+        </div>
+      </div>
+    );
+  }
+
   // Return empty div for other backgrounds
   return <div style={{ padding: '0', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '0.95em', color: '#666' }}>
     No background selected.

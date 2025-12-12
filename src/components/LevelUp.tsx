@@ -180,6 +180,12 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
       if (sheet?.background === "Awakened Machine") {
         antiBoosterSkills.push("Culture", "Performance");
       }
+      if (sheet?.background === "Belt Miner") {
+        antiBoosterSkills.push("Culture", "Performance");
+      }
+      if (sheet?.background === "Black Market Executive") {
+        antiBoosterSkills.push("Awareness", "Survival");
+      }
 
       // Create skill dots with first two columns filled, except for anti-booster skills which only get first column
       const newSkillDots = Object.fromEntries(
@@ -221,6 +227,12 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
     }
     if (sheet.background === "Awakened Machine") {
       antiBoosterSkills.push("Culture", "Performance");
+    }
+    if (sheet.background === "Belt Miner") {
+      antiBoosterSkills.push("Culture", "Performance");
+    }
+    if (sheet.background === "Black Market Executive") {
+      antiBoosterSkills.push("Awareness", "Survival");
     }
     
     // Check if we need to update any skill dots
@@ -3108,26 +3120,39 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                         if (sheet?.background === "Anti-Deft Secessionist" && skillName === "Survival") sources.push({ type: 'background', color: "rgba(102,102,102,0.5)" });
                         if (sheet?.background === "Awakened Machine" && skillName === "Awareness") sources.push({ type: 'background', color: "rgba(102,102,102,0.5)" });
                         if (sheet?.background === "Awakened Machine" && skillName === "Investigation") sources.push({ type: 'background', color: "rgba(102,102,102,0.5)" });
+                        if (sheet?.background === "Belt Miner" && skillName === "Athletics") sources.push({ type: 'background', color: "rgba(102,102,102,0.5)" });
+                        if (sheet?.background === "Belt Miner" && skillName === "Awareness") sources.push({ type: 'background', color: "rgba(102,102,102,0.5)" });
+                        if (sheet?.background === "Black Market Executive" && skillName === "Deception") sources.push({ type: 'background', color: "rgba(102,102,102,0.5)" });
+                        if (sheet?.background === "Black Market Executive" && skillName === "Diplomacy") sources.push({ type: 'background', color: "rgba(102,102,102,0.5)" });
+                        if (sheet?.background === "Combat Medic" && skillName === "Medicine") sources.push({ type: 'background', color: "rgba(102,102,102,0.5)" });
+                        if (sheet?.background === "Combat Medic" && skillName === "Performance") sources.push({ type: 'background', color: "rgba(102,102,102,0.5)" });
 
                         return sources;
                       };
                       
-                      // Helper function to get anti-booster skills (skills that lose an auto-filled dot)
-                      const getAntiBoosterSkills = () => {
-                        const antiSkills = [];
-                        if (sheet?.background === "Adherent of the Pollen Collective") {
-                          antiSkills.push("Investigation", "Technology");
-                        }
-                        if (sheet?.background === "Anti-Deft Secessionist") {
-                          antiSkills.push("Diplomacy", "Intimidation");
-                        }
-                        if (sheet?.background === "Awakened Machine") {
-                          antiSkills.push("Culture", "Performance");
-                        }
-                        return antiSkills;
-                      };
-
-                      // Helper function to get booster positions for a skill (handles overlaps and anti-boosters)
+                // Helper function to get anti-booster skills (skills that lose an auto-filled dot)
+                const getAntiBoosterSkills = () => {
+                  const antiSkills = [];
+                  if (sheet?.background === "Adherent of the Pollen Collective") {
+                    antiSkills.push("Investigation", "Technology");
+                  }
+                  if (sheet?.background === "Anti-Deft Secessionist") {
+                    antiSkills.push("Diplomacy", "Intimidation");
+                  }
+                  if (sheet?.background === "Awakened Machine") {
+                    antiSkills.push("Culture", "Performance");
+                  }
+                  if (sheet?.background === "Belt Miner") {
+                    antiSkills.push("Culture", "Performance");
+                  }
+                  if (sheet?.background === "Black Market Executive") {
+                    antiSkills.push("Awareness", "Survival");
+                  }
+                  if (sheet?.background === "Combat Medic") {
+                    antiSkills.push("Deception", "Stealth");
+                  }
+                  return antiSkills;
+                };                      // Helper function to get booster positions for a skill (handles overlaps and anti-boosters)
                       const getBoosterPositions = (skillName: string) => {
                         const sources = getBoosterSources(skillName);
                         const antiBoosterSkills = getAntiBoosterSkills();
