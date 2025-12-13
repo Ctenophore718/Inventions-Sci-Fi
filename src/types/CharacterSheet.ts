@@ -23,6 +23,7 @@ export type CharacterSheet = {
   covertOperativeLanguage?: string; // For Covert Operative background - selected bonus language
   dagrOfficerLanguage?: string; // For DAGR Officer background - selected bonus language
   exobiologistLanguages?: string[]; // For Exobiologist background - selected bonus languages (max 2)
+  featheredOneLanguage?: string; // For Feathered One background - selected bonus language
   background: string;
 
 
@@ -423,5 +424,6 @@ export type CharacterSheet = {
     covertOperativeInfiltrationExpertDots?: boolean[];
     dagrOfficerSupernaturalAwarenessDots?: boolean[];
     exobiologistNatureAndScienceDots?: boolean[];
+    featheredOnePeeringIntoDarknessDots?: boolean[];
   };
 };

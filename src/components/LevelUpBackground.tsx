@@ -46,6 +46,8 @@ const LevelUpBackground: React.FC<LevelUpBackgroundProps> = ({
       if (index === 0) return sheet.backgroundProgressionDots.dagrOfficerSupernaturalAwarenessDots || [];
     } else if (background === "Exobiologist") {
       if (index === 0) return sheet.backgroundProgressionDots.exobiologistNatureAndScienceDots || [];
+    } else if (background === "Feathered One") {
+      if (index === 0) return sheet.backgroundProgressionDots.featheredOnePeeringIntoDarknessDots || [];
     }
     return [];
   };
@@ -61,7 +63,8 @@ const LevelUpBackground: React.FC<LevelUpBackgroundProps> = ({
       combatMedicHorrorsOfWarDots: sheet?.backgroundProgressionDots?.combatMedicHorrorsOfWarDots ? [...sheet.backgroundProgressionDots.combatMedicHorrorsOfWarDots] : undefined,
       covertOperativeInfiltrationExpertDots: sheet?.backgroundProgressionDots?.covertOperativeInfiltrationExpertDots ? [...sheet.backgroundProgressionDots.covertOperativeInfiltrationExpertDots] : undefined,
       dagrOfficerSupernaturalAwarenessDots: sheet?.backgroundProgressionDots?.dagrOfficerSupernaturalAwarenessDots ? [...sheet.backgroundProgressionDots.dagrOfficerSupernaturalAwarenessDots] : undefined,
-      exobiologistNatureAndScienceDots: sheet?.backgroundProgressionDots?.exobiologistNatureAndScienceDots ? [...sheet.backgroundProgressionDots.exobiologistNatureAndScienceDots] : undefined
+      exobiologistNatureAndScienceDots: sheet?.backgroundProgressionDots?.exobiologistNatureAndScienceDots ? [...sheet.backgroundProgressionDots.exobiologistNatureAndScienceDots] : undefined,
+      featheredOnePeeringIntoDarknessDots: sheet?.backgroundProgressionDots?.featheredOnePeeringIntoDarknessDots ? [...sheet.backgroundProgressionDots.featheredOnePeeringIntoDarknessDots] : undefined
     };
 
     // Initialize the current background's dots if they don't exist
@@ -83,6 +86,8 @@ const LevelUpBackground: React.FC<LevelUpBackgroundProps> = ({
       allDots.dagrOfficerSupernaturalAwarenessDots = [false];
     } else if (background === "Exobiologist" && !allDots.exobiologistNatureAndScienceDots) {
       allDots.exobiologistNatureAndScienceDots = [false];
+    } else if (background === "Feathered One" && !allDots.featheredOnePeeringIntoDarknessDots) {
+      allDots.featheredOnePeeringIntoDarknessDots = [false];
     }
 
     return allDots;
@@ -1660,6 +1665,198 @@ const LevelUpBackground: React.FC<LevelUpBackgroundProps> = ({
                             for (let j = idx; j < arr.length; ++j) newDots.exobiologistNatureAndScienceDots[j] = false;
                           }
                           persistBackgroundDots(newDots || {}, -8);
+                        }
+                      }}
+                      style={{
+                        width: '15px',
+                        height: '15px',
+                        border: '2px solid #000',
+                        borderRadius: '50%',
+                        display: 'block',
+                        background: arr[idx] ? '#000' : '#fff',
+                        cursor: 'pointer',
+                        transition: 'background 0.2s'
+                      }}
+                    ></span>
+                  );
+                })()}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (background === "Feathered One") {
+    return (
+      <div style={{ width: '100%', fontSize: '1em' }}>
+        {/* Description */}
+        <div style={{ fontSize: '1em', color: '#000', marginBottom: '12px', fontFamily: 'Arial, Helvetica, sans-serif', lineHeight: 1.4 }}>
+        <div style={{ fontWeight: 'bold', color: '#000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Description</u></div>
+          <i>The Feathered Ones, also called The Murder, is a cult-like group of Avenochs who have more or less embraced the darker aspects of their being and are all in service to an entity larger than themselves. This entity inhabits the Void Realm and grants the Feathered Ones a supernatural ability to see through even the pitchest of black. They are, all in all, worshipers of Darkness Itself.</i>
+        </div>
+
+        {/* Perks Header */}
+        <div style={{ fontWeight: 'bold', color: '#000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+          <u>Perks</u>
+        </div>
+
+        {/* Skills */}
+        <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+          <i><b>Skills.</b></i> <i>Awareness</i> +2, <i>Xenomagic</i> +2,<br />
+          <i>Culture</i> -2, <i>Oikomagic</i> -2
+        </div>
+
+        {/* Languages */}
+        <div style={{ fontSize: '1em', color: '#000', marginBottom: '-12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+          <i><b>Languages.</b></i> Xenovox, Choose 1
+          
+          {/* Language Dropdown */}
+          <div style={{ marginTop: '8px', marginLeft: '24px' }}>
+            <select
+              value=""
+              onChange={(e) => {
+                const val = e.target.value;
+                if (val && onAutoSave) {
+                  onAutoSave({ featheredOneLanguage: val });
+                }
+              }}
+              disabled={!!sheet?.featheredOneLanguage}
+              style={{
+                fontSize: '1em',
+                padding: '2px 8px',
+                borderRadius: '6px',
+                border: '1px solid #ccc',
+                background: sheet?.featheredOneLanguage ? '#eee' : '#fff',
+                textAlign: 'left',
+                minWidth: '200px',
+                fontFamily: 'Arial, Helvetica, sans-serif',
+                fontWeight: 'bold',
+                color: '#000',
+                cursor: sheet?.featheredOneLanguage ? 'not-allowed' : 'pointer'
+              }}
+            >
+              <option value="" style={{ color: 'black', backgroundColor: 'white' }}>
+                {sheet?.featheredOneLanguage ? 'Language Selected' : 'Languages'}
+              </option>
+              {!sheet?.featheredOneLanguage && (
+                <option value="Binary" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Binary</option>
+              )}
+              {!sheet?.featheredOneLanguage && (
+                <option value="Body Language" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Body Language</option>
+              )}
+              {!sheet?.featheredOneLanguage && (
+                <option value="Cerebronych" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Cerebronych</option>
+              )}
+              {!sheet?.featheredOneLanguage && (
+                <option value="Chloroptid" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Chloroptid</option>
+              )}
+              {!sheet?.featheredOneLanguage && (
+                <option value="Defteran" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Defteran</option>
+              )}
+              {!sheet?.featheredOneLanguage && (
+                <option value="Entomos" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Entomos</option>
+              )}
+              {!sheet?.featheredOneLanguage && (
+                <option value="Hycryptice" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Hycryptice</option>
+              )}
+              {!sheet?.featheredOneLanguage && (
+                <option value="Galactapol Jargon" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Galactapol Jargon</option>
+              )}
+              {!sheet?.featheredOneLanguage && (
+                <option value="Lumenaren" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Lumenaren</option>
+              )}
+              {!sheet?.featheredOneLanguage && (
+                <option value="Lux" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Lux</option>
+              )}
+              {!sheet?.featheredOneLanguage && sheet?.charClass !== 'Coder' && (
+                <option value="Oikovox" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Oikovox</option>
+              )}
+              {!sheet?.featheredOneLanguage && (
+                <option value="Praedari" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Praedari</option>
+              )}
+              {!sheet?.featheredOneLanguage && sheet?.charClass !== 'Elementalist' && (
+                <option value="Xenoelemental" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Xenoelemental</option>
+              )}
+            </select>
+
+            {/* Display selected language */}
+            {sheet?.featheredOneLanguage && (
+              <div style={{ marginTop: '4px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ color: '#000', fontWeight: 'bold' }}>
+                  {sheet.featheredOneLanguage}
+                </span>
+                <button
+                  onClick={() => {
+                    if (onAutoSave) {
+                      onAutoSave({ featheredOneLanguage: undefined });
+                    }
+                  }}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: '#cc0000',
+                    cursor: 'pointer',
+                    fontSize: '1.2em',
+                    fontWeight: 'bold',
+                    padding: '0',
+                    lineHeight: '1'
+                  }}
+                  title="Remove language"
+                >
+                  ×
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Perk 1: Peering Into Darkness */}
+        <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '20px' }}>
+          <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', gap: '12px' }}>
+            <span style={{ display: 'inline-block', maxWidth: 'calc(100% - 40px)' }}>
+              <b><i style={{ color: '#000' }}>Peering Into Darkness.</i></b> Your worship of Darkness has granted you the ability to see into pitch black spaces, whether natural or magical. You can see in the dark as though it were broad daylight.
+            </span>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '24px',
+              gridTemplateRows: 'repeat(2, auto)',
+              alignItems: 'start',
+              marginLeft: '4px',
+            }}>
+              {/* Row 1: 11sp */}
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#000', textAlign: 'center', width: '100%' }}>11sp</span>
+              {/* Row 2: dot (interactive) */}
+              <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px', width: '100%' }}>
+                {(() => {
+                  const arr = safeGetBackgroundDotsArray(0);
+                  const idx = 0;
+                  const canCheck = idx === 0 || arr.slice(0, idx).every(Boolean);
+                  const rightmostChecked = arr.lastIndexOf(true);
+                  const canUncheck = arr[idx] && idx === rightmostChecked;
+                  const availableSp = (spTotal || 0) - (spSpent || 0);
+                  const canAfford = availableSp >= 11;
+
+                  return (
+                    <span
+                      onClick={() => {
+                        if (!arr[idx] && canCheck) {
+                          if (!canAfford) {
+                            if (setNotice) setNotice('Not enough sp!');
+                            return;
+                          }
+                          const newDots = safeCloneBackgroundDots();
+                          if (newDots && newDots.featheredOnePeeringIntoDarknessDots) {
+                            for (let j = 0; j <= idx; ++j) newDots.featheredOnePeeringIntoDarknessDots[j] = true;
+                          }
+                          persistBackgroundDots(newDots || {}, 11);
+                        } else if (arr[idx] && canUncheck) {
+                          const newDots = safeCloneBackgroundDots();
+                          if (newDots && newDots.featheredOnePeeringIntoDarknessDots) {
+                            for (let j = idx; j < arr.length; ++j) newDots.featheredOnePeeringIntoDarknessDots[j] = false;
+                          }
+                          persistBackgroundDots(newDots || {}, -11);
                         }
                       }}
                       style={{

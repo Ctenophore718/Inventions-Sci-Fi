@@ -125,6 +125,19 @@ const CharacterSheetBackground: React.FC<CharacterSheetBackgroundProps> = ({ she
     );
   }
 
+  if (background === "Feathered One") {
+    return (
+      <div style={{ padding: '0', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+        <h4 style={{ margin: '0 0 8px 0', fontSize: '1.1em', fontWeight: 'bold', textDecoration: 'underline' }}>
+          Feathered One
+        </h4>
+        <div style={{ fontSize: '0.95em', color: '#000', lineHeight: 1.4 }}>
+          <i>The Feathered Ones, also called The Murder, is a cult-like group of Avenochs who have more or less embraced the darker aspects of their being and are all in service to an entity larger than themselves. This entity inhabits the Void Realm and grants the Feathered Ones a supernatural ability to see through even the pitchest of black. They are, all in all, worshipers of Darkness Itself.</i>
+        </div>
+      </div>
+    );
+  }
+
   // Return empty div for other backgrounds
   return <div style={{ padding: '0', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '0.95em', color: '#666' }}>
     No background selected.

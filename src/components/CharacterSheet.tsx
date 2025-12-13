@@ -1262,7 +1262,7 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
     { label: "Covert Operative", value: "Covert Operative", color: "#666666" },
     { label: "DAGR Officer", value: "DAGR Officer", color: "#666666" },
     { label: "Exobiologist", value: "Exobiologist", color: "#666666" },
-    { label: "Feathered One", value: "Feathered One", color: "#666666" },
+    { label: "Feathered One", value: "Feathered One", color: "#666666", prerequisite: "Avenoch" },
     { label: "Galactapol Netizen", value: "Galactapol Netizen", color: "#666666" },
     { label: "Interstellar Refugee", value: "Interstellar Refugee", color: "#666666" },
     { label: "Intragalactic Nobility", value: "Intragalactic Nobility", color: "#666666" },
@@ -2644,6 +2644,8 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                   if (sheet?.background === "DAGR Officer" && skillName === "Investigation") sources.push({ type: 'background', color: "rgba(102,102,102,0.5)" });
                   if (sheet?.background === "Exobiologist" && skillName === "Medicine") sources.push({ type: 'background', color: "rgba(102,102,102,0.5)" });
                   if (sheet?.background === "Exobiologist" && skillName === "Survival") sources.push({ type: 'background', color: "rgba(102,102,102,0.5)" });
+                  if (sheet?.background === "Feathered One" && skillName === "Awareness") sources.push({ type: 'background', color: "rgba(102,102,102,0.5)" });
+                  if (sheet?.background === "Feathered One" && skillName === "Xenomagic") sources.push({ type: 'background', color: "rgba(102,102,102,0.5)" });
                   
                   return sources;
                 };
@@ -2677,6 +2679,9 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                   }
                   if (sheet?.background === "Exobiologist") {
                     antiSkills.push("Culture", "Deception");
+                  }
+                  if (sheet?.background === "Feathered One") {
+                    antiSkills.push("Culture", "Oikomagic");
                   }
                   return antiSkills;
                 };

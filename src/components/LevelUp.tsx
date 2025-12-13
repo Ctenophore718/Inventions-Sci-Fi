@@ -271,6 +271,9 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
     if (sheet.background === "Exobiologist") {
       antiBoosterSkills.push("Culture", "Deception");
     }
+    if (sheet.background === "Feathered One") {
+      antiBoosterSkills.push("Culture", "Oikomagic");
+    }
     
     // Check if we need to update any skill dots
     let needsUpdate = false;
@@ -880,6 +883,15 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
           if (sheet.background === "Covert Operative") {
             antiBoosterSkills.push("Diplomacy", "Medicine");
           }
+          if (sheet.background === "DAGR Officer") {
+            antiBoosterSkills.push("Medicine", "Thievery");
+          }
+          if (sheet.background === "Exobiologist") {
+            antiBoosterSkills.push("Culture", "Deception");
+          }
+          if (sheet.background === "Feathered One") {
+            antiBoosterSkills.push("Culture", "Oikomagic");
+          }
           
           return Object.keys(sheet.skillDots || {}).reduce((acc, skill) => {
             const hasAntiBooster = antiBoosterSkills.includes(skill);
@@ -1275,6 +1287,18 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
       if (newBackground === "Combat Medic") {
         antiBoosterSkills.push("Deception", "Stealth");
       }
+      if (newBackground === "Covert Operative") {
+        antiBoosterSkills.push("Diplomacy", "Medicine");
+      }
+      if (newBackground === "DAGR Officer") {
+      antiBoosterSkills.push("Medicine", "Thievery");
+      }
+      if (newBackground === "Exobiologist") {
+      antiBoosterSkills.push("Culture", "Deception  ");
+      }
+      if (newBackground === "Feathered One") {
+      antiBoosterSkills.push("Culture", "Oikomagic");
+      }
       
       const resetSkillDots = tempSheet.hasFreeSkillStarterDots ? 
         Object.keys(tempSheet.skillDots || {}).reduce((acc, skill) => {
@@ -1339,6 +1363,18 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
         }
         if (newBackground === "Combat Medic") {
           antiBoosterSkills.push("Deception", "Stealth");
+        }
+        if (newBackground === "Covert Operative") {
+        antiBoosterSkills.push("Diplomacy", "Medicine");
+        }
+        if (newBackground === "DAGR Officer") {
+        antiBoosterSkills.push("Medicine", "Thievery");
+        }
+        if (newBackground === "Exobiologist") {
+        antiBoosterSkills.push("Culture", "Deception");
+        }
+        if (newBackground === "Feathered One") {
+        antiBoosterSkills.push("Culture", "Oikomagic");
         }
         
         // Reset skill dots with correct anti-booster handling for new background
@@ -3094,6 +3130,11 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                   if (setNotice) setNotice("Prerequisite: Species must be Cognizant");
                   return;
                 }
+                // Check prerequisite for Feathered One
+                if (newBackground === "Feathered One" && species !== "Avenoch") {
+                  if (setNotice) setNotice("Prerequisite: Species must be Avenoch");
+                  return;
+                }
                 handleBackgroundChange(newBackground);
               }}
               className={styles.colorSelect + ' ' + styles.selectedBackgroundColor}
@@ -3322,6 +3363,8 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                         if (sheet?.background === "DAGR Officer" && skillName === "Investigation") sources.push({ type: 'background', color: "rgba(102,102,102,0.5)" });
                         if (sheet?.background === "Exobiologist" && skillName === "Medicine") sources.push({ type: 'background', color: "rgba(102,102,102,0.5)" });
                         if (sheet?.background === "Exobiologist" && skillName === "Survival") sources.push({ type: 'background', color: "rgba(102,102,102,0.5)" });
+                        if (sheet?.background === "Feathered One" && skillName === "Awareness") sources.push({ type: 'background', color: "rgba(102,102,102,0.5)" });
+                        if (sheet?.background === "Feathered One" && skillName === "Xenomagic") sources.push({ type: 'background', color: "rgba(102,102,102,0.5)" });
 
                         return sources;
                       };
@@ -3355,6 +3398,9 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                   }
                   if (sheet?.background === "Exobiologist") {
                     antiSkills.push("Culture", "Deception");
+                  }
+                  if (sheet?.background === "Feathered One") {
+                    antiSkills.push("Culture", "Oikomagic");
                   }
                   return antiSkills;
                 };                      // Helper function to get booster positions for a skill (handles overlaps and anti-boosters)

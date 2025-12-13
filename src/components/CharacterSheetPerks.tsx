@@ -143,6 +143,16 @@ const CharacterSheetPerks: React.FC<CharacterSheetPerksProps> = ({
                 {sheet.beltMinerLanguage}
               </span>
             )}
+            {sheet?.background === 'Feathered One' && (
+              <span style={{ fontWeight: 'normal', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', color: '#000' }}>
+                Xenovox
+              </span>
+            )}
+            {sheet?.featheredOneLanguage && (
+              <span style={{ fontWeight: 'normal', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', color: '#000' }}>
+                {sheet.featheredOneLanguage}
+              </span>
+            )}
             {sheet?.blackMarketExecutiveLanguages && sheet.blackMarketExecutiveLanguages.length > 0 && (
               sheet.blackMarketExecutiveLanguages.map((lang, idx) => (
                 <span key={idx} style={{ fontWeight: 'normal', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', color: '#000' }}>
@@ -795,8 +805,13 @@ const CharacterSheetPerks: React.FC<CharacterSheetPerksProps> = ({
               <b><i style={{ color: '#000' }}>Nature & Science.</i></b> <span style={{ color: '#000' }}>You’ve spent an inordinate amount of time out in nature and developed a keen intuition in relation to natural life. Gain an advantage on skill rolls related to interacting with exotic flora and fauna.</span>
             </span>
           </div>
-          )}
-        </div>
+          )}          {sheet?.background === 'Feathered One' && sheet?.backgroundProgressionDots?.featheredOnePeeringIntoDarknessDots?.[0] && (
+          <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <span>
+              <b><i style={{ color: '#000' }}>Peering Into Darkness.</i></b> <span style={{ color: '#000' }}>Your worship of Darkness has granted you the ability to see into pitch black spaces, whether natural or magical. You can see in the dark as though it were broad daylight.</span>
+            </span>
+          </div>
+          )}        </div>
       </div>
   );
 };
