@@ -40,36 +40,52 @@ const LevelUpBackground: React.FC<LevelUpBackgroundProps> = ({
       if (index === 0) return sheet.backgroundProgressionDots.blackMarketExecutiveQuestionableNegotiationsDots || [];
     } else if (background === "Combat Medic") {
       if (index === 0) return sheet.backgroundProgressionDots.combatMedicHorrorsOfWarDots || [];
+    } else if (background === "Covert Operative") {
+      if (index === 0) return sheet.backgroundProgressionDots.covertOperativeInfiltrationExpertDots || [];
+    } else if (background === "DAGR Officer") {
+      if (index === 0) return sheet.backgroundProgressionDots.dagrOfficerSupernaturalAwarenessDots || [];
+    } else if (background === "Exobiologist") {
+      if (index === 0) return sheet.backgroundProgressionDots.exobiologistNatureAndScienceDots || [];
     }
     return [];
   };
 
   // Helper function to safely clone and persist background dots
   const safeCloneBackgroundDots = (): CharacterSheet["backgroundProgressionDots"] => {
-    if (!sheet?.backgroundProgressionDots) {
-      if (background === "Adherent of the Pollen Collective") {
-        return { pollenCollectiveGreenThumbDots: [false] };
-      } else if (background === "Anti-Deft Secessionist") {
-        return { antiDeftSecessionistAtrocitiesDots: [false] };
-      } else if (background === "Awakened Machine") {
-        return { awakenedMachineFilthyCogDots: [false] };
-      } else if (background === "Belt Miner") {
-        return { beltMinerMinersKnowledgeDots: [false] };
-      } else if (background === "Black Market Executive") {
-        return { blackMarketExecutiveQuestionableNegotiationsDots: [false] };
-      } else if (background === "Combat Medic") {
-        return { combatMedicHorrorsOfWarDots: [false] };
-      }
-      return {};
-    }
-    return {
-      pollenCollectiveGreenThumbDots: sheet.backgroundProgressionDots.pollenCollectiveGreenThumbDots ? [...sheet.backgroundProgressionDots.pollenCollectiveGreenThumbDots] : undefined,
-      antiDeftSecessionistAtrocitiesDots: sheet.backgroundProgressionDots.antiDeftSecessionistAtrocitiesDots ? [...sheet.backgroundProgressionDots.antiDeftSecessionistAtrocitiesDots] : undefined,
-      awakenedMachineFilthyCogDots: sheet.backgroundProgressionDots.awakenedMachineFilthyCogDots ? [...sheet.backgroundProgressionDots.awakenedMachineFilthyCogDots] : undefined,
-      beltMinerMinersKnowledgeDots: sheet.backgroundProgressionDots.beltMinerMinersKnowledgeDots ? [...sheet.backgroundProgressionDots.beltMinerMinersKnowledgeDots] : undefined,
-      blackMarketExecutiveQuestionableNegotiationsDots: sheet.backgroundProgressionDots.blackMarketExecutiveQuestionableNegotiationsDots ? [...sheet.backgroundProgressionDots.blackMarketExecutiveQuestionableNegotiationsDots] : undefined,
-      combatMedicHorrorsOfWarDots: sheet.backgroundProgressionDots.combatMedicHorrorsOfWarDots ? [...sheet.backgroundProgressionDots.combatMedicHorrorsOfWarDots] : undefined
+    const allDots = {
+      pollenCollectiveGreenThumbDots: sheet?.backgroundProgressionDots?.pollenCollectiveGreenThumbDots ? [...sheet.backgroundProgressionDots.pollenCollectiveGreenThumbDots] : undefined,
+      antiDeftSecessionistAtrocitiesDots: sheet?.backgroundProgressionDots?.antiDeftSecessionistAtrocitiesDots ? [...sheet.backgroundProgressionDots.antiDeftSecessionistAtrocitiesDots] : undefined,
+      awakenedMachineFilthyCogDots: sheet?.backgroundProgressionDots?.awakenedMachineFilthyCogDots ? [...sheet.backgroundProgressionDots.awakenedMachineFilthyCogDots] : undefined,
+      beltMinerMinersKnowledgeDots: sheet?.backgroundProgressionDots?.beltMinerMinersKnowledgeDots ? [...sheet.backgroundProgressionDots.beltMinerMinersKnowledgeDots] : undefined,
+      blackMarketExecutiveQuestionableNegotiationsDots: sheet?.backgroundProgressionDots?.blackMarketExecutiveQuestionableNegotiationsDots ? [...sheet.backgroundProgressionDots.blackMarketExecutiveQuestionableNegotiationsDots] : undefined,
+      combatMedicHorrorsOfWarDots: sheet?.backgroundProgressionDots?.combatMedicHorrorsOfWarDots ? [...sheet.backgroundProgressionDots.combatMedicHorrorsOfWarDots] : undefined,
+      covertOperativeInfiltrationExpertDots: sheet?.backgroundProgressionDots?.covertOperativeInfiltrationExpertDots ? [...sheet.backgroundProgressionDots.covertOperativeInfiltrationExpertDots] : undefined,
+      dagrOfficerSupernaturalAwarenessDots: sheet?.backgroundProgressionDots?.dagrOfficerSupernaturalAwarenessDots ? [...sheet.backgroundProgressionDots.dagrOfficerSupernaturalAwarenessDots] : undefined,
+      exobiologistNatureAndScienceDots: sheet?.backgroundProgressionDots?.exobiologistNatureAndScienceDots ? [...sheet.backgroundProgressionDots.exobiologistNatureAndScienceDots] : undefined
     };
+
+    // Initialize the current background's dots if they don't exist
+    if (background === "Adherent of the Pollen Collective" && !allDots.pollenCollectiveGreenThumbDots) {
+      allDots.pollenCollectiveGreenThumbDots = [false];
+    } else if (background === "Anti-Deft Secessionist" && !allDots.antiDeftSecessionistAtrocitiesDots) {
+      allDots.antiDeftSecessionistAtrocitiesDots = [false];
+    } else if (background === "Awakened Machine" && !allDots.awakenedMachineFilthyCogDots) {
+      allDots.awakenedMachineFilthyCogDots = [false];
+    } else if (background === "Belt Miner" && !allDots.beltMinerMinersKnowledgeDots) {
+      allDots.beltMinerMinersKnowledgeDots = [false];
+    } else if (background === "Black Market Executive" && !allDots.blackMarketExecutiveQuestionableNegotiationsDots) {
+      allDots.blackMarketExecutiveQuestionableNegotiationsDots = [false];
+    } else if (background === "Combat Medic" && !allDots.combatMedicHorrorsOfWarDots) {
+      allDots.combatMedicHorrorsOfWarDots = [false];
+    } else if (background === "Covert Operative" && !allDots.covertOperativeInfiltrationExpertDots) {
+      allDots.covertOperativeInfiltrationExpertDots = [false];
+    } else if (background === "DAGR Officer" && !allDots.dagrOfficerSupernaturalAwarenessDots) {
+      allDots.dagrOfficerSupernaturalAwarenessDots = [false];
+    } else if (background === "Exobiologist" && !allDots.exobiologistNatureAndScienceDots) {
+      allDots.exobiologistNatureAndScienceDots = [false];
+    }
+
+    return allDots;
   };
 
   const persistBackgroundDots = (newDots: CharacterSheet["backgroundProgressionDots"], spDelta: number) => {
@@ -1150,6 +1166,498 @@ const LevelUpBackground: React.FC<LevelUpBackgroundProps> = ({
                           const newDots = safeCloneBackgroundDots();
                           if (newDots && newDots.combatMedicHorrorsOfWarDots) {
                             for (let j = idx; j < arr.length; ++j) newDots.combatMedicHorrorsOfWarDots[j] = false;
+                          }
+                          persistBackgroundDots(newDots || {}, -8);
+                        }
+                      }}
+                      style={{
+                        width: '15px',
+                        height: '15px',
+                        border: '2px solid #000',
+                        borderRadius: '50%',
+                        display: 'block',
+                        background: arr[idx] ? '#000' : '#fff',
+                        cursor: 'pointer',
+                        transition: 'background 0.2s'
+                      }}
+                    ></span>
+                  );
+                })()}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (background === "Covert Operative") {
+    return (
+      <div style={{ width: '100%', fontSize: '1em' }}>
+        {/* Description */}
+        <div style={{ fontSize: '1em', color: '#000', marginBottom: '12px', fontFamily: 'Arial, Helvetica, sans-serif', lineHeight: 1.4 }}>
+        <div style={{ fontWeight: 'bold', color: '#000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Description</u></div>
+          <i>You’re adept at sneaking and/or breaking into places you’re not normally supposed to get into. While this skill is often used for nefarious purposes, this doesn’t necessarily make you a criminal. You could be anything from a common thief to a ninja to a military infiltrator. Whatever the reason, your gifts of sneakery and infiltration provide you many additional avenues for exploring an often restricting and overly secure world.</i>
+        </div>
+
+        {/* Perks Header */}
+        <div style={{ fontWeight: 'bold', color: '#000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+          <u>Perks</u>
+        </div>
+
+        {/* Skills */}
+        <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+          <i><b>Skills.</b></i> <i>Acrobatics</i> +2, <i>Stealth</i> +2,<br />
+          <i>Diplomacy</i> -2, <i>Medicine</i> -2
+        </div>
+
+        {/* Languages */}
+        <div style={{ fontSize: '1em', color: '#000', marginBottom: '-12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+          <i><b>Languages.</b></i> Choose 1
+          
+          {/* Language Dropdown */}
+          <div style={{ marginTop: '8px', marginLeft: '24px' }}>
+            <select
+              value=""
+              onChange={(e) => {
+                const val = e.target.value;
+                if (val && onAutoSave) {
+                  onAutoSave({ covertOperativeLanguage: val });
+                }
+              }}
+              disabled={!!sheet?.covertOperativeLanguage}
+              style={{
+                fontSize: '1em',
+                padding: '2px 8px',
+                borderRadius: '6px',
+                border: '1px solid #ccc',
+                background: sheet?.covertOperativeLanguage ? '#eee' : '#fff',
+                textAlign: 'left',
+                minWidth: '200px',
+                fontFamily: 'Arial, Helvetica, sans-serif',
+                fontWeight: 'bold',
+                color: '#000',
+                cursor: sheet?.covertOperativeLanguage ? 'not-allowed' : 'pointer'
+              }}
+            >
+              <option value="" style={{ color: 'black', backgroundColor: 'white' }}>
+                {sheet?.covertOperativeLanguage ? 'Language Selected' : 'Languages'}
+              </option>
+              {!sheet?.covertOperativeLanguage && sheet?.species !== 'Avenoch' && (
+                <option value="Avenoch" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Avenoch</option>
+              )}
+              {!sheet?.covertOperativeLanguage && (
+                <option value="Binary" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Binary</option>
+              )}
+              {!sheet?.covertOperativeLanguage && (
+                <option value="Body Language" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Body Language</option>
+              )}
+              {!sheet?.covertOperativeLanguage && sheet?.species !== 'Cerebronych' && (
+                <option value="Cerebronych" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Cerebronych</option>
+              )}
+              {!sheet?.covertOperativeLanguage && (
+                <option value="Defteran" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Defteran</option>
+              )}
+              {!sheet?.covertOperativeLanguage && sheet?.species !== 'Entomos' && (
+                <option value="Entomos" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Entomos</option>
+              )}
+              {!sheet?.covertOperativeLanguage && (
+                <option value="Hycryptice" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Hycryptice</option>
+              )}
+              {!sheet?.covertOperativeLanguage && (
+                <option value="Galactapol Jargon" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Galactapol Jargon</option>
+              )}
+              {!sheet?.covertOperativeLanguage && sheet?.species !== 'Lumenaren' && (
+                <option value="Lumenaren" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Lumenaren</option>
+              )}
+              {!sheet?.covertOperativeLanguage && (
+                <option value="Lux" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Lux</option>
+              )}
+              {!sheet?.covertOperativeLanguage && sheet?.charClass !== 'Coder' && (
+                <option value="Oikovox" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Oikovox</option>
+              )}
+              {!sheet?.covertOperativeLanguage && sheet?.species !== 'Praedari' && (
+                <option value="Praedari" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Praedari</option>
+              )}
+              {!sheet?.covertOperativeLanguage && sheet?.charClass !== 'Elementalist' && (
+                <option value="Xenoelemental" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Xenoelemental</option>
+              )}
+              {!sheet?.covertOperativeLanguage && sheet?.charClass !== 'Devout' && (
+                <option value="Xenovox" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Xenovox</option>
+              )}
+            </select>
+
+            {/* Display selected language */}
+            {sheet?.covertOperativeLanguage && (
+              <div style={{ marginTop: '4px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ color: '#000', fontWeight: 'bold' }}>
+                  {sheet.covertOperativeLanguage}
+                </span>
+                <button
+                  onClick={() => {
+                    if (onAutoSave) {
+                      onAutoSave({ covertOperativeLanguage: undefined });
+                    }
+                  }}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: '#cc0000',
+                    fontSize: '1.2em',
+                    cursor: 'pointer',
+                    padding: 0,
+                    lineHeight: 1
+                  }}
+                  title="Remove language"
+                >
+                  ×
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Infiltration Expert Perk */}
+        <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '20px' }}>
+          <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', gap: '12px' }}>
+            <span style={{ display: 'inline-block', maxWidth: 'calc(100% - 40px)' }}>
+              <b><i style={{ color: '#000' }}>Infiltration Expert.</i></b> You are adept at accessing high security areas and are otherwise good at getting into places you’re not supposed to be. As long as nobody is actively looking for you, gain an advantage on related skill rolls.
+            </span>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '24px',
+              gridTemplateRows: 'repeat(2, auto)',
+              alignItems: 'start',
+              marginLeft: '4px',
+            }}>
+              {/* Row 1: 13sp */}
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#000', textAlign: 'center', width: '100%' }}>13sp</span>
+              {/* Row 2: dot (interactive) */}
+              <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px', width: '100%' }}>
+                {(() => {
+                  const arr = safeGetBackgroundDotsArray(0);
+                  const idx = 0;
+                  const canCheck = idx === 0 || arr.slice(0, idx).every(Boolean);
+                  const rightmostChecked = arr.lastIndexOf(true);
+                  const canUncheck = arr[idx] && idx === rightmostChecked;
+                  const availableSp = (spTotal || 0) - (spSpent || 0);
+                  const canAfford = availableSp >= 13;
+
+                  return (
+                    <span
+                      onClick={() => {
+                        if (!arr[idx] && canCheck) {
+                          if (!canAfford) {
+                            if (setNotice) setNotice('Not enough sp!');
+                            return;
+                          }
+                          const newDots = safeCloneBackgroundDots();
+                          if (newDots && newDots.covertOperativeInfiltrationExpertDots) {
+                            for (let j = 0; j <= idx; ++j) newDots.covertOperativeInfiltrationExpertDots[j] = true;
+                          }
+                          persistBackgroundDots(newDots || {}, 13);
+                        } else if (arr[idx] && canUncheck) {
+                          const newDots = safeCloneBackgroundDots();
+                          if (newDots && newDots.covertOperativeInfiltrationExpertDots) {
+                            for (let j = idx; j < arr.length; ++j) newDots.covertOperativeInfiltrationExpertDots[j] = false;
+                          }
+                          persistBackgroundDots(newDots || {}, -13);
+                        }
+                      }}
+                      style={{
+                        width: '15px',
+                        height: '15px',
+                        border: '2px solid #000',
+                        borderRadius: '50%',
+                        display: 'block',
+                        background: arr[idx] ? '#000' : '#fff',
+                        cursor: 'pointer',
+                        transition: 'background 0.2s'
+                      }}
+                    ></span>
+                  );
+                })()}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (background === "DAGR Officer") {
+    return (
+      <div style={{ width: '100%', fontSize: '1em' }}>
+        {/* Description */}
+        <div style={{ fontSize: '1em', color: '#000', marginBottom: '12px', fontFamily: 'Arial, Helvetica, sans-serif', lineHeight: 1.4 }}>
+        <div style={{ fontWeight: 'bold', color: '#000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Description</u></div>
+          <i>You’re an officer of the little-known Defteran elite galactic unit known as Defteran Aberrance Ground Reconnaissance (a.k.a. DAGR), which specializes in investigating and exploiting aberrant phenomena throughout the Defteran Empire. You’ve studied and engaged with creatures ranging from undead spirits to grotesque genetic mutations that only the vilest lab could concoct. Such engagements ultimately end in either exploitation or violence. Such is the way of DAGR.</i>
+        </div>
+
+        {/* Perks Header */}
+        <div style={{ fontWeight: 'bold', color: '#000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+          <u>Perks</u>
+        </div>
+
+        {/* Skills */}
+        <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+          <i><b>Skills.</b></i> <i>Awareness</i> +2, <i>Investigation</i> +2,<br />
+          <i>Medicine</i> -2, <i>Thievery</i> -2
+        </div>
+
+        {/* Languages */}
+        <div style={{ fontSize: '1em', color: '#000', marginBottom: '-12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+          <i><b>Languages.</b></i> Defteran
+        </div>
+
+        {/* Supernatural Awareness Perk */}
+        <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '20px' }}>
+          <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', gap: '12px' }}>
+            <span style={{ display: 'inline-block', maxWidth: 'calc(100% - 40px)' }}>
+              <b><i style={{ color: '#000' }}>Supernatural Awareness.</i></b> Extensive experience with aberrant phenomena has given you an honed, intuitive sense of the supernatural. Gain an advantage on skill rolls related to interacting with undead, extraplanar, and/or supernatural creatures.
+            </span>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '24px',
+              gridTemplateRows: 'repeat(2, auto)',
+              alignItems: 'start',
+              marginLeft: '4px',
+            }}>
+              {/* Row 1: 9sp */}
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#000', textAlign: 'center', width: '100%' }}>9sp</span>
+              {/* Row 2: dot (interactive) */}
+              <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px', width: '100%' }}>
+                {(() => {
+                  const arr = safeGetBackgroundDotsArray(0);
+                  const idx = 0;
+                  const canCheck = idx === 0 || arr.slice(0, idx).every(Boolean);
+                  const rightmostChecked = arr.lastIndexOf(true);
+                  const canUncheck = arr[idx] && idx === rightmostChecked;
+                  const availableSp = (spTotal || 0) - (spSpent || 0);
+                  const canAfford = availableSp >= 9;
+
+                  return (
+                    <span
+                      onClick={() => {
+                        if (!arr[idx] && canCheck) {
+                          if (!canAfford) {
+                            if (setNotice) setNotice('Not enough sp!');
+                            return;
+                          }
+                          const newDots = safeCloneBackgroundDots();
+                          if (newDots && newDots.dagrOfficerSupernaturalAwarenessDots) {
+                            for (let j = 0; j <= idx; ++j) newDots.dagrOfficerSupernaturalAwarenessDots[j] = true;
+                          }
+                          persistBackgroundDots(newDots || {}, 9);
+                        } else if (arr[idx] && canUncheck) {
+                          const newDots = safeCloneBackgroundDots();
+                          if (newDots && newDots.dagrOfficerSupernaturalAwarenessDots) {
+                            for (let j = idx; j < arr.length; ++j) newDots.dagrOfficerSupernaturalAwarenessDots[j] = false;
+                          }
+                          persistBackgroundDots(newDots || {}, -9);
+                        }
+                      }}
+                      style={{
+                        width: '15px',
+                        height: '15px',
+                        border: '2px solid #000',
+                        borderRadius: '50%',
+                        display: 'block',
+                        background: arr[idx] ? '#000' : '#fff',
+                        cursor: 'pointer',
+                        transition: 'background 0.2s'
+                      }}
+                    ></span>
+                  );
+                })()}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (background === "Exobiologist") {
+    return (
+      <div style={{ width: '100%', fontSize: '1em' }}>
+        {/* Description */}
+        <div style={{ fontSize: '1em', color: '#000', marginBottom: '12px', fontFamily: 'Arial, Helvetica, sans-serif', lineHeight: 1.4 }}>
+        <div style={{ fontWeight: 'bold', color: '#000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}><u>Description</u></div>
+          <i>You are a natural scientist, through and through, and you have a deep fondness and curiosity of the natural world and the creatures that inhabit it that goes well beyond the average nature lover. Due to your extensive field research, you haven’t interacted with normal people for quite some time and have a noted disadvantage in the subtler side of social situations. However, your deep knowledge of the wilderness in scientific terms shines through when you want it to.</i>
+        </div>
+
+        {/* Perks Header */}
+        <div style={{ fontWeight: 'bold', color: '#000', marginBottom: '6px', fontSize: '1.08em', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+          <u>Perks</u>
+        </div>
+
+        {/* Skills */}
+        <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+          <i><b>Skills.</b></i> <i>Medicine</i> +2, <i>Survival</i> +2,<br />
+          <i>Culture</i> -2, <i>Deception</i> -2
+        </div>
+
+        {/* Languages */}
+        <div style={{ fontSize: '1em', color: '#000', marginBottom: '-12px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+          <i><b>Languages.</b></i> Choose 2
+          
+          {/* Language Dropdown */}
+          <div style={{ marginTop: '8px', marginLeft: '24px' }}>
+            <select
+              value=""
+              onChange={(e) => {
+                const val = e.target.value;
+                if (val && onAutoSave) {
+                  const currentLanguages = sheet?.exobiologistLanguages || [];
+                  if (currentLanguages.length < 2 && !currentLanguages.includes(val)) {
+                    onAutoSave({ exobiologistLanguages: [...currentLanguages, val] });
+                  }
+                }
+              }}
+              disabled={!!(sheet?.exobiologistLanguages && sheet.exobiologistLanguages.length >= 2)}
+              style={{
+                fontSize: '1em',
+                padding: '2px 8px',
+                borderRadius: '6px',
+                border: '1px solid #ccc',
+                background: (sheet?.exobiologistLanguages && sheet.exobiologistLanguages.length >= 2) ? '#eee' : '#fff',
+                textAlign: 'left',
+                minWidth: '200px',
+                fontFamily: 'Arial, Helvetica, sans-serif',
+                fontWeight: 'bold',
+                color: '#000',
+                cursor: (sheet?.exobiologistLanguages && sheet.exobiologistLanguages.length >= 2) ? 'not-allowed' : 'pointer'
+              }}
+            >
+              <option value="" style={{ color: 'black', backgroundColor: 'white' }}>
+                {(sheet?.exobiologistLanguages && sheet.exobiologistLanguages.length >= 2) ? 'Languages Selected' : 'Languages'}
+              </option>
+              {!sheet?.exobiologistLanguages?.includes('Avenoch') && sheet?.species !== 'Avenoch' && (
+                <option value="Avenoch" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Avenoch</option>
+              )}
+              {!sheet?.exobiologistLanguages?.includes('Binary') && (
+                <option value="Binary" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Binary</option>
+              )}
+              {!sheet?.exobiologistLanguages?.includes('Body Language') && (
+                <option value="Body Language" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Body Language</option>
+              )}
+              {!sheet?.exobiologistLanguages?.includes('Cerebronych') && sheet?.species !== 'Cerebronych' && (
+                <option value="Cerebronych" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Cerebronych</option>
+              )}
+              {!sheet?.exobiologistLanguages?.includes('Chloroptid') && sheet?.species !== 'Chloroptid' && (
+                <option value="Chloroptid" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Chloroptid</option>
+              )}
+              {!sheet?.exobiologistLanguages?.includes('Defteran') && (
+                <option value="Defteran" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Defteran</option>
+              )}
+              {!sheet?.exobiologistLanguages?.includes('Entomos') && sheet?.species !== 'Entomos' && (
+                <option value="Entomos" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Entomos</option>
+              )}
+              {!sheet?.exobiologistLanguages?.includes('Hycryptice') && (
+                <option value="Hycryptice" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Hycryptice</option>
+              )}
+              {!sheet?.exobiologistLanguages?.includes('Galactapol Jargon') && (
+                <option value="Galactapol Jargon" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Galactapol Jargon</option>
+              )}
+              {!sheet?.exobiologistLanguages?.includes('Lumenaren') && sheet?.species !== 'Lumenaren' && (
+                <option value="Lumenaren" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Lumenaren</option>
+              )}
+              {!sheet?.exobiologistLanguages?.includes('Lux') && (
+                <option value="Lux" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Lux</option>
+              )}
+              {!sheet?.exobiologistLanguages?.includes('Oikovox') && sheet?.charClass !== 'Coder' && (
+                <option value="Oikovox" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Oikovox</option>
+              )}
+              {!sheet?.exobiologistLanguages?.includes('Praedari') && sheet?.species !== 'Praedari' && (
+                <option value="Praedari" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Praedari</option>
+              )}
+              {!sheet?.exobiologistLanguages?.includes('Xenoelemental') && sheet?.charClass !== 'Elementalist' && (
+                <option value="Xenoelemental" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Xenoelemental</option>
+              )}
+              {!sheet?.exobiologistLanguages?.includes('Xenovox') && sheet?.charClass !== 'Devout' && (
+                <option value="Xenovox" style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }}>Xenovox</option>
+              )}
+            </select>
+
+            {/* Display selected languages */}
+            {sheet?.exobiologistLanguages && sheet.exobiologistLanguages.length > 0 && (
+              <div style={{ marginTop: '4px', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                {sheet.exobiologistLanguages.map((lang, idx) => (
+                  <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <span style={{ color: '#000', fontWeight: 'bold' }}>
+                      {lang}
+                    </span>
+                    <button
+                      onClick={() => {
+                        if (onAutoSave) {
+                          const updated = sheet.exobiologistLanguages?.filter((l, i) => i !== idx) || [];
+                          onAutoSave({ exobiologistLanguages: updated });
+                        }
+                      }}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        color: '#cc0000',
+                        fontSize: '1.2em',
+                        cursor: 'pointer',
+                        padding: 0,
+                        lineHeight: 1
+                      }}
+                      title="Remove language"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Nature & Science Perk */}
+        <div style={{ fontSize: '1em', color: '#000', marginBottom: '8px', fontFamily: 'Arial, Helvetica, sans-serif', marginTop: '20px' }}>
+          <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', gap: '12px' }}>
+            <span style={{ display: 'inline-block', maxWidth: 'calc(100% - 40px)' }}>
+              <b><i style={{ color: '#000' }}>Nature & Science.</i></b> You’ve spent an inordinate amount of time out in nature and developed a keen intuition in relation to natural life. Gain an advantage on skill rolls related to interacting with exotic flora and fauna.
+            </span>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '24px',
+              gridTemplateRows: 'repeat(2, auto)',
+              alignItems: 'start',
+              marginLeft: '4px',
+            }}>
+              {/* Row 1: 8sp */}
+              <span style={{ fontWeight: 'bold', fontSize: '0.7em', color: '#000', textAlign: 'center', width: '100%' }}>8sp</span>
+              {/* Row 2: dot (interactive) */}
+              <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2px', width: '100%' }}>
+                {(() => {
+                  const arr = safeGetBackgroundDotsArray(0);
+                  const idx = 0;
+                  const canCheck = idx === 0 || arr.slice(0, idx).every(Boolean);
+                  const rightmostChecked = arr.lastIndexOf(true);
+                  const canUncheck = arr[idx] && idx === rightmostChecked;
+                  const availableSp = (spTotal || 0) - (spSpent || 0);
+                  const canAfford = availableSp >= 8;
+
+                  return (
+                    <span
+                      onClick={() => {
+                        if (!arr[idx] && canCheck) {
+                          if (!canAfford) {
+                            if (setNotice) setNotice('Not enough sp!');
+                            return;
+                          }
+                          const newDots = safeCloneBackgroundDots();
+                          if (newDots && newDots.exobiologistNatureAndScienceDots) {
+                            for (let j = 0; j <= idx; ++j) newDots.exobiologistNatureAndScienceDots[j] = true;
+                          }
+                          persistBackgroundDots(newDots || {}, 8);
+                        } else if (arr[idx] && canUncheck) {
+                          const newDots = safeCloneBackgroundDots();
+                          if (newDots && newDots.exobiologistNatureAndScienceDots) {
+                            for (let j = idx; j < arr.length; ++j) newDots.exobiologistNatureAndScienceDots[j] = false;
                           }
                           persistBackgroundDots(newDots || {}, -8);
                         }

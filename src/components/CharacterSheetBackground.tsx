@@ -86,6 +86,45 @@ const CharacterSheetBackground: React.FC<CharacterSheetBackgroundProps> = ({ she
     );
   }
 
+  if (background === "Covert Operative") {
+    return (
+      <div style={{ padding: '0', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+        <h4 style={{ margin: '0 0 8px 0', fontSize: '1.1em', fontWeight: 'bold', textDecoration: 'underline' }}>
+          Covert Operative
+        </h4>
+        <div style={{ fontSize: '0.95em', color: '#000', lineHeight: 1.4 }}>
+          <i>You’re adept at sneaking and/or breaking into places you’re not normally supposed to get into. While this skill is often used for nefarious purposes, this doesn’t necessarily make you a criminal. You could be anything from a common thief to a ninja to a military infiltrator. Whatever the reason, your gifts of sneakery and infiltration provide you many additional avenues for exploring an often restricting and overly secure world.</i>
+        </div>
+      </div>
+    );
+  }
+
+  if (background === "DAGR Officer") {
+    return (
+      <div style={{ padding: '0', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+        <h4 style={{ margin: '0 0 8px 0', fontSize: '1.1em', fontWeight: 'bold', textDecoration: 'underline' }}>
+          DAGR Officer
+        </h4>
+        <div style={{ fontSize: '0.95em', color: '#000', lineHeight: 1.4 }}>
+          <i>You're an officer of the little-known Defteran elite galactic unit known as Defteran Aberrance Ground Reconnaissance (a.k.a. DAGR), which specializes in investigating and exploiting aberrant phenomena throughout the Defteran Empire. You've studied and engaged with creatures ranging from undead spirits to grotesque genetic mutations that only the vilest lab could concoct. Such engagements ultimately end in either exploitation or violence. Such is the way of DAGR.</i>
+        </div>
+      </div>
+    );
+  }
+
+  if (background === "Exobiologist") {
+    return (
+      <div style={{ padding: '0', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+        <h4 style={{ margin: '0 0 8px 0', fontSize: '1.1em', fontWeight: 'bold', textDecoration: 'underline' }}>
+          Exobiologist
+        </h4>
+        <div style={{ fontSize: '0.95em', color: '#000', lineHeight: 1.4 }}>
+          <i>You are a natural scientist, through and through, and you have a deep fondness and curiosity of the natural world and the creatures that inhabit it that goes well beyond the average nature lover. Due to your extensive field research, you haven’t interacted with normal people for quite some time and have a noted disadvantage in the subtler side of social situations. However, your deep knowledge of the wilderness in scientific terms shines through when you want it to.</i>
+        </div>
+      </div>
+    );
+  }
+
   // Return empty div for other backgrounds
   return <div style={{ padding: '0', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '0.95em', color: '#666' }}>
     No background selected.

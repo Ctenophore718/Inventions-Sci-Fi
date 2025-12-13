@@ -2638,6 +2638,12 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                   if (sheet?.background === "Black Market Executive" && skillName === "Diplomacy") sources.push({ type: 'background', color: "rgba(102,102,102,0.5)" });
                   if (sheet?.background === "Combat Medic" && skillName === "Medicine") sources.push({ type: 'background', color: "rgba(102,102,102,0.5)" });
                   if (sheet?.background === "Combat Medic" && skillName === "Performance") sources.push({ type: 'background', color: "rgba(102,102,102,0.5)" });
+                  if (sheet?.background === "Covert Operative" && skillName === "Acrobatics") sources.push({ type: 'background', color: "rgba(102,102,102,0.5)" });
+                  if (sheet?.background === "Covert Operative" && skillName === "Stealth") sources.push({ type: 'background', color: "rgba(102,102,102,0.5)" });
+                  if (sheet?.background === "DAGR Officer" && skillName === "Awareness") sources.push({ type: 'background', color: "rgba(102,102,102,0.5)" });
+                  if (sheet?.background === "DAGR Officer" && skillName === "Investigation") sources.push({ type: 'background', color: "rgba(102,102,102,0.5)" });
+                  if (sheet?.background === "Exobiologist" && skillName === "Medicine") sources.push({ type: 'background', color: "rgba(102,102,102,0.5)" });
+                  if (sheet?.background === "Exobiologist" && skillName === "Survival") sources.push({ type: 'background', color: "rgba(102,102,102,0.5)" });
                   
                   return sources;
                 };
@@ -2662,6 +2668,15 @@ const CharacterSheetComponent: React.FC<Props> = ({ sheet, onLevelUp, onCards, o
                   }
                   if (sheet?.background === "Combat Medic") {
                     antiSkills.push("Deception", "Stealth");
+                  }
+                  if (sheet?.background === "Covert Operative") {
+                    antiSkills.push("Diplomacy", "Medicine");
+                  }
+                  if (sheet?.background === "DAGR Officer") {
+                    antiSkills.push("Medicine", "Thievery");
+                  }
+                  if (sheet?.background === "Exobiologist") {
+                    antiSkills.push("Culture", "Deception");
                   }
                   return antiSkills;
                 };

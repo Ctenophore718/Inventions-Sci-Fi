@@ -118,6 +118,21 @@ const CharacterSheetPerks: React.FC<CharacterSheetPerksProps> = ({
                 Defteran
               </span>
             )}
+            {sheet?.background === 'DAGR Officer' && (
+              <span style={{ fontWeight: 'normal', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', color: '#000' }}>
+                Defteran
+              </span>
+            )}
+            {sheet?.exobiologistLanguages && sheet.exobiologistLanguages.length > 0 && (
+              <span style={{ fontWeight: 'normal', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', color: '#000' }}>
+                {sheet.exobiologistLanguages.join(', ')}
+              </span>
+            )}
+            {sheet?.covertOperativeLanguage && (
+              <span style={{ fontWeight: 'normal', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', color: '#000' }}>
+                {sheet.covertOperativeLanguage}
+              </span>
+            )}
             {sheet?.awakenedMachineLanguage && (
               <span style={{ fontWeight: 'normal', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '1em', color: '#000' }}>
                 {sheet.awakenedMachineLanguage}
@@ -757,6 +772,27 @@ const CharacterSheetPerks: React.FC<CharacterSheetPerksProps> = ({
           <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
             <span>
               <b><i style={{ color: '#000' }}>Horrors of War.</i></b> <span style={{ color: '#000' }}>You've endured a great deal of suffering through the suffering, pain and death of many of those around you on the battlefield. Gain an advantage on related skill rolls when tending to a wound or relating with other veterans.</span>
+            </span>
+          </div>
+          )}
+          {sheet?.background === 'Covert Operative' && sheet?.backgroundProgressionDots?.covertOperativeInfiltrationExpertDots?.[0] && (
+          <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <span>
+              <b><i style={{ color: '#000' }}>Infiltration Expert.</i></b> <span style={{ color: '#000' }}>You are adept at accessing high security areas and are otherwise good at getting into places you’re not supposed to be. As long as nobody is actively looking for you, gain an advantage on related skill rolls.</span>
+            </span>
+          </div>
+          )}
+          {sheet?.background === 'DAGR Officer' && sheet?.backgroundProgressionDots?.dagrOfficerSupernaturalAwarenessDots?.[0] && (
+          <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <span>
+              <b><i style={{ color: '#000' }}>Supernatural Awareness.</i></b> <span style={{ color: '#000' }}>Extensive experience with aberrant phenomena has given you an honed, intuitive sense of the supernatural. Gain an advantage on skill rolls related to interacting with undead, extraplanar, and/or supernatural creatures.</span>
+            </span>
+          </div>
+          )}
+          {sheet?.background === 'Exobiologist' && sheet?.backgroundProgressionDots?.exobiologistNatureAndScienceDots?.[0] && (
+          <div style={{ marginBottom: 2, marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <span>
+              <b><i style={{ color: '#000' }}>Nature & Science.</i></b> <span style={{ color: '#000' }}>You’ve spent an inordinate amount of time out in nature and developed a keen intuition in relation to natural life. Gain an advantage on skill rolls related to interacting with exotic flora and fauna.</span>
             </span>
           </div>
           )}

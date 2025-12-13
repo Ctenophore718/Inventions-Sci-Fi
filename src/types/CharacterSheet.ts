@@ -20,6 +20,9 @@ export type CharacterSheet = {
   beltMinerLanguage?: string; // For Belt Miner background - selected bonus language
   blackMarketExecutiveLanguages?: string[]; // For Black Market Executive background - selected bonus languages (max 2)
   combatMedicLanguages?: string[]; // For Combat Medic background - selected bonus languages (max 2)
+  covertOperativeLanguage?: string; // For Covert Operative background - selected bonus language
+  dagrOfficerLanguage?: string; // For DAGR Officer background - selected bonus language
+  exobiologistLanguages?: string[]; // For Exobiologist background - selected bonus languages (max 2)
   background: string;
 
 
@@ -417,5 +420,8 @@ export type CharacterSheet = {
     beltMinerMinersKnowledgeDots?: boolean[];
     blackMarketExecutiveQuestionableNegotiationsDots?: boolean[];
     combatMedicHorrorsOfWarDots?: boolean[];
+    covertOperativeInfiltrationExpertDots?: boolean[];
+    dagrOfficerSupernaturalAwarenessDots?: boolean[];
+    exobiologistNatureAndScienceDots?: boolean[];
   };
 };
