@@ -65,6 +65,19 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
     sheetRef.current = sheet;
   }, [sheet]);
   
+  // Local state to override sheet prop when doing a reset (ensures child components see reset state immediately)
+  const [effectiveSheet, setEffectiveSheet] = useState<CharacterSheet | null>(sheet);
+  
+  // Flag to prevent effectiveSheet from being overwritten during a reset
+  const isResettingRef = useRef(false);
+  
+  // Sync effectiveSheet with sheet prop, unless we're in the middle of a reset
+  useEffect(() => {
+    if (!isResettingRef.current) {
+      setEffectiveSheet(sheet);
+    }
+  }, [sheet]);
+  
   // Auto-save helper function with debouncing
   const handleAutoSave = useCallback((fieldUpdates: Partial<CharacterSheet>) => {
     if (onAutoSave) {
@@ -771,7 +784,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
       spRemaining: sheet.spTotal || 0,
       
       // Reset all progression dots
-      classCardDots: Array(10).fill(false),
+      classCardDots: [],
       chemistProgressionDots: Array(10).fill(false),
       coderProgressionDots: Array(10).fill(false),
       commanderProgressionDots: Array(10).fill(false),
@@ -823,12 +836,39 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
         necroPerksSkillsDots: Array(10).fill(false),
       },
       
-      // Reset skill dots (keep only free starter dots)
+      // Reset skill dots (keep only free starter dots with correct anti-booster handling)
       skillDots: sheet.hasFreeSkillStarterDots ? 
-        Object.keys(sheet.skillDots || {}).reduce((acc, skill) => {
-          acc[skill] = [true, true, ...Array(8).fill(false)]; // Only first two dots
-          return acc;
-        }, {} as { [key: string]: boolean[] }) : 
+        (() => {
+          // Determine which skills have anti-boosters based on current background
+          const antiBoosterSkills: string[] = [];
+          if (sheet.background === "Adherent of the Pollen Collective") {
+            antiBoosterSkills.push("Investigation", "Technology");
+          }
+          if (sheet.background === "Anti-Deft Secessionist") {
+            antiBoosterSkills.push("Diplomacy", "Intimidation");
+          }
+          if (sheet.background === "Awakened Machine") {
+            antiBoosterSkills.push("Culture", "Performance");
+          }
+          if (sheet.background === "Belt Miner") {
+            antiBoosterSkills.push("Culture", "Performance");
+          }
+          if (sheet.background === "Black Market Executive") {
+            antiBoosterSkills.push("Awareness", "Survival");
+          }
+          if (sheet.background === "Combat Medic") {
+            antiBoosterSkills.push("Deception", "Stealth");
+          }
+          
+          return Object.keys(sheet.skillDots || {}).reduce((acc, skill) => {
+            const hasAntiBooster = antiBoosterSkills.includes(skill);
+            // Anti-booster skills: [true, false, ...], normal skills: [true, true, ...]
+            acc[skill] = hasAntiBooster
+              ? [true, false, false, false, false, false, false, false, false, false]
+              : [true, true, false, false, false, false, false, false, false, false];
+            return acc;
+          }, {} as { [key: string]: boolean[] });
+        })() : 
         {},
         
       // Reset any other progression systems that cost XP/SP
@@ -836,6 +876,28 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
     };
 
     return resetSheet;
+  };
+  
+  // Helper function to check if any dots have been selected (not just XP/SP spent)
+  const hasAnyDotSelections = () => {
+    // Check XP/SP spent
+    if (xpSpent > 0 || spSpent > 0) return true;
+    
+    // Check if any skill dots beyond the free starter dots are filled
+    if (skillDots) {
+      for (const skill of Object.keys(skillDots)) {
+        const dots = skillDots[skill] || [];
+        // Check positions 2+ (indices 2-9) for any filled dots
+        for (let i = 2; i < dots.length; i++) {
+          if (dots[i]) return true;
+        }
+      }
+    }
+    
+    // Check class card dots (2D array)
+    if (classCardDots && classCardDots.some(row => row.some(dot => dot === true))) return true;
+    
+    return false;
   };
 
   // Wrapper functions for foundational choice changes with confirmation
@@ -845,12 +907,12 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
       return;
     }
 
-    // Only show confirmation if XP or SP has been spent
-    const hasExpenditures = (xpSpent > 0) || (spSpent > 0);
+    // Only show confirmation if any dots have been selected
+    const hasDotSelections = hasAnyDotSelections();
     
-    if (hasExpenditures) {
+    if (hasDotSelections) {
       const confirmed = window.confirm(
-        `Are you sure you want to change your class? Doing so will remove all selections that cost xp/sp!`
+        `Are you sure you want to change your Class? Doing so will remove all dot selections and refund your total xp and sp.`
       );
       
       if (!confirmed) {
@@ -858,27 +920,41 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
       }
     }
 
-    // Make the change (with reset if there were expenditures)
-    if (hasExpenditures) {
+    // Make the change (with reset if there were dot selections)
+    if (hasDotSelections) {
       const resetSheet = resetAllExpenditures();
       if (resetSheet) {
         const updatedSheet = { ...resetSheet, charClass: newClass, subclass: "" }; // Reset subclass too
+        
+        // Set flag to prevent effectiveSheet from being overwritten
+        isResettingRef.current = true;
+        
+        // IMMEDIATELY update effectiveSheet and sheetRef so child components see the reset state when they remount
+        setEffectiveSheet(updatedSheet);
+        sheetRef.current = updatedSheet;
+        
         handleAutoSave(updatedSheet);
         
         // Update local state
         setXpSpent(0);
         setSpSpent(0);
-        setClassCardDots(Array(10).fill(false));
+        setClassCardDots([]);
         setSkillDots(resetSheet.skillDots);
         setSubclass("");
+        setCharClass(newClass);
+        
+        // Clear flag after a delay to allow remount to complete and auto-save to propagate
+        // Must be longer than the auto-save debounce (150ms) to prevent reverting to stale sheet
+        setTimeout(() => {
+          isResettingRef.current = false;
+        }, 300);
       }
     } else {
-      // No expenditures, just update the class and reset subclass
+      // No dot selections, just update the class and reset subclass
       setSubclass(""); // Reset subclass when class changes
+      setCharClass(newClass);
       handleAutoSave({ charClass: newClass, subclass: "" });
     }
-    
-    setCharClass(newClass);
   };
 
   const handleSubclassChange = (newSubclass: string) => {
@@ -912,12 +988,12 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
     // Auto-populate class if not already set
     const correspondingClass = subclassToClassMap[newSubclass];
 
-    // Only show confirmation if XP or SP has been spent
-    const hasExpenditures = (xpSpent > 0) || (spSpent > 0);
+    // Only show confirmation if any dots have been selected
+    const hasDotSelections = hasAnyDotSelections();
     
-    if (hasExpenditures) {
+    if (hasDotSelections) {
       const confirmed = window.confirm(
-        `Are you sure you want to change your subclass? Doing so will remove all selections that cost xp/sp!`
+        `Are you sure you want to change your Subclass? Doing so will remove all dot selections and refund your total xp and sp.`
       );
       
       if (!confirmed) {
@@ -925,8 +1001,8 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
       }
     }
 
-    // Make the change (with reset if there were expenditures)
-    if (hasExpenditures) {
+    // Make the change (with reset if there were dot selections)
+    if (hasDotSelections) {
       const resetSheet = resetAllExpenditures();
       if (resetSheet) {
         const updatedSheet = { 
@@ -935,30 +1011,44 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
           // Auto-populate class if not set
           charClass: charClass || correspondingClass || resetSheet.charClass
         };
+        
+        // Set flag to prevent effectiveSheet from being overwritten
+        isResettingRef.current = true;
+        
+        // IMMEDIATELY update effectiveSheet and sheetRef so child components see the reset state when they remount
+        setEffectiveSheet(updatedSheet);
+        sheetRef.current = updatedSheet;
+        
         handleAutoSave(updatedSheet);
         
         // Update local state
         setXpSpent(0);
         setSpSpent(0);
-        setClassCardDots(Array(10).fill(false));
+        setClassCardDots([]);
         setSkillDots(resetSheet.skillDots);
+        setSubclass(newSubclass);
         
         // Auto-populate class if not set
         if (!charClass && correspondingClass) {
           setCharClass(correspondingClass);
         }
+        
+        // Clear flag after a delay to allow remount to complete and auto-save to propagate
+        // Must be longer than the auto-save debounce (150ms) to prevent reverting to stale sheet
+        setTimeout(() => {
+          isResettingRef.current = false;
+        }, 300);
       }
     } else {
-      // No expenditures, just update the subclass (and auto-populate class if needed)
+      // No dot selections, just update the subclass (and auto-populate class if needed)
       const updates: Partial<CharacterSheet> = { subclass: newSubclass };
       if (!charClass && correspondingClass) {
         updates.charClass = correspondingClass;
         setCharClass(correspondingClass);
       }
+      setSubclass(newSubclass);
       handleAutoSave(updates);
     }
-    
-    setSubclass(newSubclass);
   };
 
   const handleSpeciesChange = (newSpecies: string) => {
@@ -972,12 +1062,12 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
       return;
     }
 
-    // Only show confirmation if XP or SP has been spent
-    const hasExpenditures = (xpSpent > 0) || (spSpent > 0);
+    // Only show confirmation if any dots have been selected
+    const hasDotSelections = hasAnyDotSelections();
     
-    if (hasExpenditures) {
+    if (hasDotSelections) {
       const confirmed = window.confirm(
-        `Are you sure you want to change your species? Doing so will remove all selections that cost xp/sp!`
+        `Are you sure you want to change your Species? Doing so will remove all dot selections and refund your total xp and sp.`
       );
       
       if (!confirmed) {
@@ -985,36 +1075,45 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
       }
     }
 
-    // Make the change (with reset if there were expenditures)
-    if (hasExpenditures) {
+    // Make the change (with reset if there were dot selections)
+    if (hasDotSelections) {
       const resetSheet = resetAllExpenditures();
       if (resetSheet) {
         // Auto-set Cerebronych (cont.) when Cerebronych is selected
         const newSubspecies = newSpecies === "Cerebronych" ? "Cerebronych (cont.)" : "";
         const updatedSheet = { ...resetSheet, species: newSpecies, subspecies: newSubspecies };
+        
+        // Set flag to prevent effectiveSheet from being overwritten
+        isResettingRef.current = true;
+        
+        // IMMEDIATELY update effectiveSheet and sheetRef so child components see the reset state when they remount
+        setEffectiveSheet(updatedSheet);
+        sheetRef.current = updatedSheet;
+        
         handleAutoSave(updatedSheet);
         
         // Update local state
         setXpSpent(0);
         setSpSpent(0);
-        setClassCardDots(Array(10).fill(false));
+        setClassCardDots([]);
         setSkillDots(resetSheet.skillDots);
-        // Auto-set Cerebronych (cont.) when Cerebronych is selected
-        const finalSubspecies = newSpecies === "Cerebronych" ? "Cerebronych (cont.)" : "";
-        setSubspecies(finalSubspecies);
+        setSpecies(newSpecies);
+        setSubspecies(newSubspecies);
+        
+        // Clear flag after a delay to allow remount to complete and auto-save to propagate
+        // Must be longer than the auto-save debounce (150ms) to prevent reverting to stale sheet
+        setTimeout(() => {
+          isResettingRef.current = false;
+        }, 300);
       }
     } else {
-      // No expenditures, just update the species and reset subspecies
+      // No dot selections, just update the species and reset subspecies
       // Auto-set Cerebronych (cont.) when Cerebronych is selected
       const newSubspecies = newSpecies === "Cerebronych" ? "Cerebronych (cont.)" : "";
+      setSpecies(newSpecies);
       setSubspecies(newSubspecies);
       handleAutoSave({ species: newSpecies, subspecies: newSubspecies });
     }
-    
-    setSpecies(newSpecies);
-    // Auto-set Cerebronych (cont.) when Cerebronych is selected
-    const finalSubspecies = newSpecies === "Cerebronych" ? "Cerebronych (cont.)" : "";
-    setSubspecies(finalSubspecies);
   };
 
   const handleSubspeciesChange = (newSubspecies: string) => {
@@ -1071,30 +1170,44 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
           // Auto-populate species if not set
           species: species || correspondingSpecies || resetSheet.species
         };
+        
+        // Set flag to prevent effectiveSheet from being overwritten
+        isResettingRef.current = true;
+        
+        // IMMEDIATELY update effectiveSheet and sheetRef so child components see the reset state when they remount
+        setEffectiveSheet(updatedSheet);
+        sheetRef.current = updatedSheet;
+        
         handleAutoSave(updatedSheet);
         
         // Update local state
         setXpSpent(0);
         setSpSpent(0);
-        setClassCardDots(Array(10).fill(false));
+        setClassCardDots([]);
         setSkillDots(resetSheet.skillDots);
+        setSubspecies(newSubspecies);
         
         // Auto-populate species if not set
         if (!species && correspondingSpecies) {
           setSpecies(correspondingSpecies);
         }
+        
+        // Clear flag after a delay to allow remount to complete and auto-save to propagate
+        // Must be longer than the auto-save debounce (150ms) to prevent reverting to stale sheet
+        setTimeout(() => {
+          isResettingRef.current = false;
+        }, 300);
       }
-    } else {
+    } else{
       // No expenditures, just update the subspecies (and auto-populate species if needed)
       const updates: Partial<CharacterSheet> = { subspecies: newSubspecies };
       if (!species && correspondingSpecies) {
         updates.species = correspondingSpecies;
         setSpecies(correspondingSpecies);
       }
+      setSubspecies(newSubspecies);
       handleAutoSave(updates);
     }
-    
-    setSubspecies(newSubspecies);
   };
 
   const handleBackgroundChange = (newBackground: string) => {
@@ -1103,12 +1216,12 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
       return;
     }
 
-    // Only show confirmation if XP or SP has been spent
-    const hasExpenditures = (xpSpent > 0) || (spSpent > 0);
+    // Only show confirmation if any dots have been selected
+    const hasDotSelections = hasAnyDotSelections();
     
-    if (hasExpenditures) {
+    if (hasDotSelections) {
       const confirmed = window.confirm(
-        `Are you sure you want to change your background? Doing so will remove all selections that cost xp/sp!`
+        `Are you sure you want to change your Background? Doing so will remove all dot selections and refund your total xp and sp.`
       );
       
       if (!confirmed) {
@@ -1116,25 +1229,114 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
       }
     }
 
-    // Make the change (with reset if there were expenditures)
-    if (hasExpenditures) {
-      const resetSheet = resetAllExpenditures();
-      if (resetSheet) {
-        const updatedSheet = { ...resetSheet, background: newBackground };
-        handleAutoSave(updatedSheet);
-        
-        // Update local state
-        setXpSpent(0);
-        setSpSpent(0);
-        setClassCardDots(Array(10).fill(false));
-        setSkillDots(resetSheet.skillDots);
+    // Make the change (with reset if there were dot selections)
+    if (hasDotSelections) {
+      // Need to temporarily update sheet with new background before calling reset
+      const tempSheet = { ...sheet, background: newBackground } as CharacterSheet;
+      
+      // Manually compute reset with the new background
+      const antiBoosterSkills: string[] = [];
+      if (newBackground === "Adherent of the Pollen Collective") {
+        antiBoosterSkills.push("Investigation", "Technology");
       }
+      if (newBackground === "Anti-Deft Secessionist") {
+        antiBoosterSkills.push("Diplomacy", "Intimidation");
+      }
+      if (newBackground === "Awakened Machine") {
+        antiBoosterSkills.push("Culture", "Performance");
+      }
+      if (newBackground === "Belt Miner") {
+        antiBoosterSkills.push("Culture", "Performance");
+      }
+      if (newBackground === "Black Market Executive") {
+        antiBoosterSkills.push("Awareness", "Survival");
+      }
+      if (newBackground === "Combat Medic") {
+        antiBoosterSkills.push("Deception", "Stealth");
+      }
+      
+      const resetSkillDots = tempSheet.hasFreeSkillStarterDots ? 
+        Object.keys(tempSheet.skillDots || {}).reduce((acc, skill) => {
+          const hasAntiBooster = antiBoosterSkills.includes(skill);
+          acc[skill] = hasAntiBooster
+            ? [true, false, false, false, false, false, false, false, false, false]
+            : [true, true, false, false, false, false, false, false, false, false];
+          return acc;
+        }, {} as { [key: string]: boolean[] }) : 
+        {};
+      
+      const updatedSheet = {
+        ...tempSheet,
+        xpSpent: 0,
+        spSpent: 0,
+        xpRemaining: tempSheet.xpTotal || 0,
+        spRemaining: tempSheet.spTotal || 0,
+        classCardDots: [],
+        skillDots: resetSkillDots,
+      };
+      
+      // Set flag to prevent effectiveSheet from being overwritten
+      isResettingRef.current = true;
+      
+      // IMMEDIATELY update effectiveSheet and sheetRef so child components see the reset state when they remount
+      setEffectiveSheet(updatedSheet);
+      sheetRef.current = updatedSheet;
+      
+      handleAutoSave(updatedSheet);
+      
+      // Update local state
+      setXpSpent(0);
+      setSpSpent(0);
+      setClassCardDots([]);
+      setSkillDots(resetSkillDots);
+      setBackground(newBackground);
+      
+      // Clear flag after a delay to allow remount to complete and auto-save to propagate
+      // Must be longer than the auto-save debounce (150ms) to prevent reverting to stale sheet
+      setTimeout(() => {
+        isResettingRef.current = false;
+      }, 300);
     } else {
-      // No expenditures, just update the background
-      handleAutoSave({ background: newBackground });
+      // No dot selections, just update the background and reset skill dots to handle anti-boosters
+      if (sheet && sheet.hasFreeSkillStarterDots) {
+        // Determine which skills have anti-boosters with the NEW background
+        const antiBoosterSkills: string[] = [];
+        if (newBackground === "Adherent of the Pollen Collective") {
+          antiBoosterSkills.push("Investigation", "Technology");
+        }
+        if (newBackground === "Anti-Deft Secessionist") {
+          antiBoosterSkills.push("Diplomacy", "Intimidation");
+        }
+        if (newBackground === "Awakened Machine") {
+          antiBoosterSkills.push("Culture", "Performance");
+        }
+        if (newBackground === "Belt Miner") {
+          antiBoosterSkills.push("Culture", "Performance");
+        }
+        if (newBackground === "Black Market Executive") {
+          antiBoosterSkills.push("Awareness", "Survival");
+        }
+        if (newBackground === "Combat Medic") {
+          antiBoosterSkills.push("Deception", "Stealth");
+        }
+        
+        // Reset skill dots with correct anti-booster handling for new background
+        const resetSkillDots = Object.keys(skillDots).reduce((acc, skill) => {
+          const hasAntiBooster = antiBoosterSkills.includes(skill);
+          acc[skill] = hasAntiBooster
+            ? [true, false, false, false, false, false, false, false, false, false]
+            : [true, true, false, false, false, false, false, false, false, false];
+          return acc;
+        }, {} as { [key: string]: boolean[] });
+        
+        setSkillDots(resetSkillDots);
+        setBackground(newBackground);
+        handleAutoSave({ background: newBackground, skillDots: resetSkillDots });
+      } else {
+        setBackground(newBackground);
+        handleAutoSave({ background: newBackground });
+      }
     }
-    
-    setBackground(newBackground);
   };
 
   // Cross-window synchronization for this character (optimized)
@@ -1710,7 +1912,6 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                 value={charClass}
                 onChange={e => {
                   handleCharClassChange(e.target.value);
-                  handleAutoSave({ charClass: e.target.value });
                 }}
                 className={styles.colorSelect + ' ' + styles.selectedClassColor}
                 style={{
@@ -1749,7 +1950,8 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
               <>
                 {charClass === "Chemist" ? (
                   <LevelUpClassChemist
-                    sheet={sheet}
+                    key={charClass}
+                    sheet={effectiveSheet}
                     charClass={charClass}
                     subclass={subclass}
                     onCreditsChange={handleCreditsChangeNoSave}
@@ -1765,7 +1967,8 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                   />
                 ) : charClass === "Coder" ? (
                   <LevelUpClassCoder
-                    sheet={sheet}
+                    key={charClass}
+                    sheet={effectiveSheet}
                     charClass={charClass}
                     subclass={subclass}
                     onCreditsChange={handleCreditsChangeNoSave}
@@ -1781,7 +1984,8 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                   />
                 ) : charClass === "Commander" ? (
                   <LevelUpClassCommander
-                    sheet={sheet}
+                    key={charClass}
+                    sheet={effectiveSheet}
                     charClass={charClass}
                     _subclass={subclass}
                     onAutoSave={handleAutoSave}
@@ -1797,7 +2001,8 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                   />
                 ) : charClass === "Contemplative" ? (
                   <LevelUpClassContemplative
-                    sheet={sheet}
+                    key={charClass}
+                    sheet={effectiveSheet}
                     charClass={charClass}
                     _subclass={subclass}
                     onCreditsChange={handleCreditsChangeNoSave}
@@ -1813,7 +2018,8 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                   />
                 ) : charClass === "Devout" ? (
                   <LevelUpClassDevout
-                    sheet={sheet}
+                    key={charClass}
+                    sheet={effectiveSheet}
                     charClass={charClass}
                     _subclass={subclass}
                     onCreditsChange={handleCreditsChangeNoSave}
@@ -1829,7 +2035,8 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                   />
                 ) : charClass === "Elementalist" ? (
                   <LevelUpClassElementalist
-                    sheet={sheet}
+                    key={charClass}
+                    sheet={effectiveSheet}
                     charClass={charClass}
                     subclass={subclass}
                     onCreditsChange={handleCreditsChangeNoSave}
@@ -1845,7 +2052,8 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                   />
                 ) : charClass === "Exospecialist" ? (
                   <LevelUpClassExospecialist
-                    sheet={sheet}
+                    key={charClass}
+                    sheet={effectiveSheet}
                     charClass={charClass}
                     _subclass={subclass}
                     onAutoSave={handleAutoSave}
@@ -1859,7 +2067,8 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                   />
                 ) : charClass === "Gunslinger" ? (
                   <LevelUpClassGunslinger
-                    sheet={sheet}
+                    key={charClass}
+                    sheet={effectiveSheet}
                     charClass={charClass}
                     _subclass={subclass}
                     onAutoSave={handleAutoSave}
@@ -1873,7 +2082,8 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                   />
                 ) : charClass === "Technician" ? (
                   <LevelUpClassTechnician
-                    sheet={sheet}
+                    key={charClass}
+                    sheet={effectiveSheet}
                     charClass={charClass}
                     _subclass={subclass}
                     onAutoSave={handleAutoSave}
@@ -1901,17 +2111,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                 onChange={e => {
                   const val = e.target.value;
                   handleSubclassChange(val);
-                  if (!charClass && val) {
-                    const found = allSubclassOptions.find(opt => opt.value === val);
-                    if (found) {
-                      handleCharClassChange(found.class);
-                      handleAutoSave({ subclass: val, charClass: found.class });
-                    } else {
-                      handleAutoSave({ subclass: val });
-                    }
-                  } else {
-                    handleAutoSave({ subclass: val });
-                  }
+                  // Auto-populate class is handled inside handleSubclassChange, don't call handleCharClassChange
                 }}
                 className={styles.colorSelect + ' ' + styles.selectedSubclassColor}
                 style={{
@@ -1948,7 +2148,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
             {/* Chemist Subclass Content */}
             {charClass === "Chemist" && subclass && (
               <LevelUpSubclassesChemist
-                sheet={sheet}
+                sheet={effectiveSheet}
                 charClass={charClass}
                 subclass={subclass} 
                 onCreditsChange={handleCreditsChangeNoSave}
@@ -1967,7 +2167,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
             {/* Coder Subclass Content */}
             {charClass === "Coder" && subclass && (
               <LevelUpSubclassesCoder
-                sheet={sheet}
+                sheet={effectiveSheet}
                 charClass={charClass}
                 subclass={subclass}
                 onAutoSave={handleAutoSave}
@@ -1984,7 +2184,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
             {/* Commander Subclass Content */}
             {charClass === "Commander" && subclass && (
               <LevelUpSubclassesCommander
-                sheet={sheet}
+                sheet={effectiveSheet}
                 charClass={charClass}
                 subclass={subclass}
                 onAutoSave={handleAutoSave}
@@ -2001,7 +2201,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
             {/* Contemplative Subclass Content */}
             {charClass === "Contemplative" && subclass && (
               <LevelUpSubclassesContemplative
-                sheet={sheet}
+                sheet={effectiveSheet}
                 charClass={charClass}
                 subclass={subclass}
                 onAutoSave={handleAutoSave}
@@ -2018,7 +2218,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
             {/* Devout Subclass Content */}
             {charClass === "Devout" && subclass && (
               <LevelUpSubclassesDevout
-                sheet={sheet}
+                sheet={effectiveSheet}
                 charClass={charClass}
                 subclass={subclass}
                 onAutoSave={handleAutoSave}
@@ -2035,7 +2235,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
             {/* Elementalist Subclass Content */}
             {charClass === "Elementalist" && subclass && (
               <LevelUpSubclassesElementalist
-                sheet={sheet}
+                sheet={effectiveSheet}
                 charClass={charClass}
                 subclass={subclass}
                 onAutoSave={handleAutoSave}
@@ -2052,7 +2252,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
             {/* Exospecialist Subclass Content */}
             {charClass === "Exospecialist" && subclass && (
               <LevelUpSubclassesExospecialist
-                sheet={sheet}
+                sheet={effectiveSheet}
                 charClass={charClass}
                 subclass={subclass}
                 onAutoSave={handleAutoSave}
@@ -2069,7 +2269,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
             {/* Gunslinger Subclass Content */}
             {charClass === "Gunslinger" && subclass && (
               <LevelUpSubclassesGunslinger
-                sheet={sheet}
+                sheet={effectiveSheet}
                 charClass={charClass}
                 subclass={subclass}
                 onAutoSave={handleAutoSave}
@@ -2086,7 +2286,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
             {/* Technician Subclass Content */}
             {charClass === "Technician" && subclass && (
               <LevelUpSubclassesTechnician
-                sheet={sheet}
+                sheet={effectiveSheet}
                 charClass={charClass}
                 subclass={subclass}
                 onAutoSave={handleAutoSave}
@@ -2148,7 +2348,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
             {/* Avenoch Species Content */}
             {species === "Avenoch" && (
               <LevelUpSpeciesAvenoch
-                sheet={sheet}
+                sheet={effectiveSheet}
                 species={species}
                 subspecies={subspecies}
                 contentType="species"
@@ -2166,7 +2366,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
             {/* Cerebronych Species Content */}
             {species === "Cerebronych" && (
               <LevelUpSpeciesCerebronych
-                sheet={sheet}
+                sheet={effectiveSheet}
                 species={species}
                 subspecies={subspecies}
                 contentType="species"
@@ -2184,7 +2384,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
             {/* Chloroptid Species Content */}
             {species === "Chloroptid" && (
               <LevelUpSpeciesChloroptid
-                sheet={sheet}
+                sheet={effectiveSheet}
                 species={species}
                 subspecies={subspecies}
                 contentType="species"
@@ -2202,7 +2402,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
             {/* Emberfolk Species Content */}
             {species === "Emberfolk" && (
               <LevelUpSpeciesEmberfolk
-                sheet={sheet}
+                sheet={effectiveSheet}
                 species={species}
                 subspecies={subspecies}
                 contentType="species"
@@ -2220,7 +2420,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
             {/* Entomos Species Content */}
             {species === "Entomos" && (
               <LevelUpSpeciesEntomos
-                sheet={sheet}
+                sheet={effectiveSheet}
                 species={species}
                 onAutoSave={handleAutoSave}
                 xpTotal={xpTotal}
@@ -2236,7 +2436,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
             {/* Lumenaren Species Content */}
             {species === "Lumenaren" && (
               <LevelUpSpeciesLumenaren
-                sheet={sheet}
+                sheet={effectiveSheet}
                 species={species}
                 subspecies={subspecies}
                 contentType="species"
@@ -2254,7 +2454,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
             {/* Human Species Content */}
             {species === "Human" && (
               <LevelUpSpeciesHuman
-                sheet={sheet}
+                sheet={effectiveSheet}
                 species={species}
                 contentType="species"
                 onAutoSave={handleAutoSave}
@@ -2271,7 +2471,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
             {/* Cognizant Species Content */}
             {species === "Cognizant" && (
               <LevelUpSpeciesCognizant
-                sheet={sheet}
+                sheet={effectiveSheet}
                 species={species}
                 subspecies={subspecies}
                 contentType="species"
@@ -2289,7 +2489,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
             {/* Praedari Species Content */}
             {species === "Praedari" && (
               <LevelUpSpeciesPraedari
-                sheet={sheet}
+                sheet={effectiveSheet}
                 species={species}
                 onAutoSave={handleAutoSave}
                 xpTotal={xpTotal}
@@ -2336,17 +2536,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                   onChange={e => {
                     const val = e.target.value;
                     handleSubspeciesChange(val);
-                    if (!species && val) {
-                      const found = allSubspeciesOptions.find(opt => opt.value === val);
-                      if (found) {
-                        handleSpeciesChange(found.species);
-                        handleAutoSave({ subspecies: val, species: found.species });
-                      } else {
-                        handleAutoSave({ subspecies: val });
-                      }
-                    } else {
-                      handleAutoSave({ subspecies: val });
-                    }
+                    // Auto-populate species is handled inside handleSubspeciesChange, don't call handleSpeciesChange
                   }}
                   className={styles.colorSelect + ' ' + styles.selectedSubspeciesColor}
                   style={{
@@ -2386,7 +2576,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
             {/* Corvid Subspecies Content */}
             {subspecies === "Corvid" && (
               <LevelUpSpeciesAvenoch
-                sheet={sheet}
+                sheet={effectiveSheet}
                 species={species}
                 subspecies={subspecies}
                 contentType="subspecies"
@@ -2404,7 +2594,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
             {/* Falcador Subspecies Content */}
             {subspecies === "Falcador" && (
               <LevelUpSpeciesAvenoch
-                sheet={sheet}
+                sheet={effectiveSheet}
                 species={species}
                 subspecies={subspecies}
                 contentType="subspecies"
@@ -2422,7 +2612,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
             {/* Nocturne Subspecies Content */}
             {subspecies === "Nocturne" && (
               <LevelUpSpeciesAvenoch
-                sheet={sheet}
+                sheet={effectiveSheet}
                 species={species}
                 subspecies={subspecies}
                 contentType="subspecies"
@@ -2440,7 +2630,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
             {/* Vulturine Subspecies Content */}
             {subspecies === "Vulturine" && (
               <LevelUpSpeciesAvenoch
-                sheet={sheet}
+                sheet={effectiveSheet}
                 species={species}
                 subspecies={subspecies}
                 contentType="subspecies"
@@ -2458,7 +2648,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
             {/* Barkskin Subspecies Content */}
             {subspecies === "Barkskin" && (
               <LevelUpSpeciesChloroptid
-                sheet={sheet}
+                sheet={effectiveSheet}
                 species={species}
                 subspecies={subspecies}
                 contentType="subspecies"
@@ -2476,7 +2666,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
             {/* Carnivorous Subspecies Content */}
             {subspecies === "Carnivorous" && (
               <LevelUpSpeciesChloroptid
-                sheet={sheet}
+                sheet={effectiveSheet}
                 species={species}
                 subspecies={subspecies}
                 contentType="subspecies"
@@ -2494,7 +2684,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
             {/* Drifting Subspecies Content */}
             {subspecies === "Drifting" && (
               <LevelUpSpeciesChloroptid
-                sheet={sheet}
+                sheet={effectiveSheet}
                 species={species}
                 subspecies={subspecies}
                 contentType="subspecies"
@@ -2512,7 +2702,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
             {/* Viny Subspecies Content */}
             {subspecies === "Viny" && (
               <LevelUpSpeciesChloroptid
-                sheet={sheet}
+                sheet={effectiveSheet}
                 species={species}
                 subspecies={subspecies}
                 contentType="subspecies"
@@ -2530,7 +2720,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
             {/* Android Subspecies Content */}
             {subspecies === "Android" && (
               <LevelUpSpeciesCognizant
-                sheet={sheet}
+                sheet={effectiveSheet}
                 species={species}
                 subspecies={subspecies}
                 contentType="subspecies"
@@ -2548,7 +2738,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
             {/* Utility Droid Subspecies Content */}
             {subspecies === "Utility Droid" && (
               <LevelUpSpeciesCognizant
-                sheet={sheet}
+                sheet={effectiveSheet}
                 species={species}
                 subspecies={subspecies}
                 contentType="subspecies"
@@ -2566,7 +2756,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
             {/* Petran Subspecies Content */}
             {subspecies === "Petran" && (
               <LevelUpSpeciesEmberfolk
-                sheet={sheet}
+                sheet={effectiveSheet}
                 species={species}
                 subspecies={subspecies}
                 contentType="subspecies"
@@ -2584,7 +2774,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
             {/* Pyran Subspecies Content */}
             {subspecies === "Pyran" && (
               <LevelUpSpeciesEmberfolk
-                sheet={sheet}
+                sheet={effectiveSheet}
                 species={species}
                 subspecies={subspecies}
                 contentType="subspecies"
@@ -2602,7 +2792,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
             {/* Apocritan Subspecies Content */}
             {subspecies === "Apocritan" && (
               <LevelUpSpeciesEntomos
-                sheet={sheet}
+                sheet={effectiveSheet}
                 species={species}
                 subspecies={subspecies}
                 contentType="subspecies"
@@ -2620,7 +2810,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
             {/* Dynastes Subspecies Content */}
             {subspecies === "Dynastes" && (
               <LevelUpSpeciesEntomos
-                sheet={sheet}
+                sheet={effectiveSheet}
                 species={species}
                 subspecies={subspecies}
                 contentType="subspecies"
@@ -2637,7 +2827,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
             
             {subspecies === "Mantid" && (
               <LevelUpSpeciesEntomos
-                sheet={sheet}
+                sheet={effectiveSheet}
                 species={species}
                 subspecies={subspecies}
                 contentType="subspecies"
@@ -2655,7 +2845,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
             {/* Diminutive Evolution Subspecies Content */}
             {subspecies === "Diminutive Evolution" && (
               <LevelUpSpeciesHuman
-                sheet={sheet}
+                sheet={effectiveSheet}
                 species={species}
                 subspecies={subspecies}
                 contentType="subspecies"
@@ -2673,7 +2863,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
             {/* Lithe Evolution Subspecies Content */}
             {subspecies === "Lithe Evolution" && (
               <LevelUpSpeciesHuman
-                sheet={sheet}
+                sheet={effectiveSheet}
                 species={species}
                 subspecies={subspecies}
                 contentType="subspecies"
@@ -2691,7 +2881,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
             {/* Massive Evolution Subspecies Content */}
             {subspecies === "Massive Evolution" && (
               <LevelUpSpeciesHuman
-                sheet={sheet}
+                sheet={effectiveSheet}
                 species={species}
                 subspecies={subspecies}
                 contentType="subspecies"
@@ -2709,7 +2899,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
             {/* Stout Evolution Subspecies Content */}
             {subspecies === "Stout Evolution" && (
               <LevelUpSpeciesHuman
-                sheet={sheet}
+                sheet={effectiveSheet}
                 species={species}
                 subspecies={subspecies}
                 contentType="subspecies"
@@ -2727,7 +2917,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
             {/* Infrared Subspecies Content */}
             {subspecies === "Infrared" && (
               <LevelUpSpeciesLumenaren
-                sheet={sheet}
+                sheet={effectiveSheet}
                 species={species}
                 subspecies={subspecies}
                 contentType="subspecies"
@@ -2745,7 +2935,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
             {/* Radiofrequent Subspecies Content */}
             {subspecies === "Radiofrequent" && (
               <LevelUpSpeciesLumenaren
-                sheet={sheet}
+                sheet={effectiveSheet}
                 species={species}
                 subspecies={subspecies}
                 contentType="subspecies"
@@ -2763,7 +2953,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
             {/* X-Ray Subspecies Content */}
             {subspecies === "X-Ray" && (
               <LevelUpSpeciesLumenaren
-                sheet={sheet}
+                sheet={effectiveSheet}
                 species={species}
                 subspecies={subspecies}
                 contentType="subspecies"
@@ -2781,7 +2971,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
             {/* Canid Subspecies Content */}
             {subspecies === "Canid" && (
               <LevelUpSpeciesPraedari
-                sheet={sheet}
+                sheet={effectiveSheet}
                 species={species}
                 subspecies={subspecies}
                 contentType="subspecies"
@@ -2799,7 +2989,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
             {/* Felid Subspecies Content */}
             {subspecies === "Felid" && (
               <LevelUpSpeciesPraedari
-                sheet={sheet}
+                sheet={effectiveSheet}
                 species={species}
                 subspecies={subspecies}
                 contentType="subspecies"
@@ -2817,7 +3007,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
             {/* Mustelid Subspecies Content */}
             {subspecies === "Mustelid" && (
               <LevelUpSpeciesPraedari
-                sheet={sheet}
+                sheet={effectiveSheet}
                 species={species}
                 subspecies={subspecies}
                 contentType="subspecies"
@@ -2835,7 +3025,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
             {/* Ursid Subspecies Content */}
             {subspecies === "Ursid" && (
               <LevelUpSpeciesPraedari
-                sheet={sheet}
+                sheet={effectiveSheet}
                 species={species}
                 subspecies={subspecies}
                 contentType="subspecies"
@@ -2853,7 +3043,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
             {/* Cerebronych (cont.) Subspecies Content */}
             {species === "Cerebronych" && (
               <LevelUpSpeciesCerebronych
-                sheet={sheet}
+                sheet={effectiveSheet}
                 species={species}
                 subspecies={subspecies}
                 contentType="subspecies"
@@ -2884,7 +3074,6 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
                   return;
                 }
                 handleBackgroundChange(newBackground);
-                handleAutoSave({ background: newBackground });
               }}
               className={styles.colorSelect + ' ' + styles.selectedBackgroundColor}
               style={{
@@ -2924,7 +3113,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ sheet, onBack, onCards, onHome, onAut
             
             {/* Background Details */}
             <LevelUpBackground
-              sheet={sheet}
+              sheet={effectiveSheet}
               onAutoSave={handleAutoSave}
               xpTotal={xpTotal}
               spTotal={spTotal}

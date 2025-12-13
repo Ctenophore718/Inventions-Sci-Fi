@@ -58,7 +58,19 @@ const LevelUpClassContemplative: React.FC<LevelUpClassContemplativeProps> = ({
     // Local state for class card dots (Contemplative)
     const [classCardDots, setClassCardDots] = useState<boolean[][]>(() => {
       if (sheet?.classCardDots && Array.isArray(sheet.classCardDots) && sheet.classCardDots.length > 0) {
-        return sheet.classCardDots.map(row => Array.isArray(row) ? [...row] : []);
+        // Defensive check: Ensure the sheet belongs to this class
+        // This prevents inheriting dots from a previous class if the sheet prop is stale
+        if (sheet.charClass !== "Contemplative") {
+          return defaultContemplativeDots.map(row => [...row]);
+        }
+
+        // Defensive check: Ensure the dots structure matches this class (13 rows)
+        // This prevents "ghost dots" from persisting when switching from a class with different row count (e.g. Coder with 10 rows)
+        if (sheet.classCardDots.length === defaultContemplativeDots.length) {
+          return sheet.classCardDots.map(row => Array.isArray(row) ? [...row] : []);
+        }
+        // If length mismatch, ignore and use default
+        return defaultContemplativeDots.map(row => [...row]);
       }
       return defaultContemplativeDots.map(row => [...row]);
     });

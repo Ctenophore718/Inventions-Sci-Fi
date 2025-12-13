@@ -58,7 +58,17 @@ const LevelUpClassCoder: React.FC<LevelUpClassCoderProps> = ({
     // Local state for class card dots (Coder)
     const [classCardDots, setClassCardDots] = useState<boolean[][]>(() => {
       if (sheet?.classCardDots && Array.isArray(sheet.classCardDots) && sheet.classCardDots.length > 0) {
-        return sheet.classCardDots.map(row => Array.isArray(row) ? [...row] : []);
+        // Defensive check: Ensure the sheet belongs to this class
+        // This prevents inheriting dots from a previous class if the sheet prop is stale
+        if (sheet.charClass !== "Coder") {
+          return defaultCoderDots.map(row => [...row]);
+        }
+
+        // Defensive check: Ensure the dots structure matches this class
+        if (sheet.classCardDots.length === defaultCoderDots.length) {
+          return sheet.classCardDots.map(row => Array.isArray(row) ? [...row] : []);
+        }
+        return defaultCoderDots.map(row => [...row]);
       }
       return defaultCoderDots.map(row => [...row]);
     });
